@@ -1,0 +1,19 @@
+{
+  "extends": ["adequate-react", "plugin:jsx-control-statements/recommended"],
+  "plugins": [
+    "jsx-control-statements"
+  ],
+  "env": {
+    "browser": true,
+    "jquery": true
+  },
+  "rules": {
+    "import/no-extraneous-dependencies": "off",
+    "node/no-extraneous-require": "off",
+    "react/no-danger": "off",
+    "react/no-typos": "off",
+    "no-console": ["warn"],
+    "jsx-control-statements/jsx-use-if-tag": 0,
+    "react/jsx-no-undef": [2, { "allowGlobals": true }]
+  }
+}
