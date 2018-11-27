@@ -1,17 +1,12 @@
+/* eslint-disable import/no-extraneous-dependencies */
 const path = require('path')
-const fs = require('fs')
-const cssenv = require('postcss-preset-env');
-const autoprefixer = require('autoprefixer');
-
-const { directories } = require('./package.json')
+const cssenv = require('postcss-preset-env')
+const autoprefixer = require('autoprefixer')
 
 module.exports = {
   pagePerSection: true,
   components: 'src/packages/**/[A-Za-z]*.js',
-  require: [
-    'babel-polyfill',
-    path.join(__dirname, 'src/misc/styleguide/components.js')
-  ],
+  require: ['babel-polyfill', path.join(__dirname, 'src/misc/styleguide/components.js')],
   webpackConfig: {
     module: {
       rules: [
@@ -19,7 +14,7 @@ module.exports = {
         {
           test: /\.jsx?$/,
           exclude: /node_modules/,
-          loader: 'babel-loader'
+          loader: 'babel-loader',
         },
         // Other loaders that are needed for your components
         {
@@ -31,10 +26,10 @@ module.exports = {
             {
               loader: 'postcss-loader',
               options: {
-                plugins: () => [cssenv(), autoprefixer()]
-              }
-            }
-          ]
+                plugins: () => [cssenv(), autoprefixer()],
+              },
+            },
+          ],
         },
         {
           enforce: 'pre',
@@ -46,20 +41,20 @@ module.exports = {
             {
               loader: 'css-loader',
               options: {
-                importLoaders: 1 ,
+                importLoaders: 1,
                 modules: true,
                 localIdentName: '[name]-[hash:base64:5]',
-              }
+              },
             },
             {
               loader: 'postcss-loader',
               options: {
-                plugins: [cssenv(), autoprefixer()]
-              }
-            }
-          ]
-        }
-      ]
-    }
-  }
+                plugins: [cssenv(), autoprefixer()],
+              },
+            },
+          ],
+        },
+      ],
+    },
+  },
 }
