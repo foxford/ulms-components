@@ -9,7 +9,8 @@ module.exports = {
   pagePerSection: true,
   components: 'src/packages/**/[A-Za-z]*.js',
   require: [
-    'babel-polyfill'
+    'babel-polyfill',
+    path.join(__dirname, 'src/misc/styleguide/components.js')
   ],
   webpackConfig: {
     module: {
