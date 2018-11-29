@@ -23,6 +23,7 @@
     "build/packages": "cross-env BABEL_ENV=packages node rollup.js",
     "docs/build": "cross-env BABEL_ENV=styleguidist npx styleguidist build",
     "docs/serve": "cross-env BABEL_ENV=styleguidist npx styleguidist server",
+    "docs": "npm run docs/build && http-server ./styleguide -p ${DOCS_PORT:-9090}",
     "prepublishOnly": "npm run build"
   },
   "dependencies": {
