@@ -8,12 +8,12 @@ import css from './grid.css'
 const rowProps = props => ({
   ...props,
   vAlignChildren: props.vAlignChildren || 'stretch',
-  className: cn(props.className, css.row)
+  className: cn(props.className, css.row),
 })
 
 const gridProps = props => ({
   ...props,
-  className: cn(props.className, css.grid, {[css.debug]: props.debug})
+  className: cn(props.className, css.grid, { [css.debug]: props.debug }),
 })
 
 const Grid = props => <G {...gridProps(props)}>{props.children}</G>

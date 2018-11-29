@@ -21,10 +21,12 @@
     "build/cjs": "cross-env BABEL_ENV=cjs npm run babel -- -d lib",
     "build/es": "cross-env BABEL_ENV=es npm run babel -- -d es",
     "build/packages": "cross-env BABEL_ENV=packages node rollup.js",
+    "docs": "npm run docs/build && http-server ./styleguide -p ${DOCS_PORT:-9090}",
     "docs/build": "cross-env BABEL_ENV=styleguidist npx styleguidist build",
     "docs/serve": "cross-env BABEL_ENV=styleguidist npx styleguidist server",
-    "docs": "npm run docs/build && http-server ./styleguide -p ${DOCS_PORT:-9090}",
-    "prepublishOnly": "npm run build"
+    "lint": "eslint src",
+    "prepublishOnly": "npm run test && npm run build",
+    "test": "npm run lint"
   },
   "dependencies": {
     "@foxford/ui": "^1.2.1",
@@ -51,6 +53,7 @@
     "babel-register": "^6.26.0",
     "concurrently": "^3.6.1",
     "cssnano": "^4.1.7",
+    "eslint-config-adequate-react": "^1.1.1",
     "mkdirp": "^0.5.1",
     "ncp": "^2.0.0",
     "postcss-loader": "^3.0.0",
