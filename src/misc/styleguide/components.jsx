@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types  */
 import React from 'react'
-import cn from 'classnames'
+import cx from 'classnames'
 import { withState, compose } from 'recompose'
 
 import css from './components.css'
@@ -29,7 +29,7 @@ class MakeFullscreen extends React.Component {
 
     return (
       <div
-        className={cn(css.root, { [css.enlarged]: props.enlarged })}
+        className={cx(css.root, { [css.enlarged]: props.enlarged })}
         ref={(e) => { this.rootElement = e }}
       >
         {inner(props)}

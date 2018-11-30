@@ -1,12 +1,12 @@
 /* eslint-disable react/prop-types */
 import React from 'react'
-import cn from 'classnames'
+import cx from 'classnames'
 
 import css from './panel.css'
 
 const Header = props => (
   <div
-    className={cn(css.header, { [css.adjacent]: !props.noAdjacent })}
+    className={cx(css.header, { [css.adjacent]: !props.noAdjacent })}
   >
     {props.title ? props.title : props.children}
   </div>
@@ -28,7 +28,7 @@ const panelStyle = (props) => {
 }
 
 const Panel = props => (
-  <div className={cn(css.root, { [css.debug]: props.debug })} style={panelStyle(props)}>
+  <div className={cx(css.root, { [css.debug]: props.debug })} style={panelStyle(props)}>
     <div
       className={css.interlayer}
       style={{ flexDirection: props.direction || 'column' }}

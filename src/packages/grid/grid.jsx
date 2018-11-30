@@ -1,5 +1,5 @@
 import React from 'react'
-import cn from 'classnames'
+import cx from 'classnames'
 import { Grid as G } from '@foxford/ui/packages/Grid/Grid'
 import '@foxford/ui/packages/Grid/Grid.css'
 
@@ -8,12 +8,12 @@ import css from './grid.css'
 const rowProps = props => ({
   ...props,
   vAlignChildren: props.vAlignChildren || 'stretch',
-  className: cn(props.className, css.row),
+  className: cx(props.className, css.row),
 })
 
 const gridProps = props => ({
   ...props,
-  className: cn(props.className, css.root, { [css.debug]: props.debug }),
+  className: cx(props.className, css.root, { [css.debug]: props.debug }),
 })
 
 const Grid = props => <G {...gridProps(props)}>{props.children}</G>
