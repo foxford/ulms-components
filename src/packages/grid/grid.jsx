@@ -13,7 +13,7 @@ const rowProps = props => ({
 
 const gridProps = props => ({
   ...props,
-  className: cn(props.className, css.grid, { [css.debug]: props.debug }),
+  className: cn(props.className, css.root, { [css.debug]: props.debug }),
 })
 
 const Grid = props => <G {...gridProps(props)}>{props.children}</G>
