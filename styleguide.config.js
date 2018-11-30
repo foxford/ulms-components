@@ -6,10 +6,7 @@ const autoprefixer = require('autoprefixer')
 module.exports = {
   pagePerSection: true,
   components: 'src/packages/**/[A-Za-z]*.js',
-  require: [
-    'babel-polyfill',
-    path.join(__dirname, 'src/misc/styleguide/components.js')
-  ],
+  require: ['babel-polyfill', path.join(__dirname, 'src/misc/styleguide/components.js')],
   webpackConfig: {
     module: {
       rules: [
@@ -29,10 +26,10 @@ module.exports = {
             {
               loader: 'postcss-loader',
               options: {
-                plugins: () => [cssenv(), autoprefixer()]
-              }
-            }
-          ]
+                plugins: () => [cssenv(), autoprefixer()],
+              },
+            },
+          ],
         },
         {
           enforce: 'pre',
@@ -44,20 +41,20 @@ module.exports = {
             {
               loader: 'css-loader',
               options: {
-                importLoaders: 1 ,
+                importLoaders: 1,
                 modules: true,
-                localIdentName: '[name]-[hash:base64:5]',
-              }
+                localIdentName: '[name]-[local]-[hash:base64:5]',
+              },
             },
             {
               loader: 'postcss-loader',
               options: {
-                plugins: [cssenv(), autoprefixer()]
-              }
-            }
-          ]
-        }
-      ]
-    }
-  }
+                plugins: [cssenv(), autoprefixer()],
+              },
+            },
+          ],
+        },
+      ],
+    },
+  },
 }
