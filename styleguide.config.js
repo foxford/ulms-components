@@ -5,8 +5,8 @@ const autoprefixer = require('autoprefixer')
 
 module.exports = {
   pagePerSection: true,
-  components: 'src/packages/**/[A-Za-z]*.js',
-  require: ['babel-polyfill', path.join(__dirname, 'src/misc/styleguide/components.js')],
+  components: 'src/packages/**/[A-Za-z]*.jsx',
+  require: ['babel-polyfill', path.join(__dirname, 'src/misc/styleguide/components.jsx')],
   webpackConfig: {
     module: {
       rules: [
