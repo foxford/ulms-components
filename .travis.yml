@@ -1,0 +1,31 @@
+language: node_js
+node_js:
+  - "lts/*"
+notifications:
+  email: false
+cache:
+  directories:
+    - ${TRAVIS_BUILD_DIR}/node_modules
+git:
+  depth: 1
+addons:
+  apt:
+    packages:
+      - lftp
+env:
+  - SOURCE=styleguide
+jobs:
+  include:
+    - stage: test
+      name: Tests
+      install: npm i
+      script: npm test
+    - stage: publish
+      name: Docs
+      install: npm i
+      script: npm run docs/build && scripts/docs.sh
+stages:
+  - name: commit
+  - name: test
+  - name: publish
+    if: (branch = master AND type = push) OR tag IS present
