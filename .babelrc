@@ -60,6 +60,22 @@
         "babel-plugin-annotate-pure-calls",
         "babel-plugin-transform-class-properties"
       ]
-    }
+    },
+    "styleguidist": {
+      "presets": [
+        "babel-preset-react",
+        ["babel-preset-env", {
+          "modules": false,
+          "targets": {
+            "browsers": ["last 2 versions"]
+          }
+        }]
+      ],
+      "plugins": [
+        "babel-plugin-annotate-pure-calls",
+        "babel-plugin-transform-class-properties",
+        "babel-plugin-syntax-dynamic-import"
+      ]
+    },
   }
 }
