@@ -1,0 +1,51 @@
+:root{
+  --font-weight: var(--panel-font-weight, 700);
+  --header-border: var(--panel-header-border);
+  --header-color: var(--panel-header-color, var(--mineShaft, #333));
+  --header-margin: var(--panel-header-margin);
+  --header-padding-bottom: var(--panel-header-padding-bottom, 12px);
+  --header-padding-left: var(--panel-header-padding-left, 30px);
+  --header-padding-right: var(--panel-header-padding-right, 15px);
+  --header-padding-top: var(--panel-header-padding-top, 15px);
+  --line-height: var(--panel-line-height, 1.2em);
+}
+
+.root{
+  height: 100%;
+  flex: 1;
+}
+
+.root .root{
+  height: auto;
+}
+
+.interlayer{
+  display: flex;
+  height: 100%;
+}
+
+.debug{
+  background: rgba(0, 0, 255, 0.1);
+  outline: 1px dashed rgba(0, 0, 155, 0.5);
+}
+
+/* Header */
+.header{
+  border: var(--header-border);
+  color: var(--panel-header-color);
+  font-weight: var(--font-weight);
+  line-height: var(--line-height);
+  margin: var(--header-margin);
+  padding: var(--header-padding-top) var(--header-padding-right) var(--header-padding-bottom) var(--header-padding-left);
+}
+
+/* add padding for all adjacent panels */
+.header.adjacent ~ .root{
+  padding-left: var(--header-padding-left);
+}
+
+/* Inner */
+.inner{
+  padding-left: var(--header-padding-left);
+  padding-right: var(--header-padding-right);
+}
