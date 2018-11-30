@@ -42,7 +42,8 @@
   z-index:1000;
 }
 
-.enlarged [class^="Grid_grid"]{
+.enlarged > div:not([class="inner"]),
+.enlarged > [class="inner"]{
   background-color: #fff;
   height: 100%;
   left: 0;
