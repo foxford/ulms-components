@@ -1,0 +1,40 @@
+.control {
+  width: 20px;
+  height: 20px;
+  background: no-repeat center center #ffffff;
+  padding: 14px;
+  display: inline-block;
+  border-left: 1px solid #b8b8b8;
+  border-right: 0;
+  position: relative;
+  cursor: pointer;
+  box-sizing: content-box;
+  border-bottom: 0;
+  border-top: 0;
+  outline: none;
+}
+
+.control.active,
+.control:hover:not(:disabled) {
+  background-color: #F6F6F6;
+}
+
+.control.active > svg path,
+.control:hover:not(:disabled) > svg path {
+  fill: #333333;
+}
+
+.control:disabled {
+  cursor: not-allowed;
+}
+
+.control .bullet {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+}
+
+.control .bullet svg path {
+  fill: #FF7256;
+  stroke: #FF7256;
+}
