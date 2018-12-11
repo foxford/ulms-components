@@ -12,6 +12,7 @@ const npm = require('rollup-plugin-node-resolve')
 const path = require('path')
 const postcss = require('rollup-plugin-postcss')
 const scss = require('rollup-plugin-scss')
+const svgr = require('@svgr/rollup').default
 const uglify = require('rollup-plugin-uglify')
 
 const warn = console.warn
@@ -41,6 +42,7 @@ const postcssPlugins = [
 
 const rollupPlugins = [ // order matters
   json(),
+  svgr(),
   postcss({
     modules: true,
     extract: true,
