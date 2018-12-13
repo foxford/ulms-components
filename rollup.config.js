@@ -1,9 +1,9 @@
-const { name } = require('./package.json')
+/* eslint-disable */
 const alias = require('rollup-plugin-alias')
-const autoprefixer = require('autoprefixer')
 const babel = require('rollup-plugin-babel')
 const cjs = require('rollup-plugin-commonjs')
 const cssnano = require('cssnano')
+const cssnext = require('postcss-cssnext')
 const cssurl = require('postcss-url')
 const Debug = require('debug')
 const env = require('postcss-preset-env')
@@ -14,6 +14,8 @@ const postcss = require('rollup-plugin-postcss')
 const scss = require('rollup-plugin-scss')
 const svgr = require('@svgr/rollup').default
 const uglify = require('rollup-plugin-uglify')
+
+const { name } = require('./package.json')
 
 const warn = console.warn
 console.warn = (...argv) => process.env.LOG_WARN && Debug(`${name}:console.warn`)(...argv)
@@ -37,7 +39,7 @@ const shouldUglify = (options = uglifyOptions, minifier) => process.env.NODE_ENV
 const postcssPlugins = [
   cssurl({ url: 'inline' }),
   env(),
-  autoprefixer()
+  cssnext()
 ].concat(shouldMinifyCss())
 
 const rollupPlugins = [ // order matters
