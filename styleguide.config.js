@@ -26,7 +26,14 @@ module.exports = {
             {
               loader: 'postcss-loader',
               options: {
-                plugins: () => [cssenv(), cssnext()],
+                plugins: () => [
+                  cssenv(),
+                  cssnext({
+                    features: {
+                      customProperties: false,
+                    },
+                  }),
+                ],
               },
             },
           ],
@@ -49,7 +56,14 @@ module.exports = {
             {
               loader: 'postcss-loader',
               options: {
-                plugins: [cssenv(), cssnext()],
+                plugins: [
+                  cssenv(),
+                  cssnext({
+                    features: {
+                      customProperties: false,
+                    },
+                  }),
+                ],
               },
             },
           ],
