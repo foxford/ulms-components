@@ -29,7 +29,7 @@
   outline: 1px dashed rgba(0, 0, 155, 0.5);
 }
 
-/* Header */
+/* <Panel.Header> */
 .header{
   border: var(--header-border);
   color: var(--panel-header-color);
@@ -43,8 +43,9 @@
 .header.adjacent ~ .root{
   padding-left: var(--header-padding-left);
 }
+/* </Panel.Header> */
 
-/* Inner */
+/* <Panel.Inner> */
 .inner{
   padding-left: var(--header-padding-left);
   padding-right: var(--header-padding-right);
