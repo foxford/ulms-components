@@ -56,10 +56,10 @@
 
 /* <Toggler> */
 .toggler {
-  padding-bottom: var(--header-padding-bottom);
-  padding-left: var(--header-padding-right);
-  padding-right: var(--header-padding-right);
-  padding-top: var(--header-padding-top);
+  padding-bottom: var(--header-padding-bottom, var(--sidebar-inner-padding));
+  padding-left: var(--header-padding-right, var(--sidebar-inner-padding));
+  padding-right: var(--header-padding-right, var(--sidebar-inner-padding));
+  padding-top: var(--header-padding-top, var(--sidebar-inner-padding));
 }
 
 .togglerEnlarged {

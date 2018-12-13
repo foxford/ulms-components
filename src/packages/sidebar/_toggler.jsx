@@ -2,7 +2,7 @@
 import React from 'react'
 import cx from 'classnames'
 
-import { Arrow } from '../icons/icons'
+import { Icons } from '../icons/icons'
 import css from '../sidebar/_toggler.css'
 
 export const Toggler = props => (
@@ -10,6 +10,6 @@ export const Toggler = props => (
     className={cx(css.root, props.className, { [css.active]: props.toggled })}
     onClick={props.handleClick}
   >
-    {props.children || <Arrow />}
+    {props.children || <Icons.Arrow />}
   </div>
 )
