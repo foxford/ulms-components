@@ -6,7 +6,7 @@ import css from './panel.css'
 
 const Header = props => (
   <div
-    className={cx(css.header, { [css.adjacent]: !props.noAdjacent })}
+    className={cx(css.header, props.className, { [css.adjacent]: !props.noAdjacent })}
   >
     {props.title ? props.title : props.children}
   </div>
@@ -28,7 +28,10 @@ const panelStyle = (props) => {
 }
 
 const Panel = props => (
-  <div className={cx(css.root, { [css.debug]: props.debug })} style={panelStyle(props)}>
+  <div
+    className={cx(css.root, props.className, { [css.debug]: props.debug })}
+    style={panelStyle(props)}
+  >
     <div
       className={css.interlayer}
       style={{ flexDirection: props.direction || 'column' }}
