@@ -1,7 +1,7 @@
 /* eslint-disable import/no-extraneous-dependencies */
 const path = require('path')
 const cssenv = require('postcss-preset-env')
-const autoprefixer = require('autoprefixer')
+const cssnext = require('postcss-cssnext')
 
 module.exports = {
   pagePerSection: true,
@@ -26,7 +26,14 @@ module.exports = {
             {
               loader: 'postcss-loader',
               options: {
-                plugins: () => [cssenv(), autoprefixer()],
+                plugins: () => [
+                  cssenv(),
+                  cssnext({
+                    features: {
+                      customProperties: false,
+                    },
+                  }),
+                ],
               },
             },
           ],
@@ -49,7 +56,14 @@ module.exports = {
             {
               loader: 'postcss-loader',
               options: {
-                plugins: [cssenv(), autoprefixer()],
+                plugins: [
+                  cssenv(),
+                  cssnext({
+                    features: {
+                      customProperties: false,
+                    },
+                  }),
+                ],
               },
             },
           ],

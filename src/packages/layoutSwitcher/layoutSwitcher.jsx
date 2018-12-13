@@ -2,7 +2,7 @@
 import React from 'react'
 import cx from 'classnames'
 
-import { Bullet } from '../icons/icons.jsx'
+import { Icons } from '../icons/icons'
 
 import css from './layoutSwitcher.css'
 
@@ -17,7 +17,7 @@ const Btn = ({
     type='button'
   >
     {children}
-    {showBullet && <div className={css.bullet}><Bullet /></div>}
+    {showBullet && <div className={css.bullet}><Icons.Bullet /></div>}
   </button>
 )
 

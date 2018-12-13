@@ -13,7 +13,7 @@
 ```js
 <MakeFullscreen wrap>
   <Sidebar
-    childrenMinified={<Icons.Feed/>}
+    childrenMinified={<Icons name='feed' size='xs'/>}
     debug
     minified
     title="We gonna space?!"
