@@ -2,15 +2,10 @@
 
 #### Example
 ```js
-const Icons = require('../icons/icons.jsx');
-const Feed = Icons.Feed;
-const Slides = Icons.Slides;
-const Video = Icons.Video;
-
 const items = [
   {
     active: true,
-    children: (<Feed />),
+    children: (<Icons name="feed" size="xs" />),
     disabled: true,
     onClick: () => {},
     showBullet: true,
@@ -18,7 +13,7 @@ const items = [
   },
   {
     active: false,
-    children: (<Video />),
+    children: (<Icons name="video" size="xs" />),
     disabled: false,
     onClick: () => {},
     showBullet: false,
@@ -26,7 +21,7 @@ const items = [
   },
   {
     active: false,
-    children: (<Slides />),
+    children: (<Icons name="slides" size="xs" width="18px" />),
     disabled: false,
     onClick: () => {},
     showBullet: false,
