@@ -24,31 +24,35 @@
   }
 }
 
-.root{
+.root {
   position: relative;
 }
 
-.root button{
+.root button {
   cursor: pointer;
   margin-top: 10px;
 }
 
-.enlarged button{
+.enlarged button {
   animation: pulse 2s infinite;
   bottom: 0;
   left: 0;
   position: fixed;
   user-select: none;
-  z-index:1000;
+  z-index: 10000;
+}
+
+[class="inner"]{
+  position: relative;
 }
 
 .enlarged > div:not([class="inner"]),
-.enlarged > [class="inner"]{
+.enlarged > [class="inner"] {
   background-color: #fff;
   height: 100%;
   left: 0;
   position: fixed;
   top: 0;
   width: 100%;
-  z-index:100;
+  z-index: 10000;
 }
