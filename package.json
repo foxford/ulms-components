@@ -1,6 +1,6 @@
 {
   "name": "@netology-group/media-ui",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "description": "UI components library",
   "repository": {
     "type": "git",
@@ -42,7 +42,10 @@
     "debug": "^4.1.0",
     "react": "^16.6.3",
     "react-dom": "^16.6.3",
-    "recompose": "^0.30.0"
+    "react-sizeme": "~2.5.2",
+    "react-visibility-sensor": "~5.0.2",
+    "recompose": "^0.30.0",
+    "scroll-into-view-if-needed": "~2.2.20"
   },
   "devDependencies": {
     "@svgr/rollup": "~4.1.0",

@@ -1,0 +1,6 @@
+### Spinner
+
+#### Example
+```js
+<Spinner />
+```

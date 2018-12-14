@@ -2,6 +2,8 @@
 import React from 'react'
 
 import Arrow from './images/arrow.svg'
+import ArrowLeft from './images/arrow-left.svg'
+import ArrowRight from './images/arrow-right.svg'
 import Bullet from './images/bullet.svg'
 import Feed from './images/feed.svg'
 import Slides from './images/slides.svg'
@@ -11,6 +13,8 @@ import css from './icons.css'
 
 const icons = new Map([
   ['arrow', Arrow],
+  ['arrow-left', ArrowLeft],
+  ['arrow-right', ArrowRight],
   ['bullet', Bullet],
   ['feed', Feed],
   ['slides', Slides],
@@ -40,6 +44,8 @@ const Icons = (props) => {
 }
 
 Icons.Arrow = Arrow
+Icons.ArrowLeft = ArrowLeft
+Icons.ArrowRight = ArrowRight
 Icons.Bullet = Bullet
 Icons.Feed = Feed
 Icons.Slides = Slides
