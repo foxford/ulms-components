@@ -7,15 +7,17 @@ const cssnext = require('postcss-cssnext')
 const cssurl = require('postcss-url')
 const Debug = require('debug')
 const env = require('postcss-preset-env')
+const fs = require('fs')
 const json = require('rollup-plugin-json')
 const npm = require('rollup-plugin-node-resolve')
-const path = require('path')
 const postcss = require('rollup-plugin-postcss')
 const scss = require('rollup-plugin-scss')
 const svgr = require('@svgr/rollup').default
 const uglify = require('rollup-plugin-uglify')
 
 const { name } = require('./package.json')
+
+const babelrc = JSON.parse(fs.readFileSync('./.babelrc', 'utf8'))
 
 const warn = console.warn
 console.warn = (...argv) => process.env.LOG_WARN && Debug(`${name}:console.warn`)(...argv)
@@ -51,11 +53,24 @@ const rollupPlugins = [ // order matters
     namedExports: true,
     plugins: postcssPlugins
   }),
-  npm({ browser: true }),
-  cjs({
-    include: 'node_modules/**'
+  npm({
+    browser: true,
+    extensions: ['.js', '.jsx']
   }),
-  babel({})
+  cjs({
+    include: 'node_modules/**',
+    namedExports: {
+      'react-sizeme': ['SizeMe']
+    }
+  }),
+  babel({
+    babelrc: false,
+    presets: babelrc.env.packages.presets,
+    plugins: [
+      ...babelrc.plugins,
+      ...babelrc.env.packages.plugins
+    ]
+  })
 ].concat(shouldUglify())
 
 const dist = (entry, frm = 'src/packages', out = 'packages') => ({
@@ -86,7 +101,7 @@ const dist = (entry, frm = 'src/packages', out = 'packages') => ({
 
     if(process.env.LOG_DEBUG) debug(warning)
 
-    if(warning.code == 'UNKNOWN_OPTION'){
+    if(warning.code === 'UNKNOWN_OPTION'){
       if(process.env.LOG_DEBUG) debug(warning.message)
       return
     } else if(warning.code) {
