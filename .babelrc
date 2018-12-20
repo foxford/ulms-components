@@ -1,6 +1,6 @@
 {
   "plugins": [
-    "babel-plugin-transform-object-rest-spread",
+    "babel-plugin-transform-object-rest-spread"
   ],
   "env":{
     "es": {
@@ -15,7 +15,7 @@
       ],
       "plugins": [
         "babel-plugin-annotate-pure-calls",
-        "babel-plugin-transform-class-properties",
+        "babel-plugin-transform-class-properties"
       ]
     },
     "cjs": {
@@ -76,6 +76,6 @@
         "babel-plugin-transform-class-properties",
         "babel-plugin-syntax-dynamic-import"
       ]
-    },
+    }
   }
 }
