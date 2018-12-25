@@ -16,6 +16,7 @@ const svgr = require('@svgr/rollup').default
 const uglify = require('rollup-plugin-uglify')
 
 const { name } = require('./package.json')
+const { postcssLoader } = require('./rollup/loaders')
 
 const babelrc = JSON.parse(fs.readFileSync('./.babelrc', 'utf8'))
 
@@ -48,10 +49,29 @@ const rollupPlugins = [ // order matters
   json(),
   svgr(),
   postcss({
-    modules: true,
     extract: true,
-    namedExports: true,
-    plugins: postcssPlugins
+    plugins: postcssPlugins,
+    loaders: [
+      {
+        name: 'postcss',
+        alwaysProcess: true,
+        test: /\.css/,
+        process (_) {
+          if (
+            /\.css/.test(this.id)
+            && new RegExp(name).exec(this.id)
+            && !(/@foxford\/ui/.exec(this.id))
+          ) {
+            this.options = {
+              ...this.options, modules: true, namedExports: true,
+            }
+          }
+          // :up is crucial to allow transpile local and external .css separately
+
+          return postcssLoader.process.call(this, _)
+        },
+      },
+    ],
   }),
   npm({
     browser: true,
