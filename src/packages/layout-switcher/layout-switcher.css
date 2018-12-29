@@ -1,8 +1,15 @@
+:root {
+  --layout-switcher-control-padding-size: 14px;
+}
+
 .control {
-  width: 20px;
-  height: 20px;
+  width: var(--layout-switcher-control-width, 20px);
+  height: var(--layout-switcher-control-height, 20px);
   background: no-repeat center center #ffffff;
-  padding: 14px;
+  padding-top: var(--layout-switcher-control-padding-size);
+  padding-right: var(--layout-switcher-control-padding-size);
+  padding-bottom: var(--layout-switcher-control-padding-size);
+  padding-left: var(--layout-switcher-control-padding-size);
   display: inline-block;
   border-left: 1px solid #b8b8b8;
   border-right: 0;
