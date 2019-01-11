@@ -4,13 +4,13 @@ import cx from 'classnames'
 
 import { Icons } from '../icons/icons'
 
-import css from './layoutSwitcher.css'
+import css from './layout-switcher.css'
 
 const Btn = ({
-  active, children, disabled, onClick, showBullet, title,
+  active, children, className, disabled, onClick, showBullet, title,
 }) => (
   <button
-    className={cx(css.control, { [css.active]: active })}
+    className={cx(css.control, className, { [css.active]: active })}
     disabled={disabled}
     onClick={onClick}
     title={title}

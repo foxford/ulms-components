@@ -4,6 +4,7 @@ const babel = require('rollup-plugin-babel')
 const cjs = require('rollup-plugin-commonjs')
 const cssnano = require('cssnano')
 const cssnext = require('postcss-cssnext')
+const cssdupl = require('postcss-discard-duplicates')
 const cssurl = require('postcss-url')
 const Debug = require('debug')
 const env = require('postcss-preset-env')
@@ -42,7 +43,8 @@ const shouldUglify = (options = uglifyOptions, minifier) => process.env.NODE_ENV
 const postcssPlugins = [
   cssurl({ url: 'inline' }),
   env(),
-  cssnext()
+  cssnext(),
+  cssdupl()
 ].concat(shouldMinifyCss())
 
 const rollupPlugins = [ // order matters
