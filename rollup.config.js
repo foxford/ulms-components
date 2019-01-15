@@ -2,9 +2,9 @@
 const alias = require('rollup-plugin-alias')
 const babel = require('rollup-plugin-babel')
 const cjs = require('rollup-plugin-commonjs')
+const cssdupl = require('postcss-discard-duplicates')
 const cssnano = require('cssnano')
 const cssnext = require('postcss-cssnext')
-const cssdupl = require('postcss-discard-duplicates')
 const cssurl = require('postcss-url')
 const Debug = require('debug')
 const env = require('postcss-preset-env')
@@ -16,10 +16,9 @@ const scss = require('rollup-plugin-scss')
 const svgr = require('@svgr/rollup').default
 const uglify = require('rollup-plugin-uglify')
 
-const { name } = require('./package.json')
+const { name, peerDependencies } = require('./package.json')
 const { postcssLoader } = require('./rollup/loaders')
-
-const babelrc = JSON.parse(fs.readFileSync('./.babelrc', 'utf8'))
+const babelrc = require('./.babelrc.json')
 
 const warn = console.warn
 console.warn = (...argv) => process.env.LOG_WARN && Debug(`${name}:console.warn`)(...argv)
@@ -104,17 +103,7 @@ const dist = (entry, frm = 'src/packages', out = 'packages') => ({
   file: `${out}/${entry}`, // that's important duplicate
   cache: true,
   perf: false,
-  external: [
-    'classnames',
-    'js-cookie',
-    'moment',
-    'prop-types',
-    'react-datepicker',
-    'react-dom',
-    'react-input-mask',
-    'react-router-dom',
-    'react'
-  ],
+  external: Object.keys(peerDependencies),
   plugins: rollupPlugins,
   onwarn: function(warning, warn){
     if(!warning.code) return globalDebug(warning.message)
