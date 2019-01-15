@@ -1,10 +1,14 @@
 {
   "name": "@netology-group/media-ui",
-  "version": "0.0.13",
+  "version": "0.0.14",
   "description": "UI components library",
+  "homepage": "https://github.com/netology-group/ulms-media-ui",
+  "bugs": {
+    "url": "https://github.com/netology-group/ulms-media-ui/issues"
+  },
   "repository": {
     "type": "git",
-    "url": "https://github.com/netology-group/ulms-media-ui"
+    "url": "https://github.com/netology-group/ulms-media-ui.git"
   },
   "license": "UNLICENSED",
   "author": "",
@@ -19,28 +23,30 @@
     "lib": "src"
   },
   "scripts": {
-    "babel": "babel src --copy-files",
+    "babel": "babel src --config-file ./.babelrc.json --copy-files",
     "prebuild": "rm -rf es packages lib && mkdir -p packages",
     "build": "npm run build/cjs && npm run build/es && npm run build/packages",
     "build/cjs": "cross-env BABEL_ENV=cjs npm run babel -- -d lib",
     "build/es": "cross-env BABEL_ENV=es npm run babel -- -d es",
     "build/packages": "cross-env BABEL_ENV=packages node rollup.js",
-    "precoverage": "rm -rf .nyc_output",
-    "coverage": "npm run tap -- --cov",
-    "postcoverage": "tap --coverage-report=text-lcov && codecov",
-    "docs": "npm run docs/build && http-server ./styleguide -p ${DOCS_PORT:-9090}",
-    "docs/build": "cross-env BABEL_ENV=styleguidist npx styleguidist build",
-    "docs/serve": "cross-env BABEL_ENV=styleguidist npx styleguidist server",
+    "precoverage": "rm -rf .nyc_output coverage && mkdir -p coverage",
+    "coverage": "npm run nodetap -- --nyc-arg=--require=./test/babel-register.js --cov",
+    "postcoverage": "tap --coverage-report=text-lcov > coverage/coverage.lcov && codecov",
+    "docs": "npm run docs/build && http-server ./styleguide",
+    "docs/build": "cross-env BABEL_ENV=styleguidist styleguidist build",
+    "docs/serve": "cross-env BABEL_ENV=styleguidist styleguidist server",
     "lint": "eslint --ext js,jsx src",
-    "prepublishOnly": "npm run test && npm run build",
+    "nodetap": "tap test/**/*.test.js",
+    "prepublishOnly": "cross-env NODE_ENV=production npm run build",
     "start": "npm run docs/serve",
-    "tap": "tap test/*.js",
+    "tap": "npm run nodetap -- --node-arg=--require=./test/babel-register.js",
     "test": "npm run lint && npm run tap"
   },
   "dependencies": {
-    "@foxford/ui": "^1.2.1",
+    "@foxford/ui": "^1.3.6",
     "classnames": "^2.2.6",
     "debug": "^4.1.0",
+    "query-string": "^6.2.0",
     "react": "^16.6.3",
     "react-dom": "^16.6.3",
     "react-sizeme": "~2.5.2",
@@ -49,25 +55,23 @@
     "scroll-into-view-if-needed": "~2.2.20"
   },
   "devDependencies": {
+    "@babel/cli": "^7.2.3",
+    "@babel/plugin-proposal-class-properties": "^7.2.3",
+    "@babel/plugin-proposal-object-rest-spread": "^7.2.0",
+    "@babel/plugin-syntax-dynamic-import": "^7.2.0",
+    "@babel/polyfill": "^7.2.5",
+    "@babel/preset-env": "^7.2.3",
+    "@babel/preset-react": "^7.0.0",
+    "@babel/register": "^7.0.0",
     "@svgr/rollup": "~4.1.0",
     "@svgr/webpack": "~4.1.0",
     "autoprefixer": "^9.1.1",
-    "babel-cli": "^6.26.0",
-    "babel-core": "^6.26.3",
-    "babel-loader": "^7.1.5",
+    "babel-loader": "^8.0.5",
     "babel-plugin-annotate-pure-calls": "^0.4.0",
-    "babel-plugin-external-helpers": "^6.22.0",
     "babel-plugin-react-css-modules": "^3.4.2",
-    "babel-plugin-syntax-dynamic-import": "^6.18.0",
-    "babel-plugin-transform-class-properties": "^6.24.1",
     "babel-plugin-transform-es2015-modules-commonjs": "^6.26.2",
-    "babel-plugin-transform-object-rest-spread": "^6.26.0",
     "babel-plugin-transform-require-ignore": "^0.1.1",
-    "babel-preset-env": "^1.7.0",
-    "babel-preset-react": "^6.24.1",
-    "babel-register": "^6.26.0",
     "codecov": "^3.1.0",
-    "concurrently": "^3.6.1",
     "cross-env": "^5.2.0",
     "cssnano": "^4.1.7",
     "eslint-config-adequate-react": "^1.1.1",
@@ -82,7 +86,7 @@
     "reserved-words": "^0.1.2",
     "rollup": "^0.67.3",
     "rollup-plugin-alias": "^1.4.0",
-    "rollup-plugin-babel": "^3.0.7",
+    "rollup-plugin-babel": "^4.3.0",
     "rollup-plugin-commonjs": "^9.1.5",
     "rollup-plugin-json": "^3.0.0",
     "rollup-plugin-node-resolve": "^3.3.0",
@@ -94,16 +98,13 @@
     "webpack": "^4.26.1"
   },
   "peerDependencies": {
-    "js-cookie": "^2.2.0",
-    "moment": "^2.22.2",
-    "ramda": "^0.25.0",
-    "react": "^16.4.2",
-    "react-datepicker": "^1.6.0",
-    "react-dom": "^16.4.2",
-    "react-input-mask": "^2.0.3",
-    "react-router-dom": "^4.3.1"
+    "react": "^15.6 || ^16.x",
+    "react-dom": "^15.6 || ^16.x",
+    "react-sizeme": "~2.5",
+    "react-visibility-sensor": "~5.0",
+    "scroll-into-view-if-needed": "~2.2"
   },
   "engines": {
-    "node": ">=8.10"
+    "node": ">=10.14"
   }
 }

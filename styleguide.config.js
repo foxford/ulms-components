@@ -1,20 +1,27 @@
 /* eslint-disable import/no-extraneous-dependencies */
-const path = require('path')
+const cssdedupe = require('postcss-discard-duplicates')
 const cssenv = require('postcss-preset-env')
 const cssnext = require('postcss-cssnext')
+const path = require('path')
+
+const babelrc = require('./.babelrc.json')
 
 module.exports = {
   pagePerSection: true,
   components: 'src/packages/**/[A-Za-z]*.jsx',
-  require: ['babel-polyfill', path.join(__dirname, 'src/misc/styleguide/components.jsx')],
+  require: ['@babel/polyfill', path.join(__dirname, 'src/misc/styleguide/components.jsx')],
   webpackConfig: {
+    bail: true,
     module: {
       rules: [
         // Babel loader, will use your project’s .babelrc
         {
           test: /\.jsx?$/,
           exclude: /node_modules/,
-          loader: 'babel-loader',
+          use: {
+            loader: 'babel-loader',
+            options: babelrc.env.styleguidist,
+          },
         },
         // Other loaders that are needed for your components
         {
@@ -58,6 +65,7 @@ module.exports = {
               options: {
                 plugins: [
                   cssenv(),
+                  cssdedupe(),
                   cssnext({
                     features: {
                       customProperties: false,
