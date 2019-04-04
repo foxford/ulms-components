@@ -7,9 +7,12 @@ import css from './components.css'
 
 const handleEnlarge = (e, props) => props.setEnlarged(!props.enlarged)
 
-const inner = props => !props.wrap
-  ? props.children
-  : <div className='inner'>{props.children}</div>
+const inner = ({
+  children,
+  wrap,
+}) => !wrap
+  ? children
+  : <div className='inner'>{children}</div>
 
 class MakeFullscreen extends React.Component {
   componentDidMount () {
@@ -33,7 +36,12 @@ class MakeFullscreen extends React.Component {
         ref={(e) => { this.rootElement = e }}
       >
         {inner(props)}
-        <button onClick={e => handleEnlarge(e, props)}>{!props.enlarged ? 'Enlarge' : 'Shrink'}</button>
+        <button
+          type='button'
+          onClick={e => handleEnlarge(e, props)}
+        >
+          {!props.enlarged ? 'Enlarge' : 'Shrink'}
+        </button>
       </div>
     )
   }

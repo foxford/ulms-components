@@ -23,22 +23,29 @@ const icons = new Map([
 
 const sizeValue = size => css[`size${size.toUpperCase()}`]
 
-const Icons = (props) => {
-  const IconFn = typeof props.fn === 'function'
-    ? props.fn()
+const Icons = ({
+  children,
+  fn,
+  height,
+  name,
+  size,
+  width,
+}) => {
+  const IconFn = typeof fn === 'function'
+    ? fn()
     : null
 
-  const Icon = props.name
-    ? icons.get(props.name)
+  const Icon = name
+    ? icons.get(name)
     : IconFn
 
   const style = {}
-  if (props.width || props.size) style.width = props.width || sizeValue(props.size)
-  if (props.height || props.size) style.height = props.height || sizeValue(props.size)
+  if (width || size) style.width = width || sizeValue(size)
+  if (height || size) style.height = height || sizeValue(size)
 
   return (
     <div className={css.root} style={style}>
-      {props.children || (Icon === null ? Icon : <Icon />)}
+      {children || (Icon === null ? Icon : <Icon />)}
     </div>
   )
 }

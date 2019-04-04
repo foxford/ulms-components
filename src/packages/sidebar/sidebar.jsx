@@ -7,22 +7,25 @@ import { name } from '../../../package.json'
 import { Debug } from '../../util/index'
 
 import { Panel } from '../panel/panel'
-import { Toggler } from '../sidebar/_toggler'
-import css from '../sidebar/sidebar.css'
+
+import { Toggler } from './_toggler'
+import css from './sidebar.css'
 
 const debug = Debug(`${name}:sidebar`)
 
-const Inner = props => (<div className={css.sidebarInner}>{props.children}</div>)
+const Inner = ({ children }) => (<div className={css.sidebarInner}>{children}</div>)
 
 const childrenEnlarged = props => [
   <Panel.Header key='header' className={css.panelHeader}>
     {props.freezed
       ? null
-      : (<Toggler
-        className={cx(css.toggler, css.togglerEnlarged)}
-        handleClick={() => props.toggle(!props.minified)}
-        toggled={props.minified}
-      />)}
+      : (
+        <Toggler
+          className={cx(css.toggler, css.togglerEnlarged)}
+          handleClick={() => props.toggle(!props.minified)}
+          toggled={props.minified}
+        />
+      )}
     {props.title}
   </Panel.Header>,
   <Panel.Inner key='inner'>{props.children}</Panel.Inner>,
