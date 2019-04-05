@@ -104,6 +104,7 @@
 }
 
 .root .slideWrapper .controls .linkArrow {
+  background-color: transparent;
   display: block;
   border: none;
   font-size: 16px;

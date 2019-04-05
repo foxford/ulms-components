@@ -112,13 +112,13 @@ class Presentation extends Component {
         }
         <div className={css.slideWrapper}>
           <SizeMe monitorHeight>
-            {({ size }) => {
+            {({ size: { height, width } }) => {
               let result
 
-              if (collection[index].image) {
+              if (collection[index].image && height > 0 && width > 0) {
                 const imageSize = calculateSize(
-                  size.width,
-                  size.height,
+                  width,
+                  height,
                   collection[index].imageWidth,
                   collection[index].imageHeight
                 )

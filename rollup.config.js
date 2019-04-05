@@ -60,7 +60,6 @@ const rollupPlugins = [ // order matters
         process (_) {
           if (
             /\.css/.test(this.id)
-            && new RegExp(name).exec(this.id)
             && !(/@foxford\/ui/.exec(this.id))
           ) {
             this.options = {
