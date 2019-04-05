@@ -1,4 +1,4 @@
-/* eslint-disable react/prop-types */
+/* eslint-disable react/prop-types, react/jsx-one-expression-per-line */
 import React, { Component } from 'react'
 import { SizeMe } from 'react-sizeme'
 import VisibilitySensor from 'react-visibility-sensor'
@@ -26,9 +26,11 @@ class Presentation extends Component {
     this.handlePrevious = this.handlePrevious.bind(this)
     this.handleNext = this.handleNext.bind(this)
   }
+
   componentDidMount () {
     this.maybeScrollToActive()
   }
+
   componentDidUpdate (prevProps) {
     const { index } = this.props
 
@@ -36,6 +38,7 @@ class Presentation extends Component {
       this.maybeScrollToActive()
     }
   }
+
   handlePrevious () {
     const { index, onChange } = this.props
 
@@ -43,6 +46,7 @@ class Presentation extends Component {
       onChange(index - 1)
     }
   }
+
   handleNext () {
     const {
       index, collection, onChange,
@@ -52,6 +56,7 @@ class Presentation extends Component {
       onChange(index + 1)
     }
   }
+
   maybeScrollToActive () {
     const { showPreviews } = this.props
 
@@ -59,6 +64,7 @@ class Presentation extends Component {
       this.scrollToActive()
     }
   }
+
   scrollToActive () {
     const element = this.container.querySelector(`.${css.preview}.${css.active}`)
 
@@ -70,6 +76,7 @@ class Presentation extends Component {
       })
     }
   }
+
   render () {
     const {
       index, collection, onChange, showPagesCount, showActions, showPreviews, slotSlide,
@@ -92,7 +99,7 @@ class Presentation extends Component {
                       <div className={css.image}>
                         <VisibilitySensor partialVisibility>
                           {({ isVisible }) => isVisible && item.preview
-                            ? <img src={item.preview} />
+                            ? <img alt='preview' src={item.preview} />
                             : <div className={css.placeholder} />}
                         </VisibilitySensor>
                       </div>
@@ -119,6 +126,7 @@ class Presentation extends Component {
                 result = (
                   <div className={css.slide}>
                     <img
+                      alt='image'
                       className={css.mainImage}
                       src={collection[index].image}
                       width={imageSize.width}

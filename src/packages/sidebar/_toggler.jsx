@@ -3,13 +3,19 @@ import React from 'react'
 import cx from 'classnames'
 
 import { Icons } from '../icons/icons'
-import css from '../sidebar/_toggler.css'
 
-export const Toggler = props => (
+import css from './_toggler.css'
+
+export const Toggler = ({
+  children,
+  className,
+  handleClick,
+  toggled,
+}) => (
   <div
-    className={cx(css.root, props.className, { [css.active]: props.toggled })}
-    onClick={props.handleClick}
+    className={cx(css.root, className, { [css.active]: toggled })}
+    onClick={handleClick}
   >
-    {props.children || <Icons.Arrow />}
+    {children || <Icons.Arrow />}
   </div>
 )

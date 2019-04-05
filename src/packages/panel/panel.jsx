@@ -4,17 +4,22 @@ import cx from 'classnames'
 
 import css from './panel.css'
 
-const Header = props => (
+const Header = ({
+  children,
+  className,
+  noAdjacent,
+  title,
+}) => (
   <div
-    className={cx(css.header, props.className, { [css.adjacent]: !props.noAdjacent })}
+    className={cx(css.header, className, { [css.adjacent]: !noAdjacent })}
   >
-    {props.title ? props.title : props.children}
+    {title || children}
   </div>
 )
 
-const Inner = props => !props.children
+const Inner = ({ children }) => !children
   ? null
-  : (<div className={css.inner}>{props.children}</div>)
+  : (<div className={css.inner}>{children}</div>)
 
 const panelStyle = (props) => {
   const style = {}
@@ -27,19 +32,29 @@ const panelStyle = (props) => {
   }
 }
 
-const Panel = props => (
-  <div
-    className={cx(css.root, props.className, { [css.debug]: props.debug })}
-    style={panelStyle(props)}
-  >
+const Panel = (props) => {
+  const {
+    children,
+    className,
+    content,
+    debug,
+    direction,
+  } = props
+
+  return (
     <div
-      className={css.interlayer}
-      style={{ flexDirection: props.direction || 'column' }}
+      className={cx(css.root, className, { [css.debug]: debug })}
+      style={panelStyle(props)}
     >
-      {props.children ? props.children : [<Header key='h' {...props} />, <Inner key='i'>{props.content}</Inner>]}
+      <div
+        className={css.interlayer}
+        style={{ flexDirection: direction || 'column' }}
+      >
+        {children || [<Header key='h' {...props} />, <Inner key='i'>{content}</Inner>]}
+      </div>
     </div>
-  </div>
-)
+  )
+}
 
 Panel.Header = Header
 Panel.Inner = Inner

@@ -6,7 +6,7 @@ import css from './spinner.css'
 
 function Spinner () {
   return (
-    <div className={css.root} >
+    <div className={css.root}>
       <div className={css.child} />
       <div className={cx(css.circle2, css.child)} />
       <div className={cx(css.circle3, css.child)} />
