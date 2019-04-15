@@ -24,6 +24,7 @@ class Presentation extends Component {
     super()
 
     this.handlePrevious = this.handlePrevious.bind(this)
+    this.handleKeyDownEvent = this.handleKeyDownEvent.bind(this)
     this.handleNext = this.handleNext.bind(this)
   }
 
@@ -57,6 +58,29 @@ class Presentation extends Component {
     }
   }
 
+  handleKeyDownEvent (e) {
+    switch (e.keyCode) {
+      case 33: // PageUp
+      // falls through
+
+      case 37: // ArrowLeft
+        this.handlePrevious()
+
+        break
+
+      case 34: // PageDown
+      // falls through
+
+      case 39: // ArrowRight
+        this.handleNext()
+
+        break
+
+      default:
+      // Nothing to do here..
+    }
+  }
+
   maybeScrollToActive () {
     const { showPreviews } = this.props
 
@@ -83,7 +107,12 @@ class Presentation extends Component {
     } = this.props
 
     return (
-      <div ref={(ref) => { this.container = ref }} className={css.root}>
+      <div
+        ref={(ref) => { this.container = ref }}
+        className={css.root}
+        onKeyDown={this.handleKeyDownEvent}
+        tabIndex={-1}
+      >
         {
           showPreviews && (
             <div className={css.listWrapper}>
@@ -115,7 +144,7 @@ class Presentation extends Component {
             {({ size: { height, width } }) => {
               let result
 
-              if (collection[index].image && height > 0 && width > 0) {
+              if (collection[index] && collection[index].image && height > 0 && width > 0) {
                 const imageSize = calculateSize(
                   width,
                   height,
@@ -153,7 +182,7 @@ class Presentation extends Component {
             }}
           </SizeMe>
           {
-            (showPagesCount || (showActions && onChange)) && (
+            collection[index] && (showPagesCount || (showActions && onChange)) && (
               <div className={css.controls}>
                 {
                   showActions && onChange && (
