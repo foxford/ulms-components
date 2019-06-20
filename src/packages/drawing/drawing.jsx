@@ -14,12 +14,12 @@ export class DrawingComponent extends React.Component {
 
   componentDidMount () {
     const {
-      brushColor, brushMode, brushWidth, canDraw, height, width, objects, pageWidth,
+      brushColor, brushMode, brushWidth, canDraw, tool, height, width, objects, pageWidth,
     } = this.props
 
     if (canDraw) {
       this.initCanvas()
-      this.updateCanvasDrawingMode(canDraw)
+      this.updateCanvasDrawingMode(tool === 'brush')
       this.updateCanvasBrush({
         brushColor, brushMode, brushWidth,
       })
@@ -33,7 +33,7 @@ export class DrawingComponent extends React.Component {
 
   componentDidUpdate (prevProps) {
     const {
-      brushColor, brushMode, brushWidth, canDraw, height, width, objects, pageWidth,
+      brushColor, brushMode, brushWidth, canDraw, tool, height, width, objects, pageWidth,
     } = this.props
 
     if (prevProps.canDraw !== canDraw) {
@@ -43,7 +43,7 @@ export class DrawingComponent extends React.Component {
 
       if (canDraw) {
         this.initCanvas()
-        this.updateCanvasDrawingMode(canDraw)
+        this.updateCanvasDrawingMode(tool === 'brush')
         this.updateCanvasBrush({
           brushColor, brushMode, brushWidth,
         })
@@ -72,6 +72,10 @@ export class DrawingComponent extends React.Component {
         brushColor, brushMode, brushWidth,
       })
     }
+
+    if (prevProps.tool !== tool) {
+      this.updateCanvasDrawingMode(tool === 'brush')
+    }
   }
 
   componentWillUnmount () {
@@ -93,6 +97,12 @@ export class DrawingComponent extends React.Component {
       } else {
         delete object.remote
       }
+    })
+
+    this.canvas.on('object:modified', (event) => {
+      const object = event.target
+
+      onDraw(object.toObject(['_id']))
     })
   }
 
