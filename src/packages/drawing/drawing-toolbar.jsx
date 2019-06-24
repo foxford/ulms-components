@@ -52,7 +52,7 @@ export class DrawingToolbarComponent extends React.Component {
 
   render () {
     const {
-      brushColor, brushMode, brushWidth,
+      brushColor, brushMode, brushWidth, colors,
     } = this.props
     const { colorPickerOpened } = this.state
 
@@ -77,7 +77,19 @@ export class DrawingToolbarComponent extends React.Component {
               <div className={css.popover}>
                 <TwitterPicker
                   color={brushColor}
+                  colors={colors}
+                  styles={{
+                    'default': {
+                      hash: {
+                        display: 'none',
+                      },
+                      input: {
+                        display: 'none',
+                      },
+                    },
+                  }}
                   triangle='hide'
+                  width={204}
                   onChangeComplete={this.handleColorChange}
                 />
               </div>
