@@ -83,11 +83,20 @@ export class DrawingComponent extends React.Component {
   }
 
   initCanvas () {
-    const { onDraw } = this.props
+    const { onDraw, onObjectClick } = this.props
 
     this.canvas = new fabric.Canvas('canvas')
 
     this.canvas.freeDrawingBrush.width = 12
+    this.canvas.perPixelTargetFind = true
+
+    this.canvas.on('mouse:up', (event) => {
+      const object = event.target
+
+      if (object !== null) {
+        onObjectClick(object.toObject(['_id']))
+      }
+    })
 
     this.canvas.on('object:added', (event) => {
       const object = event.target
