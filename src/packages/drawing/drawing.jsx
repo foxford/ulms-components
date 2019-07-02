@@ -89,6 +89,7 @@ export class DrawingComponent extends React.Component {
 
     this.canvas.freeDrawingBrush.width = 12
     this.canvas.perPixelTargetFind = true
+    this.canvas.selection = false
 
     this.canvas.on('mouse:up', (event) => {
       const object = event.target
