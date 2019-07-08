@@ -83,7 +83,9 @@ export class DrawingComponent extends React.Component {
   }
 
   initCanvas () {
-    const { onDraw, onObjectClick } = this.props
+    const {
+      onDraw, onObjectClick, uniqId,
+    } = this.props
 
     this.canvas = new fabric.Canvas('canvas')
 
@@ -103,7 +105,8 @@ export class DrawingComponent extends React.Component {
       const object = event.target
 
       if (!object.remote) {
-        onDraw(object.toObject())
+        object._id = uniqId()
+        onDraw(object.toObject(['_id']))
       } else {
         delete object.remote
       }
@@ -154,15 +157,47 @@ export class DrawingComponent extends React.Component {
   }
 
   updateCanvasObjects (objects) {
-    this.canvas.clear()
-    this.canvas.loadFromJSON(
-      {
-        objects: objects.map(_ => ({ ..._, remote: true })),
-      },
-      () => {
-        this.canvas.renderAll()
+    const canvasObjects = this.canvas.getObjects()
+    const canvasObjectIds = canvasObjects.map(_ => _._id)
+    const newObjectIds = objects.map(_ => _._id)
+    const objectsToRemove = []
+
+    canvasObjects.forEach((_) => {
+      if (newObjectIds.indexOf(_._id) === -1) {
+        objectsToRemove.push(_)
       }
-    )
+    })
+
+    if (objectsToRemove.length > 0) {
+      this.canvas.remove(...objectsToRemove)
+    }
+
+    objects.forEach((_) => {
+      const objIndex = canvasObjectIds.indexOf(_._id)
+
+      if (objIndex === -1) {
+        // add
+        fabric.util.enlivenObjects([{ ..._, remote: true }], ([fObject]) => {
+          this.canvas.add(fObject)
+        })
+      } else {
+        // update
+        canvasObjects[objIndex].set(_)
+        canvasObjects[objIndex].setCoords()
+      }
+    })
+
+    this.canvas.requestRenderAll()
+
+    // this.canvas.clear()
+    // this.canvas.loadFromJSON(
+    //   {
+    //     objects: objects.map(_ => ({ ..._, remote: true })),
+    //   },
+    //   () => {
+    //     this.canvas.renderAll()
+    //   }
+    // )
   }
 
   render () {
