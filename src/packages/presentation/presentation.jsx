@@ -112,6 +112,7 @@ class Presentation extends Component {
         className={css.root}
         onKeyDown={this.handleKeyDownEvent}
         tabIndex={-1}
+        data-presentation-root
       >
         {
           showPreviews && (
@@ -192,6 +193,7 @@ class Presentation extends Component {
                         className={css.linkArrow}
                         onClick={this.handlePrevious}
                         disabled={index === 0}
+                        data-presentation-previous
                       >
                         <span className={css.linkArrowIcon}><Icons name='arrow-left' size='xs' /></span> Назад
                       </button>
@@ -213,6 +215,7 @@ class Presentation extends Component {
                         className={css.linkArrow}
                         onClick={this.handleNext}
                         disabled={index === collection.length - 1}
+                        data-presentation-next
                       >
                         Вперед <span className={css.linkArrowIcon}><Icons name='arrow-right' size='xs' /></span>
                       </button>
