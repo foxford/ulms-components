@@ -1,0 +1,28 @@
+:host, .root { }
+
+.root {
+  background: no-repeat center center #ffffff;
+  border-radius: var(--media-ui-button-border-top-left-radius, 5px) var(--media-ui-button-border-top-right-radius, 5px) var(--media-ui-button-border-bottom-right-radius, 5px) var(--media-ui-button-border-bottom-left-radius, 5px);
+  box-sizing: content-box;
+  color: var(--media-ui-button-color, currentColor);
+  cursor: pointer;
+  font-size: var(--media-ui-button-font-size, 1em);
+  min-height: var(--media-ui-button-height-min, 20px);
+  min-width: var(--media-ui-button-width-min, 20px);
+  outline: none;
+  padding-bottom: var(--media-ui-button-padding-bottom, 14px);
+  padding-left: var(--media-ui-button-padding-left, 14px);
+  padding-right: var(--media-ui-button-padding-right, 14px);
+  padding-top: var(--media-ui-button-padding-top, 14px);
+  position: relative;
+}
+
+.root.active
+,.root:hover:not(:disabled)
+{
+  cursor: pointer;
+}
+
+.root:disabled {
+  cursor: not-allowed;
+}

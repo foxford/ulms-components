@@ -1,4 +1,4 @@
-:root {
+:host, .root {
   --icons-size-xxxs: 10px;
   --icons-size-xxs: 14px;
   --icons-size-xs: 16px;
@@ -9,23 +9,35 @@
   --icons-size-xl: 34px;
   --icons-size-xxl: 38px;
   --icons-size-xxxl: 42px;
-  --icons-color: transparent
+  --icons-color: transparent;
+  --icons-color-active: transparent;
 }
 
-.root{
+.root {
+  color: var(--media-ui-icons-color, var(--icons-color));
   display: inline-block;
   flex-shrink: 0;
+  height: 1em;
   vertical-align: baseline;
   width: 1em;
-  height: 1em;
-  color: var(--icons-color);
+}
+.root:hover {
+  color: var(--media-ui-icons-color-active, var(--icons-color-active));
 }
 
-.root svg{
+.root svg {
   display: block;
-  width: 100%;
   height: 100%;
+  width: 100%;
+}
+
+.root svg path {
   fill: currentColor;
+}
+
+.root.bullet svg path {
+  fill: transparent;
+  stroke: currentColor;
 }
 
 :export {

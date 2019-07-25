@@ -1,53 +1,60 @@
-:root {
+:host, .root {
   --layout-switcher-control-padding-size: 14px;
+
+  --media-ui-button-border-top-left-radius: 0;
+  --media-ui-button-border-top-right-radius: 0;
+  --media-ui-button-border-bottom-right-radius: 0;
+  --media-ui-button-border-bottom-left-radius: 0;
+
+  --media-ui-icons-color: currentColor;
+  --media-ui-icons-color-active: currentColor;
 }
 
-.control {
-  width: var(--layout-switcher-control-width, 20px);
-  height: var(--layout-switcher-control-height, 20px);
-  background: no-repeat center center #ffffff;
-  padding-top: var(--layout-switcher-control-padding-size);
-  padding-right: var(--layout-switcher-control-padding-size);
-  padding-bottom: var(--layout-switcher-control-padding-size);
-  padding-left: var(--layout-switcher-control-padding-size);
-  display: inline-block;
+.root {
+  background: no-repeat center center #fff;
+  border-bottom: 0;
   border-left: 1px solid #b8b8b8;
   border-right: 0;
-  position: relative;
-  cursor: pointer;
-  box-sizing: content-box;
-  border-bottom: 0;
   border-top: 0;
+  box-sizing: content-box;
+  color: #b8b8b8;
+  cursor: pointer;
+  display: inline-block;
+  height: var(--layout-switcher-control-height, 20px);
   outline: none;
+  padding-bottom: var(--layout-switcher-control-padding-size);
+  padding-left: var(--layout-switcher-control-padding-size);
+  padding-right: var(--layout-switcher-control-padding-size);
+  padding-top: var(--layout-switcher-control-padding-size);
+  position: relative;
+  width: var(--layout-switcher-control-width, 20px);
 }
-
-.control.active,
-.control:hover:not(:disabled) {
+.root.active,
+.root:hover:not(:disabled) {
   background-color: #F6F6F6;
+  color: #333;
 }
-
-.control svg {
-  display: block;
-}
-
-.control.active svg path,
-.control:hover:not(:disabled) svg path {
-  fill: #333333;
-}
-
-.control:disabled {
+.root:disabled {
+  color: #333;
   cursor: not-allowed;
 }
 
-.control .bullet {
+.root svg {
+  display: block;
+}
+.root.active svg path,
+.root:hover:not(:disabled) svg path {
+  fill: #333;
+}
+
+.root .bullet {
   position: absolute;
   top: 8px;
   right: 8px;
   width: 6px;
   height: 6px;
 }
-
-.control .bullet svg path {
+.root .bullet svg path {
   fill: #FF7256;
   stroke: #FF7256;
 }

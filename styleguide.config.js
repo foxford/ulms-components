@@ -48,8 +48,8 @@ module.exports = {
         {
           enforce: 'pre',
           test: /\.css$/,
-          exclude: /node_modules/,
-          include: path.resolve(__dirname, 'src'),
+          exclude: /node_modules\/(?!rc-slider)/ig,
+          include: [path.resolve(__dirname, 'src'), /node_modules\/rc-slider/],
           use: [
             'style-loader',
             {

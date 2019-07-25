@@ -1,0 +1,77 @@
+:host, .root {
+  /* --media-ui-button-color: #333; */
+  --media-ui-button-padding-bottom: 0;
+  --media-ui-button-padding-left: 0;
+  --media-ui-button-padding-right: 0;
+  --media-ui-button-padding-top: 0;
+
+  --media-ui-icons-color: #333;
+}
+
+.root {
+  display: inline-block;
+  font-size: 1em;
+  padding: var(--media-ui-action-button-group-padding, 14px);
+  position: relative;
+}
+.root:hover {
+  cursor: pointer;
+}
+.root.disabled {
+  cursor: not-allowed;
+}
+.root + .root {
+  margin-left: 25px;
+}
+
+/* TODO: add media-queries */
+
+.root .button {
+  background: transparent;
+  border: 0;
+  display: flex;
+  font-weight: 500;
+  position: relative;
+}
+.root:hover
+,.root.active
+,.root:hover .button > *
+,.root.active .button > *
+{
+  color: #48A1E6;
+}
+.root .button.active > * {
+  filter: brightness(83%);
+}
+
+.root .textAfter {
+  padding-left: 10px
+}
+
+.root .underline {
+  height: 3px;
+  width: 100%;
+  margin-top: 10px;
+}
+.root:hover .underline
+,.root.active .underline
+{
+  background-color: #48A1E6;
+}
+.root.active .underline {
+  filter: brightness(83%);
+}
+
+.root .bullet {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 6px;
+  height: 6px;
+  top: 0;
+}
+.root .bullet > svg path {
+  fill: #FF7256;
+  stroke: #FF7256;
+}
+
