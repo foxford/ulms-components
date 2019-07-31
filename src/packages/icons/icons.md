@@ -14,6 +14,12 @@
   <br/>
   <Icons name="bullet" />
   <br/>
+  <Icons name="comment-outline" />
+  <br/>
+  <Icons name="compress" />
+  <br/>
+  <Icons name="expand" />
+  <br/>
   <Icons name="feed" />
   <br/>
   <Icons name="slides" />
@@ -69,6 +75,9 @@
 <div style={{width: '20px'}}>
   <Icons.Arrow />
   <Icons.Bullet />
+  <Icons.CommentOutline />
+  <Icons.Compress />
+  <Icons.Expand />
   <Icons.Feed />
   <Icons.Slides />
   <Icons.Video />

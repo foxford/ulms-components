@@ -6,7 +6,10 @@ import Arrow from './images/arrow.svg'
 import ArrowLeft from './images/arrow-left.svg'
 import ArrowRight from './images/arrow-right.svg'
 import Bullet from './images/bullet.svg'
+import CommentOutline from './images/comment-outline.svg'
+import Compress from './images/compress.svg'
 import Edit from './images/edit.svg'
+import Expand from './images/expand.svg'
 import Feed from './images/feed.svg'
 import Slides from './images/slides.svg'
 import Video from './images/video.svg'
@@ -18,7 +21,10 @@ const icons = new Map([
   ['arrow-right', ArrowRight],
   ['arrow', Arrow],
   ['bullet', Bullet],
+  ['comment-outline', CommentOutline],
+  ['compress', Compress],
   ['edit', Edit],
+  ['expand', Expand],
   ['feed', Feed],
   ['slides', Slides],
   ['video', Video],
@@ -57,7 +63,10 @@ Icons.Arrow = Arrow
 Icons.ArrowLeft = ArrowLeft
 Icons.ArrowRight = ArrowRight
 Icons.Bullet = Bullet
+Icons.CommentOutline = CommentOutline
+Icons.Compress = Compress
 Icons.Edit = Edit
+Icons.Expand = Expand
 Icons.Feed = Feed
 Icons.Slides = Slides
 Icons.Video = Video
