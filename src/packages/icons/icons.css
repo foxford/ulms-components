@@ -9,12 +9,11 @@
   --icons-size-xl: 34px;
   --icons-size-xxl: 38px;
   --icons-size-xxxl: 42px;
-  --icons-color: transparent;
-  --icons-color-active: transparent;
 }
 
 .root {
-  color: var(--media-ui-icons-color, var(--icons-color));
+  color: currentColor;
+  color: var(--media-ui-icons-color);
   display: inline-block;
   flex-shrink: 0;
   height: 1em;
@@ -22,7 +21,10 @@
   width: 1em;
 }
 .root:hover {
-  color: var(--media-ui-icons-color-active, var(--icons-color-active));
+  color: var(--media-ui-icons-color-hover);
+}
+.root:active {
+  color: var(--media-ui-icons-color-active);
 }
 
 .root svg {

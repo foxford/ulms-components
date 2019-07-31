@@ -39,32 +39,36 @@ const shouldMinifyCss = options => process.env.NODE_ENV === 'production' ? cssna
 
 const shouldUglify = (options = uglifyOptions, minifier) => process.env.NODE_ENV === 'production' ? uglify(options, minifier) : []
 
-const postcssPlugins = [
-  cssurl({ url: 'inline' }),
-  env(),
-  cssnext(),
-  cssdupl()
-].concat(shouldMinifyCss())
+const processAsCssModule = function(){
+  this.options = {
+    ...this.options, modules: true, namedExports: true,
+  }
+}
 
 const rollupPlugins = [ // order matters
   json(),
   svgr(),
   postcss({
     extract: true,
-    plugins: postcssPlugins,
+    plugins: [
+      cssurl({ url: 'inline' }),
+      env(),
+      cssnext(),
+      cssdupl()
+    ].concat(shouldMinifyCss()),
     loaders: [
       {
         name: 'postcss',
         alwaysProcess: true,
-        test: /\.css/,
+        test: /\.css$/,
         process (_) {
-          if (
-            /\.css/.test(this.id)
-            && !(/@foxford\/ui/.exec(this.id))
-          ) {
-            this.options = {
-              ...this.options, modules: true, namedExports: true,
-            }
+          if(/node_modules\/@foxford\/ui\/.*\.css$/.exec(this.id)){
+            // do nothing as we going to import file as is
+          } else if(/node_modules\/.*\.css$/.exec(this.id)){
+            // do nothing as we going to import file as is
+          } else {
+            processAsCssModule.call(this)
+            // process css as css-modules
           }
           // :up is crucial to allow transpile local and external .css separately
 
@@ -93,35 +97,35 @@ const rollupPlugins = [ // order matters
   })
 ].concat(shouldUglify())
 
-const dist = (entry, frm = 'src/packages', out = 'packages') => ({
-  input: `${frm}/${entry}`,
-  output: {
-    file: `${out}/${entry}`,
-    format: 'cjs',
-  },
-  file: `${out}/${entry}`, // that's important duplicate
-  cache: true,
-  perf: false,
-  external: Object.keys(peerDependencies),
-  plugins: rollupPlugins,
-  onwarn: function(warning, warn){
-    if(!warning.code) return globalDebug(warning.message)
+const dist = (entry, frm = 'src/packages', out = 'packages') => {
+  const opts = ({
+    input: `${frm}/${entry}`,
+    output: {
+      file: `${out}/${entry}`,
+      format: 'cjs',
+    },
+    file: `${out}/${entry}`, // that's important duplicate
+    external: Object.keys(peerDependencies),
+    plugins: rollupPlugins,
+    onwarn: function(warning, warn){
+      if(!warning.code) return globalDebug(warning.message)
 
-    const debug = Debug(`${name}:${warning.code}`)
+      const debug = Debug(`${name}:${warning.code}`)
 
-    if(process.env.LOG_DEBUG) debug(warning)
+      if(process.env.LOG_DEBUG) debug(warning)
 
-    if(warning.code === 'UNKNOWN_OPTION'){
-      if(process.env.LOG_DEBUG) debug(warning.message)
-      return
-    } else if(warning.code) {
-      return debug(warning.message)
+      if(warning.code === 'UNKNOWN_OPTION'){
+        if(process.env.LOG_DEBUG) debug(warning.message)
+        return
+      } else if(warning.code) {
+        return debug(warning.message)
+      }
+
+      globalDebug(warning.message)
     }
+  })
 
-    globalDebug(warning.message)
-  }
-})
+  return opts
+}
 
 exports.dist = dist
-
-exports.default = dist()

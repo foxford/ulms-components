@@ -19,6 +19,7 @@ function ActionButtonGroup (props) {
           [css.root]: true,
           [css.active]: item.active,
           [css.disabled]: item.disabled,
+          [props.className]: props.className,
         })}
         key={`action-button-group-item-${index}`}
       >

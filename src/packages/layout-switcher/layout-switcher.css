@@ -10,7 +10,9 @@
   --media-ui-icons-color-active: currentColor;
 }
 
-.root {
+.root { }
+
+.root .button {
   background: no-repeat center center #fff;
   border-bottom: 0;
   border-left: 1px solid #b8b8b8;
@@ -29,32 +31,33 @@
   position: relative;
   width: var(--layout-switcher-control-width, 20px);
 }
-.root.active,
-.root:hover:not(:disabled) {
+
+.root .button.active,
+.root .button:hover:not(:disabled) {
   background-color: #F6F6F6;
   color: #333;
 }
-.root:disabled {
+.root .button:disabled {
   color: #333;
   cursor: not-allowed;
 }
 
-.root svg {
+.root .button svg {
   display: block;
 }
-.root.active svg path,
-.root:hover:not(:disabled) svg path {
+.root .button.active svg path,
+.root .button:hover:not(:disabled) svg path {
   fill: #333;
 }
 
-.root .bullet {
+.root .button .bullet {
   position: absolute;
   top: 8px;
   right: 8px;
   width: 6px;
   height: 6px;
 }
-.root .bullet svg path {
+.root .button .bullet svg path {
   fill: #FF7256;
   stroke: #FF7256;
 }

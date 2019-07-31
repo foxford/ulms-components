@@ -49,7 +49,7 @@ const items = [
   <style dangerouslySetInnerHTML={{__html: `
     .styleguidist-action-button-group [class^="action-button-group-root"] {
       font-size: 16px;
-      // color: yellow;
+      --media-ui-action-button-group-padding-bottom:0;
     }
     /* here we might overwrite default variables */
   `}} />

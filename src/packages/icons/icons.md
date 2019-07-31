@@ -1,10 +1,12 @@
 ### Icons
 
 ```js
-<div className="styleguidist-icons">
+<div className="styleguidist-icons-1">
   <style dangerouslySetInnerHTML={{__html: `
-    .styleguidist-icons [class^="icons-root"] {
+    .styleguidist-icons-1 {
       color: #000;
+      --media-ui-icons-color-hover: #333;
+      --media-ui-icons-color-active: #888;
     }
     /* here we might overwrite default variables */
   `}} />
@@ -23,11 +25,9 @@
 
 #### Sizeable icons
 ```js
-<div className="styleguidist-icons">
+<div className="styleguidist-icons-2">
   <style dangerouslySetInnerHTML={{__html: `
-    .styleguidist-icons [class^="icons-root"] {
-      color: #000;
-    }
+    .styleguidist-icons-2 { }
     /* here we might overwrite default variables */
   `}} />
   <Icons name="arrow" size="xxxs" />
@@ -53,11 +53,9 @@
 
 #### Custom icons
 ```js
-<div className="styleguidist-icons">
+<div className="styleguidist-icons-3">
   <style dangerouslySetInnerHTML={{__html: `
-    .styleguidist-icons [class^="icons-root"] {
-      color: #000;
-    }
+    .styleguidist-icons-3 { }
     /* here we might overwrite default variables */
   `}} />
   <Icons>
