@@ -2,7 +2,7 @@
 
 import Base from './base'
 
-class EraserTool extends Base {
+export default class EraserTool extends Base {
   constructor (canvas) {
     super(canvas)
 
@@ -56,5 +56,3 @@ class EraserTool extends Base {
     }
   }
 }
-
-export default EraserTool

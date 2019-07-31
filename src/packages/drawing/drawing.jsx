@@ -1,9 +1,10 @@
 /* eslint-disable react/prop-types */
-import React from 'react'
+import React, { Fragment } from 'react'
 import { fabric } from 'fabric'
 
 import { toCSSColor } from '../../util/helpers'
 
+import DynamicPattern from './tools/dynamic-pattern'
 import EraserTool from './tools/eraser'
 import PanTool from './tools/pan'
 import PenTool from './tools/pen'
@@ -29,20 +30,24 @@ export class DrawingComponent extends React.Component {
     brushWidth: 12,
     tool: toolEnum.PEN,
     zoom: 1,
+    zoomToCenter: false,
   }
 
   constructor () {
     super()
 
     this.canvas = null
+    this.canvasPattern = null
     this.canvasRef = React.createRef()
+    this.canvasPatternRef = React.createRef()
+    this.dynamicPattern = null
     this.ignoreObjectRemovedEvent = false
     this.tool = null
   }
 
   componentDidMount () {
     const {
-      canDraw, tool, height, width, objects, zoom,
+      canDraw, tool, height, width, objects, pattern, zoom,
     } = this.props
 
     if (canDraw) {
@@ -52,13 +57,23 @@ export class DrawingComponent extends React.Component {
       this.initStaticCanvas()
     }
 
+    if (pattern) {
+      this.initCanvasPattern()
+
+      this.dynamicPattern = new DynamicPattern(this.canvasPattern)
+
+      this.updateCanvasPatternParameters(height, width)
+      this.dynamicPattern.setPattern(pattern)
+      this.updateCanvasPattern()
+    }
+
     this.updateCanvasParameters(height, width, zoom)
     this.updateCanvasObjects(objects)
   }
 
   componentDidUpdate (prevProps) {
     const {
-      brushColor, brushMode, brushWidth, canDraw, tool, height, width, objects, zoom,
+      brushColor, brushMode, brushWidth, canDraw, tool, height, width, objects, pattern, zoom,
     } = this.props
 
     if (prevProps.canDraw !== canDraw) {
@@ -77,8 +92,30 @@ export class DrawingComponent extends React.Component {
       this.updateCanvasObjects(objects)
     }
 
+    if (prevProps.pattern !== pattern) {
+      if (pattern !== null) {
+        if (!this.dynamicPattern) {
+          this.initCanvasPattern()
+
+          this.dynamicPattern = new DynamicPattern(this.canvasPattern)
+          this.updateCanvasPatternParameters(height, width)
+        }
+
+        this.dynamicPattern.setPattern(pattern)
+        this.updateCanvasPattern()
+      } else {
+        this.dynamicPattern.destroy()
+        this.destroyCanvasPattern()
+      }
+    }
+
     if (prevProps.height !== height || prevProps.width !== width || prevProps.zoom !== zoom) {
       this.updateCanvasParameters(height, width, zoom)
+
+      if (this.dynamicPattern) {
+        this.updateCanvasPatternParameters(height, width)
+        this.updateCanvasPattern()
+      }
     }
 
     if (prevProps.objects && objects && prevProps.objects !== objects) {
@@ -99,6 +136,11 @@ export class DrawingComponent extends React.Component {
   }
 
   componentWillUnmount () {
+    if (this.dynamicPattern) {
+      this.dynamicPattern.destroy()
+    }
+
+    this.destroyCanvasPattern()
     this.destroyCanvas()
   }
 
@@ -116,6 +158,10 @@ export class DrawingComponent extends React.Component {
 
   _handleObjectAdded = (opts) => {
     this.tool.handleObjectAddedEvent(opts)
+  }
+
+  _handleAfterRender = () => {
+    this.updateCanvasPattern()
   }
 
   initCanvas () {
@@ -157,6 +203,8 @@ export class DrawingComponent extends React.Component {
       onObjectRemove && onObjectRemove(object.toObject(['_id']))
     })
 
+    this.canvas.on('after:render', () => this._handleAfterRender())
+
     // this.canvas.on('mouse:wheel', (opt) => {
     //   const delta = opt.e.deltaY
     //   let zoom = this.canvas.getZoom()
@@ -173,8 +221,22 @@ export class DrawingComponent extends React.Component {
     // })
   }
 
+  initCanvasPattern () {
+    this.canvasPattern = new fabric.StaticCanvas('canvasPattern')
+  }
+
   initStaticCanvas () {
     this.canvas = new fabric.StaticCanvas('canvas')
+  }
+
+  updateCanvasPattern () {
+    if (this.dynamicPattern) {
+      this.dynamicPattern.update({
+        offsetX: this.canvas.viewportTransform[4],
+        offsetY: this.canvas.viewportTransform[5],
+        zoom: this.canvas.getZoom(),
+      })
+    }
   }
 
   destroyCanvas () {
@@ -183,6 +245,15 @@ export class DrawingComponent extends React.Component {
       this.canvas.dispose()
 
       this.canvas = null
+    }
+  }
+
+  destroyCanvasPattern () {
+    if (this.canvasPattern !== null) {
+      this.canvasPattern.clear()
+      this.canvasPattern.dispose()
+
+      this.canvasPattern = null
     }
   }
 
@@ -250,10 +321,22 @@ export class DrawingComponent extends React.Component {
   }
 
   updateCanvasParameters (height, width, zoom) {
+    const { zoomToCenter } = this.props
+
     if (height && width && zoom) {
-      this.canvas.setHeight(height)
-      this.canvas.setWidth(width)
-      this.canvas.setZoom(zoom)
+      this.canvas.setDimensions({ height, width })
+
+      if (zoomToCenter) {
+        this.canvas.zoomToPoint({ x: width / 2, y: height / 2 }, zoom)
+      } else {
+        this.canvas.setZoom(zoom)
+      }
+    }
+  }
+
+  updateCanvasPatternParameters (height, width) {
+    if (height && width) {
+      this.canvasPattern.setDimensions({ height, width })
     }
   }
 
@@ -304,10 +387,15 @@ export class DrawingComponent extends React.Component {
   }
 
   render () {
-    const { height, width } = this.props
+    const {
+      height, width, pattern,
+    } = this.props
 
     return (
-      <canvas id='canvas' ref={this.canvasRef} width={width} height={height} />
+      <Fragment>
+        { pattern && <canvas id='canvasPattern' ref={this.canvasPatternRef} width={width} height={height} style={{ position: 'absolute' }} /> }
+        <canvas id='canvas' ref={this.canvasRef} width={width} height={height} />
+      </Fragment>
     )
   }
 }

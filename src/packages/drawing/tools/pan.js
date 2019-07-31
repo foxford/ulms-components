@@ -2,7 +2,7 @@
 
 import Base from './base'
 
-class PanTool extends Base {
+export default class PanTool extends Base {
   constructor (canvas) {
     super(canvas)
 
@@ -55,5 +55,3 @@ class PanTool extends Base {
     Object.assign(opts.target, { selectable: false, evented: false })
   }
 }
-
-export default PanTool
