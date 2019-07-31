@@ -2,7 +2,7 @@
 
 import Base from './base'
 
-class PenTool extends Base {
+export default class PenTool extends Base {
   configure (props) {
     this._canvas.isDrawingMode = true
     this._canvas.freeDrawingBrush.color = props.lineColor
@@ -12,5 +12,3 @@ class PenTool extends Base {
     this._canvas.setCursor('crosshair')
   }
 }
-
-export default PenTool

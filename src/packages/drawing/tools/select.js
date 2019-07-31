@@ -2,7 +2,7 @@
 
 import Base from './base'
 
-class SelectTool extends Base {
+export default class SelectTool extends Base {
   constructor (canvas) {
     super(canvas)
 
@@ -23,5 +23,3 @@ class SelectTool extends Base {
     Object.assign(opts.target, { selectable: true, evented: true })
   }
 }
-
-export default SelectTool
