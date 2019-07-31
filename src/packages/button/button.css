@@ -6,7 +6,6 @@
 }
 
 .root {
-  background: no-repeat center center #ffffff;
   border-radius: var(--media-ui-button-border-top-left-radius) var(--media-ui-button-border-top-right-radius) var(--media-ui-button-border-bottom-right-radius) var(--media-ui-button-border-bottom-left-radius);
   box-sizing: content-box;
   color: var(--media-ui-button-color);

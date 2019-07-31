@@ -23,7 +23,7 @@ function LayoutSwitcher (props) {
             title={item.title}
           >
             {item.children}
-            {item.showBullet && <div className={css.bullet}><Icons.Bullet /></div>}
+            {item.showBullet && (<div className={css.bullet}><Icons.Bullet /></div>)}
           </Button>
         ))
       }
