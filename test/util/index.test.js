@@ -3,12 +3,9 @@ const tap = require('tap')
 const { Debug } = require('../../src/util/index')
 
 tap.test('`Debug` helper is generally ok', (test) => {
-  Promise.resolve(() => Debug())
-    .then(fn => fn())
-    .catch((error) => {
-      tap.throws(error)
-    })
+  const p = Promise.resolve(() => Debug()).then(fn => fn())
 
+  tap.rejects(p, new TypeError('Namespace should be a string'))
   test.end()
 })
 

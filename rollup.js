@@ -16,7 +16,21 @@ const out = 'packages'
 const packages = path.resolve(__dirname, src)
 const packagesOut = path.resolve(__dirname, out)
 
-const WHITELIST = !process.env.WHITELIST ? [] : process.env.WHITELIST.split(',').map(it => it.toLowerCase())
+const extractArg = function extractArgument (argName) {
+  const fromArgv = (it) => {
+    const pattern = `^${it}=(.*)$`
+    const exist = process.argv.findIndex(_ => new RegExp(pattern).exec(_))
+
+    if (~exist && !process.argv[exist]) throw new Error('Argument is absent')
+
+    return !~exist ? undefined : process.argv[exist].match(new RegExp(pattern))[1]
+  }
+  const arg = process.env[argName]
+
+  return !arg ? fromArgv(argName) : arg
+}
+
+const WHITELIST = (maybeList => !maybeList ? [] : maybeList.split(',').map(it => it.toLowerCase()))(extractArg('WHITELIST'))
 
 debug('Whitelist:', WHITELIST)
 
@@ -62,43 +76,44 @@ async function processImageFolder (entry) {
   return copyDir(`${packages}/${entry}`, outdir)
 }
 
-readDir(packages)
-  .then(result => result.filter(it => !it.includes('.')))
-  .then(result => !WHITELIST.length
-    ? result
-    : result.filter(it => WHITELIST.includes(it.toLowerCase())))
-  .then(async (parents) => {
-    const children = parents.map(it => readDir(`${packages}/${it}`))
+const transpilePackages = function transpilePackages (dirNames) {
+  const children = dirNames.map(it => readDir(`${packages}/${it}`))
 
-    const result = await Promise.all(children)
-
-    const results = parents.reduce((acc, next, i) => {
+  return Promise.all(children)
+    .then(result => dirNames.reduce((acc, next, i) => {
       const list = result[i].map(it => `${next}/${it}`)
 
       return acc.concat(list)
-    }, [])
+    }, []))
+    .then(x => [].concat(x.filter(matchImage), x.filter(matchScript)))
+    .then((result) => {
+      const resolveScripts = it => it.map(processOne)
+      const resolveImages = it => it.map(processImageFolder)
 
-    return results
+      const payload = [].concat(
+        resolveImages(result.filter(matchImage)),
+        resolveScripts(result.filter(matchScript)),
+      )
+
+      return Promise.all(payload)
+    })
+}
+
+Promise.resolve(WHITELIST[0])
+  .then((packageName) => {
+    if (!packageName) throw new Error(`Could not process '${packageName}' package`)
+
+    return [packageName]
   })
-  .then(x => [].concat(x.filter(matchImage), x.filter(matchScript)))
-  .then((result) => {
-    const resolveScripts = it => it.map(processOne)
-    const resolveImages = it => it.map(processImageFolder)
-
-    const payload = [].concat(
-      resolveImages(result.filter(matchImage)),
-      resolveScripts(result.filter(matchScript)),
-    )
-
-    return Promise.all(payload)
-  })
+  .then(transpilePackages)
   .then(() => {
-    console.log('Successfully processed') // eslint-disable-line no-console
+    console.log(`Successfully process '${WHITELIST[0]}' package`) // eslint-disable-line no-console
 
     return process.exit(0) // eslint-disable-line unicorn/no-process-exit
   })
   .catch((error) => {
-    console.error(error) // eslint-disable-line no-console
+    console.error(error.message) // eslint-disable-line no-console
+    debug('Transpiling error:', error.stack)
 
-    return process.exit(0) // eslint-disable-line unicorn/no-process-exit
+    process.exit(1) // eslint-disable-line unicorn/no-process-exit
   })
