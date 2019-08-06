@@ -1,15 +1,14 @@
 :host, .root {
   --media-ui-icons-color: #333;
-  --media-ui-action-button-group-padding-top: 14px;
-  --media-ui-action-button-group-padding-right: 14px;
-  --media-ui-action-button-group-padding-bottom: 14px;
-  --media-ui-action-button-group-padding-left: 14px;
+  --media-ui-action-button-group-button-padding-top: 14px;
+  --media-ui-action-button-group-button-padding-right: 14px;
+  --media-ui-action-button-group-button-padding-bottom: 14px;
+  --media-ui-action-button-group-button-padding-left: 14px;
 }
 
 .root {
   display: inline-block;
   font-size: 1em;
-  padding: var(--media-ui-action-button-group-padding-top) var(--media-ui-action-button-group-padding-right) var(--media-ui-action-button-group-padding-bottom) var(--media-ui-action-button-group-padding-left);
   position: relative;
 }
 .root:hover {
@@ -25,32 +24,33 @@
 /* TODO: add media-queries */
 
 .root .button {
+  padding: var(--media-ui-action-button-group-button-padding-top) var(--media-ui-action-button-group-button-padding-right) var(--media-ui-action-button-group-button-padding-bottom) var(--media-ui-action-button-group-button-padding-left);
   --media-ui-button-padding-bottom: 0;
   --media-ui-button-padding-left: 0;
   --media-ui-button-padding-right: 0;
   --media-ui-button-padding-top: 0;
+  user-select: none;
 }
 .root .button {
   background: transparent;
   border: 0;
-  display: flex;
   font-weight: 500;
   position: relative;
 }
 .root:hover
-,.root:hover .button > *
+,.root:hover .button .content > *
 {
   color: #48A1E6;
 }
 .root:active
 ,.root.active
-,.root:active .button > *
-,.root.active .button > *
+,.root:active .button .content > *
+,.root.active .button .content > *
 {
   color: #48A1E6;
 }
-.root .button.active > *
-,.root .button:active > *
+.root .button.active .content > *
+,.root .button:active .content > *
 {
   filter: brightness(83%);
 }
@@ -62,7 +62,7 @@
 .root .underline {
   height: 3px;
   width: 100%;
-  margin-top: 10px;
+  margin-top: 11px;
 }
 .root:hover .underline {
   background-color: #48A1E6;
