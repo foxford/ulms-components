@@ -30,11 +30,13 @@ function ActionButtonGroup (props) {
           onClick={item.onClick}
           title={item.title}
         >
-          {item.children}
-          <span className={cx(css.text, typeof item.children !== 'undefined' ? css.textAfter : undefined)}>{item.text}</span>
+          <div className={css.content}>
+            {item.children}
+            <span className={cx(css.text, typeof item.children !== 'undefined' ? css.textAfter : undefined)}>{item.text}</span>
+          </div>
+          {item.showUnderline && (<div className={css.underline} />)}
         </Button>
         {item.showBullet && (<div className={css.bullet}><Icons.Bullet /></div>)}
-        {item.showUnderline && (<div className={css.underline} />)}
       </div>
     ))
   )
