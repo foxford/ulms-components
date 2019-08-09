@@ -320,6 +320,29 @@ export class DrawingComponent extends React.Component {
     }, options)
   }
 
+  existsInCanvas (id) {
+    const canvasObjectIds = this.canvas.getObjects().map(_ => _._id)
+
+    return canvasObjectIds.indexOf(id) !== -1
+  }
+
+  existsInObjects (id) {
+    const { objects } = this.props
+
+    return objects.map(_ => _._id).indexOf(id) !== -1
+  }
+
+  sortObjects () {
+    const { objects } = this.props
+    const canvasObjectIds = this.canvas.getObjects().map(_ => _._id)
+    const objectIds = objects.map(_ => _._id)
+    const filteredObjectIds = objectIds.filter(_ => canvasObjectIds.indexOf(_) !== -1) // eslint-disable-line max-len
+
+    this.canvas.forEachObject((_) => {
+      _.moveTo(filteredObjectIds.indexOf(_._id))
+    })
+  }
+
   updateCanvasParameters (height, width, zoom) {
     const { zoomToCenter } = this.props
 
@@ -364,7 +387,13 @@ export class DrawingComponent extends React.Component {
       if (objIndex === -1) {
         // add
         fabric.util.enlivenObjects([{ ..._, remote: true }], ([fObject]) => {
+          if (!this.existsInObjects(fObject._id) || this.existsInCanvas(fObject._id)) {
+            return
+          }
+
           this.canvas.add(fObject)
+
+          this.sortObjects()
         })
       } else {
         // update
@@ -374,16 +403,6 @@ export class DrawingComponent extends React.Component {
     })
 
     this.canvas.requestRenderAll()
-
-    // this.canvas.clear()
-    // this.canvas.loadFromJSON(
-    //   {
-    //     objects: objects.map(_ => ({ ..._, remote: true })),
-    //   },
-    //   () => {
-    //     this.canvas.renderAll()
-    //   }
-    // )
   }
 
   render () {
