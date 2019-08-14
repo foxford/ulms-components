@@ -367,6 +367,7 @@ export class DrawingComponent extends React.Component {
     const canvasObjects = this.canvas.getObjects()
     const canvasObjectIds = canvasObjects.map(_ => _._id)
     const newObjectIds = objects.map(_ => _._id)
+    const objectsToAdd = []
     const objectsToRemove = []
 
     canvasObjects.forEach((_) => {
@@ -386,21 +387,27 @@ export class DrawingComponent extends React.Component {
 
       if (objIndex === -1) {
         // add
-        fabric.util.enlivenObjects([{ ..._, remote: true }], ([fObject]) => {
-          if (!this.existsInObjects(fObject._id) || this.existsInCanvas(fObject._id)) {
-            return
-          }
-
-          this.canvas.add(fObject)
-
-          this.sortObjects()
-        })
+        objectsToAdd.push(_)
       } else {
         // update
         canvasObjects[objIndex].set(_)
         canvasObjects[objIndex].setCoords()
       }
     })
+
+    if (objectsToAdd.length) {
+      fabric.util.enlivenObjects(objectsToAdd.map(_ => ({ ..._, remote: true })), (fObjectList) => {
+        fObjectList.forEach((fObject) => {
+          if (!this.existsInObjects(fObject._id) || this.existsInCanvas(fObject._id)) {
+            return
+          }
+
+          this.canvas.add(fObject)
+        })
+
+        this.sortObjects()
+      })
+    }
 
     this.canvas.requestRenderAll()
   }
