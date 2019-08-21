@@ -23,25 +23,25 @@ export default class PanTool extends Base {
   }
 
   handleMouseDownEvent (opts) {
-    const { clientX, clientY } = opts.e
+    const { x, y } = opts.pointer
 
     this._isDown = true
-    this._lastPosX = clientX
-    this._lastPosY = clientY
+    this._lastPosX = x
+    this._lastPosY = y
     this._canvas.setCursor('grabbing')
   }
 
   handleMouseMoveEvent (opts) {
     if (!this._isDown) return
 
-    const { clientX, clientY } = opts.e
+    const { x, y } = opts.pointer
 
-    this._canvas.viewportTransform[4] += clientX - this._lastPosX;
-    this._canvas.viewportTransform[5] += clientY - this._lastPosY;
+    this._canvas.viewportTransform[4] += x - this._lastPosX;
+    this._canvas.viewportTransform[5] += y - this._lastPosY;
     this._canvas.setCursor('grabbing')
     this._canvas.requestRenderAll()
-    this._lastPosX = clientX
-    this._lastPosY = clientY
+    this._lastPosX = x
+    this._lastPosY = y
   }
 
   handleMouseUpEvent () {
