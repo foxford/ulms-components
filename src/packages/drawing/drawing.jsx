@@ -351,7 +351,7 @@ export class DrawingComponent extends React.Component {
 
     focus()
 
-    return itext
+    return itext.toObject(['_id'])
   }
 
   existsInCanvas (id) {
