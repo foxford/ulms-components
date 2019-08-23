@@ -9,6 +9,7 @@ import EraserTool from './tools/eraser'
 import PanTool from './tools/pan'
 import PenTool from './tools/pen'
 import SelectTool from './tools/select'
+import { InteractiveText } from './tools/interactive-text'
 
 export const toolEnum = {
   ERASER: 'eraser',
@@ -166,7 +167,7 @@ export class DrawingComponent extends React.Component {
 
   initCanvas () {
     const {
-      onDraw, onObjectRemove, uniqId,
+      onDraw, onDrawUpdate, onObjectRemove, uniqId, onTextEditingEnd,
     } = this.props
 
     this.canvas = new fabric.Canvas('canvas')
@@ -192,7 +193,7 @@ export class DrawingComponent extends React.Component {
     this.canvas.on('object:modified', (event) => {
       const object = event.target
 
-      onDraw && onDraw(object.toObject(['_id']))
+      onDrawUpdate && onDrawUpdate(object.toObject(['_id']))
     })
 
     this.canvas.on('object:removed', (event) => {
@@ -204,6 +205,12 @@ export class DrawingComponent extends React.Component {
     })
 
     this.canvas.on('after:render', () => this._handleAfterRender())
+
+    this.canvas.on('text:editing:exited', ({ target }) => {
+      onTextEditingEnd
+        && target.text !== target._textBeforeEdit
+        && onTextEditingEnd(target.toObject(['_id']))
+    })
 
     // this.canvas.on('mouse:wheel', (opt) => {
     //   const delta = opt.e.deltaY
@@ -320,6 +327,33 @@ export class DrawingComponent extends React.Component {
     }, options)
   }
 
+  addText (text, options) {
+    const { itext, focus } = InteractiveText(this.canvas, undefined, {
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif',
+      angle: 0,
+      scaleX: 0.5,
+      scaleY: 0.5,
+      fontWeight: '',
+      originX: 'left',
+      hasRotatingPoint: true,
+      centerTransform: true,
+      fillNext: options.fill,
+      ...options,
+    })
+
+    const { tl, br } = this.canvas.calcViewportBoundaries()
+    const rect = itext.getBoundingRect()
+
+    itext.set('left', br.x - (br.x - tl.x) / 2 - rect.width / 2)
+    itext.set('top', br.y - (br.y - tl.y) / 2 - rect.height / 2)
+
+    this.canvas.add(itext)
+
+    focus()
+
+    return itext
+  }
+
   existsInCanvas (id) {
     const canvasObjectIds = this.canvas.getObjects().map(_ => _._id)
 
@@ -419,7 +453,7 @@ export class DrawingComponent extends React.Component {
 
     return (
       <Fragment>
-        { pattern && <canvas id='canvasPattern' ref={this.canvasPatternRef} width={width} height={height} style={{ position: 'absolute' }} /> }
+        {pattern && <canvas id='canvasPattern' ref={this.canvasPatternRef} width={width} height={height} style={{ position: 'absolute' }} />}
         <canvas id='canvas' ref={this.canvasRef} width={width} height={height} />
       </Fragment>
     )
