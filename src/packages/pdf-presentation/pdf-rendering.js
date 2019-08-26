@@ -8,9 +8,9 @@ export function keyFn (documentUrl, pageNumber, width, height) {
   return `${documentUrl}_${pageNumber}_${width}_${height}`
 }
 
-export function getDocument (url) {
+export function getDocument (url, { httpHeaders }) {
   if (!documentCache[url]) {
-    documentCache[url] = service.getDocument({ url })
+    documentCache[url] = service.getDocument({ url, httpHeaders })
   }
 
   return documentCache[url]
@@ -20,7 +20,7 @@ export function getImage (key) {
   return imageCache[key]
 }
 
-export function renderPage (documentUrl, pageNumber, width, height) {
+export function renderPage (documentUrl, pageNumber, width, height, { httpHeaders }) {
   const key = keyFn(documentUrl, pageNumber, width, height)
   let canvas
   let context
@@ -28,7 +28,7 @@ export function renderPage (documentUrl, pageNumber, width, height) {
 
   if (!tasks[key]) {
     tasks[key] = new Promise((resolve, reject) => {
-      getDocument(documentUrl)
+      getDocument(documentUrl, { httpHeaders })
         .then(document => document.getPage(pageNumber))
         .then((page) => {
           const initialViewport = page.getViewport(1)

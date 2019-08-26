@@ -56,11 +56,12 @@ export class PDFPresentation extends React.Component {
   }
 
   createCollection (count) {
-    const { url } = this.props
+    const { tokenProvider, url } = this.props
     const collection = []
 
     const getter = (documentUrl, documentPage, width, height) => () => {
-      renderPage(documentUrl, documentPage, width, height)
+      tokenProvider()
+        .then(token => renderPage(documentUrl, documentPage, width, height, { httpHeaders: { authorization: `Bearer ${token}` } }))
         .then(() => {
           this.debouncedUpdateCollection()
 
@@ -115,9 +116,10 @@ export class PDFPresentation extends React.Component {
   }
 
   updateCollection () {
-    const { url } = this.props
+    const { tokenProvider, url } = this.props
 
-    getDocument(url)
+    tokenProvider()
+      .then(token => getDocument(url, { httpHeaders: { authorization: `Bearer ${token}` } }))
       .then((document) => {
         if (this.mounted) {
           this.setState({

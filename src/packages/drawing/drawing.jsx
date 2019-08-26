@@ -23,6 +23,77 @@ export const penToolModeEnum = {
   MARKER: 'marker',
 }
 
+class TokenProvider {
+  constructor () {
+    this._provider = null
+    this._rq = []
+  }
+
+  setProvider (provider) {
+    this._provider = provider
+
+    if (this._provider !== null) {
+      this._provider()
+        .then((token) => {
+          this._rq.forEach((p) => {
+            p.resolve(token)
+          })
+
+          this._rq = []
+
+          return null
+        })
+        .catch(error => console.log(error)) // eslint-disable-line no-console
+    }
+  }
+
+  getToken () {
+    let p
+
+    if (this._provider === null) {
+      p = new Promise((resolve, reject) => {
+        this._rq.push({ resolve, reject })
+      })
+    } else {
+      p = this._provider()
+    }
+
+    return p
+  }
+}
+
+const tp = new TokenProvider()
+
+function matchesStorageURIScheme (url) {
+  const re = /^.*\/api\/v1\/buckets\/(.*)\/sets\/(.*)\/objects\/(.*)$/
+
+  return url.match(re)
+}
+
+const originalFabricLoadImegeFn = fabric.util.loadImage
+
+fabric.util.loadImage = function loadImage (url, callback, context, crossOrigin) {
+  if (matchesStorageURIScheme(url)) {
+    tp.getToken()
+      .then((token) => {
+        originalFabricLoadImegeFn(`${url}?access_token=${token}`, callback, context, crossOrigin)
+
+        return null
+      })
+      .catch(error => console.log(error)) // eslint-disable-line no-console
+  } else {
+    originalFabricLoadImegeFn(url, callback, context, crossOrigin)
+  }
+}
+
+function maybeRemoveToken (object) {
+  if (object.type === 'image' && object.src.indexOf('?access_token=') !== -1) {
+    object.src = object.src.split('?')[0] // eslint-disable-line
+  }
+
+  return object
+}
+
 export class DrawingComponent extends React.Component {
   static defaultProps = {
     brushColor: {
@@ -48,8 +119,10 @@ export class DrawingComponent extends React.Component {
 
   componentDidMount () {
     const {
-      canDraw, tool, height, width, objects, pattern, zoom,
+      canDraw, tool, height, width, objects, pattern, tokenProvider, zoom,
     } = this.props
+
+    tp.setProvider(tokenProvider)
 
     if (canDraw) {
       this.initCanvas()
@@ -137,6 +210,8 @@ export class DrawingComponent extends React.Component {
   }
 
   componentWillUnmount () {
+    tp.setProvider(null)
+
     if (this.dynamicPattern) {
       this.dynamicPattern.destroy()
     }
@@ -184,7 +259,7 @@ export class DrawingComponent extends React.Component {
 
       if (!object.remote) {
         object._id = uniqId()
-        onDraw && onDraw(object.toObject(['_id']))
+        onDraw && onDraw(maybeRemoveToken(object.toObject(['_id'])))
       } else {
         delete object.remote
       }
@@ -193,7 +268,7 @@ export class DrawingComponent extends React.Component {
     this.canvas.on('object:modified', (event) => {
       const object = event.target
 
-      onDrawUpdate && onDrawUpdate(object.toObject(['_id']))
+      onDrawUpdate && onDrawUpdate(maybeRemoveToken(object.toObject(['_id'])))
     })
 
     this.canvas.on('object:removed', (event) => {
@@ -201,7 +276,7 @@ export class DrawingComponent extends React.Component {
 
       const object = event.target
 
-      onObjectRemove && onObjectRemove(object.toObject(['_id']))
+      onObjectRemove && onObjectRemove(maybeRemoveToken(object.toObject(['_id'])))
     })
 
     this.canvas.on('after:render', () => this._handleAfterRender())
