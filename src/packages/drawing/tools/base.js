@@ -15,3 +15,5 @@ export default class Base {
 
   handleObjectAddedEvent () {}
 }
+
+export { Base }

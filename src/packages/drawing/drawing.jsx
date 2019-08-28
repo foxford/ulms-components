@@ -10,12 +10,27 @@ import PanTool from './tools/pan'
 import PenTool from './tools/pen'
 import SelectTool from './tools/select'
 import { InteractiveText } from './tools/interactive-text'
+import { PositionableObject } from './tools/object'
+import {
+  circle,
+  circleSolid,
+  rectangle,
+  rectangleSolid,
+  triangle,
+  triangleSolid,
+} from './tools/shapes'
 
 export const toolEnum = {
   ERASER: 'eraser',
   PAN: 'pan',
   PEN: 'pen',
   SELECT: 'select',
+  SHAPE_SQUARE: 'shape-square',
+  SHAPE_CIRCLE: 'shape-circle',
+  SHAPE_TRIAG: 'shape-triangle',
+  SHAPE_SQUARE_SOLID: 'shape-square-solid',
+  SHAPE_CIRCLE_SOLID: 'shape-circle-solid',
+  SHAPE_TRIAG_SOLID: 'shape-triangle-solid',
 }
 
 export const penToolModeEnum = {
@@ -133,6 +148,10 @@ export class DrawingComponent extends React.Component {
       || prevProps.brushWidth !== brushWidth
     ) {
       this.configureTool()
+    }
+
+    if (prevProps.brushColor !== brushColor) {
+      this.initTool(tool)
     }
   }
 
@@ -264,8 +283,8 @@ export class DrawingComponent extends React.Component {
     }
   }
 
-  initTool () {
-    const { tool } = this.props
+  initTool (tool) {
+    const { brushColor } = this.props
 
     switch (tool) {
       case toolEnum.ERASER:
@@ -286,6 +305,70 @@ export class DrawingComponent extends React.Component {
       case toolEnum.SELECT:
         this.tool = new SelectTool(this.canvas)
 
+        break
+
+      case toolEnum.SHAPE_CIRCLE:
+        this.tool = new PositionableObject(
+          this.canvas,
+          () => circle({ stroke: toCSSColor(brushColor) }),
+          { adjustCenter: '-0.5 -0.5' }
+        )
+        break
+
+      case toolEnum.SHAPE_CIRCLE_SOLID:
+        this.tool = new PositionableObject(
+          this.canvas,
+          () => circleSolid({ fill: toCSSColor(brushColor) }),
+          { adjustCenter: '-0.5 -0.5' }
+        )
+        break
+
+      case toolEnum.SHAPE_SQUARE:
+        this.tool = new PositionableObject(
+          this.canvas,
+          () => rectangle({
+            width: 97.2,
+            height: 97.2,
+            stroke: toCSSColor(brushColor),
+          }),
+          { adjustCenter: '0 -1' }
+        )
+        break
+
+      case toolEnum.SHAPE_SQUARE_SOLID:
+        this.tool = new PositionableObject(
+          this.canvas,
+          () => rectangleSolid({
+            width: 97.2,
+            height: 97.2,
+            fill: toCSSColor(brushColor),
+          }),
+          { adjustCenter: '0 -1' }
+        )
+        break
+
+      case toolEnum.SHAPE_TRIAG:
+        this.tool = new PositionableObject(
+          this.canvas,
+          () => triangle({
+            width: 97.2,
+            height: 97.2,
+            stroke: toCSSColor(brushColor),
+          }),
+          { adjustCenter: '0 -1' }
+        )
+        break
+
+      case toolEnum.SHAPE_TRIAG_SOLID:
+        this.tool = new PositionableObject(
+          this.canvas,
+          () => triangleSolid({
+            fill: toCSSColor(brushColor),
+            height: 97.2,
+            width: 97.2,
+          }),
+          { adjustCenter: '0 -1' }
+        )
         break
 
       default:
@@ -309,8 +392,17 @@ export class DrawingComponent extends React.Component {
         lineColor: toCSSColor(color),
         lineWidth: brushWidth,
       })
-    } else {
+    } else if (
+      tool === toolEnum.SELECT
+      || tool === toolEnum.PAN
+      || tool === toolEnum.ERASER
+    ) {
       this.tool.configure()
+    } else {
+      this.tool.configure({
+        lineColor: toCSSColor(brushColor),
+        lineWidth: brushWidth,
+      })
     }
   }
 

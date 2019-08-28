@@ -7,7 +7,11 @@ export default class SelectTool extends Base {
     super(canvas)
 
     this._canvas.forEachObject((_) => {
-      Object.assign(_, { selectable: true, evented: true })
+      Object.assign(_, {
+        evented: true,
+        hoverCursor: 'move',
+        selectable: true,
+      })
     })
   }
 
@@ -20,6 +24,10 @@ export default class SelectTool extends Base {
   }
 
   handleObjectAddedEvent (opts) {
-    Object.assign(opts.target, { selectable: true, evented: true })
+    Object.assign(opts.target, {
+      evented: true,
+      hoverCursor: 'move',
+      selectable: true,
+    })
   }
 }
