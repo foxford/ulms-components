@@ -11,6 +11,7 @@ import Compress from './images/compress.svg'
 import Edit from './images/edit.svg'
 import Expand from './images/expand.svg'
 import Feed from './images/feed.svg'
+import Line from './images/line.svg'
 import Lines from './images/lines.svg'
 import ShapeCircle from './images/shape-circle.svg'
 import ShapeSquare from './images/shape-square.svg'
@@ -30,8 +31,10 @@ const icons = new Map([
   ['edit', Edit],
   ['expand', Expand],
   ['feed', Feed],
+  ['line', Line],
   ['lines', Lines],
   ['shape-circle', ShapeCircle],
+  ['shape-line', Line],
   ['shape-square', ShapeSquare],
   ['shape-triangle', ShapeTrinagle],
   ['slides', Slides],
@@ -76,8 +79,10 @@ Icons.Compress = Compress
 Icons.Edit = Edit
 Icons.Expand = Expand
 Icons.Feed = Feed
+Icons.Line = Line
 Icons.Lines = Lines
 Icons.ShapeCircle = ShapeCircle
+Icons.ShapeLine = Line
 Icons.ShapeSquare = ShapeSquare
 Icons.ShapeTrinagle = ShapeTrinagle
 Icons.Slides = Slides

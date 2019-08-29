@@ -8,7 +8,7 @@ export const triangle = (params = {}) => {
     strokeWidth: 2,
     ...params,
     stroke: params.stroke,
-    fill: params.fill || 'rgba(0,0,0,0.001)',
+    fill: params.fill || 'rgba(0,0,0,0.01)',
   })
 }
 
@@ -30,7 +30,7 @@ export const circle = (params = {}) => {
     strokeWidth: 2,
     ...params,
     stroke: params.stroke,
-    fill: params.fill || 'rgba(0,0,0,0.001)',
+    fill: params.fill || 'rgba(0,0,0,0.01)',
   })
 }
 
@@ -52,7 +52,7 @@ export const rectangle = (params = {}) => {
     width:100,
     ...params,
     stroke: params.stroke,
-    fill: params.fill || 'rgba(0,0,0,0.001)',
+    fill: params.fill || 'rgba(0,0,0,0.01)',
   })
 }
 

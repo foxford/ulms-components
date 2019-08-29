@@ -11,6 +11,7 @@ import PenTool from './tools/pen'
 import SelectTool from './tools/select'
 import { InteractiveText } from './tools/interactive-text'
 import { PositionableObject } from './tools/object'
+import { Line } from './tools/line'
 import {
   circle,
   circleSolid,
@@ -19,6 +20,33 @@ import {
   triangle,
   triangleSolid,
 } from './tools/shapes'
+
+const toObject = (fields = ['_id'], optFields = []) => (obj) => {
+  const keysToHashmap = (_, keys) => {
+    const map = {}
+
+    keys.forEach((key) => { map[key] = _[key] })
+
+    return map
+  }
+
+  const object = {
+    ...obj.toObject(fields),
+    // ...(optFields.reduce((acc, _) => ({ ...acc, [_]: obj[_] }), {})),
+    ...keysToHashmap(obj, optFields),
+  }
+
+  console.log(JSON.stringify(obj))
+
+  return object
+}
+
+const maybeLineToObject = toObject(undefined, [
+  'x1',
+  'x2',
+  'y1',
+  'y2',
+])
 
 export const toolEnum = {
   ERASER: 'eraser',
@@ -31,6 +59,7 @@ export const toolEnum = {
   SHAPE_SQUARE_SOLID: 'shape-square-solid',
   SHAPE_CIRCLE_SOLID: 'shape-circle-solid',
   SHAPE_TRIAG_SOLID: 'shape-triangle-solid',
+  SHAPE_LINE: 'shape-line',
 }
 
 export const penToolModeEnum = {
@@ -190,7 +219,7 @@ export class DrawingComponent extends React.Component {
     } = this.props
 
     this.canvas = new fabric.Canvas('canvas')
-
+    window.z = this.canvas
     this.canvas.perPixelTargetFind = true // fixme: move to select tool (need setup/release methods)
 
     this.canvas.on('mouse:down', opt => this._handleMouseDown(opt))
@@ -203,7 +232,8 @@ export class DrawingComponent extends React.Component {
 
       if (!object.remote) {
         object._id = uniqId()
-        onDraw && onDraw(object.toObject(['_id']))
+
+        onDraw && onDraw(maybeLineToObject(object))
       } else {
         delete object.remote
       }
@@ -212,7 +242,7 @@ export class DrawingComponent extends React.Component {
     this.canvas.on('object:modified', (event) => {
       const object = event.target
 
-      onDrawUpdate && onDrawUpdate(object.toObject(['_id']))
+      onDrawUpdate && onDrawUpdate(maybeLineToObject(object))
     })
 
     this.canvas.on('object:removed', (event) => {
@@ -220,7 +250,7 @@ export class DrawingComponent extends React.Component {
 
       const object = event.target
 
-      onObjectRemove && onObjectRemove(object.toObject(['_id']))
+      onObjectRemove && onObjectRemove(maybeLineToObject(object))
     })
 
     this.canvas.on('after:render', () => this._handleAfterRender())
@@ -369,6 +399,15 @@ export class DrawingComponent extends React.Component {
           }),
           { adjustCenter: '0 -1' }
         )
+        break
+
+      case toolEnum.SHAPE_LINE:
+        console.log('_23')
+
+        this.tool = new Line(this.canvas, {
+          stroke: toCSSColor(brushColor),
+        })
+
         break
 
       default:
