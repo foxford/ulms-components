@@ -1,6 +1,6 @@
 /* eslint-disable */
 
-export default class Base {
+export class Base {
   constructor (canvas) {
     this._canvas = canvas
   }
@@ -15,5 +15,3 @@ export default class Base {
 
   handleObjectAddedEvent () {}
 }
-
-export { Base }

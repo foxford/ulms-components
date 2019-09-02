@@ -1,6 +1,6 @@
 /* eslint-disable */
 
-import Base from './base'
+import { Base } from './base'
 
 export default class PenTool extends Base {
   configure (props) {
