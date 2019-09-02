@@ -138,7 +138,10 @@ export class DrawingComponent extends React.Component {
       this.updateCanvasObjects(objects)
     }
 
-    if (prevProps.tool !== tool) {
+    if (
+      prevProps.tool !== tool
+      || prevProps.brushColor !== brushColor
+    ) {
       this.initTool(tool)
     }
 
@@ -148,10 +151,6 @@ export class DrawingComponent extends React.Component {
       || prevProps.brushWidth !== brushWidth
     ) {
       this.configureTool()
-    }
-
-    if (prevProps.brushColor !== brushColor) {
-      this.initTool(tool)
     }
   }
 
