@@ -391,12 +391,6 @@ export class DrawingComponent extends React.Component {
         lineColor: toCSSColor(color),
         lineWidth: brushWidth,
       })
-    } else if (
-      tool === toolEnum.SELECT
-      || tool === toolEnum.PAN
-      || tool === toolEnum.ERASER
-    ) {
-      this.tool.configure()
     } else {
       this.tool.configure({
         lineColor: toCSSColor(brushColor),
