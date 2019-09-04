@@ -9,8 +9,8 @@ import EraserTool from './tools/eraser'
 import PanTool from './tools/pan'
 import PenTool from './tools/pen'
 import SelectTool from './tools/select'
-import { InteractiveText } from './tools/interactive-text'
 import { PositionableObject } from './tools/object'
+import { Textbox } from './tools/textbox'
 import {
   circle,
   circleSolid,
@@ -25,12 +25,13 @@ export const toolEnum = {
   PAN: 'pan',
   PEN: 'pen',
   SELECT: 'select',
-  SHAPE_SQUARE: 'shape-square',
-  SHAPE_CIRCLE: 'shape-circle',
-  SHAPE_TRIAG: 'shape-triangle',
-  SHAPE_SQUARE_SOLID: 'shape-square-solid',
   SHAPE_CIRCLE_SOLID: 'shape-circle-solid',
+  SHAPE_CIRCLE: 'shape-circle',
+  SHAPE_SQUARE_SOLID: 'shape-square-solid',
+  SHAPE_SQUARE: 'shape-square',
   SHAPE_TRIAG_SOLID: 'shape-triangle-solid',
+  SHAPE_TRIAG: 'shape-triangle',
+  TEXT: 'textbox',
 }
 
 export const penToolModeEnum = {
@@ -118,6 +119,7 @@ export class DrawingComponent extends React.Component {
     tool: toolEnum.PEN,
     zoom: 1,
     zoomToCenter: false,
+    toolActivationTimeout: 2e2,
   }
 
   constructor () {
@@ -260,7 +262,13 @@ export class DrawingComponent extends React.Component {
 
   initCanvas () {
     const {
-      onDraw, onDrawUpdate, onObjectRemove, uniqId, onTextEditingEnd,
+      onDraw,
+      onDrawUpdate,
+      onObjectRemove,
+      onTextEditingEnd,
+      onTextEditingStart,
+      toolActivationTimeout,
+      uniqId,
     } = this.props
 
     this.canvas = new fabric.Canvas('canvas')
@@ -299,10 +307,21 @@ export class DrawingComponent extends React.Component {
 
     this.canvas.on('after:render', () => this._handleAfterRender())
 
-    this.canvas.on('text:editing:exited', ({ target }) => {
+    this.canvas.on('text:editing:entered', ({ target: object }) => {
+      this.initTool(toolEnum.SELECT)
+      onTextEditingStart && onTextEditingStart(maybeRemoveToken(object.toObject(['_id'])))
+    })
+
+    this.canvas.on('text:editing:exited', ({ target: object }) => {
       onTextEditingEnd
-        && target.text !== target._textBeforeEdit
-        && onTextEditingEnd(target.toObject(['_id']))
+        && object.text !== object._textBeforeEdit
+        && onTextEditingEnd(maybeRemoveToken(object.toObject(['_id'])))
+
+      setTimeout(() => {
+        const { tool: curTool } = this.props
+
+        this.initTool(curTool || toolEnum.TEXT)
+      }, toolActivationTimeout)
     })
 
     // this.canvas.on('mouse:wheel', (opt) => {
@@ -378,6 +397,14 @@ export class DrawingComponent extends React.Component {
 
       case toolEnum.SELECT:
         this.tool = new SelectTool(this.canvas)
+
+        break
+
+      case toolEnum.TEXT:
+        this.tool = new Textbox(this.canvas, undefined, {
+          fill: toCSSColor(brushColor),
+          fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif',
+        })
 
         break
 
@@ -485,33 +512,6 @@ export class DrawingComponent extends React.Component {
 
       this.canvas.add(image)
     }, options)
-  }
-
-  addText (text, options) {
-    const { itext, focus } = InteractiveText(this.canvas, undefined, {
-      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif',
-      angle: 0,
-      scaleX: 0.5,
-      scaleY: 0.5,
-      fontWeight: '',
-      originX: 'left',
-      hasRotatingPoint: true,
-      centerTransform: true,
-      fillNext: options.fill,
-      ...options,
-    })
-
-    const { tl, br } = this.canvas.calcViewportBoundaries()
-    const rect = itext.getBoundingRect()
-
-    itext.set('left', br.x - (br.x - tl.x) / 2 - rect.width / 2)
-    itext.set('top', br.y - (br.y - tl.y) / 2 - rect.height / 2)
-
-    this.canvas.add(itext)
-
-    focus()
-
-    return itext.toObject(['_id'])
   }
 
   existsInCanvas (id) {
