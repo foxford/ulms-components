@@ -10,9 +10,8 @@ export class Textbox extends PositionableObject {
       perPixelTargetFind: false,
       borderScaleFactor: 1,
       strokeUniform: true,
-      fontSize: 16,
-      scaleX: 1,
-      scaleY: 1,
+      scaleX: 0.5,
+      scaleY: 0.5,
       ...options,
       fill: options.fill || 'rgba(0,0,0,1)',
     }))
