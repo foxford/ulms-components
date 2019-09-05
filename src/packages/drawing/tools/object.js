@@ -1,41 +1,53 @@
-/* eslint-disable */
-
 import { Base } from './base'
 
-const makeNotInteractive = _ => Object.assign(_, { selectable: false, evented: false, hoverCursor: 'crosshair' })
+export const makeNotInteractive = _ => Object.assign(_, {
+  selectable: false, evented: false, hoverCursor: 'crosshair',
+})
+
+export const adjustPosition = (object, pointer, adjust) => {
+  const { width, height } = object.getBoundingRect()
+
+  let [dx, dy] = (adjust || '0 0').split(' ')
+
+  dx = Number(dx) || 0
+  dy = Number(dy) || 0
+
+  return [pointer.x + width * dx, pointer.y + height * dy]
+}
 
 export class PositionableObject extends Base {
   constructor (canvas, objectFn, options = {}) {
     super(canvas)
-    this.__options = options
-    this.__objectFn = objectFn
-    this.__object = undefined
 
-    this._canvas.forEachObject(_ => makeNotInteractive(_))
+    this.__object = undefined
+    this.__objectFn = objectFn
+    this.__options = options
   }
 
-  configure(props){
+  configure () {
     this._canvas.isDrawingMode = false
     this._canvas.selection = false
     this._canvas.defaultCursor = 'crosshair'
     this._canvas.setCursor('crosshair')
+    this._canvas.forEachObject(_ => makeNotInteractive(_))
   }
 
+  __resolveObject () {
+    this.__object = this.__objectFn()
+  }
+
+  // eslint-disable-next-line class-methods-use-this
   handleObjectAddedEvent (opts) {
     makeNotInteractive(opts.target)
   }
 
-  handleMouseDownEvent(opts){
-    this.__object = this.__objectFn()
+  handleMouseDownEvent (opts) {
+    this.__resolveObject(opts)
 
-    const { width, height } = this.__object.getBoundingRect()
+    const [x, y] = adjustPosition(this.__object, opts.absolutePointer, this.__options.adjustCenter)
 
-    let [dx, dy] = (this.__options.adjustCenter || '0 0').split(' ')
-    dx = Number(dx)
-    dy = Number(dy)
-
-    this.__object.set('left', opts.absolutePointer.x + (!this.__options.adjustCenter ? 0 : width * dx))
-    this.__object.set('top', opts.absolutePointer.y + (!this.__options.adjustCenter ? 0 : height * dy))
+    this.__object.set('left', x)
+    this.__object.set('top', y)
 
     this._canvas.add(this.__object)
   }
