@@ -119,7 +119,6 @@ export class DrawingComponent extends React.Component {
     tool: toolEnum.PEN,
     zoom: 1,
     zoomToCenter: false,
-    toolActivationTimeout: 2e2,
   }
 
   constructor () {
@@ -265,9 +264,6 @@ export class DrawingComponent extends React.Component {
       onDraw,
       onDrawUpdate,
       onObjectRemove,
-      onTextEditingEnd,
-      onTextEditingStart,
-      toolActivationTimeout,
       uniqId,
     } = this.props
 
@@ -285,7 +281,8 @@ export class DrawingComponent extends React.Component {
 
       if (!object.remote) {
         object._id = uniqId()
-        onDraw && onDraw(maybeRemoveToken(object.toObject(['_id'])))
+
+        object.type !== toolEnum.TEXT && onDraw && onDraw(maybeRemoveToken(object.toObject(['_id'])))
       } else {
         delete object.remote
       }
@@ -293,8 +290,13 @@ export class DrawingComponent extends React.Component {
 
     this.canvas.on('object:modified', (event) => {
       const object = event.target
+      const serializedObj = maybeRemoveToken(object.toObject(['_id']))
 
-      onDrawUpdate && onDrawUpdate(maybeRemoveToken(object.toObject(['_id'])))
+      if (object.type === toolEnum.TEXT && object._textBeforeEdit === '') {
+        onDraw && onDraw(serializedObj)
+      } else {
+        onDrawUpdate && onDrawUpdate(serializedObj)
+      }
     })
 
     this.canvas.on('object:removed', (event) => {
@@ -306,23 +308,6 @@ export class DrawingComponent extends React.Component {
     })
 
     this.canvas.on('after:render', () => this._handleAfterRender())
-
-    this.canvas.on('text:editing:entered', ({ target: object }) => {
-      this.initTool(toolEnum.SELECT)
-      onTextEditingStart && onTextEditingStart(maybeRemoveToken(object.toObject(['_id'])))
-    })
-
-    this.canvas.on('text:editing:exited', ({ target: object }) => {
-      onTextEditingEnd
-        && object.text !== object._textBeforeEdit
-        && onTextEditingEnd(maybeRemoveToken(object.toObject(['_id'])))
-
-      setTimeout(() => {
-        const { tool: curTool } = this.props
-
-        this.initTool(curTool || toolEnum.TEXT)
-      }, toolActivationTimeout)
-    })
 
     // this.canvas.on('mouse:wheel', (opt) => {
     //   const delta = opt.e.deltaY
