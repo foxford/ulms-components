@@ -2,7 +2,7 @@ import { fabric } from 'fabric'
 
 import { PositionableObject, makeNotInteractive, adjustPosition } from './object'
 
-export class Textbox extends PositionableObject {
+export class TextboxTool extends PositionableObject {
   constructor (canvas, objectFn, options = {}) {
     super(canvas, objectFn, options)
 
