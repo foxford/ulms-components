@@ -278,11 +278,14 @@ export class DrawingComponent extends React.Component {
 
     this.canvas.on('object:added', (event) => {
       const object = event.target
+      const { injectContextData } = this.props
+      let serializedObj
 
       if (!object.remote) {
         object._id = uniqId()
+        serializedObj = injectContextData ? injectContextData(object) : object.toObject(['_id'])
 
-        object.type !== toolEnum.TEXT && onDraw && onDraw(maybeRemoveToken(object.toObject(['_id'])))
+        object.type !== toolEnum.TEXT && onDraw && onDraw(maybeRemoveToken(serializedObj))
       } else {
         delete object.remote
       }
@@ -290,10 +293,11 @@ export class DrawingComponent extends React.Component {
 
     this.canvas.on('object:modified', (event) => {
       const object = event.target
-      const serializedObj = maybeRemoveToken(object.toObject(['_id']))
+      const { injectContextData } = this.props
+      const serializedObj = injectContextData ? injectContextData(object) : object.toObject(['_id'])
 
       if (object.type === toolEnum.TEXT && object._textBeforeEdit === '') {
-        onDraw && onDraw(serializedObj)
+        onDraw && onDraw(maybeRemoveToken(serializedObj))
       } else {
         onDrawUpdate && onDrawUpdate(serializedObj)
       }
