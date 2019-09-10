@@ -9,8 +9,8 @@ import EraserTool from './tools/eraser'
 import PanTool from './tools/pan'
 import PenTool from './tools/pen'
 import SelectTool from './tools/select'
-import { PositionableObject } from './tools/object'
-import { Textbox } from './tools/textbox'
+import { ShapeTool } from './tools/shape'
+import { TextboxTool } from './tools/textbox'
 import {
   circle,
   circleSolid,
@@ -18,19 +18,20 @@ import {
   rectangleSolid,
   triangle,
   triangleSolid,
-} from './tools/shapes'
+} from './tools/_shapes'
 
 export const toolEnum = {
   ERASER: 'eraser',
   PAN: 'pan',
   PEN: 'pen',
   SELECT: 'select',
-  SHAPE_CIRCLE_SOLID: 'shape-circle-solid',
-  SHAPE_CIRCLE: 'shape-circle',
-  SHAPE_SQUARE_SOLID: 'shape-square-solid',
-  SHAPE_SQUARE: 'shape-square',
-  SHAPE_TRIAG_SOLID: 'shape-triangle-solid',
-  SHAPE_TRIAG: 'shape-triangle',
+  SHAPE_CIRCLE_SOLID: 'circle-solid',
+  SHAPE_CIRCLE: 'circle',
+  SHAPE_RECT: 'rect',
+  SHAPE_SQUARE_SOLID: 'square-solid',
+  SHAPE_SQUARE: 'square',
+  SHAPE_TRIAG_SOLID: 'triangle-solid',
+  SHAPE_TRIAG: 'triangle',
   TEXT: 'textbox',
 }
 
@@ -108,6 +109,16 @@ function maybeRemoveToken (object) {
   }
 
   return object
+}
+
+function isShapeObject (object) {
+  return object.type === toolEnum.SHAPE_RECT
+    || object.type === toolEnum.SHAPE_CIRCLE
+    || object.type === toolEnum.SHAPE_TRIAG
+}
+
+function isTextObject (object) {
+  return object.type === toolEnum.TEXT
 }
 
 export class DrawingComponent extends React.Component {
@@ -285,7 +296,10 @@ export class DrawingComponent extends React.Component {
         object._id = uniqId()
         serializedObj = injectContextData ? injectContextData(object) : object.toObject(['_id'])
 
-        object.type !== toolEnum.TEXT && onDraw && onDraw(maybeRemoveToken(serializedObj))
+        if (isShapeObject(object)) return
+        if (isTextObject(object)) return
+
+        onDraw && onDraw(maybeRemoveToken(serializedObj))
       } else {
         delete object.remote
       }
@@ -296,8 +310,12 @@ export class DrawingComponent extends React.Component {
       const { injectContextData } = this.props
       const serializedObj = injectContextData ? injectContextData(object) : object.toObject(['_id'])
 
-      if (object.type === toolEnum.TEXT && object._textBeforeEdit === '') {
-        onDraw && onDraw(maybeRemoveToken(serializedObj))
+      if (isTextObject(object) && object._textBeforeEdit === '') {
+        onDraw && onDraw(serializedObj)
+      } else if (isShapeObject(object)) {
+        object._new
+          ? onDraw && onDraw(serializedObj)
+          : onDrawUpdate && onDrawUpdate(serializedObj)
       } else {
         onDrawUpdate && onDrawUpdate(serializedObj)
       }
@@ -390,7 +408,7 @@ export class DrawingComponent extends React.Component {
         break
 
       case toolEnum.TEXT:
-        this.tool = new Textbox(this.canvas, undefined, {
+        this.tool = new TextboxTool(this.canvas, undefined, {
           fill: toCSSColor(brushColor),
           fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif',
         })
@@ -398,7 +416,7 @@ export class DrawingComponent extends React.Component {
         break
 
       case toolEnum.SHAPE_CIRCLE:
-        this.tool = new PositionableObject(
+        this.tool = new ShapeTool(
           this.canvas,
           () => circle({ stroke: toCSSColor(brushColor) }),
           { adjustCenter: '-0.5 -0.5' }
@@ -406,7 +424,7 @@ export class DrawingComponent extends React.Component {
         break
 
       case toolEnum.SHAPE_CIRCLE_SOLID:
-        this.tool = new PositionableObject(
+        this.tool = new ShapeTool(
           this.canvas,
           () => circleSolid({ fill: toCSSColor(brushColor) }),
           { adjustCenter: '-0.5 -0.5' }
@@ -414,7 +432,7 @@ export class DrawingComponent extends React.Component {
         break
 
       case toolEnum.SHAPE_SQUARE:
-        this.tool = new PositionableObject(
+        this.tool = new ShapeTool(
           this.canvas,
           () => rectangle({
             width: 97.2,
@@ -426,7 +444,7 @@ export class DrawingComponent extends React.Component {
         break
 
       case toolEnum.SHAPE_SQUARE_SOLID:
-        this.tool = new PositionableObject(
+        this.tool = new ShapeTool(
           this.canvas,
           () => rectangleSolid({
             width: 97.2,
@@ -438,7 +456,7 @@ export class DrawingComponent extends React.Component {
         break
 
       case toolEnum.SHAPE_TRIAG:
-        this.tool = new PositionableObject(
+        this.tool = new ShapeTool(
           this.canvas,
           () => triangle({
             width: 97.2,
@@ -450,7 +468,7 @@ export class DrawingComponent extends React.Component {
         break
 
       case toolEnum.SHAPE_TRIAG_SOLID:
-        this.tool = new PositionableObject(
+        this.tool = new ShapeTool(
           this.canvas,
           () => triangleSolid({
             fill: toCSSColor(brushColor),
