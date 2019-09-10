@@ -44,6 +44,7 @@ class DrawingUpdaterComponent extends React.Component{
       canDraw
       uniqId={() => Math.random()}
       zoomToCenter
+      tokenProvider={() => Promise.resolve('access_token')}
     >
     </DrawingComponent>
   </DrawingUpdaterComponent>
