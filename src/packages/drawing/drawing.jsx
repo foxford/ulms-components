@@ -311,13 +311,13 @@ export class DrawingComponent extends React.Component {
       const serializedObj = injectContextData ? injectContextData(object) : object.toObject(['_id'])
 
       if (isTextObject(object) && object._textBeforeEdit === '') {
-        onDraw && onDraw(serializedObj)
+        onDraw && onDraw(maybeRemoveToken(serializedObj))
       } else if (isShapeObject(object)) {
         object._new
-          ? onDraw && onDraw(serializedObj)
-          : onDrawUpdate && onDrawUpdate(serializedObj)
+          ? onDraw && onDraw(maybeRemoveToken(serializedObj))
+          : onDrawUpdate && onDrawUpdate(maybeRemoveToken(serializedObj))
       } else {
-        onDrawUpdate && onDrawUpdate(serializedObj)
+        onDrawUpdate && onDrawUpdate(maybeRemoveToken(serializedObj))
       }
     })
 
