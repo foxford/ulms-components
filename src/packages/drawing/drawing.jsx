@@ -174,7 +174,17 @@ export class DrawingComponent extends React.Component {
 
   componentDidUpdate (prevProps) {
     const {
-      brushColor, brushMode, brushWidth, canDraw, tool, height, width, objects, pattern, zoom,
+      brushColor,
+      brushMode,
+      brushWidth,
+      canDraw,
+      eraserWidth,
+      height,
+      objects,
+      pattern,
+      tool,
+      width,
+      zoom,
     } = this.props
 
     if (prevProps.canDraw !== canDraw) {
@@ -234,6 +244,7 @@ export class DrawingComponent extends React.Component {
       prevProps.brushColor !== brushColor
       || prevProps.brushMode !== brushMode
       || prevProps.brushWidth !== brushWidth
+      || prevProps.eraserWidth !== eraserWidth
     ) {
       this.configureTool()
     }
@@ -384,7 +395,7 @@ export class DrawingComponent extends React.Component {
   }
 
   initTool (tool) {
-    const { brushColor } = this.props
+    const { brushColor, eraserWidth } = this.props
 
     switch (tool) {
       case toolEnum.ERASER:
@@ -488,7 +499,7 @@ export class DrawingComponent extends React.Component {
 
   configureTool () {
     const {
-      brushColor, brushMode, brushWidth, tool,
+      brushColor, brushMode, brushWidth, eraserWidth, eraserPrecision, tool,
     } = this.props
 
     if (tool === toolEnum.PEN) {
@@ -504,6 +515,8 @@ export class DrawingComponent extends React.Component {
       this.tool.configure({
         lineColor: toCSSColor(brushColor),
         lineWidth: brushWidth,
+        precision: eraserPrecision,
+        eraserWidth,
       })
     }
   }
