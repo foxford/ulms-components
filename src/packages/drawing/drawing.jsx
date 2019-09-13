@@ -316,6 +316,22 @@ export class DrawingComponent extends React.Component {
       }
     })
 
+    this.canvas.on('selection:cleared', ({ deselected }) => {
+      const { injectContextData } = this.props
+
+      if (!deselected || deselected.length !== 1) return
+      const [object] = deselected
+
+      if (isShapeObject(object)) {
+        const serializedObj = injectContextData ? injectContextData(object) : object.toObject(['_id'])
+
+        if (object._new) {
+          onDraw && onDraw(maybeRemoveToken(serializedObj))
+          object.set('_new', undefined)
+        }
+      }
+    })
+
     this.canvas.on('object:modified', (event) => {
       const object = event.target
       const { injectContextData } = this.props
@@ -327,6 +343,8 @@ export class DrawingComponent extends React.Component {
         object._new
           ? onDraw && onDraw(maybeRemoveToken(serializedObj))
           : onDrawUpdate && onDrawUpdate(maybeRemoveToken(serializedObj))
+
+        object.set('_new', undefined)
       } else {
         onDrawUpdate && onDrawUpdate(maybeRemoveToken(serializedObj))
       }
