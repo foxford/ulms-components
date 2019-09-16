@@ -26,6 +26,6 @@ export class ShapeTool extends PositionableObject {
     this.__object.set('_new', true)
     // mark shape as new one
 
-    this._canvas.setActiveObject(this.__object)
+    if (this.__options.selectOnInit) this._canvas.setActiveObject(this.__object)
   }
 }
