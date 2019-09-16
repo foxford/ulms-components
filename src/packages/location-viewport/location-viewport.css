@@ -1,0 +1,24 @@
+.root { }
+
+.root .outer {
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+}
+
+.root .object { }
+
+.root .cursor {
+  position:absolute;
+}
+
+.root .cursorItem
+,.root .cursorText
+{
+  display: inline-block;
+  user-select: none;
+}
+
+.root .cursorItem {
+  margin-right: 7px;
+}

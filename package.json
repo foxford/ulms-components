@@ -49,6 +49,7 @@
     "debug": "^4.1.0",
     "fabric": "netology-group/fabric.js#feature/ULMS-509",
     "lodash": "~4.17.14",
+    "popper.js": "^1.15.0",
     "query-string": "^6.2.0",
     "rc-slider": "^8.6.9",
     "react": "^16.6.3",
