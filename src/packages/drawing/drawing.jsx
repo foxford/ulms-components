@@ -286,6 +286,7 @@ export class DrawingComponent extends React.Component {
       onDraw,
       onDrawUpdate,
       onObjectRemove,
+      selectOnInit,
       uniqId,
     } = this.props
 
@@ -307,7 +308,7 @@ export class DrawingComponent extends React.Component {
         object._id = uniqId()
         serializedObj = injectContextData ? injectContextData(object) : object.toObject(['_id'])
 
-        if (isShapeObject(object)) return
+        if (selectOnInit && isShapeObject(object)) return
         if (isTextObject(object)) return
 
         onDraw && onDraw(maybeRemoveToken(serializedObj))
@@ -413,7 +414,7 @@ export class DrawingComponent extends React.Component {
   }
 
   initTool (tool) {
-    const { brushColor, eraserWidth } = this.props
+    const { brushColor, selectOnInit } = this.props
 
     switch (tool) {
       case toolEnum.ERASER:
@@ -448,7 +449,10 @@ export class DrawingComponent extends React.Component {
         this.tool = new ShapeTool(
           this.canvas,
           () => circle({ stroke: toCSSColor(brushColor) }),
-          { adjustCenter: '-0.5 -0.5' }
+          {
+            adjustCenter: '-0.5 -0.5',
+            selectOnInit,
+          }
         )
         break
 
@@ -456,7 +460,10 @@ export class DrawingComponent extends React.Component {
         this.tool = new ShapeTool(
           this.canvas,
           () => circleSolid({ fill: toCSSColor(brushColor) }),
-          { adjustCenter: '-0.5 -0.5' }
+          {
+            adjustCenter: '-0.5 -0.5',
+            selectOnInit,
+          }
         )
         break
 
@@ -468,7 +475,10 @@ export class DrawingComponent extends React.Component {
             height: 97.2,
             stroke: toCSSColor(brushColor),
           }),
-          { adjustCenter: '0 -1' }
+          {
+            adjustCenter: '0 -1',
+            selectOnInit,
+          }
         )
         break
 
@@ -480,7 +490,10 @@ export class DrawingComponent extends React.Component {
             height: 97.2,
             fill: toCSSColor(brushColor),
           }),
-          { adjustCenter: '0 -1' }
+          {
+            adjustCenter: '0 -1',
+            selectOnInit,
+          }
         )
         break
 
@@ -492,7 +505,10 @@ export class DrawingComponent extends React.Component {
             height: 97.2,
             stroke: toCSSColor(brushColor),
           }),
-          { adjustCenter: '0 -1' }
+          {
+            adjustCenter: '0 -1',
+            selectOnInit,
+          }
         )
         break
 
@@ -504,7 +520,10 @@ export class DrawingComponent extends React.Component {
             height: 97.2,
             width: 97.2,
           }),
-          { adjustCenter: '0 -1' }
+          {
+            adjustCenter: '0 -1',
+            selectOnInit,
+          }
         )
         break
 
@@ -642,6 +661,10 @@ export class DrawingComponent extends React.Component {
     }
 
     this.canvas.requestRenderAll()
+  }
+
+  cleanSelection () {
+    if (this.canvas.getActiveObject()) this.canvas.discardActiveObject()
   }
 
   render () {
