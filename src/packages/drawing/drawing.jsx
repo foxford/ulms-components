@@ -217,6 +217,8 @@ export class DrawingComponent extends React.Component {
       } else {
         this.dynamicPattern.destroy()
         this.destroyCanvasPattern()
+
+        this.dynamicPattern = null
       }
     }
 
@@ -255,9 +257,11 @@ export class DrawingComponent extends React.Component {
 
     if (this.dynamicPattern) {
       this.dynamicPattern.destroy()
+      this.destroyCanvasPattern()
+
+      this.dynamicPattern = null
     }
 
-    this.destroyCanvasPattern()
     this.destroyCanvas()
   }
 
@@ -674,7 +678,7 @@ export class DrawingComponent extends React.Component {
 
     return (
       <Fragment>
-        {pattern && <canvas id='canvasPattern' ref={this.canvasPatternRef} width={width} height={height} style={{ position: 'absolute' }} />}
+        <canvas id='canvasPattern' ref={this.canvasPatternRef} width={width} height={height} style={{ display: pattern ? 'block' : 'none', position: 'absolute' }} />
         <canvas id='canvas' ref={this.canvasRef} width={width} height={height} />
       </Fragment>
     )
