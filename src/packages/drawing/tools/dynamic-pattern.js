@@ -89,7 +89,9 @@ export default class DynamicPattern {
       this._pattern.offsetY = this._offsetY
     }
 
-    this._canvas.requestRenderAll()
+    if (this._canvas) {
+      this._canvas.requestRenderAll()
+    }
   }
 
   destroy () {
