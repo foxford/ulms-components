@@ -16,6 +16,13 @@ const adjustTop = (top, height) => { if (!height) { throw new TypeError('Absent 
 
 // eslint-disable-next-line react/prefer-stateless-function
 export class LocationObjectCursor extends React.PureComponent {
+  static defaultProps = {
+    boundLower: [0, 0],
+    boundUpper: [],
+    defaultCursorRotation: 0, // deg
+    opts: { inverted: true }, // or {{ inverted: false, sizeX: Number }}
+  }
+
   constructor (props) {
     super(props)
 
@@ -54,12 +61,12 @@ export class LocationObjectCursor extends React.PureComponent {
 
   render () {
     const {
-      boundLower = [0, 0],
-      boundUpper = [],
+      boundLower,
+      boundUpper,
       className,
-      defaultCursorRotation = 0, // deg
+      defaultCursorRotation,
       left,
-      opts = { inverted: true }, // or {{ inverted: false, sizeX: Number }}
+      opts,
       text,
     } = this.props
     let { top } = this.props
@@ -67,7 +74,12 @@ export class LocationObjectCursor extends React.PureComponent {
     if (!opts.inverted) { top = adjustTop(top, opts.sizeX) }
     // adjust top coordinate for regular coordinate plane
 
-    if (boundUpper.length !== 2) throw new Error('Wrong upper bound')
+    if (boundUpper.length !== 2 || boundLower.length !== 2) {
+      // eslint-disable-next-line no-console
+      console.error('Wrong bound format')
+
+      return undefined
+    }
 
     const [xLo, yLo] = boundLower
     const [xUp, yUp] = boundUpper

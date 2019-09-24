@@ -1,7 +1,7 @@
 ### LocationViewport
 
 ```js
-  window.__locationViewportEmitter = new EventTarget()
+  window.__locationViewportEmitter = LocationViewport.emitter()
 
   class LocationEmitter extends React.Component {
     constructor(props){
@@ -43,9 +43,9 @@
       return this.__eventTarget
     }
     set _emitter(eventTarget){
-      let _et = eventTarget || new EventTarget()
+      let _et = eventTarget
 
-      if(!(_et instanceof EventTarget)) throw new TypeError('Emitter has wrong type')
+      if(!_et) throw new TypeError('Emitter is absent')
       this.__eventTarget = _et
     }
     render(){

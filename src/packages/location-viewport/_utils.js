@@ -165,7 +165,8 @@ export const fCalcIntermediateCoords = ([x2, y2], xy1) => {
  * @param  {Array} xy2
  * @param  {Array} xy1
  * @param  {Object} opts
- * @param  {number} opts.defRotation allows adjust rotation with any user-specific value like image's default angle, etc
+ * @param  {number} opts.defRotation allows adjust rotation with any
+ *  user-specific value like image's default angle, etc
  * @param  {number} opts.invert describes Y axis' direction
  * @return {number}
  */

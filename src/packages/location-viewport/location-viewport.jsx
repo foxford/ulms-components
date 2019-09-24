@@ -3,6 +3,7 @@
 import React from 'react'
 import ReactDom from 'react-dom'
 import cx from 'classnames'
+import EventTarget from '@ungap/event-target'
 
 import { LocationObjectCursor } from './_location-object-cursor'
 import css from './location-viewport.css'
@@ -16,8 +17,14 @@ class ObjectPortal extends React.Component {
   }
 }
 
+const Emitter = (...argv) => new EventTarget(...argv)
+
 // eslint-disable-next-line react/prefer-stateless-function
 export class LocationViewport extends React.Component {
+  static emitter (...argv) {
+    return Emitter(...argv)
+  }
+
   constructor (props) {
     super(props)
 
@@ -29,6 +36,7 @@ export class LocationViewport extends React.Component {
   componentDidMount () {
     window.__locationViewportEmitter.addEventListener('broadcast_message.create', (e) => {
       if (!e.detail || !e.detail.data) {
+        // eslint-disable-next-line no-console
         console.warn('Can not parse broadcast event')
 
         return
