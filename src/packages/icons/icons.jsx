@@ -8,15 +8,18 @@ import ArrowRight from './images/arrow-right.svg'
 import Bullet from './images/bullet.svg'
 import CommentOutline from './images/comment-outline.svg'
 import Compress from './images/compress.svg'
+import CopyOutline from './images/copy-outline.svg'
 import CursorPointer from './images/cursor-pointer.svg'
 import Edit from './images/edit.svg'
 import Expand from './images/expand.svg'
 import Feed from './images/feed.svg'
 import Lines from './images/lines.svg'
+import LockOutline from './images/lock-outline.svg'
 import ShapeCircle from './images/shape-circle.svg'
 import ShapeSquare from './images/shape-square.svg'
 import ShapeTrinagle from './images/shape-triangle.svg'
 import Slides from './images/slides.svg'
+import TrashOutline from './images/trash-outline.svg'
 import Video from './images/video.svg'
 
 import css from './icons.css'
@@ -28,15 +31,18 @@ const icons = new Map([
   ['bullet', Bullet],
   ['comment-outline', CommentOutline],
   ['compress', Compress],
+  ['copy-outline', CopyOutline],
   ['cursor-pointer', CursorPointer],
   ['edit', Edit],
   ['expand', Expand],
   ['feed', Feed],
   ['lines', Lines],
+  ['lock-outline', LockOutline],
   ['shape-circle', ShapeCircle],
   ['shape-square', ShapeSquare],
   ['shape-triangle', ShapeTrinagle],
   ['slides', Slides],
+  ['trash-outline', TrashOutline],
   ['video', Video],
 ])
 
@@ -75,15 +81,18 @@ Icons.ArrowRight = ArrowRight
 Icons.Bullet = Bullet
 Icons.CommentOutline = CommentOutline
 Icons.Compress = Compress
+Icons.CopyOutline = CopyOutline
 Icons.CursorPointer = CursorPointer
 Icons.Edit = Edit
 Icons.Expand = Expand
 Icons.Feed = Feed
 Icons.Lines = Lines
+Icons.LockOutline = LockOutline
 Icons.ShapeCircle = ShapeCircle
 Icons.ShapeSquare = ShapeSquare
 Icons.ShapeTrinagle = ShapeTrinagle
 Icons.Slides = Slides
+Icons.TrashOutline = TrashOutline
 Icons.Video = Video
 
 export { Icons }

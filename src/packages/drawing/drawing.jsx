@@ -11,6 +11,7 @@ import PenTool from './tools/pen'
 import SelectTool from './tools/select'
 import { ShapeTool } from './tools/shape'
 import { TextboxTool } from './tools/textbox'
+import { LockTool } from './tools/lock'
 import {
   circle,
   circleSolid,
@@ -39,6 +40,18 @@ export const penToolModeEnum = {
   PENCIL: 'pencil',
   MARKER: 'marker',
 }
+
+export const enhancedFields = ['_id', '_lockedbyuser']
+
+export const normalizeFields = (object, fields) => Object.assign(
+  object,
+  fields.reduce((a, field) => {
+    // eslint-disable-next-line no-param-reassign
+    a[field] = object[field] || undefined
+
+    return a
+  }, {})
+)
 
 class TokenProvider {
   constructor () {
@@ -146,6 +159,8 @@ export class DrawingComponent extends React.Component {
     this.dynamicPattern = null
     this.ignoreObjectRemovedEvent = false
     this.tool = null
+
+    this.__lockModeTool = null
   }
 
   componentDidMount () {
@@ -318,7 +333,9 @@ export class DrawingComponent extends React.Component {
 
       if (!object.remote) {
         object._id = uniqId()
-        serializedObj = injectContextData ? injectContextData(object) : object.toObject(['_id'])
+        serializedObj = injectContextData
+          ? injectContextData(object)
+          : object.toObject(enhancedFields)
 
         if (selectOnInit && isShapeObject(object)) return
         if (isTextObject(object)) return
@@ -336,7 +353,9 @@ export class DrawingComponent extends React.Component {
       const [object] = deselected
 
       if (isShapeObject(object)) {
-        const serializedObj = injectContextData ? injectContextData(object) : object.toObject(['_id'])
+        const serializedObj = injectContextData
+          ? injectContextData(object)
+          : object.toObject(enhancedFields)
 
         if (object._new) {
           onDraw && onDraw(maybeRemoveToken(serializedObj))
@@ -348,7 +367,9 @@ export class DrawingComponent extends React.Component {
     this.canvas.on('object:modified', (event) => {
       const object = event.target
       const { injectContextData } = this.props
-      const serializedObj = injectContextData ? injectContextData(object) : object.toObject(['_id'])
+      const serializedObj = injectContextData
+        ? injectContextData(object)
+        : object.toObject(enhancedFields)
 
       if (isTextObject(object) && object._textBeforeEdit === '') {
         onDraw && onDraw(maybeRemoveToken(serializedObj))
@@ -368,7 +389,7 @@ export class DrawingComponent extends React.Component {
 
       const object = event.target
 
-      onObjectRemove && onObjectRemove(maybeRemoveToken(object.toObject(['_id'])))
+      onObjectRemove && onObjectRemove(maybeRemoveToken(object.toObject(enhancedFields)))
     })
 
     this.canvas.on('after:render', () => this._handleAfterRender())
@@ -412,6 +433,8 @@ export class DrawingComponent extends React.Component {
       this.canvas.clear()
       this.canvas.dispose()
 
+      this.__cleanTools()
+
       this.canvas = null
     }
   }
@@ -426,7 +449,9 @@ export class DrawingComponent extends React.Component {
   }
 
   initTool (tool) {
-    const { brushColor, selectOnInit } = this.props
+    const {
+      brushColor, selectOnInit, onLockSelection, onLockDeselection,
+    } = this.props
 
     switch (tool) {
       case toolEnum.ERASER:
@@ -543,6 +568,9 @@ export class DrawingComponent extends React.Component {
         this.tool = new PenTool(this.canvas)
     }
 
+    this.__cleanTools()
+    this.__lockModeTool = new LockTool(this.canvas, onLockSelection, onLockDeselection)
+
     this.configureTool()
   }
 
@@ -629,12 +657,12 @@ export class DrawingComponent extends React.Component {
   updateCanvasObjects (objects) {
     const canvasObjects = this.canvas.getObjects()
     const canvasObjectIds = canvasObjects.map(_ => _._id)
-    const newObjectIds = objects.map(_ => _._id)
+    const newObjectIds = new Set(objects.map(_ => _._id))
     const objectsToAdd = []
     const objectsToRemove = []
 
     canvasObjects.forEach((_) => {
-      if (newObjectIds.indexOf(_._id) === -1) {
+      if (!newObjectIds.has(_._id)) {
         objectsToRemove.push(_)
       }
     })
@@ -647,13 +675,19 @@ export class DrawingComponent extends React.Component {
 
     objects.forEach((_) => {
       const objIndex = canvasObjectIds.indexOf(_._id)
+      const nextObject = normalizeFields(_, enhancedFields)
 
       if (objIndex === -1) {
         // add
-        objectsToAdd.push(_)
+        objectsToAdd.push(nextObject)
       } else {
         // update
-        canvasObjects[objIndex].set(_)
+        canvasObjects[objIndex].set(nextObject)
+
+        !LockTool.isLocked(canvasObjects[objIndex])
+          ? LockTool.unlockObject(canvasObjects[objIndex])
+          : LockTool.lockObject(canvasObjects[objIndex])
+
         canvasObjects[objIndex].setCoords()
       }
     })
@@ -679,6 +713,16 @@ export class DrawingComponent extends React.Component {
     if (this.canvas.getActiveObject()) this.canvas.discardActiveObject()
   }
 
+  currentSelection () {
+    return this.canvas.getActiveObject().toObject(enhancedFields)
+  }
+
+  __cleanTools () {
+    this.__lockModeTool && this.__lockModeTool.destroy()
+
+    this.__lockModeTool = undefined
+  }
+
   render () {
     const {
       height, width, pattern,
@@ -692,3 +736,5 @@ export class DrawingComponent extends React.Component {
     )
   }
 }
+
+export { LockTool }

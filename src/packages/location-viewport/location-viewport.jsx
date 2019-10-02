@@ -36,7 +36,9 @@ export class LocationViewport extends React.PureComponent {
 
       const { data } = e.detail
 
-      this.setState({ objects: Array.isArray(data) ? data : [data] })
+      const objects = Array.isArray(data) ? data : [data]
+
+      this.setState({ objects })
     })
   }
 
