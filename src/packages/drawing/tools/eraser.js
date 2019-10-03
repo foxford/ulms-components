@@ -1,3 +1,5 @@
+import { fabric } from 'fabric'
+
 import { Base } from './base'
 
 const areSamePoints = ([xy1, xy2]) => xy1[0] === xy2[0] && xy1[1] === xy2[1]
@@ -132,7 +134,13 @@ export default class EraserTool extends Base {
     const realPath = adjustPath(makeAproximatedVector((_)), { precision: this._precision })
 
     this._canvas.forEachObject((object) => {
+      if (!object.isOnScreen()) return
+
       realPath.forEach((point) => {
+        const p = new fabric.Point(point[0], point[1])
+
+        if (!object.containsPoint(p)) return
+
         if (!this._canvas.isTargetTransparent(object, point[0], point[1])) {
           result.push(object)
         }
@@ -144,8 +152,11 @@ export default class EraserTool extends Base {
 
   __applyEraseByPoint ([x, y]) {
     const result = []
+    const point = new fabric.Point(x, y)
 
     this._canvas.forEachObject((_) => {
+      if (!_.isOnScreen() || !_.containsPoint(point)) return
+
       const isNotTransparent = isNotTransparentOnArea(this._canvas, _, {
         r: this._width, x, y,
       }, { precision: this._precision })
@@ -203,9 +214,7 @@ export default class EraserTool extends Base {
     if (this._isContinuousDraw.length === 1) {
       list = this.__applyEraseByPoint(this._isContinuousDraw[0])
       this._isContinuousDraw = []
-    } else
-
-    if (this._isContinuousDraw.length > 1) {
+    } else if (this._isContinuousDraw.length > 1) {
       list = this.__applyEraseByPath(this._isContinuousDraw)
       this._isContinuousDraw = []
     }
