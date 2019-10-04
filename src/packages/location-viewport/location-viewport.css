@@ -1,4 +1,6 @@
-.root { }
+.root {
+  --location-viewport-object-size: 20px
+}
 
 .root .outer {
   position: relative;
@@ -15,10 +17,27 @@
 .root .cursorItem
 ,.root .cursorText
 {
-  display: inline-block;
   user-select: none;
 }
 
 .root .cursorItem {
-  margin-right: 7px;
+  display: block;
+  transform-origin: top left;
+}
+
+.root .cursorText {
+  display: inline-block;
+  margin: 0 12px;
+  padding: 2px 3px;
+}
+
+.root .cursorItem > * {
+  --icons-size-xs: var(--location-viewport-object-size);
+  display: block;
+}
+
+.root .cursorItem svg path {
+  width: inherit;
+  height: inherit;
+  fill: currentColor;
 }

@@ -14,20 +14,32 @@
       this.__targetEl = undefined
     }
     componentDidMount() {
+      const { opts } = this.props
+
       this.__emitterEl && this.__emitterEl.addEventListener('mousemove', (ev) => {
         if (this.__isDispatching) return
         else this.__isDispatching = true
 
-        setTimeout(() => {
-          const xy = { x: ev.layerX, y: ev.layerY }
+        const maybeEvent = {
+          pointer: {
+            x: ev.layerX,
+            y: ev.layerY,
+          },
+          ...opts.vptCoords
+        }
 
-          if(this.props.top) xy.x = xy.x + this.props.left
-          if(this.props.left) xy.y = xy.y + this.props.top
+        const xy = { x: ev.layerX, y: ev.layerY }
+        setTimeout(() => {
+
+          if(opts){
+            xy.x = xy.x - opts.vptCoords.tl.x
+            xy.y = xy.y - opts.vptCoords.tl.y
+          }
 
           this._emitter.dispatchEvent(new CustomEvent('broadcast_message.create', {
             detail: {
               data:{
-                id: Math.random(),
+                id: 1,
                 aCoords: {tl: xy},
                 text: 'Alan Mathison Turing'
               }
@@ -53,22 +65,19 @@
     }
   };
   <div style={{ position:'relative'}}>
-    <div style={{border: '1px solid rebeccapurple', boxSizing: 'border-box', width: '300px', height: '300px'}}>
+    <div style={{ border: '1px solid rebeccapurple', boxSizing: 'content-box', width: '300px', height: '300px' }}>
       <LocationViewport
-        boundUpper={[280, 280]}
-        height={300}
+        boundUpper={[300, 300]}
         id='locationViewport'
         emitter={window.__locationViewportEmitter}
         // opts={{ inverted: false, sizeX: 300 }}
-        width={300}
       />
     </div>
-    <div style={{border: '1px solid orange', boxSizing: 'border-box', top: -15, left: -15, position:'absolute', width: '330px', height: '330px'}}>
+    <div style={{ border: '1px solid orange', boxSizing: 'content-box', top: -15, left: -15, position:'absolute', width: '330px', height: '330px' }}>
       <LocationEmitter
         emitter={window.__locationViewportEmitter}
         interval={100}
-        top={-15} // adjust position 4 the demo
-        left={-15} // adjust position 4 the demo
+        opts={{ vptCoords: { tl: { x: 15, y: 15 } } }}
       />
     </div>
   </div>

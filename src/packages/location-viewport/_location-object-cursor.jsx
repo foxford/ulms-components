@@ -15,12 +15,13 @@ const isOutOfRange = (a, high, low = 0) => a < low || a > high
 const adjustTop = (top, height) => { if (!height) { throw new TypeError('Absent height') } else { return height - top } }
 
 // eslint-disable-next-line react/prefer-stateless-function
-export class LocationObjectCursor extends React.PureComponent {
+export class LocationObjectCursor extends React.Component {
   static defaultProps = {
     boundLower: [0, 0],
     boundUpper: [],
     defaultCursorRotation: 0, // deg
     opts: { inverted: true }, // or {{ inverted: false, sizeX: Number }}
+    style: {},
   }
 
   constructor (props) {
@@ -48,6 +49,14 @@ export class LocationObjectCursor extends React.PureComponent {
     )
   }
 
+  shouldComponentUpdate (nextProps) {
+    const { top, left } = this.props
+
+    if (nextProps.left !== left || nextProps.top !== top) return 1
+
+    return 0
+  }
+
   set _element (element) {
     const { onAccessElement, id } = this.props
 
@@ -67,6 +76,7 @@ export class LocationObjectCursor extends React.PureComponent {
       defaultCursorRotation,
       left,
       opts,
+      style,
       text,
     } = this.props
     let { top } = this.props
@@ -91,15 +101,11 @@ export class LocationObjectCursor extends React.PureComponent {
 
     const [xi, yi] = fCalcIntermediateCoords([x, y], [xC, yC])([xLo, yLo], [xUp, yUp])
 
+    let rot = 0
     let transform
-    const styles = {
-      left: getPosition(xi),
-      top: getPosition(!opts.inverted ? adjustTop(yi, opts.sizeX) : yi),
-      // adjust top for CSS styles
-    }
 
     if (isOutOfRange(left, xUp, xLo) || isOutOfRange(top, yUp, yLo)) {
-      const rot = rotation([xi, yi], [xC, yC], {
+      rot = rotation([xi, yi], [xC, yC], {
         defRotation: defaultCursorRotation,
         invert: !opts.inverted ? 1 : -1,
       })
@@ -107,14 +113,37 @@ export class LocationObjectCursor extends React.PureComponent {
       transform = `rotate(${Math.round(rot)}deg)`
     }
 
+    const styles = {
+      left: xi,
+      top: !opts.inverted ? adjustTop(yi, opts.sizeX) : yi,
+      // adjust top for CSS styles
+    }
+
     return (
       <div
-        className={cx({ [className]: className, [css.cursor]: true })}
-        style={styles}
+        className={cx({
+          [className]: className,
+          [css.cursor]: true,
+        })}
+        style={{
+          left: getPosition(styles.left),
+          top: getPosition(styles.top),
+        }}
         ref={(el) => { this.__referenceEl = el }}
       >
-        <span className={css.cursorItem} style={{ transform }}><Icons name='cursor-pointer' /></span>
-        <span ref={(el) => { this._element = el }} className={css.cursorText}>{text}</span>
+        <span
+          className={css.cursorItem}
+          style={{ transform, color: style.background || '#000' }}
+        >
+          <Icons size='xs' name='cursor-pointer' />
+        </span>
+        <span
+          ref={(el) => { this._element = el }}
+          className={css.cursorText}
+          style={style}
+        >
+          {text}
+        </span>
       </div>
     )
   }
