@@ -8,9 +8,9 @@ import { getDocument, getImage, keyFn, renderPage } from './pdf-rendering'
 
 const reportError = error => console.log(error) // eslint-disable-line no-console
 
-export const CANVAS_WIDTH = 1024
+export const CANVAS_WIDTH = 2048
 
-export const CANVAS_HEIGHT = 768
+export const CANVAS_HEIGHT = 1536
 
 export const CANVAS_PREVIEW_WIDTH = 120
 
