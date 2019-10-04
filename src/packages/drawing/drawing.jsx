@@ -270,7 +270,10 @@ export class DrawingComponent extends React.Component {
   }
 
   _handleMouseMove = (opts) => {
+    const { onMouseMove } = this.props
+
     this.tool.handleMouseMoveEvent(opts)
+    onMouseMove && onMouseMove({ ...opts, vptCoords: this.canvas.vptCoords })
   }
 
   _handleMouseUp = (opts) => {

@@ -8,6 +8,7 @@ import ArrowRight from './images/arrow-right.svg'
 import Bullet from './images/bullet.svg'
 import CommentOutline from './images/comment-outline.svg'
 import Compress from './images/compress.svg'
+import CursorPointer from './images/cursor-pointer.svg'
 import Edit from './images/edit.svg'
 import Expand from './images/expand.svg'
 import Feed from './images/feed.svg'
@@ -27,6 +28,7 @@ const icons = new Map([
   ['bullet', Bullet],
   ['comment-outline', CommentOutline],
   ['compress', Compress],
+  ['cursor-pointer', CursorPointer],
   ['edit', Edit],
   ['expand', Expand],
   ['feed', Feed],
@@ -73,6 +75,7 @@ Icons.ArrowRight = ArrowRight
 Icons.Bullet = Bullet
 Icons.CommentOutline = CommentOutline
 Icons.Compress = Compress
+Icons.CursorPointer = CursorPointer
 Icons.Edit = Edit
 Icons.Expand = Expand
 Icons.Feed = Feed
