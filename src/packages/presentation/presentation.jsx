@@ -19,6 +19,15 @@ function calculateSize (containerWidth, containerHeight, imageWidth, imageHeight
   }
 }
 
+function calculateFitSize (containerWidth, containerHeight, imageWidth, imageHeight) {
+  const scale = containerWidth / imageWidth
+
+  return {
+    width: imageWidth * scale,
+    height: imageHeight * scale,
+  }
+}
+
 class Presentation extends Component {
   constructor () {
     super()
@@ -103,7 +112,7 @@ class Presentation extends Component {
 
   render () {
     const {
-      index, collection, onChange, showPagesCount, showActions, showPreviews, slotSlide,
+      index, collection, fitToWidth, onChange, showPagesCount, showActions, showPreviews, slotSlide,
     } = this.props
 
     return (
@@ -146,25 +155,32 @@ class Presentation extends Component {
               let result
 
               if (collection[index] && collection[index].image && height > 0 && width > 0) {
-                const imageSize = calculateSize(
-                  width,
-                  height,
-                  collection[index].imageWidth,
-                  collection[index].imageHeight
-                )
+                const imageSize = fitToWidth
+                  ? calculateFitSize(
+                    width,
+                    height,
+                    collection[index].imageWidth,
+                    collection[index].imageHeight
+                  )
+                  : calculateSize(
+                    width,
+                    height,
+                    collection[index].imageWidth,
+                    collection[index].imageHeight
+                  )
 
                 result = (
-                  <div className={css.slide}>
+                  <div className={cx(css.slide, { [css.fitToWidth]: fitToWidth })}>
                     <img
                       alt='image'
-                      className={css.mainImage}
+                      className={cx(css.mainImage, { [css.centered]: !fitToWidth })}
                       src={collection[index].image}
                       width={imageSize.width}
                       height={imageSize.height}
                     />
                     {
                       slotSlide && (
-                        <div className={css.slotSlide}>
+                        <div className={cx(css.slotSlide, { [css.centered]: !fitToWidth })}>
                           {slotSlide(imageSize.width, imageSize.height)}
                         </div>
                       )
