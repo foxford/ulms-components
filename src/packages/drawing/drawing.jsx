@@ -93,7 +93,11 @@ fabric.util.loadImage = function loadImage (url, callback, context, crossOrigin)
   if (matchesStorageURIScheme(url)) {
     tp.getToken()
       .then((token) => {
-        originalFabricLoadImegeFn(`${url}?access_token=${token}`, callback, context, crossOrigin)
+        if (url.indexOf('access_token') !== -1) {
+          originalFabricLoadImegeFn(url.replace(/\?access_token=(.*)$/i, `?access_token=${token}`), callback, context, crossOrigin)
+        } else {
+          originalFabricLoadImegeFn(`${url}?access_token=${token}`, callback, context, crossOrigin)
+        }
 
         return null
       })
