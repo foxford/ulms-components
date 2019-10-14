@@ -328,14 +328,11 @@ export class DrawingComponent extends React.Component {
 
     this.canvas.on('object:added', (event) => {
       const object = event.target
-      const { injectContextData } = this.props
       let serializedObj
 
       if (!object.remote) {
         object._id = uniqId()
-        serializedObj = injectContextData
-          ? injectContextData(object)
-          : object.toObject(enhancedFields)
+        serializedObj = object.toObject(enhancedFields)
 
         if (selectOnInit && isShapeObject(object)) return
         if (isTextObject(object)) return
@@ -347,15 +344,11 @@ export class DrawingComponent extends React.Component {
     })
 
     this.canvas.on('selection:cleared', ({ deselected }) => {
-      const { injectContextData } = this.props
-
       if (!deselected || deselected.length !== 1) return
       const [object] = deselected
 
       if (isShapeObject(object)) {
-        const serializedObj = injectContextData
-          ? injectContextData(object)
-          : object.toObject(enhancedFields)
+        const serializedObj = object.toObject(enhancedFields)
 
         if (object._new) {
           onDraw && onDraw(maybeRemoveToken(serializedObj))
@@ -366,10 +359,7 @@ export class DrawingComponent extends React.Component {
 
     this.canvas.on('object:modified', (event) => {
       const object = event.target
-      const { injectContextData } = this.props
-      const serializedObj = injectContextData
-        ? injectContextData(object)
-        : object.toObject(enhancedFields)
+      const serializedObj = object.toObject(enhancedFields)
 
       if (isTextObject(object) && object._textBeforeEdit === '') {
         onDraw && onDraw(maybeRemoveToken(serializedObj))
