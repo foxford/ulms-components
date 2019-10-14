@@ -60,9 +60,9 @@ export class LockTool extends StateTool {
     this.__onSelectListener = onSelect
     this.__onDeselectListener = onDeselect
 
-    this._canvas.on('selection:created', this.__handleSelect)
-    this._canvas.on('selection:updated', this.__handleSelect)
-    this._canvas.on('before:selection:cleared', this.__handleDeselect)
+    onSelect && this._canvas.on('selection:created', this.__handleSelect)
+    onSelect && this._canvas.on('selection:updated', this.__handleSelect)
+    onDeselect && this._canvas.on('before:selection:cleared', this.__handleDeselect)
   }
 
   __handleSelect = (event) => {
@@ -99,10 +99,9 @@ export class LockTool extends StateTool {
   }
 
   destroy(){
-    this._canvas.off('selection:created', this.__handleSelect)
-    this._canvas.off('selection:updated', this.__handleSelect)
-    this._canvas.off('before:selection:cleared', this.__handleDeselect)
-    this.__listener = undefined
+    this.__onSelectListener && this._canvas.off('selection:created', this.__handleSelect)
+    this.__onSelectListener && this._canvas.off('selection:updated', this.__handleSelect)
+    this.__onDeselectListener && this._canvas.off('before:selection:cleared', this.__handleDeselect)
     this._canvas = undefined
   }
 }
