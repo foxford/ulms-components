@@ -60,7 +60,6 @@ export class LockTool extends StateTool {
     this.__onSelectListener = onSelect
     this.__onDeselectListener = onDeselect
 
-    console.log('init')
     this._canvas.on('selection:created', this.__handleSelect)
     this._canvas.on('selection:updated', this.__handleSelect)
     this._canvas.on('before:selection:cleared', this.__handleDeselect)
@@ -69,16 +68,26 @@ export class LockTool extends StateTool {
   __handleSelect = (event) => {
     const { selected } = event
 
-    if(Array.isArray(selected) && selected.length > 1) {
-      debug('Can not perform lock. Too much objects selected')
-      return
+    const maybeProperSelectionForLock = Array.isArray(selected)
+      && selected.length === 1
+
+    const denyNewTextObject = selected[0].type === 'textbox'
+     && selected[0].text.length !== 0
+    // FIXME: we have to forbid knowing about other type of objects for the LockTool later :(
+
+    if(
+      (maybeProperSelectionForLock && selected[0].type !== 'textbox')
+      || (maybeProperSelectionForLock && denyNewTextObject)
+      ){
+      this.__onSelectListener({
+        target: !selected.length
+          ? undefined
+          : selected[0].toObject(enhancedFields)
+      })
+    } else {
+      debug('Lock is unavailable (too much or wrong objects selected)')
     }
 
-    this.__onSelectListener({
-      target: !selected.length
-        ? undefined
-        : selected[0].toObject(enhancedFields)
-    })
   }
 
   __handleDeselect = (event) => {
