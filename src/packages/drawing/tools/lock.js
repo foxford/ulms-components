@@ -22,6 +22,7 @@ export class LockTool extends StateTool {
       lockScalingX: true,
       lockScalingY: true,
       lockUniScaling: true,
+      editable: false,
     }
 
     Object.keys(props).forEach((key) => { object.set(key, props[key]) })
@@ -44,6 +45,7 @@ export class LockTool extends StateTool {
       lockScalingX: false,
       lockScalingY: false,
       lockUniScaling: false,
+      editable: true,
     }
     Object.keys(props).forEach((key) => { object.set(key, props[key]) })
 
@@ -62,7 +64,7 @@ export class LockTool extends StateTool {
 
     onSelect && this._canvas.on('selection:created', this.__handleSelect)
     onSelect && this._canvas.on('selection:updated', this.__handleSelect)
-    onDeselect && this._canvas.on('before:selection:cleared', this.__handleDeselect)
+    onDeselect && this._canvas.on('selection:cleared', this.__handleDeselect)
   }
 
   __handleSelect = (event) => {
@@ -91,8 +93,6 @@ export class LockTool extends StateTool {
   }
 
   __handleDeselect = (event) => {
-    const { target } = event
-
     this.__onDeselectListener({
       target: undefined
     })
@@ -101,7 +101,7 @@ export class LockTool extends StateTool {
   destroy(){
     this.__onSelectListener && this._canvas.off('selection:created', this.__handleSelect)
     this.__onSelectListener && this._canvas.off('selection:updated', this.__handleSelect)
-    this.__onDeselectListener && this._canvas.off('before:selection:cleared', this.__handleDeselect)
+    this.__onDeselectListener && this._canvas.off('selection:cleared', this.__handleDeselect)
     this._canvas = undefined
   }
 }
