@@ -74,13 +74,24 @@
 ```js
 <div style={{width: '20px'}}>
   <Icons.Arrow />
+  <Icons.ArrowLeft/>
+  <Icons.ArrowRight/>
   <Icons.Bullet />
   <Icons.CommentOutline />
   <Icons.Compress />
+  <Icons.CopyOutline/>
+  <Icons.CursorPointer/>
+  <Icons.Edit/>
   <Icons.Expand />
   <Icons.Feed />
+  <Icons.Lines/>
+  <Icons.LockOutline/>
+  <Icons.ShapeCircle/>
+  <Icons.ShapeSquare/>
+  <Icons.ShapeTrinagle/>
   <Icons.Slides />
-  <Icons.Video />
+  <Icons.TrashOutline/>
+  <Icons.Video/>
 </div>
 ```
 

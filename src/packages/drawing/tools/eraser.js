@@ -1,6 +1,7 @@
 import { fabric } from 'fabric'
 
 import { Base } from './base'
+import { LockTool } from './lock'
 
 const areSamePoints = ([xy1, xy2]) => xy1[0] === xy2[0] && xy1[1] === xy2[1]
 
@@ -135,6 +136,7 @@ export default class EraserTool extends Base {
 
     this._canvas.forEachObject((object) => {
       if (!object.isOnScreen()) return
+      if (LockTool.isLocked(object)) return
 
       realPath.forEach((point) => {
         const p = new fabric.Point(point[0], point[1])
@@ -154,15 +156,16 @@ export default class EraserTool extends Base {
     const result = []
     const point = new fabric.Point(x, y)
 
-    this._canvas.forEachObject((_) => {
-      if (!_.isOnScreen() || !_.containsPoint(point)) return
+    this._canvas.forEachObject((object) => {
+      if (!object.isOnScreen() || !object.containsPoint(point)) return
+      if (LockTool.isLocked(object)) return
 
-      const isNotTransparent = isNotTransparentOnArea(this._canvas, _, {
+      const isNotTransparent = isNotTransparentOnArea(this._canvas, object, {
         r: this._width, x, y,
       }, { precision: this._precision })
 
       if (isNotTransparent) {
-        result.push(_)
+        result.push(object)
       }
     })
 
