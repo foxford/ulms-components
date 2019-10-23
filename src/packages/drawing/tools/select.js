@@ -18,7 +18,7 @@ export default class SelectTool extends Base {
   configure () {
     this._canvas.isDrawingMode = false
     this._canvas.selection = false
-    // this._canvas.perPixelTargetFind = true
+    this._canvas.perPixelTargetFind = true
     this._canvas.defaultCursor = 'default'
     this._canvas.setCursor('default')
   }
