@@ -180,6 +180,7 @@ export default class EraserTool extends Base {
 
   configure (options) {
     this._canvas.isDrawingMode = false
+    this._canvas.perPixelTargetFind = true
     this._canvas.selection = false
     this._canvas.defaultCursor = 'cell'
     this._canvas.setCursor('cell')

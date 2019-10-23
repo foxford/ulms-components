@@ -11,12 +11,13 @@ export default class PanTool extends Base {
     this._lastPosY = null
 
     this._canvas.forEachObject((_) => {
-      Object.assign(_, { selectable: false, evented: false })
+      Object.assign(_, { evented: false, selectable: false })
     })
   }
 
   configure () {
     this._canvas.isDrawingMode = false
+    this._canvas.perPixelTargetFind = false
     this._canvas.selection = false
     this._canvas.defaultCursor = 'grab'
     this._canvas.setCursor('grab')

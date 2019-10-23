@@ -319,7 +319,6 @@ export class DrawingComponent extends React.Component {
     this.canvas = new fabric.Canvas('canvas')
 
     this.canvas.enablePointerEvents = 'PointerEvent' in window
-    this.canvas.perPixelTargetFind = true // fixme: move to select tool (need setup/release methods)
 
     this.canvas.on('mouse:down', opt => this._handleMouseDown(opt))
     this.canvas.on('mouse:move', opt => this._handleMouseMove(opt))
