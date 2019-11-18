@@ -50,6 +50,8 @@ export default class PanTool extends Base {
     this._lastPosX = null
     this._lastPosY = null
     this._canvas.setCursor('grab')
+    this._canvas.forEachObject(_ => _.setCoords())
+    this._canvas.requestRenderAll()
   }
 
   handleObjectAddedEvent (opts) {
