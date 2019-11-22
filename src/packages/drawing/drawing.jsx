@@ -9,6 +9,7 @@ import EraserTool from './tools/eraser'
 import PanTool from './tools/pan'
 import PenTool from './tools/pen'
 import SelectTool from './tools/select'
+import { LineTool } from './tools/line'
 import { ShapeTool } from './tools/shape'
 import { TextboxTool } from './tools/textbox'
 import { LockTool } from './tools/lock'
@@ -26,6 +27,7 @@ export const toolEnum = {
   PAN: 'pan',
   PEN: 'pen',
   SELECT: 'select',
+  LINE: 'line',
   SHAPE_CIRCLE_SOLID: 'circle-solid',
   SHAPE_CIRCLE: 'circle',
   SHAPE_RECT: 'rect',
@@ -284,6 +286,14 @@ export class DrawingComponent extends React.Component {
     this.destroyCanvas()
   }
 
+  _handleKeyDown = (opts) => {
+    this.tool.handleKeyDownEvent(opts)
+  }
+
+  _handleKeyUp = (opts) => {
+    this.tool.handleKeyUpEvent(opts)
+  }
+
   _handleMouseDown = (opts) => {
     this.tool.handleMouseDownEvent(opts)
   }
@@ -326,9 +336,15 @@ export class DrawingComponent extends React.Component {
     this.canvas.on('mouse:up', opt => this._handleMouseUp(opt))
     this.canvas.on('object:added', opt => this._handleObjectAdded(opt))
 
+    document.addEventListener('keydown', opt => this._handleKeyDown(opt));
+    document.addEventListener('keyup', opt => this._handleKeyUp(opt));
+
     this.canvas.on('object:added', (event) => {
       const object = event.target
       let serializedObj
+
+      // Пропускаем черновые объекты
+      if(object._draft) return;
 
       if (!object.remote) {
         object._id = uniqId()
@@ -469,6 +485,11 @@ export class DrawingComponent extends React.Component {
           fill: toCSSColor(brushColor),
           fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif',
         })
+
+        break
+
+      case toolEnum.LINE:
+        this.tool = new LineTool(this.canvas)
 
         break
 
