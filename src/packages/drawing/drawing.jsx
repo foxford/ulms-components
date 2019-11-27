@@ -40,7 +40,7 @@ export const toolEnum = {
 export const penToolModeEnum = {
   PENCIL: 'pencil',
   MARKER: 'marker',
-  LINE: 'line'
+  LINE: 'line',
 }
 
 export const enhancedFields = ['_id', '_lockedbyuser']
@@ -259,7 +259,7 @@ export class DrawingComponent extends React.Component {
     if (
       prevProps.tool !== tool
       || prevProps.brushColor !== brushColor
-      || tool === toolEnum.PEN  // Обновляем, чтобы не пропуститль LINE
+      || tool === toolEnum.PEN // need to update the tool if it's a pen
     ) {
       this.initTool(tool)
     }
@@ -337,15 +337,15 @@ export class DrawingComponent extends React.Component {
     this.canvas.on('mouse:up', opt => this._handleMouseUp(opt))
     this.canvas.on('object:added', opt => this._handleObjectAdded(opt))
 
-    document.addEventListener('keydown', this._handleKeyDown);
-    document.addEventListener('keyup', this._handleKeyUp);
+    this.canvasRef.current.ownerDocument.addEventListener('keydown', this._handleKeyDown)
+    this.canvasRef.current.ownerDocument.addEventListener('keyup', this._handleKeyUp)
 
     this.canvas.on('object:added', (event) => {
       const object = event.target
       let serializedObj
 
-      // Пропускаем черновые объекты
-      if(object._draft) return;
+      // Skipping draft objects
+      if (object._draft) return
 
       if (!object.remote) {
         object._id = uniqId()
@@ -441,9 +441,8 @@ export class DrawingComponent extends React.Component {
       this.canvas.dispose()
 
       this.__cleanTools()
-
-      document.removeEventListener('keydown', this._handleKeyDown);
-      document.removeEventListener('keyup', this._handleKeyUp);
+      this.canvasRef.current.ownerDocument.removeEventListener('keydown', this._handleKeyDown)
+      this.canvasRef.current.ownerDocument.removeEventListener('keyup', this._handleKeyUp)
 
       this.canvas = null
     }
@@ -475,7 +474,7 @@ export class DrawingComponent extends React.Component {
         break
 
       case toolEnum.PEN:
-        if(brushMode === penToolModeEnum.LINE) {
+        if (brushMode === penToolModeEnum.LINE) {
           this.tool = new LineTool(this.canvas)
         } else {
           this.tool = new PenTool(this.canvas)
