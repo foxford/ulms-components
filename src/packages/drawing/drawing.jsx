@@ -27,7 +27,6 @@ export const toolEnum = {
   PAN: 'pan',
   PEN: 'pen',
   SELECT: 'select',
-  LINE: 'line',
   SHAPE_CIRCLE_SOLID: 'circle-solid',
   SHAPE_CIRCLE: 'circle',
   SHAPE_RECT: 'rect',
@@ -41,6 +40,7 @@ export const toolEnum = {
 export const penToolModeEnum = {
   PENCIL: 'pencil',
   MARKER: 'marker',
+  LINE: 'line'
 }
 
 export const enhancedFields = ['_id', '_lockedbyuser']
@@ -259,6 +259,7 @@ export class DrawingComponent extends React.Component {
     if (
       prevProps.tool !== tool
       || prevProps.brushColor !== brushColor
+      || tool === toolEnum.PEN  // Обновляем, чтобы не пропуститль LINE
     ) {
       this.initTool(tool)
     }
@@ -327,7 +328,6 @@ export class DrawingComponent extends React.Component {
     } = this.props
 
     this.canvas = new fabric.Canvas('canvas')
-    window.z = this.canvas
 
     this.canvas.enablePointerEvents = 'PointerEvent' in window
     this.canvas.perPixelTargetFind = true // fixme: move to select tool (need setup/release methods)
@@ -457,7 +457,7 @@ export class DrawingComponent extends React.Component {
 
   initTool (tool) {
     const {
-      brushColor, selectOnInit, onLockSelection, onLockDeselection,
+      brushMode, brushColor, selectOnInit, onLockSelection, onLockDeselection,
     } = this.props
 
     switch (tool) {
@@ -472,8 +472,11 @@ export class DrawingComponent extends React.Component {
         break
 
       case toolEnum.PEN:
-        this.tool = new PenTool(this.canvas)
-
+        if(brushMode === penToolModeEnum.LINE) {
+          this.tool = new LineTool(this.canvas)
+        } else {
+          this.tool = new PenTool(this.canvas)
+        }
         break
 
       case toolEnum.SELECT:
@@ -486,11 +489,6 @@ export class DrawingComponent extends React.Component {
           fill: toCSSColor(brushColor),
           fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif',
         })
-
-        break
-
-      case toolEnum.LINE:
-        this.tool = new LineTool(this.canvas)
 
         break
 

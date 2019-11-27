@@ -12,12 +12,13 @@ fabric.WhiteboardLine = fabric.WhiteboardLine || fabric.util.createClass(fabric.
   },
   toObject: function (enhancedFields) {
     const resObject = fabric.util.object.extend(this.callSuper('toObject', enhancedFields))
-    const {x1, x2, y1, y2, top, left} = resObject
+    const {x1, x2, y1, y2} = resObject
+    const {x, y} = this.getCenterPoint()
 
-    resObject.x1 = left + x1
-    resObject.x2 = left + x2
-    resObject.y1 = top + y1
-    resObject.y2 = top + y2
+    resObject.x1 = x + x1
+    resObject.x2 = x + x2
+    resObject.y1 = y + y1
+    resObject.y2 = y + y2
 
     return resObject
   },
