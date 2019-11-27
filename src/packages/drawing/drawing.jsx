@@ -327,6 +327,7 @@ export class DrawingComponent extends React.Component {
     } = this.props
 
     this.canvas = new fabric.Canvas('canvas')
+    window.z = this.canvas
 
     this.canvas.enablePointerEvents = 'PointerEvent' in window
     this.canvas.perPixelTargetFind = true // fixme: move to select tool (need setup/release methods)
@@ -582,10 +583,10 @@ export class DrawingComponent extends React.Component {
     this.__cleanTools()
     this.__lockModeTool = new LockTool(this.canvas, onLockSelection, onLockDeselection)
 
-    this.configureTool()
+    this.configureTool(true)
   }
 
-  configureTool () {
+  configureTool (initial = false) {
     const {
       brushColor, brushMode, brushWidth, eraserWidth, eraserPrecision, tool,
     } = this.props
@@ -605,6 +606,7 @@ export class DrawingComponent extends React.Component {
         lineWidth: brushWidth,
         precision: eraserPrecision,
         eraserWidth,
+        initial,
       })
     }
   }

@@ -1,6 +1,6 @@
 import { Base } from './base'
-import { makeNotInteractive, adjustPosition } from './object'
-import {fabric} from "fabric";
+import { makeNotInteractive } from './object'
+import fabric from './_primitives'
 
 const MIN_DELTA = 0.2
 const POINT_DELTA = 5
@@ -9,7 +9,7 @@ export class LineTool extends Base {
   constructor (canvas, options) {
     super(canvas)
 
-    this.__draftLine = new fabric.Line([0, 0, 1, 1], {
+    this.__draftLine = new fabric.Line([], {
       fill:  'red',
       stroke: 'red',
       strokeDashArray: [5, 5],
@@ -39,7 +39,11 @@ export class LineTool extends Base {
     this._canvas.selection = false
     this._canvas.defaultCursor = 'crosshair'
     this._canvas.setCursor('crosshair')
-    this._canvas.forEachObject(_ => makeNotInteractive(_))
+
+    // Чтобы не запускать обход объектов каждый раз, проходим только при инициализации кисти
+    if(props.initial) {
+      this._canvas.forEachObject(_ => makeNotInteractive(_))
+    }
 
   }
 
@@ -56,12 +60,11 @@ export class LineTool extends Base {
   }
 
   handleMouseDownEvent (opts) {
-
-    const [x, y] = adjustPosition(this.__draftLine, opts.absolutePointer, this.__options.adjustCenter)
+    const {x, y} = this._canvas.getPointer(opts.e)
 
     this.__startX = x
     this.__startY = y
-    this.__draftLine.set({'x1': x, 'y1': y, 'x2': x + 1, 'y2': y + 1})
+    this.__draftLine.set({'x1': x, 'y1': y, 'x2': x , 'y2': y })
 
     this._canvas.add(this.__draftLine)
     this.__isDrawing  = true
@@ -69,7 +72,7 @@ export class LineTool extends Base {
 
   handleMouseMoveEvent (opts) {
     if(this.__isDrawing) {
-      const [x, y] = adjustPosition(this.__draftLine, opts.absolutePointer, this.__options.adjustCenter)
+      const {x, y} = this._canvas.getPointer(opts.e)
 
       if(this.__shiftPressed) {
         const deltaX = Math.abs(this.__startX - x)
@@ -97,9 +100,11 @@ export class LineTool extends Base {
   handleMouseUpEvent (opts) {
     this._canvas.defaultCursor = 'crosshair'
     this._canvas.setCursor('crosshair')
-    if(this.__isDrawing) {
 
-      const [x, y] = adjustPosition(this.__draftLine, opts.absolutePointer, this.__options.adjustCenter)
+    if(this.__isDrawing) {
+      const {x, y} = this._canvas.getPointer(opts.e)
+
+      // Пропускаем точечный клик
       if(this.__pointCkick(x, y)) {
         this._canvas.remove(this.__draftLine)
         this.__isDrawing = false
@@ -107,12 +112,14 @@ export class LineTool extends Base {
         return
       }
 
-      let line = new fabric.Line([this.__draftLine.x1, this.__draftLine.y1, this.__draftLine.x2, this.__draftLine.y2], {
+      const line = new fabric.WhiteboardLine([this.__draftLine.x1, this.__draftLine.y1, this.__draftLine.x2, this.__draftLine.y2], {
         fill: this.__color,
         stroke: this.__color,
         strokeWidth: this.__width,
       });
-      line.set('_new', true)
+
+      line.set({'_new': true})
+
       this._canvas.add(line);
 
       this._canvas.remove(this.__draftLine)
