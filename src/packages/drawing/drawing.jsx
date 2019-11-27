@@ -337,8 +337,8 @@ export class DrawingComponent extends React.Component {
     this.canvas.on('mouse:up', opt => this._handleMouseUp(opt))
     this.canvas.on('object:added', opt => this._handleObjectAdded(opt))
 
-    document.addEventListener('keydown', opt => this._handleKeyDown(opt));
-    document.addEventListener('keyup', opt => this._handleKeyUp(opt));
+    document.addEventListener('keydown', this._handleKeyDown);
+    document.addEventListener('keyup', this._handleKeyUp);
 
     this.canvas.on('object:added', (event) => {
       const object = event.target
@@ -441,6 +441,9 @@ export class DrawingComponent extends React.Component {
       this.canvas.dispose()
 
       this.__cleanTools()
+
+      document.removeEventListener('keydown', this._handleKeyDown);
+      document.removeEventListener('keyup', this._handleKeyUp);
 
       this.canvas = null
     }
