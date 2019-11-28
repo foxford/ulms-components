@@ -7,6 +7,10 @@ export class Base {
 
   configure () {}
 
+  handleKeyDownEvent () {}
+
+  handleKeyUpEvent () {}
+
   handleMouseDownEvent () {}
 
   handleMouseMoveEvent () {}
