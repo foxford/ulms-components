@@ -1,7 +1,7 @@
 /* eslint-disable no-param-reassign */
 import { fabric } from 'fabric'
 
-fabric.WhiteboardLine = fabric.WhiteboardLine || fabric.util.createClass(fabric.Line, {
+const WhiteboardLine = fabric.util.createClass(fabric.Line, {
   type: 'WhiteboardLine',
   initialize (points, options) {
     options || (options = { })
@@ -29,7 +29,7 @@ fabric.WhiteboardLine = fabric.WhiteboardLine || fabric.util.createClass(fabric.
   },
 })
 
-fabric.WhiteboardLine.fromObject = fabric.WhiteboardLine.fromObject || function (object, callback) {
+WhiteboardLine.fromObject = function (object, callback) {
   // Correct the coordinates relative to top/left
   callback && callback(new fabric.WhiteboardLine([
     object.x1 + object.left,
@@ -39,4 +39,6 @@ fabric.WhiteboardLine.fromObject = fabric.WhiteboardLine.fromObject || function 
   ], object))
 }
 
-export { fabric }
+fabric.WhiteboardLine = fabric.WhiteboardLine || WhiteboardLine
+
+export { WhiteboardLine }

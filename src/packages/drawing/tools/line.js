@@ -1,6 +1,7 @@
+import { fabric } from 'fabric'
 import { Base } from './base'
 import { makeNotInteractive } from './object'
-import { fabric } from './_primitives'
+import { WhiteboardLine } from './_primitives'
 
 const MIN_DELTA = 0.2
 const POINT_DELTA = 5
@@ -116,7 +117,7 @@ export class LineTool extends Base {
         return
       }
 
-      const line = new fabric.WhiteboardLine([
+      const line = new WhiteboardLine([
         this.__draftLine.x1,
         this.__draftLine.y1,
         this.__draftLine.x2,
