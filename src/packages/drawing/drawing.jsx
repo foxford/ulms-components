@@ -1,6 +1,7 @@
 /* eslint-disable react/prop-types */
 import React, { Fragment } from 'react'
 import { fabric } from 'fabric'
+import { queue as Queue } from 'd3-queue'
 
 import { toCSSColor } from '../../util/helpers'
 
@@ -160,6 +161,8 @@ export class DrawingComponent extends React.Component {
     this.canvasPatternRef = React.createRef()
     this.dynamicPattern = null
     this.ignoreObjectRemovedEvent = false
+    this.q = null
+    this.rq = null
     this.tool = null
 
     this.__lockModeTool = null
@@ -209,6 +212,7 @@ export class DrawingComponent extends React.Component {
     } = this.props
 
     if (prevProps.canDraw !== canDraw) {
+      this.destroyQueues()
       this.destroyCanvas()
 
       this.canvasRef.current.style.position = 'relative'
@@ -277,6 +281,8 @@ export class DrawingComponent extends React.Component {
   componentWillUnmount () {
     tp.setProvider(null)
 
+    this.destroyQueues()
+
     if (this.dynamicPattern) {
       this.dynamicPattern.destroy()
       this.destroyCanvasPattern()
@@ -327,10 +333,9 @@ export class DrawingComponent extends React.Component {
       uniqId,
     } = this.props
 
-    this.canvas = new fabric.Canvas('canvas')
-
-    this.canvas.enablePointerEvents = 'PointerEvent' in window
-    this.canvas.perPixelTargetFind = true // fixme: move to select tool (need setup/release methods)
+    this.canvas = new fabric.Canvas('canvas', {
+      enablePointerEvents: 'PointerEvent' in window,
+    })
 
     this.canvas.on('mouse:down', opt => this._handleMouseDown(opt))
     this.canvas.on('mouse:move', opt => this._handleMouseMove(opt))
@@ -454,6 +459,20 @@ export class DrawingComponent extends React.Component {
       this.canvasPattern.dispose()
 
       this.canvasPattern = null
+    }
+  }
+
+  destroyQueues () {
+    if (this.q !== null) {
+      this.q.abort()
+
+      this.q = null
+    }
+
+    if (this.rq !== null) {
+      this.rq.abort()
+
+      this.rq = null
     }
   }
 
@@ -624,29 +643,6 @@ export class DrawingComponent extends React.Component {
     }, options)
   }
 
-  existsInCanvas (id) {
-    const canvasObjectIds = this.canvas.getObjects().map(_ => _._id)
-
-    return canvasObjectIds.indexOf(id) !== -1
-  }
-
-  existsInObjects (id) {
-    const { objects } = this.props
-
-    return objects.map(_ => _._id).indexOf(id) !== -1
-  }
-
-  sortObjects () {
-    const { objects } = this.props
-    const canvasObjectIds = this.canvas.getObjects().map(_ => _._id)
-    const objectIds = objects.map(_ => _._id)
-    const filteredObjectIds = objectIds.filter(_ => canvasObjectIds.indexOf(_) !== -1) // eslint-disable-line max-len
-
-    this.canvas.forEachObject((_) => {
-      _.moveTo(filteredObjectIds.indexOf(_._id))
-    })
-  }
-
   updateCanvasParameters (height, width, zoom) {
     const { zoomToCenter } = this.props
 
@@ -673,6 +669,14 @@ export class DrawingComponent extends React.Component {
     const newObjectIds = new Set(objects.map(_ => _._id))
     const objectsToAdd = []
     const objectsToRemove = []
+    const enlivenedObjects = new Map()
+
+    this.destroyQueues()
+
+    this.q = new Queue(50)
+    this.rq = new Queue(50)
+
+    this.canvas.renderOnAddRemove = false
 
     canvasObjects.forEach((_) => {
       if (!newObjectIds.has(_._id)) {
@@ -694,7 +698,11 @@ export class DrawingComponent extends React.Component {
         // add
         objectsToAdd.push(nextObject)
       } else {
-        // update
+        // update (only if revision has been changed)
+        if (_._rev === canvasObjects[objIndex]._rev) {
+          return
+        }
+
         canvasObjects[objIndex].set(nextObject)
 
         !LockTool.isLocked(canvasObjects[objIndex])
@@ -706,20 +714,60 @@ export class DrawingComponent extends React.Component {
     })
 
     if (objectsToAdd.length) {
-      fabric.util.enlivenObjects(objectsToAdd.map(_ => ({ ..._, remote: true })), (fObjectList) => {
-        fObjectList.forEach((fObject) => {
-          if (!this.existsInObjects(fObject._id) || this.existsInCanvas(fObject._id)) {
+      objectsToAdd
+        .map(_ => ({ ..._, remote: true }))
+        .forEach((_) => {
+          this.q.defer((done) => {
+            window.requestAnimationFrame(() => {
+              fabric.util.enlivenObjects([_], ([fObject]) => {
+                enlivenedObjects.set(fObject._id, fObject)
+
+                done(null)
+              })
+            })
+          })
+        })
+
+      this.q.awaitAll((error) => {
+        if (error) {
+          return
+        }
+
+        this.canvas.renderOnAddRemove = false
+
+        objects.forEach((object) => {
+          if (!enlivenedObjects.has(object._id)) {
             return
           }
 
-          this.canvas.add(fObject)
+          this.rq.defer((done) => {
+            window.requestAnimationFrame(() => {
+              const objectToAdd = enlivenedObjects.get(object._id)
+
+              if (LockTool.isLocked(objectToAdd)) {
+                LockTool.lockObject(objectToAdd)
+              }
+
+              this.canvas.add(objectToAdd)
+
+              done(null)
+            })
+          })
         })
 
-        this.sortObjects()
-      })
-    }
+        this.rq.awaitAll((rqError) => {
+          if (rqError) {
+            return
+          }
 
-    this.canvas.requestRenderAll()
+          this.canvas.renderOnAddRemove = true
+          this.canvas.requestRenderAll()
+        })
+      })
+    } else {
+      this.canvas.renderOnAddRemove = true
+      this.canvas.requestRenderAll()
+    }
   }
 
   cleanSelection () {

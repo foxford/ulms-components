@@ -26,6 +26,7 @@ export class PositionableObject extends Base {
 
   configure () {
     this._canvas.isDrawingMode = false
+    this._canvas.perPixelTargetFind = false
     this._canvas.selection = false
     this._canvas.defaultCursor = 'crosshair'
     this._canvas.setCursor('crosshair')
