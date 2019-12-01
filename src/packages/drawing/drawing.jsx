@@ -381,6 +381,10 @@ export class DrawingComponent extends React.Component {
 
     this.canvas.on('object:modified', (event) => {
       const object = event.target
+
+      // Skipping draft objects
+      if (object._draft) return
+
       const serializedObj = object.toObject(enhancedFields)
 
       if (isTextObject(object) && object._textBeforeEdit === '') {
@@ -400,6 +404,9 @@ export class DrawingComponent extends React.Component {
       if (this.ignoreObjectRemovedEvent) return
 
       const object = event.target
+
+      // Skipping draft objects
+      if (object._draft) return
 
       onObjectRemove && onObjectRemove(maybeRemoveToken(object.toObject(enhancedFields)))
     })
