@@ -10,6 +10,7 @@ import EraserTool from './tools/eraser'
 import PanTool from './tools/pan'
 import PenTool from './tools/pen'
 import SelectTool from './tools/select'
+import { LineTool } from './tools/line'
 import { ShapeTool } from './tools/shape'
 import { TextboxTool } from './tools/textbox'
 import { LockTool } from './tools/lock'
@@ -40,6 +41,7 @@ export const toolEnum = {
 export const penToolModeEnum = {
   PENCIL: 'pencil',
   MARKER: 'marker',
+  LINE: 'line',
 }
 
 export const enhancedFields = ['_id', '_lockedbyuser']
@@ -261,6 +263,7 @@ export class DrawingComponent extends React.Component {
     if (
       prevProps.tool !== tool
       || prevProps.brushColor !== brushColor
+      || tool === toolEnum.PEN // need to update the tool if it's a pen
     ) {
       this.initTool(tool)
     }
@@ -288,6 +291,14 @@ export class DrawingComponent extends React.Component {
     }
 
     this.destroyCanvas()
+  }
+
+  _handleKeyDown = (opts) => {
+    this.tool.handleKeyDownEvent(opts)
+  }
+
+  _handleKeyUp = (opts) => {
+    this.tool.handleKeyUpEvent(opts)
   }
 
   _handleMouseDown = (opts) => {
@@ -331,9 +342,15 @@ export class DrawingComponent extends React.Component {
     this.canvas.on('mouse:up', opt => this._handleMouseUp(opt))
     this.canvas.on('object:added', opt => this._handleObjectAdded(opt))
 
+    this.canvasRef.current.ownerDocument.addEventListener('keydown', this._handleKeyDown)
+    this.canvasRef.current.ownerDocument.addEventListener('keyup', this._handleKeyUp)
+
     this.canvas.on('object:added', (event) => {
       const object = event.target
       let serializedObj
+
+      // Skipping draft objects
+      if (object._draft) return
 
       if (!object.remote) {
         object._id = uniqId()
@@ -364,6 +381,10 @@ export class DrawingComponent extends React.Component {
 
     this.canvas.on('object:modified', (event) => {
       const object = event.target
+
+      // Skipping draft objects
+      if (object._draft) return
+
       const serializedObj = object.toObject(enhancedFields)
 
       if (isTextObject(object) && object._textBeforeEdit === '') {
@@ -383,6 +404,9 @@ export class DrawingComponent extends React.Component {
       if (this.ignoreObjectRemovedEvent) return
 
       const object = event.target
+
+      // Skipping draft objects
+      if (object._draft) return
 
       onObjectRemove && onObjectRemove(maybeRemoveToken(object.toObject(enhancedFields)))
     })
@@ -429,6 +453,8 @@ export class DrawingComponent extends React.Component {
       this.canvas.dispose()
 
       this.__cleanTools()
+      this.canvasRef.current.ownerDocument.removeEventListener('keydown', this._handleKeyDown)
+      this.canvasRef.current.ownerDocument.removeEventListener('keyup', this._handleKeyUp)
 
       this.canvas = null
     }
@@ -459,7 +485,7 @@ export class DrawingComponent extends React.Component {
 
   initTool (tool) {
     const {
-      brushColor, selectOnInit, onLockSelection, onLockDeselection,
+      brushMode, brushColor, selectOnInit, onLockSelection, onLockDeselection,
     } = this.props
 
     switch (tool) {
@@ -474,8 +500,11 @@ export class DrawingComponent extends React.Component {
         break
 
       case toolEnum.PEN:
-        this.tool = new PenTool(this.canvas)
-
+        if (brushMode === penToolModeEnum.LINE) {
+          this.tool = new LineTool(this.canvas)
+        } else {
+          this.tool = new PenTool(this.canvas)
+        }
         break
 
       case toolEnum.SELECT:
@@ -580,10 +609,10 @@ export class DrawingComponent extends React.Component {
     this.__cleanTools()
     this.__lockModeTool = new LockTool(this.canvas, onLockSelection, onLockDeselection)
 
-    this.configureTool()
+    this.configureTool(true)
   }
 
-  configureTool () {
+  configureTool (initial = false) {
     const {
       brushColor, brushMode, brushWidth, eraserWidth, eraserPrecision, tool,
     } = this.props
@@ -603,6 +632,7 @@ export class DrawingComponent extends React.Component {
         lineWidth: brushWidth,
         precision: eraserPrecision,
         eraserWidth,
+        initial,
       })
     }
   }
