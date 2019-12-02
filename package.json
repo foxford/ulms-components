@@ -36,7 +36,7 @@
     "docs": "npm run docs/build && http-server ./styleguide",
     "docs/build": "cross-env BABEL_ENV=styleguidist styleguidist build",
     "docs/serve": "cross-env BABEL_ENV=styleguidist styleguidist server",
-    "lint": "eslint --ext js,jsx src",
+    "lint": "eslint --fix --ext js,jsx src",
     "nodetap": "tap test/**/*.test.js",
     "prepublishOnly": "cross-env NODE_ENV=production npm run build",
     "start": "npm run docs/serve",
@@ -44,7 +44,7 @@
     "test": "npm run lint && npm run tap"
   },
   "dependencies": {
-    "@foxford/ui": "^1.3.6",
+    "@foxford/ui": "1.3.6",
     "@ungap/event-target": "^0.1.0",
     "classnames": "^2.2.6",
     "d3-queue": "~3.0.7",
