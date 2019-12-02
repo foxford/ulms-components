@@ -36,7 +36,7 @@
     "docs": "npm run docs/build && http-server ./styleguide",
     "docs/build": "cross-env BABEL_ENV=styleguidist styleguidist build",
     "docs/serve": "cross-env BABEL_ENV=styleguidist styleguidist server",
-    "lint": "eslint --fix --ext js,jsx src",
+    "lint": "eslint --ext js,jsx src",
     "nodetap": "tap test/**/*.test.js",
     "prepublishOnly": "cross-env NODE_ENV=production npm run build",
     "start": "npm run docs/serve",
