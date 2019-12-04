@@ -23,6 +23,8 @@ import {
   triangleSolid,
 } from './tools/_shapes'
 
+import {Keyboard} from './tools/_keyboard'
+
 export const toolEnum = {
   ERASER: 'eraser',
   PAN: 'pan',
@@ -166,6 +168,7 @@ export class DrawingComponent extends React.Component {
     this.tool = null
 
     this.__lockModeTool = null
+    this._keyboardHandler = null
   }
 
   componentDidMount () {
@@ -295,6 +298,8 @@ export class DrawingComponent extends React.Component {
 
   _handleKeyDown = (opts) => {
     this.tool.handleKeyDownEvent(opts)
+
+    this._keyboardHandler && this._keyboardHandler.handler(opts)
   }
 
   _handleKeyUp = (opts) => {
@@ -336,6 +341,8 @@ export class DrawingComponent extends React.Component {
     this.canvas = new fabric.Canvas('canvas', {
       enablePointerEvents: 'PointerEvent' in window,
     })
+
+    this._keyboardHandler = new Keyboard(this.canvas);
 
     this.canvas.on('mouse:down', opt => this._handleMouseDown(opt))
     this.canvas.on('mouse:move', opt => this._handleMouseMove(opt))
