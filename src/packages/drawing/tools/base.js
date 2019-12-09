@@ -7,6 +7,12 @@ export class Base {
 
   configure () {}
 
+  destroy () {}
+
+  handleTextEditStartEvent () {}
+
+  handleTextEditEndEvent () {}
+
   handleKeyDownEvent () {}
 
   handleKeyUpEvent () {}
@@ -18,4 +24,10 @@ export class Base {
   handleMouseUpEvent () {}
 
   handleObjectAddedEvent () {}
+
+  handleSelectionUpdatedEvent () {}
+
+  handleSelectionCreatedEvent () {}
+
+  handleSelectionClearedEvent () {}
 }

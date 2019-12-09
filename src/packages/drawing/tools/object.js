@@ -4,6 +4,10 @@ export const makeNotInteractive = _ => Object.assign(_, {
   selectable: false, evented: false, hoverCursor: 'crosshair',
 })
 
+export const makeInteractive = _ => Object.assign(_, {
+  selectable: true, evented: true, hoverCursor: 'move',
+})
+
 export const adjustPosition = (object, pointer, adjust) => {
   const { width, height } = object.getBoundingRect()
 

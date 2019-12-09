@@ -44,7 +44,7 @@ export const penToolModeEnum = {
   LINE: 'line',
 }
 
-export const enhancedFields = ['_id', '_lockedbyuser']
+export const enhancedFields = ['_id', '_lockedbyuser', '_lockedselection', '_toDelete']
 
 export const normalizeFields = (object, fields) => Object.assign(
   object,
@@ -206,6 +206,7 @@ export class DrawingComponent extends React.Component {
       height,
       objects,
       pattern,
+      onlineIds,
       tool,
       width,
       zoom,
@@ -226,6 +227,11 @@ export class DrawingComponent extends React.Component {
 
       this.updateCanvasParameters(height, width, zoom)
       this.updateCanvasObjects(objects)
+    }
+    if (tool === prevProps.tool && tool === toolEnum.SELECT) {
+      if (onlineIds && (onlineIds.length !== prevProps.onlineIds.length)) {
+        SelectTool.updateAllSelection(this.canvas, onlineIds)
+      }
     }
 
     if (prevProps.pattern !== pattern) {
@@ -316,6 +322,26 @@ export class DrawingComponent extends React.Component {
     this.tool.handleMouseUpEvent(opts)
   }
 
+  _handleTextEditStartEvent = (opts) => {
+    this.tool.handleTextEditStartEvent(opts)
+  }
+
+  _handleTextEditEndEvent = (opts) => {
+    this.tool.handleTextEditEndEvent(opts)
+  }
+
+  _handleSelectionUpdatedEvent = (opts) => {
+    this.tool.handleSelectionUpdatedEvent(opts)
+  }
+
+  _handleSelectionCreatedEvent = (opts) => {
+    this.tool.handleSelectionCreatedEvent(opts)
+  }
+
+  _handleSelectionClearedEvent = (opts) => {
+    this.tool.handleSelectionClearedEvent(opts)
+  }
+
   _handleObjectAdded = (opts) => {
     this.tool.handleObjectAddedEvent(opts)
   }
@@ -327,17 +353,24 @@ export class DrawingComponent extends React.Component {
   initCanvas () {
     const {
       selectOnInit,
+      clientId,
       uniqId,
     } = this.props
 
     this.canvas = new fabric.Canvas('canvas', {
       enablePointerEvents: 'PointerEvent' in window,
     })
+    this.canvas._id = clientId
 
     this.canvas.on('mouse:down', opt => this._handleMouseDown(opt))
     this.canvas.on('mouse:move', opt => this._handleMouseMove(opt))
     this.canvas.on('mouse:up', opt => this._handleMouseUp(opt))
     this.canvas.on('object:added', opt => this._handleObjectAdded(opt))
+    this.canvas.on('text:editing:entered', opt => this._handleTextEditStartEvent(opt))
+    this.canvas.on('text:editing:exited', opt => this._handleTextEditEndEvent(opt))
+    this.canvas.on('selection:updated', opt => this._handleSelectionUpdatedEvent(opt))
+    this.canvas.on('selection:created', opt => this._handleSelectionCreatedEvent(opt))
+    this.canvas.on('selection:cleared', opt => this._handleSelectionClearedEvent(opt))
 
     this.canvasRef.current.ownerDocument.addEventListener('keydown', this._handleKeyDown)
     this.canvasRef.current.ownerDocument.addEventListener('keyup', this._handleKeyUp)
@@ -384,7 +417,7 @@ export class DrawingComponent extends React.Component {
       const object = event.target
 
       // Skipping draft objects
-      if (object._draft) return
+      if (object._draft || object._toDelete) return
 
       const serializedObj = object.toObject(enhancedFields)
 
@@ -487,8 +520,10 @@ export class DrawingComponent extends React.Component {
 
   initTool (tool) {
     const {
-      brushMode, brushColor, selectOnInit, onLockSelection, onLockDeselection,
+      brushMode, brushColor, selectOnInit, onLockSelection, onLockDeselection, isPresentation,
     } = this.props
+
+    this.tool && this.tool.destroy()
 
     switch (tool) {
       case toolEnum.ERASER:
@@ -510,7 +545,7 @@ export class DrawingComponent extends React.Component {
         break
 
       case toolEnum.SELECT:
-        this.tool = new SelectTool(this.canvas)
+        this.tool = new SelectTool(this.canvas, { isPresentation })
 
         break
 
@@ -680,6 +715,8 @@ export class DrawingComponent extends React.Component {
     const objectsToRemove = []
     const enlivenedObjects = new Map()
 
+    const { onlineIds } = this.props
+
     this.destroyQueues()
 
     this.q = new Queue(50)
@@ -705,11 +742,20 @@ export class DrawingComponent extends React.Component {
 
       if (objIndex === -1) {
         // add
-        objectsToAdd.push(nextObject)
+        if (nextObject._lockedselection && !onlineIds.includes(nextObject._lockedselection)) {
+          nextObject._lockedselection = undefined
+        }
+        if(!nextObject._toDelete) {
+          objectsToAdd.push(nextObject)
+        }
       } else {
         // update (only if revision has been changed)
         if (_._rev === canvasObjects[objIndex]._rev) {
           return
+        }
+
+        if(_._lockedselection !== canvasObjects[objIndex]._lockedselection) {
+          SelectTool.updateObjectSelection(this.canvas, nextObject)
         }
 
         canvasObjects[objIndex].set(nextObject)
@@ -743,38 +789,36 @@ export class DrawingComponent extends React.Component {
         }
 
         this.canvas.renderOnAddRemove = false
-
         objects.forEach((object) => {
           if (!enlivenedObjects.has(object._id)) {
             return
           }
 
           this.rq.defer((done) => {
-            window.requestAnimationFrame(() => {
-              if (this.canvas === null) {
-                done()
+            // With requestAnimationFrame objects may be duplicated on canvas
+            if (this.canvas === null) {
+              done()
 
-                return
-              }
+              return
+            }
 
-              const newObjectIdsAgain = new Set(this.props.objects.map(_ => _._id))
+            const newObjectIdsAgain = new Set(this.props.objects.map(_ => _._id))
 
-              if (!newObjectIdsAgain.has(object._id)) {
-                done()
+            if (!newObjectIdsAgain.has(object._id)) {
+              done()
 
-                return
-              }
+              return
+            }
 
-              const objectToAdd = enlivenedObjects.get(object._id)
+            const objectToAdd = enlivenedObjects.get(object._id)
 
-              if (LockTool.isLocked(objectToAdd)) {
-                LockTool.lockObject(objectToAdd)
-              }
+            if (LockTool.isLocked(objectToAdd)) {
+              LockTool.lockObject(objectToAdd)
+            }
 
-              this.canvas.add(objectToAdd)
+            this.canvas.add(objectToAdd)
 
-              done(null)
-            })
+            done(null)
           })
         })
 
