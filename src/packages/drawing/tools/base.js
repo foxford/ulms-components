@@ -18,4 +18,10 @@ export class Base {
   handleMouseUpEvent () {}
 
   handleObjectAddedEvent () {}
+
+  handleSelectionUpdatedEvent () {}
+
+  handleSelectionCreatedEvent () {}
+
+  handleSelectionClearedEvent () {}
 }

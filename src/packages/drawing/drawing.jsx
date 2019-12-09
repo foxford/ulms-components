@@ -23,8 +23,6 @@ import {
   triangleSolid,
 } from './tools/_shapes'
 
-import {Keyboard} from './tools/_keyboard'
-
 export const toolEnum = {
   ERASER: 'eraser',
   PAN: 'pan',
@@ -168,7 +166,6 @@ export class DrawingComponent extends React.Component {
     this.tool = null
 
     this.__lockModeTool = null
-    this._keyboardHandler = null
   }
 
   componentDidMount () {
@@ -298,8 +295,6 @@ export class DrawingComponent extends React.Component {
 
   _handleKeyDown = (opts) => {
     this.tool.handleKeyDownEvent(opts)
-
-    this._keyboardHandler && this._keyboardHandler.handler(opts)
   }
 
   _handleKeyUp = (opts) => {
@@ -319,6 +314,18 @@ export class DrawingComponent extends React.Component {
 
   _handleMouseUp = (opts) => {
     this.tool.handleMouseUpEvent(opts)
+  }
+
+  _handleSelectionUpdatedEvent = (opts) => {
+    this.tool.handleSelectionUpdatedEvent(opts)
+  }
+
+  _handleSelectionCreatedEvent = (opts) => {
+    this.tool.handleSelectionCreatedEvent(opts)
+  }
+
+  _handleSelectionClearedEvent = (opts) => {
+    this.tool.handleSelectionClearedEvent(opts)
   }
 
   _handleObjectAdded = (opts) => {
@@ -342,12 +349,13 @@ export class DrawingComponent extends React.Component {
       enablePointerEvents: 'PointerEvent' in window,
     })
 
-    this._keyboardHandler = new Keyboard(this.canvas);
-
     this.canvas.on('mouse:down', opt => this._handleMouseDown(opt))
     this.canvas.on('mouse:move', opt => this._handleMouseMove(opt))
     this.canvas.on('mouse:up', opt => this._handleMouseUp(opt))
     this.canvas.on('object:added', opt => this._handleObjectAdded(opt))
+    this.canvas.on('selection:updated', opt => this._handleSelectionUpdatedEvent(opt))
+    this.canvas.on('selection:created', opt => this._handleSelectionCreatedEvent(opt))
+    this.canvas.on('selection:cleared', opt => this._handleSelectionClearedEvent(opt))
 
     this.canvasRef.current.ownerDocument.addEventListener('keydown', this._handleKeyDown)
     this.canvasRef.current.ownerDocument.addEventListener('keyup', this._handleKeyUp)
