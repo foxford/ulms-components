@@ -103,23 +103,23 @@ function matchesStorageURIScheme (url) {
   return url.match(re)
 }
 
-const originalFabricLoadImegeFn = fabric.util.loadImage
+const originalFabricLoadImageFn = fabric.util.loadImage
 
 fabric.util.loadImage = function loadImage (url, callback, context, crossOrigin) {
   if (matchesStorageURIScheme(url)) {
     tp.getToken()
       .then((token) => {
         if (url.indexOf('access_token') !== -1) {
-          originalFabricLoadImegeFn(url.replace(/\?access_token=(.*)$/i, `?access_token=${token}`), callback, context, crossOrigin)
+          originalFabricLoadImageFn(url.replace(/\?access_token=(.*)$/i, `?access_token=${token}`), callback, context, crossOrigin)
         } else {
-          originalFabricLoadImegeFn(`${url}?access_token=${token}`, callback, context, crossOrigin)
+          originalFabricLoadImageFn(`${url}?access_token=${token}`, callback, context, crossOrigin)
         }
 
         return null
       })
       .catch(error => console.log(error)) // eslint-disable-line no-console
   } else {
-    originalFabricLoadImegeFn(url, callback, context, crossOrigin)
+    originalFabricLoadImageFn(url, callback, context, crossOrigin)
   }
 }
 
@@ -326,9 +326,6 @@ export class DrawingComponent extends React.Component {
 
   initCanvas () {
     const {
-      onDraw,
-      onDrawUpdate,
-      onObjectRemove,
       selectOnInit,
       uniqId,
     } = this.props
@@ -346,6 +343,7 @@ export class DrawingComponent extends React.Component {
     this.canvasRef.current.ownerDocument.addEventListener('keyup', this._handleKeyUp)
 
     this.canvas.on('object:added', (event) => {
+      const { onDraw } = this.props
       const object = event.target
       let serializedObj
 
@@ -367,6 +365,8 @@ export class DrawingComponent extends React.Component {
 
     this.canvas.on('selection:cleared', ({ deselected }) => {
       if (!deselected || deselected.length !== 1) return
+
+      const { onDraw } = this.props
       const [object] = deselected
 
       if (isShapeObject(object)) {
@@ -380,6 +380,7 @@ export class DrawingComponent extends React.Component {
     })
 
     this.canvas.on('object:modified', (event) => {
+      const { onDraw, onDrawUpdate } = this.props
       const object = event.target
 
       // Skipping draft objects
@@ -403,6 +404,7 @@ export class DrawingComponent extends React.Component {
     this.canvas.on('object:removed', (event) => {
       if (this.ignoreObjectRemovedEvent) return
 
+      const { onObjectRemove } = this.props
       const object = event.target
 
       // Skipping draft objects
@@ -749,6 +751,20 @@ export class DrawingComponent extends React.Component {
 
           this.rq.defer((done) => {
             window.requestAnimationFrame(() => {
+              if (this.canvas === null) {
+                done()
+
+                return
+              }
+
+              const newObjectIdsAgain = new Set(this.props.objects.map(_ => _._id))
+
+              if (!newObjectIdsAgain.has(object._id)) {
+                done()
+
+                return
+              }
+
               const objectToAdd = enlivenedObjects.get(object._id)
 
               if (LockTool.isLocked(objectToAdd)) {
