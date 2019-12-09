@@ -119,6 +119,10 @@ export default class SelectTool extends Base {
     }
   }
 
+  handleKeyUpEvent (e) {
+    this.__shiftPressed = e.shiftKey
+  }
+
   handleObjectAddedEvent (opts) {
     Object.assign(opts.target, {
       evented: true,
