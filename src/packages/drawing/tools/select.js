@@ -48,9 +48,10 @@ export default class SelectTool extends Base {
     this._shiftPressed = false
   }
 
-  _deleteObject = (object) => {
+  _deleteObject = () => {
     if(this.__object) {
-      this._canvas.remove(object)
+      this._canvas.remove(this.__object)
+      this.__object = null
     }
   }
 
