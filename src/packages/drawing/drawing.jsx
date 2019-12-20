@@ -44,7 +44,7 @@ export const penToolModeEnum = {
   LINE: 'line',
 }
 
-export const enhancedFields = ['_id', '_lockedbyuser']
+export const enhancedFields = ['_id', '_lockedbyuser', '_lockedselection']
 
 export const normalizeFields = (object, fields) => Object.assign(
   object,
@@ -206,6 +206,7 @@ export class DrawingComponent extends React.Component {
       height,
       objects,
       pattern,
+      onlineIds,
       tool,
       width,
       zoom,
@@ -226,6 +227,12 @@ export class DrawingComponent extends React.Component {
 
       this.updateCanvasParameters(height, width, zoom)
       this.updateCanvasObjects(objects)
+    }
+
+    if(tool === prevProps.tool && tool === toolEnum.SELECT) {
+      if(onlineIds && (onlineIds.length !== prevProps.onlineIds.length)) {
+        SelectTool.updateAllSelection(this.canvas, onlineIds)
+      }
     }
 
     if (prevProps.pattern !== pattern) {
@@ -339,12 +346,13 @@ export class DrawingComponent extends React.Component {
   initCanvas () {
     const {
       selectOnInit,
+      clientId,
       uniqId,
     } = this.props
-
     this.canvas = new fabric.Canvas('canvas', {
       enablePointerEvents: 'PointerEvent' in window,
     })
+    this.canvas._id = clientId
 
     this.canvas.on('mouse:down', opt => this._handleMouseDown(opt))
     this.canvas.on('mouse:move', opt => this._handleMouseMove(opt))
@@ -399,7 +407,7 @@ export class DrawingComponent extends React.Component {
       const object = event.target
 
       // Skipping draft objects
-      if (object._draft) return
+      if (object._draft || object._toDelete) return
 
       const serializedObj = object.toObject(enhancedFields)
 
@@ -502,8 +510,10 @@ export class DrawingComponent extends React.Component {
 
   initTool (tool) {
     const {
-      brushMode, brushColor, selectOnInit, onLockSelection, onLockDeselection,
+      brushMode, brushColor, selectOnInit, onLockSelection, onLockDeselection, isPresentation
     } = this.props
+
+    this.tool &&this.tool.destroy()
 
     switch (tool) {
       case toolEnum.ERASER:
@@ -525,7 +535,7 @@ export class DrawingComponent extends React.Component {
         break
 
       case toolEnum.SELECT:
-        this.tool = new SelectTool(this.canvas)
+        this.tool = new SelectTool(this.canvas, {isPresentation})
 
         break
 
@@ -695,6 +705,8 @@ export class DrawingComponent extends React.Component {
     const objectsToRemove = []
     const enlivenedObjects = new Map()
 
+    const { onlineIds } = this.props
+
     this.destroyQueues()
 
     this.q = new Queue(50)
@@ -720,6 +732,10 @@ export class DrawingComponent extends React.Component {
 
       if (objIndex === -1) {
         // add
+          if(nextObject._lockedselection && !onlineIds.includes(nextObject._lockedselection)) {
+            nextObject._lockedselection = undefined
+        }
+
         objectsToAdd.push(nextObject)
       } else {
         // update (only if revision has been changed)
@@ -728,6 +744,7 @@ export class DrawingComponent extends React.Component {
         }
 
         canvasObjects[objIndex].set(nextObject)
+        SelectTool.updateObjectSelection(this.canvas, canvasObjects[objIndex])
 
         !LockTool.isLocked(canvasObjects[objIndex])
           ? LockTool.unlockObject(canvasObjects[objIndex])
@@ -736,6 +753,7 @@ export class DrawingComponent extends React.Component {
         canvasObjects[objIndex].setCoords()
       }
     })
+
 
     if (objectsToAdd.length) {
       objectsToAdd
@@ -758,14 +776,13 @@ export class DrawingComponent extends React.Component {
         }
 
         this.canvas.renderOnAddRemove = false
-
         objects.forEach((object) => {
           if (!enlivenedObjects.has(object._id)) {
             return
           }
 
           this.rq.defer((done) => {
-            window.requestAnimationFrame(() => {
+            // With requestAnimationFrame objects may duplicate on canvas
               if (this.canvas === null) {
                 done()
 
@@ -789,7 +806,6 @@ export class DrawingComponent extends React.Component {
               this.canvas.add(objectToAdd)
 
               done(null)
-            })
           })
         })
 

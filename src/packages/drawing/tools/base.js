@@ -7,6 +7,8 @@ export class Base {
 
   configure () {}
 
+  destroy () {}
+
   handleKeyDownEvent () {}
 
   handleKeyUpEvent () {}
