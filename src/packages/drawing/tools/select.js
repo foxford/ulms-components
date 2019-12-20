@@ -24,7 +24,7 @@ const directions = {
 }
 
 
-export default class Base extends StateTool {
+export default class SelectTool extends Base {
   constructor (canvas, options = {}) {
     super(canvas)
 

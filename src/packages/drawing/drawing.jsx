@@ -229,8 +229,8 @@ export class DrawingComponent extends React.Component {
       this.updateCanvasObjects(objects)
     }
 
-    if(tool === prevProps.tool && tool === toolEnum.SELECT) {
-      if(onlineIds && (onlineIds.length !== prevProps.onlineIds.length)) {
+    if (tool === prevProps.tool && tool === toolEnum.SELECT) {
+      if (onlineIds && (onlineIds.length !== prevProps.onlineIds.length)) {
         SelectTool.updateAllSelection(this.canvas, onlineIds)
       }
     }
@@ -349,6 +349,7 @@ export class DrawingComponent extends React.Component {
       clientId,
       uniqId,
     } = this.props
+
     this.canvas = new fabric.Canvas('canvas', {
       enablePointerEvents: 'PointerEvent' in window,
     })
@@ -510,10 +511,10 @@ export class DrawingComponent extends React.Component {
 
   initTool (tool) {
     const {
-      brushMode, brushColor, selectOnInit, onLockSelection, onLockDeselection, isPresentation
+      brushMode, brushColor, selectOnInit, onLockSelection, onLockDeselection, isPresentation,
     } = this.props
 
-    this.tool &&this.tool.destroy()
+    this.tool && this.tool.destroy()
 
     switch (tool) {
       case toolEnum.ERASER:
@@ -535,7 +536,7 @@ export class DrawingComponent extends React.Component {
         break
 
       case toolEnum.SELECT:
-        this.tool = new SelectTool(this.canvas, {isPresentation})
+        this.tool = new SelectTool(this.canvas, { isPresentation })
 
         break
 
@@ -732,8 +733,8 @@ export class DrawingComponent extends React.Component {
 
       if (objIndex === -1) {
         // add
-          if(nextObject._lockedselection && !onlineIds.includes(nextObject._lockedselection)) {
-            nextObject._lockedselection = undefined
+        if (nextObject._lockedselection && !onlineIds.includes(nextObject._lockedselection)) {
+          nextObject._lockedselection = undefined
         }
 
         objectsToAdd.push(nextObject)
@@ -753,7 +754,6 @@ export class DrawingComponent extends React.Component {
         canvasObjects[objIndex].setCoords()
       }
     })
-
 
     if (objectsToAdd.length) {
       objectsToAdd
@@ -783,29 +783,29 @@ export class DrawingComponent extends React.Component {
 
           this.rq.defer((done) => {
             // With requestAnimationFrame objects may duplicate on canvas
-              if (this.canvas === null) {
-                done()
+            if (this.canvas === null) {
+              done()
 
-                return
-              }
+              return
+            }
 
-              const newObjectIdsAgain = new Set(this.props.objects.map(_ => _._id))
+            const newObjectIdsAgain = new Set(this.props.objects.map(_ => _._id))
 
-              if (!newObjectIdsAgain.has(object._id)) {
-                done()
+            if (!newObjectIdsAgain.has(object._id)) {
+              done()
 
-                return
-              }
+              return
+            }
 
-              const objectToAdd = enlivenedObjects.get(object._id)
+            const objectToAdd = enlivenedObjects.get(object._id)
 
-              if (LockTool.isLocked(objectToAdd)) {
-                LockTool.lockObject(objectToAdd)
-              }
+            if (LockTool.isLocked(objectToAdd)) {
+              LockTool.lockObject(objectToAdd)
+            }
 
-              this.canvas.add(objectToAdd)
+            this.canvas.add(objectToAdd)
 
-              done(null)
+            done(null)
           })
         })
 

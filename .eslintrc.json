@@ -5,6 +5,7 @@
     "jquery": true
   },
   "rules": {
-    "node/no-unsupported-features/es-syntax": 0
+    "node/no-unsupported-features/es-syntax": 0,
+    "no-underscore-dangle": "off"
   }
 }

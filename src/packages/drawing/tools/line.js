@@ -1,4 +1,5 @@
 import { fabric } from 'fabric'
+
 import { Base } from './base'
 import { makeNotInteractive } from './object'
 import { WhiteboardLine } from './_primitives'
