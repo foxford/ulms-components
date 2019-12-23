@@ -95,7 +95,6 @@ export default class SelectTool extends Base {
   }
 
   _move = (direction) => {
-
     if(this.__object) {
       if(this.__options.isPresentation) {
         switch (direction) {

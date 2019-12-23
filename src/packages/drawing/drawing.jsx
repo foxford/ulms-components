@@ -228,7 +228,6 @@ export class DrawingComponent extends React.Component {
       this.updateCanvasParameters(height, width, zoom)
       this.updateCanvasObjects(objects)
     }
-
     if (tool === prevProps.tool && tool === toolEnum.SELECT) {
       if (onlineIds && (onlineIds.length !== prevProps.onlineIds.length)) {
         SelectTool.updateAllSelection(this.canvas, onlineIds)
@@ -781,7 +780,7 @@ export class DrawingComponent extends React.Component {
           }
 
           this.rq.defer((done) => {
-            // With requestAnimationFrame objects may duplicate on canvas
+            // With requestAnimationFrame objects may be duplicated on canvas
             if (this.canvas === null) {
               done()
 
