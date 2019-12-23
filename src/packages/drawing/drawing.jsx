@@ -743,6 +743,10 @@ export class DrawingComponent extends React.Component {
           return
         }
 
+        if(_._lockedselection !== canvasObjects[objIndex]._lockedselection) {
+          SelectTool.updateObjectSelection(this.canvas, nextObject)
+        }
+
         canvasObjects[objIndex].set(nextObject)
 
         !LockTool.isLocked(canvasObjects[objIndex])
