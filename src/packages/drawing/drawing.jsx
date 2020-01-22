@@ -267,18 +267,24 @@ export class DrawingComponent extends React.Component {
     }
 
     if (
-      prevProps.tool !== tool
-      || prevProps.brushColor !== brushColor
-      || tool === toolEnum.PEN // need to update the tool if it's a pen
+      canDraw
+      && (
+        prevProps.tool !== tool
+        || prevProps.brushColor !== brushColor
+        || tool === toolEnum.PEN // need to update the tool if it's a pen
+      )
     ) {
       this.initTool(tool)
     }
 
     if (
-      prevProps.brushColor !== brushColor
-      || prevProps.brushMode !== brushMode
-      || prevProps.brushWidth !== brushWidth
-      || prevProps.eraserWidth !== eraserWidth
+      canDraw
+      && (
+        prevProps.brushColor !== brushColor
+        || prevProps.brushMode !== brushMode
+        || prevProps.brushWidth !== brushWidth
+        || prevProps.eraserWidth !== eraserWidth
+      )
     ) {
       this.configureTool()
     }
