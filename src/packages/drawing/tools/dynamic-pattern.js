@@ -3,6 +3,7 @@ import { fabric } from 'fabric'
 export default class DynamicPattern {
   constructor (canvas) {
     this._canvas = canvas
+    this._destroyed = false
     this._offsetX = null
     this._offsetY = null
     this._patternCanvas = null
@@ -35,12 +36,18 @@ export default class DynamicPattern {
     }
 
     fabric.Image.fromURL(this._patternImageSrc, (imageObject) => {
+      if (this._destroyed) {
+        return
+      }
+
       this._patternImageWidth = imageObject.width
       this._patternImageHeight = imageObject.height
 
-      this._patternCanvas.clear()
-      this._patternCanvas.add(imageObject)
-      this._patternCanvas.renderAll()
+      if (this._patternCanvas) {
+        this._patternCanvas.clear()
+        this._patternCanvas.add(imageObject)
+        this._patternCanvas.renderAll()
+      }
 
       if (!this._pattern) {
         this._pattern = new fabric.Pattern({
@@ -49,7 +56,7 @@ export default class DynamicPattern {
         })
       }
 
-      if (!this._patternRect) {
+      if (!this._patternRect && this._canvas && this._pattern) {
         this._patternRect = new fabric.Rect({
           width: this._canvas.width,
           height: this._canvas.height,
@@ -95,14 +102,20 @@ export default class DynamicPattern {
   }
 
   destroy () {
-    this._canvas.remove(this._patternRect)
-    this._canvas = null
+    this._destroyed = true
 
+    if (this._canvas) {
+      this._canvas.remove(this._patternRect)
+    }
+
+    this._canvas = null
     this._offsetX = null
     this._offsetY = null
 
-    this._patternCanvas.clear()
-    this._patternCanvas.dispose()
+    if (this._patternCanvas) {
+      this._patternCanvas.clear()
+      this._patternCanvas.dispose()
+    }
 
     this._patternCanvas = null
     this._pattern = null

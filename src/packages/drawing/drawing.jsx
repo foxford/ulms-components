@@ -781,7 +781,9 @@ export class DrawingComponent extends React.Component {
           this.q.defer((done) => {
             window.requestAnimationFrame(() => {
               fabric.util.enlivenObjects([_], ([fObject]) => {
-                enlivenedObjects.set(fObject._id, fObject)
+                if (fObject) {
+                  enlivenedObjects.set(fObject._id, fObject)
+                }
 
                 done(null)
               })
