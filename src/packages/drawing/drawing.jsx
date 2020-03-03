@@ -44,7 +44,7 @@ export const penToolModeEnum = {
   LINE: 'line',
 }
 
-export const enhancedFields = ['_id', '_lockedbyuser', '_lockedselection', '_toDelete']
+export const enhancedFields = ['_id', '_lockedbyuser', '_lockedselection', '_toDelete', 'noScaleCache', 'strokeUniform']
 
 export const normalizeFields = (object, fields) => Object.assign(
   object,
