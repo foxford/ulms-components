@@ -5,9 +5,13 @@ const WhiteboardLine = fabric.util.createClass(fabric.Line, {
   type: 'WhiteboardLine',
   initialize (points, options) {
     options || (options = { })
+
+    options.noScaleCache = false
     // Origin is always centered
     options.originX = 'center'
     options.originY = 'center'
+    options.strokeUniform = true
+
     this.callSuper('initialize', points, options)
   },
   toObject (enhancedFields) {

@@ -1,11 +1,25 @@
 /* eslint-disable */
 import { fabric } from 'fabric'
 
+const commonDefaults = {
+  noScaleCache: false,
+}
+
+const dimensionDefaults = {
+  width: 100,
+  height: 100,
+}
+
+const strokeDefaults = {
+  strokeWidth: 2,
+  strokeUniform: true,
+}
+
 export const triangle = (params = {}) => {
   return new fabric.Triangle({
-    width: 100,
-    height: 100,
-    strokeWidth: 2,
+    ...commonDefaults,
+    ...dimensionDefaults,
+    ...strokeDefaults,
     ...params,
     stroke: params.stroke,
     fill: params.fill || 'rgba(0,0,0,0.009)',
@@ -14,10 +28,11 @@ export const triangle = (params = {}) => {
 
 export const triangleSolid = (params = {}) => {
   const filler = params.stroke || params.fill || 'rgba(0,0,0,1)'
+
   return new fabric.Triangle({
-    width: 100,
-    height: 100,
-    strokeWidth: 2,
+    ...commonDefaults,
+    ...dimensionDefaults,
+    ...strokeDefaults,
     ...params,
     stroke: filler,
     fill: filler,
@@ -26,8 +41,9 @@ export const triangleSolid = (params = {}) => {
 
 export const circle = (params = {}) => {
   return new fabric.Circle({
+    ...commonDefaults,
     radius: 65,
-    strokeWidth: 2,
+    ...strokeDefaults,
     ...params,
     stroke: params.stroke,
     fill: params.fill || 'rgba(0,0,0,0.009)',
@@ -36,9 +52,11 @@ export const circle = (params = {}) => {
 
 export const circleSolid = (params = {}) => {
   const filler = params.stroke || params.fill || 'rgba(0,0,0,1)'
+
   return new fabric.Circle({
+    ...commonDefaults,
     radius: 65,
-    strokeWidth: 2,
+    ...strokeDefaults,
     ...params,
     stroke: filler,
     fill: filler,
@@ -47,9 +65,9 @@ export const circleSolid = (params = {}) => {
 
 export const rectangle = (params = {}) => {
   return new fabric.Rect({
-    height: 100,
-    strokeWidth: 2,
-    width:100,
+    ...commonDefaults,
+    ...dimensionDefaults,
+    ...strokeDefaults,
     ...params,
     stroke: params.stroke,
     fill: params.fill || 'rgba(0,0,0,0.009)',
@@ -58,10 +76,11 @@ export const rectangle = (params = {}) => {
 
 export const rectangleSolid = (params = {}) => {
   const filler = params.stroke || params.fill || 'rgba(0,0,0,1)'
+
   return new fabric.Rect({
-    height: 100,
-    strokeWidth: 2,
-    width:100,
+    ...commonDefaults,
+    ...dimensionDefaults,
+    ...strokeDefaults,
     ...params,
     stroke: filler,
     fill: filler,
