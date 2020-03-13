@@ -77,7 +77,7 @@ export class LocationViewport extends React.PureComponent {
               const { x, y } = obj.aCoords.tl
 
               return (
-                <ObjectPortal key={`id_${obj.id}-${x}-${y}`} node={this.__viewportEl}>
+                <ObjectPortal key={`id_${obj.id}`} node={this.__viewportEl}>
                   <LocationObjectCursor
                     boundLower={boundLower}
                     boundUpper={boundUpper}

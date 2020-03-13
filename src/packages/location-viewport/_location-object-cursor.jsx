@@ -126,8 +126,7 @@ export class LocationObjectCursor extends React.Component {
           [css.cursor]: true,
         })}
         style={{
-          left: getPosition(styles.left),
-          top: getPosition(styles.top),
+          transform: `translate(${getPosition(styles.left)}, ${getPosition(styles.top)})`,
         }}
         ref={(el) => { this.__referenceEl = el }}
       >

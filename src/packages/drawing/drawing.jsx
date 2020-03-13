@@ -353,7 +353,11 @@ export class DrawingComponent extends React.Component {
   }
 
   _handleAfterRender = () => {
+    const { onAfterRender } = this.props
+
     this.updateCanvasPattern()
+
+    onAfterRender && onAfterRender()
   }
 
   initCanvas () {

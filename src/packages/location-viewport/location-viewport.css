@@ -11,7 +11,8 @@
 .root .object { }
 
 .root .cursor {
-  position:absolute;
+  position: absolute;
+  transition: transform .25s linear;
 }
 
 .root .cursorItem
@@ -23,6 +24,7 @@
 .root .cursorItem {
   display: block;
   transform-origin: top left;
+  transition: transform .3s linear;
 }
 
 .root .cursorText {
