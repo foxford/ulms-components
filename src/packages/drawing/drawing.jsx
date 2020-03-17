@@ -7,6 +7,7 @@ import { toCSSColor } from '../../util/helpers'
 
 import DynamicPattern from './tools/dynamic-pattern'
 import EraserTool from './tools/eraser'
+import './tools/optimized-pencil-brush'
 import PanTool from './tools/pan'
 import PenTool from './tools/pen'
 import SelectTool from './tools/select'
@@ -371,6 +372,7 @@ export class DrawingComponent extends React.Component {
       enablePointerEvents: 'PointerEvent' in window,
     })
     this.canvas._id = clientId
+    this.canvas.freeDrawingBrush = new fabric.OptimizedPencilBrush(this.canvas)
 
     this.canvas.on('mouse:down', opt => this._handleMouseDown(opt))
     this.canvas.on('mouse:move', opt => this._handleMouseMove(opt))
