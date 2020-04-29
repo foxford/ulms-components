@@ -149,6 +149,8 @@ export class DrawingComponent extends React.Component {
     },
     brushWidth: 12,
     tool: toolEnum.PEN,
+    x: 0,
+    y: 0,
     zoom: 1,
     zoomToCenter: false,
   }
@@ -171,7 +173,7 @@ export class DrawingComponent extends React.Component {
 
   componentDidMount () {
     const {
-      canDraw, tool, height, width, objects, pattern, tokenProvider, zoom,
+      canDraw, tool, objects, pattern, tokenProvider,
     } = this.props
 
     tp.setProvider(tokenProvider)
@@ -188,12 +190,12 @@ export class DrawingComponent extends React.Component {
 
       this.dynamicPattern = new DynamicPattern(this.canvasPattern)
 
-      this.updateCanvasPatternParameters(height, width)
+      this.updateCanvasPatternParameters()
       this.dynamicPattern.setPattern(pattern)
       this.updateCanvasPattern()
     }
 
-    this.updateCanvasParameters(height, width, zoom)
+    this.updateCanvasParameters(true)
     this.updateCanvasObjects(objects)
   }
 
@@ -210,6 +212,8 @@ export class DrawingComponent extends React.Component {
       onlineIds,
       tool,
       width,
+      x,
+      y,
       zoom,
     } = this.props
 
@@ -226,7 +230,7 @@ export class DrawingComponent extends React.Component {
         this.initStaticCanvas()
       }
 
-      this.updateCanvasParameters(height, width, zoom)
+      this.updateCanvasParameters(true)
       this.updateCanvasObjects(objects)
     }
     if (tool === prevProps.tool && tool === toolEnum.SELECT) {
@@ -241,7 +245,7 @@ export class DrawingComponent extends React.Component {
           this.initCanvasPattern()
 
           this.dynamicPattern = new DynamicPattern(this.canvasPattern)
-          this.updateCanvasPatternParameters(height, width)
+          this.updateCanvasPatternParameters()
         }
 
         this.dynamicPattern.setPattern(pattern)
@@ -254,11 +258,11 @@ export class DrawingComponent extends React.Component {
       }
     }
 
-    if (prevProps.height !== height || prevProps.width !== width || prevProps.zoom !== zoom) {
-      this.updateCanvasParameters(height, width, zoom)
+    if (prevProps.height !== height || prevProps.width !== width || prevProps.x !== x || prevProps.y !== y || prevProps.zoom !== zoom) {
+      this.updateCanvasParameters()
 
       if (this.dynamicPattern) {
-        this.updateCanvasPatternParameters(height, width)
+        this.updateCanvasPatternParameters()
         this.updateCanvasPattern()
       }
     }
@@ -466,8 +470,8 @@ export class DrawingComponent extends React.Component {
     //
     //   zoom += delta / 200
     //
-    //   if (zoom > 20) zoom = 20
-    //   if (zoom < 0.1) zoom = 0.1
+    //   if (zoom > 2) zoom = 2
+    //   if (zoom < 0.5) zoom = 0.5
     //
     //   this.canvas.zoomToPoint({ x: opt.e.offsetX, y: opt.e.offsetY }, zoom)
     //
@@ -699,13 +703,34 @@ export class DrawingComponent extends React.Component {
     }, options)
   }
 
-  updateCanvasParameters (height, width, zoom) {
-    const { zoomToCenter } = this.props
+  updateCanvasParameters (forced = false) {
+    const { height, width, x, y, zoom, zoomToCenter } = this.props
+    const { tl } = this.canvas.calcViewportBoundaries()
+    const currentDimensions = {
+      height: this.canvas.getHeight(),
+      width: this.canvas.getWidth(),
+      ...tl,
+      zoom: this.canvas.getZoom(),
+    }
+    const dimensionsChanged = currentDimensions.height !== height || currentDimensions.width !== width
+    const viewportChanged = currentDimensions.x !== x || currentDimensions.y !== y
+    const zoomChanged = currentDimensions.zoom !== zoom
 
-    if (height && width && zoom) {
+    // dimensions
+    if (forced || dimensionsChanged) {
       this.canvas.setDimensions({ height, width })
+    }
 
-      if (zoomToCenter) {
+    // viewport
+    if (forced || viewportChanged) {
+      this.canvas.absolutePan({ x: x * currentDimensions.zoom, y: y * currentDimensions.zoom })
+    }
+
+    // zoom
+    if (forced) {
+      this.canvas.setZoom(zoom)
+    } else if (zoomChanged) {
+      if (zoomToCenter && !dimensionsChanged && !viewportChanged) {
         this.canvas.zoomToPoint({ x: width / 2, y: height / 2 }, zoom)
       } else {
         this.canvas.setZoom(zoom)
@@ -713,7 +738,9 @@ export class DrawingComponent extends React.Component {
     }
   }
 
-  updateCanvasPatternParameters (height, width) {
+  updateCanvasPatternParameters () {
+    const { height, width } = this.props
+
     if (height && width) {
       this.canvasPattern.setDimensions({ height, width })
     }
