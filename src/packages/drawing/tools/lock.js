@@ -1,13 +1,10 @@
 /* eslint-disable */
 
 import { StateTool } from './state-tool'
-import { Debug } from '../../../util/index'
 import { enhancedFields } from '../drawing'
 
-const debug = Debug(`@netology-group/media-ui:drawing:lock-tool`)
-
 export class LockTool extends StateTool {
-  static lockObject(object, options = {}) {
+  static lockObject (object, options = {}) {
     const opts = {
       ...options,
       borderColor: 'rgba(255,0,0,0.75)'
@@ -30,7 +27,7 @@ export class LockTool extends StateTool {
     return object
   }
 
-  static unlockObject(object, options = {}) {
+  static unlockObject (object, options = {}) {
     const opts = {
       ...options,
       borderColor: 'rgba(102,153,255,0.75)'
@@ -52,11 +49,11 @@ export class LockTool extends StateTool {
     return object
   }
 
-  static isLocked (object){
+  static isLocked (object) {
     return object && object._lockedbyuser
   }
 
-  constructor(ctx, onSelect, onDeselect){
+  constructor (ctx, onSelect, onDeselect) {
     super(ctx)
 
     this.__onSelectListener = onSelect
@@ -65,43 +62,64 @@ export class LockTool extends StateTool {
     onSelect && this._canvas.on('selection:created', this.__handleSelect)
     onSelect && this._canvas.on('selection:updated', this.__handleSelect)
     onDeselect && this._canvas.on('selection:cleared', this.__handleDeselect)
+
+    onSelect && this._canvas.on('text:editing:exited', this.__handleEditingExited)
+    onDeselect && this._canvas.on('text:editing:entered', this.__handleEditingEntered)
+  }
+
+  __handleEditingEntered = (event) => {
+    const { target } = event
+
+    if (target.type === 'textbox' && target.text.length !== 0) {
+      this.__onDeselectListener({
+        target: undefined
+      })
+    }
+  }
+
+  __handleEditingExited = (event) => {
+    const { target } = event
+
+    if (target.type === 'textbox' && target._textBeforeEdit !== '') {
+      this.__onSelectListener({
+        target: target.toObject(enhancedFields)
+      })
+    }
   }
 
   __handleSelect = (event) => {
     const { selected } = event
 
-    const maybeProperSelectionForLock = Array.isArray(selected)
-      && selected.length === 1
-
-    const denyNewTextObject = selected[0].type === 'textbox'
-     && selected[0].text.length !== 0
+    const maybeProperSelectionForLock = Array.isArray(selected) && selected.length === 1
+    const denyNewTextObject = selected[0].type === 'textbox' && selected[0].text.length !== 0
     // FIXME: we have to forbid knowing about other type of objects for the LockTool later :(
 
-    if(
+    if (
       (maybeProperSelectionForLock && selected[0].type !== 'textbox')
       || (maybeProperSelectionForLock && denyNewTextObject)
-      ){
+    ) {
       this.__onSelectListener({
         target: !selected.length
           ? undefined
           : selected[0].toObject(enhancedFields)
       })
-    } else {
-      debug('Lock is unavailable (too much or wrong objects selected)')
     }
-
   }
 
-  __handleDeselect = (event) => {
+  __handleDeselect = () => {
     this.__onDeselectListener({
       target: undefined
     })
   }
 
-  destroy(){
+  destroy () {
     this.__onSelectListener && this._canvas.off('selection:created', this.__handleSelect)
     this.__onSelectListener && this._canvas.off('selection:updated', this.__handleSelect)
     this.__onDeselectListener && this._canvas.off('selection:cleared', this.__handleDeselect)
+
+    this.__onSelectListener && this._canvas.off('text:editing:exited', this.__handleEditingExited)
+    this.__onDeselectListener && this._canvas.off('text:editing:entered', this.__handleEditingEntered)
+
     this._canvas = undefined
   }
 }
