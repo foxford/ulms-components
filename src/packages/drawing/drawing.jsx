@@ -29,13 +29,7 @@ export const toolEnum = {
   PAN: 'pan',
   PEN: 'pen',
   SELECT: 'select',
-  SHAPE_CIRCLE_SOLID: 'circle-solid',
-  SHAPE_CIRCLE: 'circle',
-  SHAPE_RECT: 'rect',
-  SHAPE_SQUARE_SOLID: 'square-solid',
-  SHAPE_SQUARE: 'square',
-  SHAPE_TRIAG_SOLID: 'triangle-solid',
-  SHAPE_TRIAG: 'triangle',
+  SHAPE: 'shape',
   TEXT: 'textbox',
 }
 
@@ -45,7 +39,16 @@ export const penToolModeEnum = {
   LINE: 'line',
 }
 
-export const enhancedFields = ['_id', '_lockedbyuser', '_lockedselection', '_toDelete', 'noScaleCache', 'strokeUniform']
+export const shapeToolModeEnum = {
+  CIRCLE: 'circle',
+  CIRCLE_SOLID: 'circle-solid',
+  RECT: 'rect',
+  RECT_SOLID: 'rect-solid',
+  TRIANGLE: 'triangle',
+  TRIANGLE_SOLID: 'triangle-solid',
+}
+
+export const enhancedFields = ['_id', '_lockedbyuser', '_lockedselection', 'noScaleCache', 'strokeUniform']
 
 export const normalizeFields = (object, fields) => Object.assign(
   object,
@@ -133,9 +136,9 @@ function maybeRemoveToken (object) {
 }
 
 function isShapeObject (object) {
-  return object.type === toolEnum.SHAPE_RECT
-    || object.type === toolEnum.SHAPE_CIRCLE
-    || object.type === toolEnum.SHAPE_TRIAG
+  return object.type === shapeToolModeEnum.CIRCLE
+    || object.type === shapeToolModeEnum.RECT
+    || object.type === shapeToolModeEnum.TRIANGLE
 }
 
 function isTextObject (object) {
@@ -148,6 +151,7 @@ export class DrawingComponent extends React.Component {
       r: 255, g: 255, b: 255, a: 1,
     },
     brushWidth: 12,
+    shapeMode: shapeToolModeEnum.RECT,
     tool: toolEnum.PEN,
     x: 0,
     y: 0,
@@ -210,6 +214,7 @@ export class DrawingComponent extends React.Component {
       objects,
       pattern,
       onlineIds,
+      shapeMode,
       tool,
       width,
       x,
@@ -276,6 +281,7 @@ export class DrawingComponent extends React.Component {
       && (
         prevProps.tool !== tool
         || prevProps.brushColor !== brushColor
+        || prevProps.shapeMode !== shapeMode
         || tool === toolEnum.PEN // need to update the tool if it's a pen
       )
     ) {
@@ -289,6 +295,7 @@ export class DrawingComponent extends React.Component {
         || prevProps.brushMode !== brushMode
         || prevProps.brushWidth !== brushWidth
         || prevProps.eraserWidth !== eraserWidth
+        || prevProps.shapeMode !== shapeMode
       )
     ) {
       this.configureTool()
@@ -433,7 +440,7 @@ export class DrawingComponent extends React.Component {
       const object = event.target
 
       // Skipping draft objects
-      if (object._draft || object._toDelete) return
+      if (object._draft) return
 
       const serializedObj = object.toObject(enhancedFields)
 
@@ -536,7 +543,13 @@ export class DrawingComponent extends React.Component {
 
   initTool (tool) {
     const {
-      brushMode, brushColor, selectOnInit, onLockSelection, onLockDeselection, isPresentation,
+      brushColor,
+      brushMode,
+      isPresentation,
+      onLockDeselection,
+      onLockSelection,
+      selectOnInit,
+      shapeMode,
     } = this.props
 
     this.tool && this.tool.destroy()
@@ -573,86 +586,111 @@ export class DrawingComponent extends React.Component {
 
         break
 
-      case toolEnum.SHAPE_CIRCLE:
-        this.tool = new ShapeTool(
-          this.canvas,
-          () => circle({ stroke: toCSSColor(brushColor) }),
-          {
-            adjustCenter: '-0.5 -0.5',
-            selectOnInit,
-          }
-        )
-        break
+      case toolEnum.SHAPE:
+        switch (shapeMode) {
+          case shapeToolModeEnum.CIRCLE:
+            this.tool = new ShapeTool(
+              this.canvas,
+              () => circle({ stroke: toCSSColor(brushColor) }),
+              {
+                adjustCenter: '-0.5 -0.5',
+                selectOnInit,
+              }
+            )
 
-      case toolEnum.SHAPE_CIRCLE_SOLID:
-        this.tool = new ShapeTool(
-          this.canvas,
-          () => circleSolid({ fill: toCSSColor(brushColor) }),
-          {
-            adjustCenter: '-0.5 -0.5',
-            selectOnInit,
-          }
-        )
-        break
+            break
 
-      case toolEnum.SHAPE_SQUARE:
-        this.tool = new ShapeTool(
-          this.canvas,
-          () => rectangle({
-            width: 97.2,
-            height: 97.2,
-            stroke: toCSSColor(brushColor),
-          }),
-          {
-            adjustCenter: '0 -1',
-            selectOnInit,
-          }
-        )
-        break
+          case shapeToolModeEnum.CIRCLE_SOLID:
+            this.tool = new ShapeTool(
+              this.canvas,
+              () => circleSolid({ fill: toCSSColor(brushColor) }),
+              {
+                adjustCenter: '-0.5 -0.5',
+                selectOnInit,
+              }
+            )
 
-      case toolEnum.SHAPE_SQUARE_SOLID:
-        this.tool = new ShapeTool(
-          this.canvas,
-          () => rectangleSolid({
-            width: 97.2,
-            height: 97.2,
-            fill: toCSSColor(brushColor),
-          }),
-          {
-            adjustCenter: '0 -1',
-            selectOnInit,
-          }
-        )
-        break
+            break
 
-      case toolEnum.SHAPE_TRIAG:
-        this.tool = new ShapeTool(
-          this.canvas,
-          () => triangle({
-            width: 97.2,
-            height: 97.2,
-            stroke: toCSSColor(brushColor),
-          }),
-          {
-            adjustCenter: '0 -1',
-            selectOnInit,
-          }
-        )
-        break
+          case shapeToolModeEnum.RECT:
+            this.tool = new ShapeTool(
+              this.canvas,
+              () => rectangle({
+                width: 97.2,
+                height: 97.2,
+                stroke: toCSSColor(brushColor),
+              }),
+              {
+                adjustCenter: '0 -1',
+                selectOnInit,
+              }
+            )
 
-      case toolEnum.SHAPE_TRIAG_SOLID:
-        this.tool = new ShapeTool(
-          this.canvas,
-          () => triangleSolid({
-            fill: toCSSColor(brushColor),
-            height: 97.2,
-            width: 97.2,
-          }),
-          {
-            adjustCenter: '0 -1',
-            selectOnInit,
-          }
-        )
+            break
+
+          case shapeToolModeEnum.RECT_SOLID:
+            this.tool = new ShapeTool(
+              this.canvas,
+              () => rectangleSolid({
+                width: 97.2,
+                height: 97.2,
+                fill: toCSSColor(brushColor),
+              }),
+              {
+                adjustCenter: '0 -1',
+                selectOnInit,
+              }
+            )
+
+            break
+
+          case shapeToolModeEnum.TRIANGLE:
+            this.tool = new ShapeTool(
+              this.canvas,
+              () => triangle({
+                width: 97.2,
+                height: 97.2,
+                stroke: toCSSColor(brushColor),
+              }),
+              {
+                adjustCenter: '0 -1',
+                selectOnInit,
+              }
+            )
+
+            break
+
+          case shapeToolModeEnum.TRIANGLE_SOLID:
+            this.tool = new ShapeTool(
+              this.canvas,
+              () => triangleSolid({
+                fill: toCSSColor(brushColor),
+                height: 97.2,
+                width: 97.2,
+              }),
+              {
+                adjustCenter: '0 -1',
+                selectOnInit,
+              }
+            )
+
+            break
+
+          default:
+            this.tool = new ShapeTool(
+              this.canvas,
+              () => rectangle({
+                width: 97.2,
+                height: 97.2,
+                stroke: toCSSColor(brushColor),
+              }),
+              {
+                adjustCenter: '0 -1',
+                selectOnInit,
+              }
+            )
+        }
+
         break
 
       default:
@@ -784,9 +822,8 @@ export class DrawingComponent extends React.Component {
         if (nextObject._lockedselection && !onlineIds.includes(nextObject._lockedselection)) {
           nextObject._lockedselection = undefined
         }
-        if(!nextObject._toDelete) {
-          objectsToAdd.push(nextObject)
-        }
+
+        objectsToAdd.push(nextObject)
       } else {
         // update (only if revision has been changed)
         if (_._rev === canvasObjects[objIndex]._rev) {

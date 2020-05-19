@@ -142,9 +142,13 @@ export default class SelectTool extends Base {
   }
 
   _unsetObject () {
-    if(this.__object) {
-      this.__object.set({'_lockedselection': undefined});
-      this._canvas.trigger('object:modified', {target: this.__object})
+    if (this.__object) {
+      this.__object.set({'_lockedselection': undefined})
+
+      if (!this.__object.get('_toDelete')) {
+        this._canvas.trigger('object:modified', { target: this.__object })
+      }
+
       this.__object = null
     }
   }
@@ -165,7 +169,6 @@ export default class SelectTool extends Base {
     if (this.__object && this.__object.isEditing) return
 
     if (!this._mouseMove && (this.__object && !this.__object._lockedbyuser)) {
-      let actionFunc
       const {keyCode} = e
 
       this._shiftPressed = e.shiftKey
@@ -173,25 +176,29 @@ export default class SelectTool extends Base {
       switch (keyCode) {
         case DEL_KEYCODE:
         case BACKSPACE_KEYCODE:
-          actionFunc = this._deleteObject
+          this._deleteObject()
+
           break
         case UP_KEYCODE:
-          actionFunc = this._moveUp
+          this._moveUp()
+          this._canvas.renderAll()
+
           break
         case DOWN_KEYCODE:
-          actionFunc = this._moveDown
+          this._moveDown()
+          this._canvas.renderAll()
+
           break
         case LEFT_KEYCODE:
-          actionFunc = this._moveLeft
+          this._moveLeft()
+          this._canvas.renderAll()
+
           break
         case RIGHT_KEYCODE:
-          actionFunc = this._moveRight
-          break
-      }
+          this._moveRight()
+          this._canvas.renderAll()
 
-      if (actionFunc) {
-        actionFunc()
-        this._canvas.renderAll()
+          break
       }
     }
   }
