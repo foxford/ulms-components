@@ -17,6 +17,7 @@ export class TextboxTool extends PositionableObject {
       scaleX: 0.5,
       scaleY: 0.5,
       strokeUniform: true,
+      width: 600,
       ...options,
     }))
   }
@@ -30,14 +31,12 @@ export class TextboxTool extends PositionableObject {
     this.__object && this.__object.on('changed', () => {
       const object = this.__object
 
-      const itemWidth = (5.9 + 1) * 17
-      // avg. word length + 1 times avg. sentence length
+      if (object._unwrappedTextLines.length === 1 && object._textLines.length === 1) {
+        const w = object.measureLine(0).width
 
-      if (object.text.length > itemWidth * 2) {
-        // text is greater than 2 sentences
-        const nextWidth = object.canvas.width - object.getBoundingRect().left
-
-        object.set('width', (nextWidth < itemWidth * 2) ? itemWidth * 10 : nextWidth)
+        if ((object.get('width') - w) < 50) {
+          object.set('width', w + 50)
+        }
       }
     })
   }
