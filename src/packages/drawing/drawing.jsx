@@ -99,7 +99,7 @@ class TokenProvider {
 const tp = new TokenProvider()
 
 function matchesStorageURIScheme (url) {
-  const re = /^.*\/api\/v1\/buckets\/(.*)\/sets\/(.*)\/objects\/(.*)$/
+  const re = /^.*\/api\/(.*)\/sets\/(.*)\/objects\/(.*)$/
 
   return url.match(re)
 }
