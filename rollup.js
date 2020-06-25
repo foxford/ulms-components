@@ -39,7 +39,7 @@ const copyDir = promisify(ncp.ncp)
 const copyFile = promisify(fs.copyFile)
 const mkDir = promisify(mkdirp)
 
-const matchScript = it => it.includes('.js')
+const matchScript = it => it.endsWith('.js') || it.endsWith('.jsx')
 const matchImage = it => it.includes('/images')
 
 async function processJson (entry) {
