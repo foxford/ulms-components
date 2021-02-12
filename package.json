@@ -50,7 +50,7 @@
     "d3-queue": "~3.0.7",
     "debug": "^4.1.0",
     "fabric": "netology-group/fabric.js#feature/ULMS-509",
-    "lodash": "~4.17.14",
+    "lodash": "^4.17.20",
     "popper.js": "^1.15.0",
     "query-string": "^6.2.0",
     "rc-slider": "^8.6.9",
@@ -63,7 +63,7 @@
     "scroll-into-view-if-needed": "~2.2.20"
   },
   "devDependencies": {
-    "@babel/cli": "^7.2.3",
+    "@babel/cli": "^7.12.16",
     "@babel/plugin-proposal-class-properties": "^7.2.3",
     "@babel/plugin-proposal-object-rest-spread": "^7.2.0",
     "@babel/plugin-syntax-dynamic-import": "^7.2.0",
