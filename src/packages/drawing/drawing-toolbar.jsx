@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
 import React from 'react'
-import cn from 'classnames'
+import cn from 'classnames-es'
 
 import { TwitterPicker } from 'react-color'
 import Slider from 'rc-slider/lib/Slider'

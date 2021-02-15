@@ -12,7 +12,7 @@ const { name } = require('./package.json')
 const debug = Debug(`${name}:rollup.js`)
 
 const src = 'src/packages'
-const out = 'packages'
+const out = 'packages-v0'
 const packages = path.resolve(__dirname, src)
 const packagesOut = path.resolve(__dirname, out)
 

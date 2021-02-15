@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
 import React from 'react'
-import cx from 'classnames'
+import cx from 'classnames-es'
 import EventTarget from '@ungap/event-target'
 
 import { LocationObjectCursor } from './_location-object-cursor'

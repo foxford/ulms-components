@@ -3,9 +3,9 @@ import React, { Component } from 'react'
 import { SizeMe } from 'react-sizeme'
 import VisibilitySensor from 'react-visibility-sensor'
 import scrollIntoView from 'scroll-into-view-if-needed'
-import cx from 'classnames'
+import cx from 'classnames-es'
 
-import { Icons } from '../icons/icons'
+import { Icons } from '../../../packages/icons/index'
 import { Spinner } from '../spinner/spinner'
 
 import css from './presentation.css'

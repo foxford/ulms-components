@@ -26,7 +26,7 @@
     "coverage": "jest ./packages --coverage",
     "coverage/report": "npm run coverage && codecov",
     "postinstall": "lerna list | sed 's/@ulms\\/ui-//g' | xargs -I{} scripts/populate-rollup.sh {}",
-    "preold_build": "rm -rf packages && mkdir -p packages",
+    "preold_build": "rm -rf packages-v0 && mkdir -p packages-v0",
     "old_build": "npm run old_build/packages",
     "old_build/package": "BABEL_ENV=packages node rollup.js",
     "old_build/packages": "./scripts/build-packages.sh",
@@ -55,7 +55,6 @@
   "dependencies": {
     "@foxford/ui": "1.3.6",
     "@ungap/event-target": "^0.1.0",
-    "classnames": "^2.2.6",
     "classnames-es": "^2.2.6",
     "d3-queue": "~3.0.7",
     "debug": "^4.1.0",

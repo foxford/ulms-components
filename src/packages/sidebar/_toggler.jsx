@@ -1,8 +1,8 @@
 /* eslint-disable react/prop-types */
 import React from 'react'
-import cx from 'classnames'
+import cx from 'classnames-es'
 
-import { Icons } from '../icons/icons'
+import { Icons } from '../../../packages/icons/index'
 
 import css from './_toggler.css'
 

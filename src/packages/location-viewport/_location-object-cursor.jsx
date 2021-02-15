@@ -1,9 +1,9 @@
 /* eslint-disable react/prop-types */
 import React from 'react'
-import cx from 'classnames'
+import cx from 'classnames-es'
 import Popper from 'popper.js'
 
-import { Icons } from '../icons/icons'
+import { Icons } from '../../../packages/icons/index'
 
 import { fCalcIntermediateCoords, rangeBound, rotation } from './_utils'
 import css from './location-viewport.css'
