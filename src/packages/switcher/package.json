@@ -1,0 +1,59 @@
+{
+  "name": "@ulms/ui-switcher",
+  "version": "1.0.0",
+  "description": "",
+  "license": "MIT",
+  "author": "",
+  "main": "index.js",
+  "files": [
+    "es",
+    "src"
+  ],
+  "scripts": {
+    "build": "rm -rf ./es/* && BABEL_ENV=es rollup --config ./rollup.config.js index.js"
+  },
+  "dependencies": {
+    "classnames-es": "^2.2.6",
+    "react": "^16.12.0"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.12.16",
+    "@babel/core": "^7.12.16",
+    "@babel/plugin-proposal-class-properties": "^7.2.3",
+    "@babel/plugin-proposal-object-rest-spread": "^7.2.0",
+    "@babel/plugin-syntax-dynamic-import": "^7.2.0",
+    "@babel/polyfill": "^7.2.5",
+    "@babel/preset-env": "^7.2.3",
+    "@babel/preset-react": "^7.0.0",
+    "@babel/register": "^7.0.0",
+    "@svgr/rollup": "~4.1.0",
+    "@svgr/webpack": "~4.1.0",
+    "autoprefixer": "^9.1.1",
+    "babel-loader": "^8.0.5",
+    "babel-plugin-annotate-pure-calls": "^0.4.0",
+    "babel-plugin-react-css-modules": "^3.4.2",
+    "babel-plugin-transform-es2015-modules-commonjs": "^6.26.2",
+    "babel-plugin-transform-require-ignore": "^0.1.1",
+    "cssnano": "^4.1.7",
+    "eslint-config-adequate": "^2.0.3",
+    "eslint-config-adequate-react": "^1.2.1",
+    "postcss-cssnext": "^3.1.0",
+    "postcss-discard-duplicates": "^4.0.2",
+    "postcss-loader": "^3.0.0",
+    "postcss-preset-env": "^5.3.0",
+    "postcss-url": "^8.0.0",
+    "rollup": "^0.67.3",
+    "rollup-plugin-alias": "^1.4.0",
+    "rollup-plugin-babel": "^4.3.0",
+    "rollup-plugin-commonjs": "^9.1.5",
+    "rollup-plugin-json": "^3.0.0",
+    "rollup-plugin-node-resolve": "^3.3.0",
+    "rollup-plugin-postcss": "^1.6.2",
+    "rollup-plugin-sass": "^0.9.2",
+    "rollup-plugin-scss": "^0.4.0",
+    "rollup-plugin-uglify": "^3.0.0"
+  },
+  "peerDependencies": {
+    "react": "^15.6 || ^16.x || ^17.x"
+  }
+}

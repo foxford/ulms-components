@@ -1,8 +1,8 @@
 /* eslint-disable react/prop-types */
 import React from 'react'
-import cx from 'classnames'
+import cx from 'classnames-es'
 
-import css from './switcher.css'
+import css from './switcher.module.css'
 
 function Switcher (props) {
   const { on, changeHandler } = props

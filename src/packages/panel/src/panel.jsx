@@ -1,8 +1,8 @@
 /* eslint-disable react/prop-types */
 import React from 'react'
-import cx from 'classnames'
+import cx from 'classnames-es'
 
-import css from './panel.css'
+import css from './panel.module.css'
 
 const Header = ({
   children,

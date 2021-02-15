@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
 import React from 'react'
-import cx from 'classnames'
+import cx from 'classnames-es'
 
 import Arrow from './images/arrow.svg'
 import ArrowLeft from './images/arrow-left.svg'
@@ -22,7 +22,7 @@ import Slides from './images/slides.svg'
 import TrashOutline from './images/trash-outline.svg'
 import Video from './images/video.svg'
 
-import css from './icons.css'
+import css from './icons.module.css'
 
 const icons = new Map([
   ['arrow-left', ArrowLeft],

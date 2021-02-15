@@ -8,3 +8,9 @@ node_modules
 /styleguide
 /coverage
 *.sw*
+
+/src/packages/*/es/*
+!/src/packages/*/es/.gitkeep
+/src/packages/*/rollup
+/src/packages/*/rollup.config.js
+/src/packages/*/.babelrc.json

@@ -1,10 +1,10 @@
 /* eslint-disable react/prop-types */
 import React from 'react'
-import cx from 'classnames'
+import cx from 'classnames-es'
 import { Grid as G } from '@foxford/ui/packages/Grid/Grid'
 import '@foxford/ui/packages/Grid/Grid.css'
 
-import css from './grid.css'
+import css from './grid.module.css'
 
 const rowProps = props => ({
   ...props,
