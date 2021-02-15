@@ -13,6 +13,7 @@ const json = require('rollup-plugin-json')
 const npm = require('rollup-plugin-node-resolve')
 const postcss = require('rollup-plugin-postcss')
 const scss = require('rollup-plugin-scss')
+const sourcemaps = require('rollup-plugin-sourcemaps')
 const svgr = require('@svgr/rollup').default
 const uglify = require('rollup-plugin-uglify')
 
@@ -96,7 +97,8 @@ const rollupPlugins = [ // order matters
       ...babelrc.plugins,
       ...babel_rc.plugins
     ]
-  })
+  }),
+  sourcemaps()
 ].concat(shouldUglify())
 
 const dist = (entry = 'index.js', frm = './', out = './es') => {
@@ -105,6 +107,7 @@ const dist = (entry = 'index.js', frm = './', out = './es') => {
     output: {
       file: `${out}/${entry}`,
       format: 'es',
+      sourcemap: true,
     },
     file: `${out}/${entry}`, // that's important duplicate
     external: Object.keys(peerDependencies),
