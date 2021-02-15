@@ -27,7 +27,7 @@
     "build/dev": "lerna exec 'npm run build'",
     "precoverage": "rm -rf coverage",
     "coverage": "jest ./packages --coverage",
-    "coverage/report": "npm run coverage && codecov",
+    "coverage/report": "npm run coverage && codecov --disable=gcov",
     "postinstall": "lerna list | sed 's/@ulms\\/ui-//g' | xargs -I{} scripts/populate-rollup.sh {} && lerna bootstrap",
     "preold_build": "rm -rf packages-v0 && mkdir -p packages-v0",
     "old_build": "npm run old_build/packages",
