@@ -6,6 +6,7 @@
 /coverage
 /packages-v0
 node_modules
+lerna-debug.log
 
 /packages/*/es/*
 !/packages/*/es/.gitkeep
