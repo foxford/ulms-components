@@ -30,7 +30,6 @@ blocks:
             - checkout
             - nvm use $(cat .nvmrc) # semaphore does not use node version from .nvmrc for some reason
             - cache restore node-modules-$SEMAPHORE_GIT_BRANCH-$(checksum package-lock.json)
-            - npx lerna exec 'npm i --save-exact'
             - npx lerna bootstrap
             - npm test
             - npm run coverage/report
