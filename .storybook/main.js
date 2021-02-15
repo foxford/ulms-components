@@ -1,8 +1,9 @@
 module.exports = {
   "stories": [
-    "../src/packages/**/src/*.stories.mdx",
-    "../src/**/*.stories.mdx",
-    "../src/**/*.stories.@(js|jsx|ts|tsx)"
+    "../packages/**/src/*.stories.mdx",
+    "../packages/**/src/*.stories.@(js|jsx|ts|tsx)",
+    "../**/*.stories.mdx",
+    // "../src/**/*.stories.@(js|jsx|ts|tsx)"
   ],
   "addons": [
     "@storybook/addon-essentials",
@@ -29,8 +30,6 @@ module.exports = {
           .replace(/\//gi, '').replace('(svg|', '(')),
       })
     }
-
-    console.log(config.module.rules)
 
     return config
   },

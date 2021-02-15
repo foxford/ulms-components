@@ -12,44 +12,30 @@
   },
   "license": "BSD-4-Clause",
   "author": "OLC Netology group LLC",
-  "main": "lib/components/index.js",
-  "module": "es/components/index.js",
   "directories": {
-    "lib": "src"
+    "lib": "packages"
   },
   "files": [
-    "es",
-    "lib",
-    "packages"
+    "packages-v0"
   ],
   "scripts": {
-    "__coverage": "npm run nodetap -- --nyc-arg=--require=./test/babel-register.js --cov",
-    "__postcoverage": "tap --coverage-report=text-lcov > coverage/coverage.lcov && codecov",
-    "_test": "npm run lint && npm run tap",
-    "babel": "babel src --config-file ./.babelrc.json --copy-files",
-    "prebuild": "rm -rf es packages lib && mkdir -p packages",
-    "build": "npm run build/cjs && npm run build/es && npm run build/packages",
+    "_lint": "eslint --ext js,jsx",
     "build-storybook": "build-storybook",
-    "build/cjs": "cross-env BABEL_ENV=cjs npm run babel -- -d lib",
-    "build/es": "cross-env BABEL_ENV=es npm run babel -- -d es",
-    "build/package": "cross-env BABEL_ENV=packages node rollup.js",
-    "build/packages": "./scripts/build-packages.sh",
+    "build": "lerna exec 'NODE_ENV=production npm run build'",
     "precoverage": "rm -rf coverage",
-    "coverage": "jest ./src/packages --coverage",
+    "coverage": "jest ./packages --coverage",
     "coverage/report": "npm run coverage && codecov",
-    "docs": "npm run docs/build && http-server ./styleguide",
-    "docs/build": "cross-env BABEL_ENV=styleguidist styleguidist build",
-    "docs/serve": "cross-env BABEL_ENV=styleguidist styleguidist server",
     "postinstall": "lerna list | sed 's/@ulms\\/ui-//g' | xargs -I{} scripts/populate-rollup.sh {}",
-    "lint": "eslint --ext js,jsx src",
-    "nodetap": "tap test/**/*.test.js",
-    "prepublishOnly": "cross-env NODE_ENV=production npm run build",
-    "start": "npm run docs/serve",
+    "preold_build": "rm -rf packages && mkdir -p packages",
+    "old_build": "npm run old_build/packages",
+    "old_build/package": "BABEL_ENV=packages node rollup.js",
+    "old_build/packages": "./scripts/build-packages.sh",
+    "prepublishOnly": "npm run build && NODE_ENV=production npm run old_build",
+    "start": "npm run storybook",
     "storybook": "start-storybook -p 6006",
-    "tap": "npm run nodetap -- --node-arg=--require=./test/babel-register.js",
-    "test": "npm run lint && npm run test/all",
+    "test": "npm run test/lint && npm run test/all",
     "test/all": "jest",
-    "test/lint": "npm run lint"
+    "test/lint": "npm run _lint -- packages/*/src"
   },
   "husky": {
     "hooks": {
@@ -112,7 +98,6 @@
     "codecov": "3.6.5",
     "concurrently": "^4.1.1",
     "core-js": "^3.8.3",
-    "cross-env": "^5.2.0",
     "cssnano": "^4.1.7",
     "eslint-config-adequate": "^2.0.3",
     "eslint-config-adequate-react": "^1.2.1",
@@ -127,7 +112,6 @@
     "postcss-loader": "^3.0.0",
     "postcss-preset-env": "^5.3.0",
     "postcss-url": "^8.0.0",
-    "react-styleguidist": "^8.0.6",
     "reserved-words": "^0.1.2",
     "rollup": "^0.67.3",
     "rollup-plugin-alias": "^1.4.0",

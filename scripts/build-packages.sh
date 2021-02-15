@@ -7,7 +7,7 @@ UI_PACKAGES=$(find ./${UI_PACKAGES_DIR:-src/packages}/* -maxdepth 0 -type d | se
 UI_COMMANDS=()
 
 for arg in ${UI_PACKAGES}; do
-  UI_COMMANDS+=("npm run build/package -- WHITELIST=$arg")
+  UI_COMMANDS+=("npm run old_build/package -- WHITELIST=$arg")
 done
 
 npx concurrently --kill-others-on-fail "${UI_COMMANDS[@]}"
