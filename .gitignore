@@ -9,6 +9,8 @@ node_modules
 
 /packages/*/es/*
 !/packages/*/es/.gitkeep
+
+/packages/*/package-lock.json
 /packages/*/rollup
 /packages/*/rollup.config.js
 /packages/*/.babelrc.json
