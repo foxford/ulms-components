@@ -5,6 +5,7 @@
   "license": "MIT",
   "author": "",
   "main": "index.js",
+  "module": "es/index.js",
   "files": [
     "es",
     "src"
