@@ -1,0 +1,36 @@
+import { Meta, Story, Canvas } from '@storybook/addon-docs/blocks';
+import { Grid } from './grid';
+
+<Meta title="Molecules/Grid" component={Grid} />
+
+# Grid
+
+Allows to use back-to-back columns for application layout.
+Not intended to wrap SplitPane-like elements.
+
+export const Template = ({ debug }) => (
+  <Grid debug={debug}>
+    <Grid.Row>
+      <Grid.Col>1 of 12</Grid.Col>
+      <Grid.Col>1 of 12</Grid.Col>
+      <Grid.Col>1 of 12</Grid.Col>
+      <Grid.Col>1 of 12</Grid.Col>
+      <Grid.Col>1 of 12</Grid.Col>
+      <Grid.Col>1 of 12</Grid.Col>
+      <Grid.Col>1 of 12</Grid.Col>
+      <Grid.Col>1 of 12</Grid.Col>
+      <Grid.Col>1 of 12</Grid.Col>
+      <Grid.Col>1 of 12</Grid.Col>
+      <Grid.Col>1 of 12</Grid.Col>
+      <Grid.Col>1 of 12</Grid.Col>
+    </Grid.Row>
+  </Grid>
+)
+
+<Canvas>
+  <Story name="Default" args={{
+    debug: true,
+  }}>
+    {Template.bind({})}
+  </Story>
+</Canvas>

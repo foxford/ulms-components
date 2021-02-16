@@ -1,0 +1,56 @@
+.root {
+  --icons-size-xxxs: 10px;
+  --icons-size-xxs: 14px;
+  --icons-size-xs: 16px;
+  --icons-size-s: 22px;
+  --icons-size-m: 26px;
+  --icons-size-l: 30px;
+  --icons-size-lm: 32px;
+  --icons-size-xl: 34px;
+  --icons-size-xxl: 38px;
+  --icons-size-xxxl: 42px;
+}
+
+.root {
+  color: currentColor;
+  color: var(--media-ui-icons-color);
+  display: inline-block;
+  flex-shrink: 0;
+  height: 1em;
+  vertical-align: baseline;
+  width: 1em;
+}
+.root:hover {
+  color: var(--media-ui-icons-color-hover);
+}
+.root:active {
+  color: var(--media-ui-icons-color-active);
+}
+
+.root svg {
+  display: block;
+  height: 100%;
+  width: 100%;
+}
+
+.root svg path {
+  fill: currentColor;
+}
+
+.root.bullet svg path {
+  fill: transparent;
+  stroke: currentColor;
+}
+
+:export {
+  sizeXXXS: var(--icons-size-xxxs);
+  sizeXXS: var(--icons-size-xxs);
+  sizeXS: var(--icons-size-xs);
+  sizeS: var(--icons-size-s);
+  sizeM: var(--icons-size-m);
+  sizeL: var(--icons-size-l);
+  sizeLM: var(--icons-size-lm);
+  sizeXL: var(--icons-size-xl);
+  sizeXXL: var(--icons-size-xxl);
+  sizeXXXL: var(--icons-size-xxxl);
+}

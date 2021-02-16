@@ -1,9 +1,9 @@
 /* eslint-disable import/extensions, react/prop-types */
 import React from 'react'
-import cx from 'classnames'
+import cx from 'classnames-es'
 
-import { Icons } from '../icons/icons'
-import { Button } from '../button/button'
+import { Icons } from '../../../packages/icons/index'
+import { Button } from '../../../packages/button/index'
 
 import css from './action-button-group.css'
 

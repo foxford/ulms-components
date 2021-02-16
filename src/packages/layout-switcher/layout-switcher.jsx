@@ -1,8 +1,8 @@
 /* eslint-disable import/extensions, react/prop-types */
 import React from 'react'
 
-import { Icons } from '../icons/icons'
-import { Button } from '../button/button'
+import { Icons } from '../../../packages/icons/index'
+import { Button } from '../../../packages/button/index'
 
 import css from './layout-switcher.css'
 

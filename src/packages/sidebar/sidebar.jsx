@@ -1,17 +1,15 @@
 /* eslint-disable react/prop-types */
 import React from 'react'
 import { compose, withState, setDisplayName } from 'recompose'
-import cx from 'classnames'
+import cx from 'classnames-es'
 
-import { name } from '../../../package.json'
 import { Debug } from '../../util/index'
-
-import { Panel } from '../panel/panel'
+import { Panel } from '../../../packages/panel/index'
 
 import { Toggler } from './_toggler'
 import css from './sidebar.css'
 
-const debug = Debug(`${name}:sidebar`)
+const debug = Debug('@ulms/ui-sidebar')
 
 const Inner = ({ children }) => (<div className={css.sidebarInner}>{children}</div>)
 

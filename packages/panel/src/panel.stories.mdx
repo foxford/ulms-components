@@ -1,0 +1,205 @@
+import { Meta, Story, Canvas } from '@storybook/addon-docs/blocks'
+import { Panel } from './panel'
+import { Grid } from '../../grid/index'
+
+<Meta title="Atoms/Panel" component={Panel} />
+
+# Panel
+
+Common panel element. Is used to split the application to the different sections.
+
+
+#### with children
+
+<Canvas>
+  <Story name="with children" args={{}}>
+    {
+      <Panel debug>
+        We gonna space?!
+      </Panel>
+    }
+  </Story>
+</Canvas>
+
+
+#### with built-in children
+
+<Canvas>
+  <Story name="with build-in children" args={{}}>
+    {
+      <Panel title='We gonna space?!' debug />
+    }
+  </Story>
+</Canvas>
+
+
+#### with custom children
+
+<Canvas>
+  <Story name="with custom children" args={{}}>
+    {
+      <Panel debug>
+        <Panel.Header>We gonna space?!</Panel.Header>
+      </Panel>
+    }
+  </Story>
+</Canvas>
+
+
+### Adjacent panels
+
+
+#### Column
+
+<Canvas>
+  <Story name="column" args={{}}>
+    {
+      <Panel>
+        <Panel debug>
+          We
+        </Panel>
+        <Panel debug>
+          gonna
+        </Panel>
+        <Panel debug>
+          space?!
+        </Panel>
+      </Panel>
+    }
+  </Story>
+</Canvas>
+
+
+#### Row
+
+<Canvas>
+  <Story name="row" args={{}}>
+    {
+      <Panel direction='row'>
+        <Panel debug>
+          We
+        </Panel>
+        <Panel debug>
+          gonna
+        </Panel>
+        <Panel debug>
+          space?!
+        </Panel>
+      </Panel>
+    }
+  </Story>
+</Canvas>
+
+
+### Nested panels
+
+<Canvas>
+  <Story name="nested-panels" args={{}}>
+    {
+      <Panel debug>
+        <Panel.Header>
+          We gonna space?!
+        </Panel.Header>
+        <Panel debug>
+          Please space..
+          <Panel debug>
+            Please space..
+          </Panel>
+        </Panel>
+      </Panel>
+    }
+  </Story>
+</Canvas>
+
+
+### Panels inside the grid
+
+<Canvas>
+  <Story name="panels inside the grid" agrs={{}}>
+    {
+      <Grid debug>
+        <Grid.Row>
+          <Grid.Col size="auto">
+            <Panel debug>
+              We gonna space?!
+              <Panel debug>
+                Please space..
+              </Panel>
+            </Panel>
+          </Grid.Col>
+          <Grid.Col size="auto">
+            <Panel debug>
+              We gonna space?!
+            </Panel>
+          </Grid.Col>
+        </Grid.Row>
+      </Grid>
+    }
+  </Story>
+</Canvas>
+
+
+### Others
+
+
+#### Panels with headers
+
+<Canvas>
+  <Story name="panels with headers" agrs={{}}>
+    {
+      <Panel direction='row'>
+        <Panel debug>
+          <Panel.Header>We</Panel.Header>
+          <Panel.Inner>gonna space?!</Panel.Inner>
+        </Panel>
+        <Panel
+          title='Is it'
+          content='space?'
+          debug
+        />
+        <Panel debug>
+          <Panel.Header>Is it</Panel.Header>
+          <Panel debug>space?</Panel>
+        </Panel>
+        <Panel debug>
+          <Panel.Header noAdjacent>Please</Panel.Header>
+          <Panel debug>
+            <Panel.Inner>
+              space!
+            </Panel.Inner>
+          </Panel>
+        </Panel>
+      </Panel>
+    }
+  </Story>
+</Canvas>
+
+
+#### Multiple nested panels
+
+<Canvas>
+  <Story name="multiple nested panels" agrs={{}}>
+    {
+      <Panel debug>
+        <Panel.Header>
+          We gonna space?!
+        </Panel.Header>
+        <Panel debug>
+          Please space..
+          <Panel debug>
+            Please space..
+            <Panel debug>
+              Please space..
+            </Panel>
+          </Panel>
+          <Panel debug>
+            Please space..
+          </Panel>
+        </Panel>
+        <Panel debug>
+          Please space..
+        </Panel>
+      </Panel>
+    }
+  </Story>
+</Canvas>

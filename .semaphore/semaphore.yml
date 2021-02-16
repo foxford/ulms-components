@@ -1,0 +1,36 @@
+version: v1.0
+name: ulms-media-ui
+agent:
+  machine:
+    type: e1-standard-2
+    os_image: ubuntu1804
+execution_time_limit:
+  minutes: 20
+blocks:
+  - name: Install
+    task:
+      jobs:
+        - name: prepare
+          commands:
+            - checkout
+            - nvm use $(cat .nvmrc) # semaphore does not use node version from .nvmrc for some reason
+            - cache restore node-modules-$SEMAPHORE_GIT_BRANCH-$(checksum package-lock.json),node-modules-$SEMAPHORE_GIT_BRANCH
+            - npm ci
+            - cache store node-modules-$SEMAPHORE_GIT_BRANCH-$(checksum package-lock.json) node_modules
+  - name: Commit
+    task:
+      env_vars:
+        - name: NODE_ENV
+          value: production
+      secrets:
+        - name: codecov-token-ulms
+      jobs:
+        - name: test
+          commands:
+            - checkout
+            - nvm use $(cat .nvmrc) # semaphore does not use node version from .nvmrc for some reason
+            - cache restore node-modules-$SEMAPHORE_GIT_BRANCH-$(checksum package-lock.json)
+            - npx lerna bootstrap
+            - npm test
+            - npm run coverage/report
+
