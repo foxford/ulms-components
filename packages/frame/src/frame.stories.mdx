@@ -1,0 +1,33 @@
+import { Meta, Story, Canvas } from '@storybook/addon-docs/blocks';
+import { Frame } from './frame';
+
+<Meta title="organisms/Frame" component={Frame} />
+
+
+# Frame
+
+export const ref = React.createRef()
+
+export const Template = ({ scope, title, url }) => (
+  <>
+    <h2>Frame content</h2>
+    <Frame
+      showDebug
+      onIncoming={({ type: t, payload: p }) => ref.current.postMessage({ type: t, payload:p })}
+      params={{ scope }}
+      ref={ref}
+      targetOrigin='*'
+      title={title}
+      url={url}
+    />
+  </>
+)
+
+<Canvas>
+  <Story name="default" args={{
+    title: 'title',
+    url: 'http://127.0.0.1:6006/iframe.html?id=utils--message-emitter&viewMode=story',
+  }}>
+    {Template.bind({})}
+  </Story>
+</Canvas>
