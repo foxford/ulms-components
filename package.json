@@ -39,7 +39,7 @@
     "start": "npm run storybook",
     "storybook": "start-storybook -p 6006",
     "test": "npm run test/lint && npm run test/all",
-    "test/all": "jest",
+    "test/all": "BABEL_ENV=jest jest",
     "test/lint": "npm run _lint -- packages/*/src"
   },
   "dependencies": {
