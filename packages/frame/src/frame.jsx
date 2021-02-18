@@ -1,6 +1,8 @@
 /* eslint react/prop-types: 0 */
 import React from 'react'
 
+import { enrichUrlWith } from './util/enrich-url-with'
+
 // TODO: move static methods to the frame-controller
 
 const isUndef = a => typeof a === 'undefined'
@@ -58,15 +60,20 @@ export class Frame extends React.PureComponent {
 
   constructor (props) {
     super(props)
+
+    const { url } = props
+
+    if (!url || typeof url !== 'string') throw new TypeError('Wrong url')
+
     this.iframeR = React.createRef()
   }
 
   componentDidMount () {
-    this._currentCtx.addEventListener('message', this.handleMessage)
+    this._currentCtx && this._currentCtx.addEventListener('message', this.handleMessage)
   }
 
   componentWillUnmount () {
-    this._currentCtx.removeEventListener('message', this.handleMessage)
+    this._currentCtx && this._currentCtx.removeEventListener('message', this.handleMessage)
   }
 
   get _childCtx () {
@@ -165,64 +172,17 @@ export class Frame extends React.PureComponent {
     })
   }
 
-  // TODO: move to helper
-  enrichUrlWith (params = {}, origin) {
-    const { url, omitOriginParams } = this.props
-
-    if (!Object.keys(params).length) return url
-
-    const append = []
-
-    Object.keys(params).forEach((a) => {
-      append.push(`${a}=${params[a]}`)
-    })
-
-    const hasParams = url.split('?').length === 1
-    const hasHash = url.split('#').length === 1
-
-    let nextUrl
-
-    if (origin) {
-      const [originUrl, originParams = ''] = origin.split('?')
-
-      let _url = url
-
-      if (omitOriginParams) {
-        // for dev reason when target frame url do n
-        const [_urlUrl] = url.split('/')
-
-        _url = _urlUrl
-      }
-
-      nextUrl = `${_url.replace(Frame.type, originUrl)}${originParams ? `?${originParams}` : ''}`
-    } else {
-      nextUrl = url
-    }
-
-    if (hasParams) {
-      const [prevUrl, prevParams = '', prevHash = ''] = nextUrl.split(/[?#]/)
-
-      nextUrl = `${prevUrl}?${prevParams}&${append.join('&')}${prevHash ? `#${prevHash}` : ''}`
-    } else if (hasHash) {
-      const [prevUrl, prevHash = ''] = nextUrl.split('#')
-
-      nextUrl = `${prevUrl}?${append.join('&')}${prevHash ? `#${prevHash}` : '#'}`
-    } else {
-      nextUrl = `${nextUrl}?${append.join('&')}`
-    }
-
-    return nextUrl
-  }
-
   render () {
     const {
       className,
+      omitOriginParams,
       origin,
       params = {},
       title,
+      url: _url,
     } = this.props
 
-    const url = this.enrichUrlWith(params, origin)
+    const url = enrichUrlWith(_url, params, Frame.type, origin, omitOriginParams)
 
     return (
       <iframe
