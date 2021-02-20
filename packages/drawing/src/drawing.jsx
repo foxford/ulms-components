@@ -248,7 +248,9 @@ export class Drawing extends React.Component {
       this.updateCanvasParameters(true)
       this.updateCanvasObjects(objects)
     }
+
     if (tool === prevProps.tool && tool === toolEnum.SELECT) {
+      // FIXME: might not work for for three users (one come and one leave)
       if (onlineIds && (onlineIds.length !== prevProps.onlineIds.length)) {
         SelectTool.updateAllSelection(this.canvas, onlineIds)
       }
@@ -794,8 +796,7 @@ export class Drawing extends React.Component {
     }
   }
 
-  updateCanvasObjects (objects) {
-    const canvasObjects = this.canvas.getObjects()
+  _updateCanvasObjects (canvasObjects, objects) {
     const canvasObjectIds = canvasObjects.map(_ => _._id)
     const newObjectIds = new Set(objects.map(_ => _._id))
     const objectsToAdd = []
@@ -816,12 +817,6 @@ export class Drawing extends React.Component {
         objectsToRemove.push(_)
       }
     })
-
-    if (objectsToRemove.length > 0) {
-      this.ignoreObjectRemovedEvent = true
-      this.canvas.remove(...objectsToRemove)
-      this.ignoreObjectRemovedEvent = false
-    }
 
     objects.forEach((_) => {
       const objIndex = canvasObjectIds.indexOf(_._id)
@@ -853,6 +848,29 @@ export class Drawing extends React.Component {
         canvasObjects[objIndex].setCoords()
       }
     })
+
+    return {
+      objects,
+      objectsToAdd,
+      objectsToRemove,
+      enlivenedObjects,
+    }
+  }
+
+  updateCanvasObjects (_objects) {
+    const canvasObjects = this.canvas.getObjects()
+    const {
+      objects,
+      objectsToAdd,
+      objectsToRemove,
+      enlivenedObjects,
+    } = this._updateCanvasObjects(canvasObjects, _objects)
+
+    if (objectsToRemove.length > 0) {
+      this.ignoreObjectRemovedEvent = true
+      this.canvas.remove(...objectsToRemove)
+      this.ignoreObjectRemovedEvent = false
+    }
 
     if (objectsToAdd.length) {
       objectsToAdd

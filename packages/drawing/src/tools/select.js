@@ -50,7 +50,7 @@ export default class SelectTool extends Base {
 
   static updateAllSelection(canvas, onlineIds) {
     canvas.forEachObject((_) => {
-      if(_._lockedselection) {
+      if(_ && _._lockedselection) {
         if(onlineIds.includes(_._lockedselection)) {
           makeNotInteractive(_)
         } else {
