@@ -33,7 +33,7 @@ const WhiteboardLine = fabric.util.createClass(fabric.Line, {
   },
 })
 
-WhiteboardLine.fromObject = function (object, callback) {
+WhiteboardLine.fromObject = function fromObject (object, callback) {
   // Correct the coordinates relative to top/left
   callback && callback(new fabric.WhiteboardLine([
     object.x1 + object.left,

@@ -53,7 +53,13 @@ export const shapeToolModeEnum = {
   TRIANGLE_SOLID: 'triangle-solid',
 }
 
-export const enhancedFields = ['_id', '_lockedbyuser', '_lockedselection', 'noScaleCache', 'strokeUniform']
+export const enhancedFields = [
+  '_id',
+  '_lockedbyuser',
+  '_lockedselection',
+  'noScaleCache',
+  'strokeUniform',
+]
 
 export const normalizeFields = (object, fields) => Object.assign(
   object,
@@ -280,7 +286,13 @@ export class Drawing extends React.Component {
       }
     }
 
-    if (prevProps.height !== height || prevProps.width !== width || prevProps.x !== x || prevProps.y !== y || prevProps.zoom !== zoom) {
+    if (
+      prevProps.height !== height
+      || prevProps.width !== width
+      || prevProps.x !== x
+      || prevProps.y !== y
+      || prevProps.zoom !== zoom
+    ) {
       this.updateCanvasParameters()
 
       if (this.dynamicPattern) {
@@ -778,7 +790,14 @@ export class Drawing extends React.Component {
   }
 
   updateCanvasParameters (forced = false) {
-    const { height, width, x, y, zoom, zoomToCenter } = this.props
+    const {
+      height,
+      width,
+      x,
+      y,
+      zoom,
+      zoomToCenter,
+    } = this.props
     const { tl } = this.canvas.calcViewportBoundaries()
     const currentDimensions = {
       height: this.canvas.getHeight(),
@@ -786,7 +805,8 @@ export class Drawing extends React.Component {
       ...tl,
       zoom: this.canvas.getZoom(),
     }
-    const dimensionsChanged = currentDimensions.height !== height || currentDimensions.width !== width
+    const dimensionsChanged = currentDimensions.height !== height
+      || currentDimensions.width !== width
     const viewportChanged = currentDimensions.x !== x || currentDimensions.y !== y
     const zoomChanged = currentDimensions.zoom !== zoom
 

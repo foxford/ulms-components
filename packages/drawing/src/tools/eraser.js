@@ -1,7 +1,7 @@
 import { fabric } from 'fabric'
 
 import { Base } from './base'
-import { LockTool } from './lock'
+import { LockTool } from './lock' // eslint-disable-line import/no-cycle
 import SelectTool from './select'
 
 const areSamePoints = ([xy1, xy2]) => xy1[0] === xy2[0] && xy1[1] === xy2[1]
