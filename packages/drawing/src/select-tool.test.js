@@ -3,9 +3,7 @@ import React from 'react'
 import Enzyme from 'enzyme' // eslint-disable-line import/no-extraneous-dependencies
 import Adapter from 'enzyme-adapter-react-16' // eslint-disable-line import/no-extraneous-dependencies
 
-import { LockProvider } from '../index'
-
-import { Drawing, toolEnum } from './drawing'
+import { Drawing, LockProvider, toolEnum } from '../index'
 
 Enzyme.configure({ adapter: new Adapter() })
 
