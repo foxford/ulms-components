@@ -23,6 +23,7 @@
     "_lint": "eslint --ext js,jsx",
     "preanalyze": "npm run build/dev",
     "analyze": "source-map-explorer ./packages/*/es/index.js",
+    "prebootstrap": "rm -rf ./**/.*.sw*",
     "bootstrap": "lerna list | sed 's/@ulms\\/ui-//g' | xargs -I{} scripts/populate-rollup.sh {} && lerna bootstrap",
     "build": "lerna exec 'NODE_ENV=production npm run build'",
     "build-storybook": "build-storybook",
