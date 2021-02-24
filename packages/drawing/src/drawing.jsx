@@ -1001,5 +1001,3 @@ export class Drawing extends React.Component {
     )
   }
 }
-
-export { LockTool }

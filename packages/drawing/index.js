@@ -1,5 +1,5 @@
-export { Drawing } from './src/drawing'
+export { Drawing, penToolModeEnum, shapeToolModeEnum, toolEnum } from './src/drawing'
 
 export { LockProvider } from './src/lock-provider'
 
-export { toolEnum } from './src/drawing'
+export { LockTool } from './src/tools/lock'
