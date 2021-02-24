@@ -6,6 +6,8 @@ import { queue as Queue } from 'd3-queue'
 import { toCSSColor } from '../../util/helpers'
 
 import DynamicPattern from './tools/dynamic-pattern'
+// FIXME: fix cycle dep
+// eslint-disable-next-line import/no-cycle
 import EraserTool from './tools/eraser'
 import './tools/optimized-pencil-brush'
 import PanTool from './tools/pan'
@@ -14,6 +16,8 @@ import SelectTool from './tools/select'
 import { LineTool } from './tools/line'
 import { ShapeTool } from './tools/shape'
 import { TextboxTool } from './tools/textbox'
+// FIXME: fix cycle dep
+// eslint-disable-next-line import/no-cycle
 import { LockTool } from './tools/lock'
 import {
   circle,
@@ -830,7 +834,7 @@ export class DrawingComponent extends React.Component {
           return
         }
 
-        if(_._lockedselection !== canvasObjects[objIndex]._lockedselection) {
+        if (_._lockedselection !== canvasObjects[objIndex]._lockedselection) {
           SelectTool.updateObjectSelection(this.canvas, nextObject)
         }
 
@@ -867,6 +871,10 @@ export class DrawingComponent extends React.Component {
         }
 
         this.canvas.renderOnAddRemove = false
+
+        const { objects: _o } = this.props
+        const newObjectIdsAgain = new Set(_o.map(_ => _._id))
+
         objects.forEach((object) => {
           if (!enlivenedObjects.has(object._id)) {
             return
@@ -880,9 +888,8 @@ export class DrawingComponent extends React.Component {
               return
             }
 
-            const newObjectIdsAgain = new Set(this.props.objects.map(_ => _._id))
-
-            if (!newObjectIdsAgain.has(object._id)) {
+            // Bypass objects which should be invalidated
+            if (!newObjectIdsAgain.has(object._id) && !object._invalidate) {
               done()
 
               return
