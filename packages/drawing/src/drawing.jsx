@@ -4,6 +4,7 @@ import { fabric } from 'fabric'
 import { queue as Queue } from 'd3-queue'
 
 import { toCSSColor } from './util/to-css-color'
+import { LockProvider } from './lock-provider'
 
 import DynamicPattern from './tools/dynamic-pattern'
 // FIXME: fix cycle dep
@@ -177,8 +178,12 @@ export class Drawing extends React.Component {
     this.tool = null
 
     const {
+      _lockProvider,
       tokenProvider,
     } = this.props
+
+    this.__lockProvider = _lockProvider || new LockProvider()
+    this.__lockProvider.onUpdate(this._handleSelectionUpdate)
 
     if (!tokenProvider) throw new TypeError('Absent tokenProvider')
 
@@ -223,7 +228,7 @@ export class Drawing extends React.Component {
       height,
       objects,
       pattern,
-      onlineIds,
+      // onlineIds,
       shapeMode,
       tool,
       width,
@@ -249,12 +254,12 @@ export class Drawing extends React.Component {
       this.updateCanvasObjects(objects)
     }
 
-    if (tool === prevProps.tool && tool === toolEnum.SELECT) {
+    /* if (tool === prevProps.tool && tool === toolEnum.SELECT) {
       // FIXME: might not work for for three users (one come and one leave)
       if (onlineIds && (onlineIds.length !== prevProps.onlineIds.length)) {
-        SelectTool.updateAllSelection(this.canvas, onlineIds)
+        // SelectTool.updateAllSelection(this.canvas, onlineIds)
       }
-    }
+    } */
 
     if (prevProps.pattern !== pattern) {
       if (pattern !== null) {
@@ -326,7 +331,26 @@ export class Drawing extends React.Component {
       this.dynamicPattern = null
     }
 
+    if (this.__lockProvider) {
+      this.__lockProvider = null
+    }
+
     this.destroyCanvas()
+  }
+
+  get LockProvider () {
+    return this.__lockProvider
+  }
+
+  _handleSelectionUpdate = (prev, changed) => {
+    const { tool } = this.props
+
+    if (tool === toolEnum.SELECT && changed) {
+      const isLocked = this.LockProvider.isLocked.bind(this.LockProvider)
+      const isOwner = this.LockProvider.isOwner.bind(this.LockProvider)
+
+      SelectTool.updateAllSelection(this.canvas, isLocked, isOwner)
+    }
   }
 
   _handleKeyDown = (opts) => {
@@ -803,7 +827,7 @@ export class Drawing extends React.Component {
     const objectsToRemove = []
     const enlivenedObjects = new Map()
 
-    const { onlineIds } = this.props
+    // const { onlineIds } = this.props
 
     this.destroyQueues()
 
@@ -821,11 +845,15 @@ export class Drawing extends React.Component {
     objects.forEach((_) => {
       const objIndex = canvasObjectIds.indexOf(_._id)
       const nextObject = normalizeFields(_, enhancedFields)
+      const { _lockedselection: selection } = nextObject
 
       if (objIndex === -1) {
         // add
-        if (nextObject._lockedselection && !onlineIds.includes(nextObject._lockedselection)) {
+
+        // if (nextObject._lockedselection && !onlineIds.includes(nextObject._lockedselection)) {
+        if (selection && !this.LockProvider.isLocked(selection)) {
           nextObject._lockedselection = undefined
+          // cleanup selection if present but is not locked according the provider
         }
 
         objectsToAdd.push(nextObject)

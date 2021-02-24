@@ -48,14 +48,16 @@ export default class SelectTool extends Base {
     return !!object._lockedselection
   }
 
-  static updateAllSelection(canvas, onlineIds) {
+  static updateAllSelection(canvas, isSelected, isOwner) {
     canvas.forEachObject((_) => {
-      if(_ && _._lockedselection) {
-        if(onlineIds.includes(_._lockedselection)) {
+      const { _lockedselection: selection } = (_ || {})
+
+      if(_ && selection) {
+        if(isSelected(selection)) {
           makeNotInteractive(_)
         } else {
           makeInteractive(_)
-          if(_._lockedselection !== canvas._id) {
+          if(!isOwner(selection)) {
             _.set({'_lockedselection': undefined})
           }
         }

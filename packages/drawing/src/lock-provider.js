@@ -1,8 +1,18 @@
 export class LockProvider {
   constructor () {
+    this._label = null
     this.prev = null
     this.next = null
     this.listener = undefined
+  }
+
+  get label () {
+    return this._label
+  }
+
+  set label (label) {
+    if (!label) throw new TypeError('Absent label')
+    this._label = label
   }
 
   labels (labels) {
@@ -18,7 +28,7 @@ export class LockProvider {
 
   _updated (prev, next) {
     if (this.listener) {
-      const changed = !prev.length
+      const changed = Boolean(!prev.length && next.length)
         || (next.length !== prev.length)
         || next.some((n, i) => n !== prev[i])
 
@@ -27,7 +37,11 @@ export class LockProvider {
   }
 
   isLocked (label) {
-    return this.next && this.next.includes(label)
+    return label && this.next && this.next.includes(label)
+  }
+
+  isOwner (label) {
+    return this.label === label
   }
 }
 
