@@ -3,7 +3,7 @@ import React from 'react'
 import Enzyme from 'enzyme' // eslint-disable-line import/no-extraneous-dependencies
 import Adapter from 'enzyme-adapter-react-16' // eslint-disable-line import/no-extraneous-dependencies
 
-import { Drawing } from './drawing'
+import { Drawing, LockProvider } from '../index'
 
 Enzyme.configure({ adapter: new Adapter() })
 
@@ -16,8 +16,6 @@ test('`constructor` is ok', () => {
 const tokenProvider = () => Promise.resolve('access_token')
 
 describe('`updateCanvasObjects` is ok', () => {
-  let instance
-
   beforeEach(() => {
     jest
       .spyOn(window, 'requestAnimationFrame')
@@ -27,7 +25,7 @@ describe('`updateCanvasObjects` is ok', () => {
   afterEach(() => {})
 
   it('adding an empty list', () => {
-    instance = shallow((
+    const instance = shallow((
       <Drawing
         tokenProvider={tokenProvider}
         objects={[]}
@@ -44,8 +42,13 @@ describe('`updateCanvasObjects` is ok', () => {
   })
 
   it('adding a new list', () => {
-    instance = shallow((
+    const lockProvider = new LockProvider()
+
+    lockProvider.labels([])
+
+    const instance = shallow((
       <Drawing
+        _lockProvider={lockProvider}
         tokenProvider={tokenProvider}
         objects={[]}
       />
@@ -69,8 +72,13 @@ describe('`updateCanvasObjects` is ok', () => {
   })
 
   it('adding a new list with items intersected', () => {
-    instance = shallow((
+    const lockProvider = new LockProvider()
+
+    lockProvider.labels([])
+
+    const instance = shallow((
       <Drawing
+        _lockProvider={lockProvider}
         tokenProvider={tokenProvider}
         objects={[{ _id: 'uuidv4_object_id_1' }]}
       />
@@ -105,8 +113,13 @@ describe('`updateCanvasObjects` is ok', () => {
   })
 
   it('adding a new list with items not intersected', () => {
-    instance = shallow((
+    const lockProvider = new LockProvider()
+
+    lockProvider.labels([])
+
+    const instance = shallow((
       <Drawing
+        _lockProvider={lockProvider}
         tokenProvider={tokenProvider}
         objects={[{ _id: 'uuidv4_object_id_1' }]}
       />
@@ -140,11 +153,15 @@ describe('`updateCanvasObjects` is ok', () => {
   })
 
   it('adding a new list and change `_lockedselection` via lock-less objects', () => {
-    instance = shallow((
+    const lockProvider = new LockProvider()
+
+    lockProvider.labels(['uuidv4_lock_id_1'])
+
+    const instance = shallow((
       <Drawing
+        _lockProvider={lockProvider}
         tokenProvider={tokenProvider}
         objects={[{ _id: 'uuidv4_object_id_2', _lockedselection: 'uuidv4_lock_id_1' }]}
-        onlineIds={['uuidv4_lock_id_1']}
       />
     )).instance()
 
@@ -171,13 +188,17 @@ describe('`updateCanvasObjects` is ok', () => {
         noScaleCache: undefined,
         strokeUniform: undefined,
       },
-
     ])
   })
 
   it('adding a new list and change `_lockedselection` via onlineIds change', () => {
-    instance = shallow((
+    const lockProvider = new LockProvider()
+
+    lockProvider.labels(['uuidv4_lock_id_1'])
+
+    const instance = shallow((
       <Drawing
+        _lockProvider={lockProvider}
         tokenProvider={tokenProvider}
         objects={[
           {
@@ -185,7 +206,6 @@ describe('`updateCanvasObjects` is ok', () => {
           },
           { _id: 'uuidv4_object_id_2', _lockedselection: 'uuidv4_lock_id_1' },
         ]}
-        onlineIds={['uuidv4_lock_id_1']}
       />
     )).instance()
 

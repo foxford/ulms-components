@@ -1,7 +1,9 @@
-/* globals test, expect, describe, it, beforeEach, afterEach, jest */
+/* globals expect, describe, it, beforeEach, afterEach, jest */
 import React from 'react'
 import Enzyme from 'enzyme' // eslint-disable-line import/no-extraneous-dependencies
 import Adapter from 'enzyme-adapter-react-16' // eslint-disable-line import/no-extraneous-dependencies
+
+import { LockProvider } from '../index'
 
 import { Drawing, toolEnum } from './drawing'
 
@@ -12,8 +14,6 @@ const { shallow } = Enzyme
 const tokenProvider = () => Promise.resolve('access_token')
 
 describe('`updateAllSelection` on onlineIds change is ok', () => {
-  let instance
-
   beforeEach(() => {
     jest
       .spyOn(window, 'requestAnimationFrame')
@@ -23,35 +23,46 @@ describe('`updateAllSelection` on onlineIds change is ok', () => {
   afterEach(() => {})
 
   it('changing onlineIds on an empty list', () => {
+    const lockProvider = new LockProvider()
+
+    lockProvider.labels([])
+
     const wrap = shallow((
       <Drawing
+        _lockProvider={lockProvider}
         tokenProvider={tokenProvider}
         objects={[]}
-        onlineIds={[]}
         tool={toolEnum.SELECT}
       />
     ))
 
-    instance = wrap.instance()
+    const instance = wrap.instance()
 
-    wrap.setProps({ onlineIds: ['uuidv4_lock_id_2'] })
+    lockProvider.labels(['uuidv4_lock_id_2'])
 
     expect(instance.canvas._objects).toEqual([])
   })
 
   it('update selection on changing onlineIds and make objects non-interactive', () => {
+    const lockProvider = new LockProvider()
+
+    lockProvider.labels(['uuidv4_lock_id_2', 'uuidv4_lock_id_1'])
+
     const wrap = shallow((
       <Drawing
+        _lockProvider={lockProvider}
         tokenProvider={tokenProvider}
         objects={[{ _id: 'uuidv4_object_id_1', _lockedselection: 'uuidv4_lock_id_2' }]}
-        onlineIds={['uuidv4_lock_id_2', 'uuidv4_lock_id_1']}
+        // onlineIds={['uuidv4_lock_id_2', 'uuidv4_lock_id_1']}
         tool={toolEnum.SELECT}
       />
     ))
 
-    instance = wrap.instance()
+    const instance = wrap.instance()
+
     instance.canvas._objects = instance.props.objects
-    wrap.setProps({ onlineIds: ['uuidv4_lock_id_2'] })
+
+    lockProvider.labels(['uuidv4_lock_id_2'])
     // update agents. one agent leave
 
     // expect locked object become non-interactive
@@ -70,20 +81,25 @@ describe('`updateAllSelection` on onlineIds change is ok', () => {
   })
 
   it('update selection on changing onlineIds and make objects interactive', () => {
+    const lockProvider = new LockProvider()
+
+    lockProvider.labels(['uuidv4_lock_id_2', 'uuidv4_lock_id_1'])
+    lockProvider.label = 'uuidv4_lock_id_1'
+
     const wrap = shallow((
       <Drawing
+        _lockProvider={lockProvider}
         tokenProvider={tokenProvider}
         objects={[{ _id: 'uuidv4_object_id_1', _lockedselection: 'uuidv4_lock_id_1' }]}
-        onlineIds={['uuidv4_lock_id_2', 'uuidv4_lock_id_1']}
         tool={toolEnum.SELECT}
       />
     ))
 
-    instance = wrap.instance()
-    instance.canvas._id = 'uuidv4_lock_id_1'
+    const instance = wrap.instance()
+
     instance.canvas._objects = [...instance.props.objects]
 
-    wrap.setProps({ onlineIds: ['uuidv4_lock_id_2'] })
+    instance.LockProvider.labels(['uuidv4_lock_id_2'])
     // update agents. one agent leave
 
     // expect locked object become interactive but save lock info

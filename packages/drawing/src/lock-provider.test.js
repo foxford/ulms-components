@@ -1,5 +1,5 @@
-/* globals test, expect, describe, it, beforeEach, afterEach, jest */
-import { LockProvider } from './locked-provider'
+/* globals expect, describe, it, beforeEach */
+import { LockProvider } from './lock-provider'
 
 describe('LockProvider', () => {
   let provider
