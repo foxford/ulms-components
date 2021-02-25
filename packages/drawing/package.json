@@ -1,0 +1,36 @@
+{
+  "name": "@ulms/ui-drawing",
+  "version": "1.0.0",
+  "description": "",
+  "keywords": [
+    "lerna"
+  ],
+  "homepage": "https://github.com/netology-group/ulms-media-ui#readme",
+  "bugs": {
+    "url": "https://github.com/netology-group/ulms-media-ui/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/netology-group/ulms-media-ui.git"
+  },
+  "license": "MIT",
+  "author": "",
+  "main": "index.js",
+  "module": "es/index.js",
+  "files": [
+    "es",
+    "src"
+  ],
+  "scripts": {
+    "build": "rm -rf ./es/* && BABEL_ENV=es rollup --config ./rollup.config.js index.js"
+  },
+  "dependencies": {
+    "classnames-es": "^2.2.6",
+    "d3-queue": "~3.0.7",
+    "fabric": "netology-group/fabric.js#feature/ULMS-509",
+    "react": "^16.12.0"
+  },
+  "peerDependencies": {
+    "react": "^15.6 || ^16.x || ^17.x"
+  }
+}
