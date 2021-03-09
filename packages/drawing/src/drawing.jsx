@@ -2,6 +2,7 @@
 import React, { Fragment } from 'react'
 import { fabric } from 'fabric'
 import { queue as Queue } from 'd3-queue'
+import Hammer from 'hammerjs'
 
 import { toCSSColor } from './util/to-css-color'
 import { LockProvider } from './lock-provider'
@@ -183,6 +184,12 @@ export class Drawing extends React.Component {
     this.rq = null
     this.tool = null
 
+    this._hammer = null
+    this._hammerCenter = null
+    this._hammerDistance = null
+    this._hammerPanActive = false
+    this._hammerZoom = null
+
     const {
       _lockProvider,
       tokenProvider,
@@ -335,6 +342,8 @@ export class Drawing extends React.Component {
     tp.setProvider(null)
 
     this.destroyQueues()
+
+    this.destroyHammer()
 
     if (this.dynamicPattern) {
       this.dynamicPattern.destroy()
@@ -518,6 +527,10 @@ export class Drawing extends React.Component {
     })
 
     this.canvas.on('after:render', () => this._handleAfterRender())
+
+    if (!this._hammer) {
+      this.initHammer(this.canvas.upperCanvasEl)
+    }
 
     // this.canvas.on('mouse:wheel', (opt) => {
     //   const delta = opt.e.deltaY
@@ -773,6 +786,76 @@ export class Drawing extends React.Component {
         eraserWidth,
         initial,
       })
+    }
+  }
+
+  initHammer (element) {
+    Hammer.defaults.touchAction = 'none'
+
+    this._hammer = new Hammer(element)
+
+    this._hammer.get('pan').set({ pointers: 2, threshold: 0 })
+
+    this._hammer.on('panstart panmove panend pancancel', (event) => {
+      const distance = Math.round(Math.sqrt((event.pointers[1].x - event.pointers[0].x) ** 2 + (event.pointers[1].y - event.pointers[0].y) ** 2))
+
+      if (event.type === 'panstart') {
+        if (this.tool) {
+          this.tool.makeInactive()
+          this.tool.reset()
+        }
+
+        this._hammerCenter = event.center
+        this._hammerDistance = distance
+        this._hammerPanActive = true
+        this._hammerZoom = this.canvas.getZoom()
+      } else if (event.type === 'panmove') {
+        if (!this._hammerPanActive) return
+
+        const zoom = this._hammerZoom
+        let newZoom = zoom + 0.005 * (distance - this._hammerDistance)
+
+        if (newZoom > 2) newZoom = 2
+        if (newZoom < 0.2) newZoom = 0.2
+
+        newZoom = parseFloat(newZoom.toPrecision(3))
+
+        this.canvas.viewportTransform[4] += event.center.x - this._hammerCenter.x
+        this.canvas.viewportTransform[5] += event.center.y - this._hammerCenter.y
+
+        if (newZoom !== zoom) {
+          this.canvas.zoomToPoint(event.center, newZoom)
+        } else {
+          this.canvas.requestRenderAll()
+        }
+
+        this._hammerCenter = event.center
+        this._hammerDistance = distance
+        this._hammerZoom = newZoom
+      } else if (event.type === 'panend' || event.type === 'pancancel') {
+        if (!this._hammerPanActive) return
+
+        const newZoom = parseFloat(this._hammerZoom.toPrecision(2))
+
+        this.canvas.zoomToPoint(event.center, newZoom)
+
+        if (this.tool) {
+          this.tool.makeActive()
+        }
+
+        this._hammerCenter = null
+        this._hammerDistance = null
+        this._hammerPanActive = false
+        this._hammerZoom = null
+      }
+    })
+  }
+
+  destroyHammer () {
+    if (this._hammer) {
+      this._hammer.destroy()
+
+      this._hammer = null
     }
   }
 

@@ -1,9 +1,9 @@
 /* eslint-disable */
 
-import { StateTool } from './state-tool'
+import { Base } from './base'
 import { enhancedFields } from '../drawing'
 
-export class LockTool extends StateTool {
+export class LockTool extends Base {
   static lockObject (object, options = {}) {
     const opts = {
       ...options,

@@ -191,6 +191,8 @@ export default class EraserTool extends Base {
   }
 
   handleMouseDownEvent (opts) {
+    if (!this._active) return
+
     const { x, y } = this._canvas.getPointer(opts.e, true)
 
     this._isDown = true
@@ -201,6 +203,7 @@ export default class EraserTool extends Base {
   }
 
   handleMouseMoveEvent (opts) {
+    if (!this._active) return
     if (!this._isDown) return
 
     const { x, y } = this._canvas.getPointer(opts.e, true)
@@ -211,7 +214,10 @@ export default class EraserTool extends Base {
   }
 
   handleMouseUpEvent () {
+    if (!this._active) return
+
     this._isDown = false
+
     if (!this._isContinuousDraw.length) return
 
     let list
@@ -225,5 +231,10 @@ export default class EraserTool extends Base {
     }
 
     if (list) this.__removeObjects(list)
+  }
+
+  reset () {
+    this._isDown = false
+    this._isContinuousDraw = []
   }
 }
