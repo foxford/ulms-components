@@ -24,6 +24,8 @@ export default class PanTool extends Base {
   }
 
   handleMouseDownEvent (opts) {
+    if (!this._active) return
+
     const { x, y } = opts.pointer
 
     this._isDown = true
@@ -33,6 +35,7 @@ export default class PanTool extends Base {
   }
 
   handleMouseMoveEvent (opts) {
+    if (!this._active) return
     if (!this._isDown) return
 
     const { x, y } = opts.pointer
@@ -46,6 +49,8 @@ export default class PanTool extends Base {
   }
 
   handleMouseUpEvent () {
+    if (!this._active) return
+
     this._isDown = false
     this._lastPosX = null
     this._lastPosY = null
@@ -56,5 +61,11 @@ export default class PanTool extends Base {
 
   handleObjectAddedEvent (opts) {
     Object.assign(opts.target, { selectable: false, evented: false })
+  }
+
+  reset () {
+    this._isDown = false
+    this._lastPosX = null
+    this._lastPosY = null
   }
 }

@@ -10,6 +10,7 @@ export default class PenTool extends Base {
       Object.assign(_, { evented: false, selectable: false })
     })
   }
+
   configure (props) {
     this._canvas.isDrawingMode = true
     this._canvas.freeDrawingBrush.color = props.lineColor
@@ -20,7 +21,26 @@ export default class PenTool extends Base {
     this._canvas.defaultCursor = 'crosshair'
     this._canvas.setCursor('crosshair')
   }
+
   handleObjectAddedEvent (opts) {
     Object.assign(opts.target, { evented: false, selectable: false })
+  }
+
+  makeActive () {
+    super.makeActive()
+
+    this._canvas.freeDrawingBrush.setActiveValue(true)
+    this._canvas.isDrawingMode = true
+  }
+
+  makeInactive () {
+    super.makeInactive()
+
+    this._canvas.freeDrawingBrush.setActiveValue(false)
+    this._canvas.isDrawingMode = false
+  }
+
+  reset () {
+    this._canvas.freeDrawingBrush.reset()
   }
 }

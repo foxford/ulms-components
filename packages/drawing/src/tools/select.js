@@ -23,7 +23,6 @@ const directions = {
   down: 'down'
 }
 
-
 export default class SelectTool extends Base {
   constructor (canvas, options = {}) {
     super(canvas)
@@ -48,12 +47,12 @@ export default class SelectTool extends Base {
     return !!object._lockedselection
   }
 
-  static updateAllSelection(canvas, isSelected, isOwner) {
+  static updateAllSelection (canvas, isSelected, isOwner) {
     canvas.forEachObject((_) => {
       const { _lockedselection: selection } = (_ || {})
 
-      if(_ && selection) {
-        if(isSelected(selection)) {
+      if (_ && selection) {
+        if (isSelected(selection)) {
           makeNotInteractive(_)
         } else {
           makeInteractive(_)
@@ -65,12 +64,12 @@ export default class SelectTool extends Base {
     })
   }
 
-  static updateObjectSelection(canvas, object) {
-      if(object._lockedselection && (object._lockedselection !== canvas._id)) {
-        makeNotInteractive(object)
-      } else {
-        makeInteractive(object)
-      }
+  static updateObjectSelection (canvas, object) {
+    if (object._lockedselection && (object._lockedselection !== canvas._id)) {
+      makeNotInteractive(object)
+    } else {
+      makeInteractive(object)
+    }
   }
 
 
@@ -90,15 +89,15 @@ export default class SelectTool extends Base {
   }
 
   _deleteObject = () => {
-    if(this.__object) {
+    if (this.__object) {
       this.__object.set({'_toDelete': true})
       this._canvas.remove(this.__object)
     }
   }
 
   _move = (direction) => {
-    if(this.__object) {
-      if(this.__options.isPresentation) {
+    if (this.__object) {
+      if (this.__options.isPresentation) {
         switch (direction) {
           case directions.left:
           case directions.right:
@@ -121,7 +120,7 @@ export default class SelectTool extends Base {
             break
         }
         this.__object.setCoords()
-        this.__debouncedUpdateObject();
+        this.__debouncedUpdateObject()
       }
     }
   }
@@ -132,8 +131,8 @@ export default class SelectTool extends Base {
   _moveDown = () => this._move(directions.down)
 
   _setObject (object) {
-    if(object) {
-      object.set({'_lockedselection': this._canvas._id});
+    if (object) {
+      object.set({'_lockedselection': this._canvas._id})
       this._canvas.trigger('object:modified', {target: object})
       this.__object = object
 
@@ -160,14 +159,17 @@ export default class SelectTool extends Base {
   }
 
   handleMouseDownEvent (opts) {
-    this._mouseMove = true;
+    if (!this._active) return
+
+    this._mouseMove = true
   }
 
   handleMouseUpEvent (opts) {
-    this._mouseMove = false;
+    this._mouseMove = false
   }
 
   handleKeyDownEvent (e) {
+    if (!this._active) return
     if (this.__object && this.__object.isEditing) return
 
     if (!this._mouseMove && (this.__object && !this.__object._lockedbyuser)) {
@@ -206,7 +208,9 @@ export default class SelectTool extends Base {
   }
 
   handleKeyUpEvent (e) {
-    this.__shiftPressed = e.shiftKey
+    if (!this._active) return
+
+    this._shiftPressed = e.shiftKey
   }
 
   handleObjectAddedEvent (opts) {
@@ -218,15 +222,31 @@ export default class SelectTool extends Base {
   }
 
   handleSelectionUpdatedEvent (opts) {
-    this._unsetObject();
+    if (!this._active) return
+
+    this._unsetObject()
     this._setObject(opts.target)
   }
 
   handleSelectionCreatedEvent (opts) {
+    if (!this._active) return
+
     this._setObject(opts.target)
   }
 
   handleSelectionClearedEvent (opts) {
-    this._unsetObject();
+    if (!this._active) return
+
+    this._unsetObject()
+  }
+
+  reset () {
+    this._shiftPressed = false
+    this._mouseMove = false
+
+    this._canvas._currentTransform = null
+
+    this._unsetObject()
+    this._canvas.discardActiveObject()
   }
 }
