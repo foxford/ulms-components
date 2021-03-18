@@ -50,6 +50,7 @@ const Panel = (props) => {
         className={css.interlayer}
         style={{ flexDirection: direction || 'column' }}
       >
+        {/* eslint-disable-next-line react/jsx-props-no-spreading */}
         {children || [<Header key='h' {...props} />, <Inner key='i'>{content}</Inner>]}
       </div>
     </div>

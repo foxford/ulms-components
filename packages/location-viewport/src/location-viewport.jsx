@@ -20,6 +20,7 @@ export class LocationViewport extends React.PureComponent {
 
     this.__viewportEl = undefined
 
+    /* eslint-disable-next-line react/state-in-constructor */
     this.state = { objects: props.cursors || [] }
   }
 

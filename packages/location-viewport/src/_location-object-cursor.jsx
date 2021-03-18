@@ -15,14 +15,7 @@ const adjustTop = (top, height) => { if (!height) { throw new TypeError('Absent 
 
 // eslint-disable-next-line react/prefer-stateless-function
 export class LocationObjectCursor extends React.Component {
-  static defaultProps = {
-    boundLower: [0, 0],
-    boundUpper: [],
-    defaultCursorRotation: 0, // deg
-    opts: { inverted: true }, // or {{ inverted: false, sizeX: Number }}
-    style: {},
-  }
-
+  static
   constructor (props) {
     super(props)
 
@@ -146,3 +139,12 @@ export class LocationObjectCursor extends React.Component {
     )
   }
 }
+
+LocationObjectCursor.defaultProps = {
+  boundLower: [0, 0],
+  boundUpper: [],
+  defaultCursorRotation: 0, // deg
+  opts: { inverted: true }, // or {{ inverted: false, sizeX: Number }}
+  style: {},
+}
+
