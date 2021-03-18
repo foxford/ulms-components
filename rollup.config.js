@@ -12,7 +12,6 @@ const fs = require('fs')
 const json = require('rollup-plugin-json')
 const npm = require('rollup-plugin-node-resolve')
 const postcss = require('rollup-plugin-postcss')
-const scss = require('rollup-plugin-scss')
 const svgr = require('@svgr/rollup').default
 const uglify = require('rollup-plugin-uglify')
 
