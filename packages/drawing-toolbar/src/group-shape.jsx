@@ -1,23 +1,11 @@
+/* eslint-disable jsx-a11y/click-events-have-key-events */
+// TODO: rewrite with useCallback
 import React from 'react'
 import cn from 'classnames-es'
 import Floater from 'react-floater'
-import Slider from 'rc-slider/lib/Slider'
-import { penToolModeEnum, shapeToolModeEnum, toolEnum } from '@ulms/ui-drawing'
+import { shapeToolModeEnum, toolEnum } from '@ulms/ui-drawing'
 
 import { toCSSColor } from './utils'
-import iconToolElementEraser from './icons/icon-tool-element-eraser.svg'
-import iconToolGrid from './icons/icon-tool-grid.svg'
-import iconToolImage from './icons/icon-tool-image.svg'
-import iconToolFitIn from './icons/icon-tool-fit-in.svg'
-import iconToolFitOut from './icons/icon-tool-fit-out.svg'
-import iconToolMarker from './icons/icon-tool-marker.svg'
-import iconToolPan from './icons/icon-tool-pan.svg'
-import iconToolPencil from './icons/icon-tool-pencil.svg'
-import iconToolLine from './icons/icon-tool-line.svg'
-import iconToolSelect from './icons/icon-tool-select.svg'
-import iconToolText from './icons/icon-tool-text.svg'
-import iconToolZoomIn from './icons/icon-tool-zoom-in.svg'
-import iconToolZoomOut from './icons/icon-tool-zoom-out.svg'
 import { Shapes } from './shapes'
 
 const shapeToolModeList = [
@@ -73,9 +61,13 @@ export const GroupShape = ({
               icon, mode, solid,
             }, index) => (
               <div
-                className={cn(css.button, { [css.active]: shapeMode === mode && tool === toolEnum.SHAPE })}
+                className={cn(css.button, {
+                  [css.active]: shapeMode === mode && tool === toolEnum.SHAPE,
+                })}
                 key={index}
                 onClick={() => handleChange({ shapeMode: mode, tool: toolEnum.SHAPE })}
+                role='button'
+                tabIndex='0'
               >
                 <Shapes shape={icon} solid={solid} />
               </div>

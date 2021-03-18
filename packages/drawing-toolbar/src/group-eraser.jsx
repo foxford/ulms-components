@@ -2,7 +2,6 @@ import React from 'react'
 import cn from 'classnames-es'
 import Floater from 'react-floater'
 import Slider from 'rc-slider/lib/Slider'
-import { penToolModeEnum, shapeToolModeEnum, toolEnum } from '@ulms/ui-drawing'
 
 export const GroupEraser = ({
   eraserWidth,

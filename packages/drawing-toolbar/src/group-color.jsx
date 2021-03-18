@@ -1,9 +1,6 @@
 import React from 'react'
-import cn from 'classnames-es'
 import Floater from 'react-floater'
-import Slider from 'rc-slider/lib/Slider'
 import { TwitterPicker } from 'react-color'
-import { penToolModeEnum, shapeToolModeEnum, toolEnum } from '@ulms/ui-drawing'
 
 const PICKER_COLORS = [
   '#000000', // black
@@ -23,7 +20,6 @@ export const GroupColor = ({
   css,
   handleChange,
   opened,
-  tool,
 }) => (
   <Floater
     component={() => (

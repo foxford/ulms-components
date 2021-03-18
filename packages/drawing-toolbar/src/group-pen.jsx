@@ -1,8 +1,10 @@
+/* eslint-disable jsx-a11y/click-events-have-key-events */
+// TODO: rewrite with useCallback
 import React from 'react'
 import cn from 'classnames-es'
 import Floater from 'react-floater'
 import Slider from 'rc-slider/lib/Slider'
-import { penToolModeEnum, shapeToolModeEnum, toolEnum } from '@ulms/ui-drawing'
+import { penToolModeEnum, toolEnum } from '@ulms/ui-drawing'
 
 import IconLine from './icons/icon-tool-line.svg'
 import IconMarker from './icons/icon-tool-marker.svg'
@@ -21,22 +23,34 @@ export const GroupPen = ({
       <div className={cn(css.popover, css.floater)}>
         <div className={css.row}>
           <div
-            className={cn(css.button, { [css.active]: tool === toolEnum.PEN && brushMode === penToolModeEnum.PENCIL })}
+            className={cn(css.button, {
+              [css.active]: tool === toolEnum.PEN && brushMode === penToolModeEnum.PENCIL,
+            })}
             onClick={() => handleChange({ brushMode: penToolModeEnum.PENCIL, tool: toolEnum.PEN })}
+            role='button'
+            tabIndex='0'
             title='Карандаш (P)'
           >
             <IconPencil />
           </div>
           <div
-            className={cn(css.button, { [css.active]: tool === toolEnum.PEN && brushMode === penToolModeEnum.MARKER })}
+            className={cn(css.button, {
+              [css.active]: tool === toolEnum.PEN && brushMode === penToolModeEnum.MARKER,
+            })}
             onClick={() => handleChange({ brushMode: penToolModeEnum.MARKER, tool: toolEnum.PEN })}
+            role='button'
+            tabIndex='0'
             title='Маркер'
           >
             <IconMarker />
           </div>
           <div
-            className={cn(css.button, { [css.active]: tool === toolEnum.PEN && brushMode === penToolModeEnum.LINE })}
+            className={cn(css.button, {
+              [css.active]: tool === toolEnum.PEN && brushMode === penToolModeEnum.LINE,
+            })}
             onClick={() => handleChange({ brushMode: penToolModeEnum.LINE, tool: toolEnum.PEN })}
+            role='button'
+            tabIndex='0'
             title='Линия (L)'
           >
             <IconLine />

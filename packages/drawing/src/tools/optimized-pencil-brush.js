@@ -1,49 +1,49 @@
 import { fabric } from 'fabric'
 
 fabric.OptimizedPencilBrush = fabric.util.createClass(fabric.PencilBrush, {
-  initialize: function (canvas) {
+  initialize (canvas) {
     this.callSuper('initialize', canvas)
 
     this._active = true
   },
-  convertPointsToSVGPath: function (points) {
+  convertPointsToSVGPath (points) {
     const path = this.callSuper('convertPointsToSVGPath', points)
 
     return path.map(_ => typeof _ === 'string' ? _ : fabric.util.toFixed(_, 2))
   },
-  _render: function () {
+  _render () {
     if (!this._active) return
     if (!this._points.length) return
 
     this.callSuper('_render')
   },
-  _finalizeAndAddPath: function () {
+  _finalizeAndAddPath () {
     if (!this._active) return
     if (!this._points.length) return
 
     this.callSuper('_finalizeAndAddPath')
   },
-  onMouseDown: function (pointer, options) {
+  onMouseDown (pointer, options) {
     if (!this._active) return
 
     this.callSuper('onMouseDown', pointer, options)
   },
-  onMouseMove: function (pointer, options) {
+  onMouseMove (pointer, options) {
     if (!this._active) return
     if (!this._points.length) return
 
     this.callSuper('onMouseMove', pointer, options)
   },
-  onMouseUp: function (options) {
+  onMouseUp (options) {
     if (!this._active) return
     if (!this._points.length) return
 
     this.callSuper('onMouseUp', options)
   },
-  setActiveValue: function (value) {
+  setActiveValue (value) {
     this._active = value
   },
-  reset: function () {
+  reset () {
     this._reset()
     this._resetShadow()
     this.canvas.clearContext(this.canvas.contextTop)

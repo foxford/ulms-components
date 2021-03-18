@@ -72,7 +72,7 @@ export class LocationViewport extends React.PureComponent {
         }}
       >
         <div className={css.outer} ref={(el) => { this.viewportEl = el }}>
-          <React.Fragment>
+          <>
             {objects.map((obj) => {
               const { x, y } = obj.aCoords.tl
 
@@ -93,7 +93,7 @@ export class LocationViewport extends React.PureComponent {
                 </ObjectPortal>
               )
             })}
-          </React.Fragment>
+          </>
         </div>
       </section>
     )

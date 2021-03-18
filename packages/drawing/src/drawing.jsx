@@ -1097,10 +1097,10 @@ export class Drawing extends React.Component {
     } = this.props
 
     return (
-      <Fragment>
+      <>
         <canvas id='canvasPattern' ref={this.canvasPatternRef} width={width} height={height} style={{ display: pattern ? 'block' : 'none', position: 'absolute' }} />
         <canvas id='canvas' ref={this.canvasRef} width={width} height={height} />
-      </Fragment>
+      </>
     )
   }
 }

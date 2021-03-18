@@ -1,8 +1,5 @@
 import React from 'react'
 import cn from 'classnames-es'
-import Floater from 'react-floater'
-import { TwitterPicker } from 'react-color'
-import Slider from 'rc-slider/lib/Slider'
 import { cond } from 'ramda'
 import { Icons } from '@ulms/ui-icons'
 import { penToolModeEnum, shapeToolModeEnum, toolEnum } from '@ulms/ui-drawing'
@@ -14,6 +11,7 @@ import { GroupShape } from './group-shape'
 import { Shapes } from './shapes'
 
 import 'rc-slider/assets/index.css'
+// TODO: move slider assets to css-module
 
 import css from './drawing-toolbar.module.css'
 import IconElementEraser from './icons/icon-tool-element-eraser.svg'
@@ -38,12 +36,10 @@ function supportPointerEvent () {
 const eventName = supportPointerEvent() ? 'pointerdown' : 'mousedown'
 
 export class DrawingToolbar extends React.Component {
+  state = { opened: null }
+
   constructor () {
     super()
-
-    this.state = {
-      opened: null,
-    }
 
     this.handleDocumentClickEvent = this.handleDocumentClickEvent.bind(this)
   }
@@ -55,7 +51,9 @@ export class DrawingToolbar extends React.Component {
   // FIXME: :point_down:
   // eslint-disable-next-line react/no-deprecated
   componentWillReceiveProps (nextProps) {
-    const toolHasChanged = nextProps.tool !== this.props.tool
+    const { tool } = this.props
+
+    const toolHasChanged = nextProps.tool !== tool
     const notEraser = nextProps.tool !== toolEnum.ERASER
     const notPen = nextProps.tool !== toolEnum.PEN
     const notShape = nextProps.tool !== toolEnum.SHAPE
@@ -69,10 +67,87 @@ export class DrawingToolbar extends React.Component {
     document.removeEventListener(eventName, this.handleDocumentClickEvent)
   }
 
-  toggleOpened (val) {
-    const { opened } = this.state
+  handleSelectClick = () => {
+    const { handleChange } = this.props
 
-    this.setState({ opened: val !== opened ? val : null })
+    handleChange({ tool: toolEnum.SELECT })
+  }
+
+  handleEraserClick = () => {
+    const { handleChange } = this.props
+
+    handleChange({ tool: toolEnum.ERASER })
+    this.toggleOpened('group-eraser')
+  }
+
+  handlePenClick = () => {
+    const { handleChange, tool } = this.props
+
+    if (tool !== toolEnum.PEN) {
+      handleChange({ tool: toolEnum.PEN })
+    }
+    this.toggleOpened('group-pen')
+  }
+
+  handleColorClick = () => this.toggleOpened('group-color')
+
+  handleImageClick = () => {
+    const { handleChange, onImageToolClick } = this.props
+
+    handleChange({ tool: toolEnum.SELECT })
+    onImageToolClick()
+  }
+
+  handleShapeClick = () => {
+    const { handleChange, tool } = this.props
+
+    if (tool !== toolEnum.SHAPE) {
+      handleChange({ tool: toolEnum.SHAPE })
+    }
+    this.toggleOpened('group-shape')
+  }
+
+  handleTextClick = () => {
+    const { handleChange } = this.props
+
+    handleChange({ tool: toolEnum.TEXT })
+  }
+
+  handleLockClick = () => {
+    const { onLock, handleChange } = this.props
+
+    handleChange({ tool: toolEnum.SELECT })
+    onLock()
+  }
+
+  handleZoomInClick = () => {
+    const { handleChange, zoom } = this.props
+
+    handleChange({ zoom: (zoom + 0.2) >= 2 ? 2 : zoom + 0.2 })
+  }
+
+  handleZoomOutClick = () => {
+    const { handleChange, zoom } = this.props
+
+    handleChange({ zoom: (zoom - 0.2) <= 0.2 ? 0.2 : zoom - 0.2 })
+  }
+
+  handleFitClick = () => {
+    const { fit, handleChange } = this.props
+
+    handleChange({ fit: !fit })
+  }
+
+  handlePanClick = () => {
+    const { handleChange } = this.props
+
+    handleChange({ tool: toolEnum.PAN })
+  }
+
+  handleGridClick = () => {
+    const { handleChange, grid } = this.props
+
+    handleChange({ grid: !grid })
   }
 
   handleDocumentClickEvent (event) {
@@ -88,6 +163,12 @@ export class DrawingToolbar extends React.Component {
     }
   }
 
+  toggleOpened (val) {
+    const { opened } = this.state
+
+    this.setState({ opened: val !== opened ? val : null })
+  }
+
   render () {
     const {
       brushColor,
@@ -98,7 +179,6 @@ export class DrawingToolbar extends React.Component {
       grid,
       handleChange,
       hasLockSelection,
-      onImageToolClick,
       shapeMode,
       tool,
       tools,
@@ -116,7 +196,7 @@ export class DrawingToolbar extends React.Component {
     const isPenEnabled = tools && tools.includes(toolEnum.PEN)
     const isSelectEnabled = tools && tools.includes(toolEnum.SELECT)
     const isShapeEnabled = tools && tools.includes(toolEnum.SHAPE)
-    const isTextEnabled =  tools && tools.includes(toolEnum.TEXT)
+    const isTextEnabled = tools && tools.includes(toolEnum.TEXT)
     const isZoomEnabled = tools && tools.includes('zoom')
 
     return (
@@ -125,7 +205,10 @@ export class DrawingToolbar extends React.Component {
           { isSelectEnabled && (
             <div
               className={cn(css.button, { [css.active]: tool === toolEnum.SELECT })}
-              onClick={() => handleChange({ tool: toolEnum.SELECT })}
+              onClick={this.handleSelectClick}
+              onKeyDown={this.handleSelectClick}
+              role='button'
+              tabIndex='0'
               title='Выбрать (V)'
             >
               <IconSelect />
@@ -133,32 +216,32 @@ export class DrawingToolbar extends React.Component {
           )}
 
           { isPenEnabled && (
-              <div
-                className={cn(css.button, css.group, 'group-pen', { [css.active]: tool === toolEnum.PEN || opened === 'group-pen' })}
-                onClick={() => {
-                  tool !== toolEnum.PEN && handleChange({ tool: toolEnum.PEN })
-                  this.toggleOpened('group-pen')
-                }}
-                title={brushMode === penToolModeEnum.MARKER ? 'Маркер' : brushMode === penToolModeEnum.LINE ? 'Линия (L)' : 'Карандаш (P)'}
-              >
-                {
-                  cond([
-                    [_ => _ === penToolModeEnum.PENCIL, () => <IconPencil />],
-                    [_ => _ === penToolModeEnum.MARKER, () => <IconMarker />],
-                    [_ => _ === penToolModeEnum.LINE, () => <IconLine />],
-                    [() => true, () => <IconPencil />],
-                  ])(brushMode)
-                }
-              </div>
+            <div
+              className={cn(css.button, css.group, 'group-pen', { [css.active]: tool === toolEnum.PEN || opened === 'group-pen' })}
+              onClick={this.handlePenClick}
+              onKeyDown={this.handlePenClick}
+              role='button'
+              tabIndex='0'
+              title={brushMode === penToolModeEnum.MARKER ? 'Маркер' : brushMode === penToolModeEnum.LINE ? 'Линия (L)' : 'Карандаш (P)'}
+            >
+              {
+                    cond([
+                      [_ => _ === penToolModeEnum.PENCIL, () => <IconPencil />],
+                      [_ => _ === penToolModeEnum.MARKER, () => <IconMarker />],
+                      [_ => _ === penToolModeEnum.LINE, () => <IconLine />],
+                      [() => true, () => <IconPencil />],
+                    ])(brushMode)
+                  }
+            </div>
           )}
 
           { isEraserEnabled && (
             <div
               className={cn(css.button, css.group, 'group-eraser', { [css.active]: tool === toolEnum.ERASER || opened === 'eraser' })}
-              onClick={() => {
-                handleChange({ tool: toolEnum.ERASER })
-                this.toggleOpened('group-eraser')
-              }}
+              onClick={this.handleEraserClick}
+              onKeyDown={this.handleEraserClick}
+              role='button'
+              tabIndex='0'
               title='Ластик (E)'
             >
               <IconElementEraser />
@@ -168,7 +251,10 @@ export class DrawingToolbar extends React.Component {
           { isColorEnabled && (
             <div
               className={cn(css.button, 'group-color', { [css.active]: opened === 'group-color' })}
-              onClick={() => this.toggleOpened('group-color')}
+              onClick={this.handleColorClick}
+              onKeyDown={this.handleColorClick}
+              role='button'
+              tabIndex='0'
               title='Цвет'
             >
               <div
@@ -181,10 +267,10 @@ export class DrawingToolbar extends React.Component {
           { isImageEnabled && (
             <div
               className={css.button}
-              onClick={() => {
-                handleChange({ tool: toolEnum.SELECT })
-                onImageToolClick()
-              }}
+              onClick={this.handleImageClick}
+              onKeyDown={this.handleImageClick}
+              role='button'
+              tabIndex='0'
               title='Загрузить изображение'
             >
               <IconImage />
@@ -194,10 +280,10 @@ export class DrawingToolbar extends React.Component {
           { isShapeEnabled && (
             <div
               className={cn(css.button, css.group, 'group-shape', { [css.active]: tool === toolEnum.SHAPE || opened === 'group-shape' })}
-              onClick={() => {
-                tool !== toolEnum.SHAPE && handleChange({ tool: toolEnum.SHAPE })
-                this.toggleOpened('group-shape')
-              }}
+              onClick={this.handleShapeClick}
+              onKeyDown={this.handleShapeClick}
+              role='button'
+              tabIndex='0'
               title='Фигура'
             >
               {
@@ -217,7 +303,10 @@ export class DrawingToolbar extends React.Component {
           { isTextEnabled && (
             <div
               className={cn(css.button, { [css.active]: tool === toolEnum.TEXT })}
-              onClick={() => handleChange({ tool: toolEnum.TEXT })}
+              onClick={this.handleTextClick}
+              onKeyDown={this.handleTextClick}
+              role='button'
+              tabIndex='0'
               title='Текст (T)'
             >
               <div className={css.buttonInner}>
@@ -230,10 +319,7 @@ export class DrawingToolbar extends React.Component {
             <button
               className={css.button}
               disabled={!hasLockSelection}
-              onClick={() => {
-                handleChange({ tool: toolEnum.SELECT })
-                this.props.onLock()
-              }}
+              onClick={this.handleLockClick}
               type='button'
             >
               <div className={css.buttonInner} title='Изменить блокировку'>
@@ -245,11 +331,25 @@ export class DrawingToolbar extends React.Component {
           { isZoomEnabled && (
             <>
               <div className={css.separator} />
-              <div className={css.button} onClick={() => handleChange({ zoom: (zoom + 0.2) >= 2 ? 2 : zoom + 0.2 })} title='Увеличить'>
+              <div
+                className={css.button}
+                onClick={this.handleZoomInClick}
+                onKeyDown={this.handleZoomInClick}
+                role='button'
+                tabIndex='0'
+                title='Увеличить'
+              >
                 <IconZoomIn />
               </div>
               <div className={css.text}>{`${parseFloat((zoom * 100).toFixed(1))}%`}</div>
-              <div className={css.button} onClick={() => handleChange({ zoom: (zoom - 0.2) <= 0.2 ? 0.2 : zoom - 0.2 })} title='Уменьшить'>
+              <div
+                className={css.button}
+                onClick={this.handleZoomOutClick}
+                onKeyDown={this.handleZoomOutClick}
+                role='button'
+                tabIndex='0'
+                title='Уменьшить'
+              >
                 <IconZoomOut />
               </div>
             </>
@@ -258,7 +358,10 @@ export class DrawingToolbar extends React.Component {
           { isFitEnabled && (
             <div
               className={css.button}
-              onClick={() => handleChange({ fit: !fit })}
+              onClick={this.handleFitClick}
+              onKeyDown={this.handleFitClick}
+              role='button'
+              tabIndex='0'
             >
               {fit ? <IconFitOut /> : <IconFitIn />}
             </div>
@@ -267,7 +370,10 @@ export class DrawingToolbar extends React.Component {
           { isPanEnabled && (
             <div
               className={cn(css.button, { [css.active]: tool === toolEnum.PAN })}
-              onClick={() => handleChange({ tool: toolEnum.PAN })}
+              onClick={this.handlePanClick}
+              onKeyDown={this.handlePanClick}
+              role='button'
+              tabIndex='0'
               title='Перемещение доски'
             >
               <IconPan />
@@ -277,7 +383,10 @@ export class DrawingToolbar extends React.Component {
           { isGridEnabled && (
             <div
               className={cn(css.button, { [css.active]: grid })}
-              onClick={() => handleChange({ grid: !grid })}
+              onClick={this.handleGridClick}
+              onKeyDown={this.handleGridClick}
+              role='button'
+              tabIndex='0'
               title='Фоновая сетка'
             >
               <IconGrid />
