@@ -123,7 +123,7 @@
   fill: transparent;
 }
 
-.buttonInner svg path {
+.buttonInner.svgStroke svg path {
   stroke: currentColor;
 }
 

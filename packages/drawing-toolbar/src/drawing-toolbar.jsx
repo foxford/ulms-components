@@ -322,7 +322,7 @@ export class DrawingToolbar extends React.Component {
               onClick={this.handleLockClick}
               type='button'
             >
-              <div className={css.buttonInner} title='Изменить блокировку'>
+              <div className={cn(css.buttonInner, css.svgStroke)} title='Изменить блокировку'>
                 <Icons name='lock-outline' />
               </div>
             </button>
