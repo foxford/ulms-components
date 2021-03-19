@@ -1,4 +1,4 @@
-/* eslint-disable react/prop-types */
+/* eslint-disable react/prop-types, react/jsx-props-no-spreading */
 import React from 'react'
 import cx from 'classnames-es'
 import { Grid as G } from '@foxford/ui/packages/Grid/Grid'

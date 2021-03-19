@@ -10,12 +10,7 @@ const handler = {
 }
 
 class Updater extends React.Component {
-  constructor () {
-    super()
-    this.state = {
-      objects: [], // eslint-disable-line react/no-unused-state
-    }
-  }
+  state = { objects: [] } // eslint-disable-line react/no-unused-state
 
   render () {
     // eslint-disable-next-line react/prop-types
@@ -47,6 +42,7 @@ export default {
 
 export const test = () => (
   <>
+    {/* eslint-disable-next-line react/jsx-props-no-spreading */}
     <style {...styles} />
     <Updater ref={handler.parent}>
       <Drawing

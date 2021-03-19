@@ -1,5 +1,5 @@
-/* eslint-disable react/prop-types */
-import React, { Fragment } from 'react'
+/* eslint-disable react/prop-types, max-classes-per-file */
+import React from 'react'
 import { fabric } from 'fabric'
 import { queue as Queue } from 'd3-queue'
 import Hammer from 'hammerjs'
@@ -72,6 +72,7 @@ export const normalizeFields = (object, fields) => Object.assign(
   }, {})
 )
 
+// TODO: use common tokenprovider
 class TokenProvider {
   constructor () {
     this._provider = null
@@ -158,19 +159,6 @@ function isTextObject (object) {
 }
 
 export class Drawing extends React.Component {
-  static defaultProps = {
-    brushColor: {
-      r: 255, g: 255, b: 255, a: 1,
-    },
-    brushWidth: 12,
-    shapeMode: shapeToolModeEnum.RECT,
-    tool: toolEnum.PEN,
-    x: 0,
-    y: 0,
-    zoom: 1,
-    zoomToCenter: false,
-  }
-
   constructor (props) {
     super(props)
 
@@ -797,6 +785,7 @@ export class Drawing extends React.Component {
     this._hammer.get('pan').set({ pointers: 2, threshold: 0 })
 
     this._hammer.on('panstart panmove panend pancancel', (event) => {
+      // eslint-disable-next-line max-len
       const distance = Math.round(Math.sqrt((event.pointers[1].x - event.pointers[0].x) ** 2 + (event.pointers[1].y - event.pointers[0].y) ** 2))
 
       if (event.type === 'panstart') {
@@ -1097,10 +1086,23 @@ export class Drawing extends React.Component {
     } = this.props
 
     return (
-      <Fragment>
+      <>
         <canvas id='canvasPattern' ref={this.canvasPatternRef} width={width} height={height} style={{ display: pattern ? 'block' : 'none', position: 'absolute' }} />
         <canvas id='canvas' ref={this.canvasRef} width={width} height={height} />
-      </Fragment>
+      </>
     )
   }
+}
+
+Drawing.defaultProps = {
+  brushColor: {
+    r: 255, g: 255, b: 255, a: 1,
+  },
+  brushWidth: 12,
+  shapeMode: shapeToolModeEnum.RECT,
+  tool: toolEnum.PEN,
+  x: 0,
+  y: 0,
+  zoom: 1,
+  zoomToCenter: false,
 }
