@@ -51,7 +51,12 @@
   pointer-events: none;
 }
 
-.button.group::after {
+.group {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.group::after {
   width: 0;
   height: 0;
   position: absolute;
@@ -63,12 +68,7 @@
   right: 3px;
 }
 
-.button.group {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
+/* TODO: get rid of duplicated popover and floater styles */
 .popover {
   padding: 12px;
   position: relative;
@@ -79,7 +79,9 @@
   border-radius: 5px;
   user-select: none;
 }
-.floater {}
+.floater {
+  user-select: none;
+}
 
 .row {
   display: flex;

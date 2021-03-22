@@ -52,19 +52,19 @@ export const GroupShape = ({
   <Floater
     component={() => (
       <div
-        className={css.popover}
+        className={cn(css.popover, css.floater)}
         style={{ color: toCSSColor(brushColor) }}
       >
         <div className={css.row}>
           {
             shapeToolModeList.map(({
               icon, mode, solid,
-            }, index) => (
+            }) => (
               <div
                 className={cn(css.button, {
                   [css.active]: shapeMode === mode && tool === toolEnum.SHAPE,
                 })}
-                key={index}
+                key={`${mode}-${solid}`}
                 onClick={() => handleChange({ shapeMode: mode, tool: toolEnum.SHAPE })}
                 role='button'
                 tabIndex='0'
