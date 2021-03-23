@@ -4,8 +4,8 @@ import Floater from 'react-floater'
 import Slider from 'rc-slider/lib/Slider'
 
 export const GroupEraser = ({
-  eraserWidth,
   css,
+  eraserWidth,
   handleChange,
   opened,
 }) => (

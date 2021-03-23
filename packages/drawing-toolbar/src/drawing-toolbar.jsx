@@ -155,6 +155,7 @@ export class DrawingToolbar extends React.Component {
 
     if (opened === null) return
 
+    // TODO: remove implicit functional based on classnames
     const closestToolbarElement = event.target.closest(`.${css.root}`)
     const closestFloaterElement = event.target.closest(`.${css.floater}`)
 
@@ -250,7 +251,7 @@ export class DrawingToolbar extends React.Component {
 
           { isColorEnabled && (
             <div
-              className={cn(css.button, 'group-color', { [css.active]: opened === 'group-color' })}
+              className={cn(css.button, css.group, 'group-color', { [css.active]: opened === 'group-color' })}
               onClick={this.handleColorClick}
               onKeyDown={this.handleColorClick}
               role='button'
@@ -406,8 +407,8 @@ export class DrawingToolbar extends React.Component {
 
           { isEraserEnabled && (
             <GroupEraser
-              eraserWidth={eraserWidth}
               css={css}
+              eraserWidth={eraserWidth}
               handleChange={handleChange}
               opened={opened}
             />
@@ -419,7 +420,6 @@ export class DrawingToolbar extends React.Component {
               css={css}
               handleChange={handleChange}
               opened={opened}
-              tool={tool}
             />
           )}
 
