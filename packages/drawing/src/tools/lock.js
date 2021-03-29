@@ -1,7 +1,7 @@
 /* eslint-disable */
 
 import { Base } from './base'
-import { enhancedFields } from '../drawing'
+import { enhancedFields } from '../constants'
 
 export class LockTool extends Base {
   static lockObject (object, options = {}) {

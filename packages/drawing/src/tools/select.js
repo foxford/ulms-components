@@ -154,6 +154,14 @@ export default class SelectTool extends Base {
     }
   }
 
+  handleTextEditStartEvent (opts) {
+    if (opts.target && opts.target.hiddenTextarea) {
+      opts.target.hiddenTextarea.style.width = '10px'
+      opts.target.hiddenTextarea.style.height = '10px'
+      opts.target.hiddenTextarea.style.fontSize = '10px'
+    }
+  }
+
   handleTextEditEndEvent (opts) {
     this._unsetObject()
   }
