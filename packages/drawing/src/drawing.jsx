@@ -4,6 +4,7 @@ import { fabric } from 'fabric'
 import { queue as Queue } from 'd3-queue'
 import Hammer from 'hammerjs'
 
+import { enhancedFields, penToolModeEnum, shapeToolModeEnum, toolEnum } from './constants'
 import { toCSSColor } from './util/to-css-color'
 import { LockProvider } from './lock-provider'
 
@@ -29,38 +30,6 @@ import {
   triangle,
   triangleSolid,
 } from './tools/_shapes'
-
-export const toolEnum = {
-  ERASER: 'eraser',
-  PAN: 'pan',
-  PEN: 'pen',
-  SELECT: 'select',
-  SHAPE: 'shape',
-  TEXT: 'textbox',
-}
-
-export const penToolModeEnum = {
-  PENCIL: 'pencil',
-  MARKER: 'marker',
-  LINE: 'line',
-}
-
-export const shapeToolModeEnum = {
-  CIRCLE: 'circle',
-  CIRCLE_SOLID: 'circle-solid',
-  RECT: 'rect',
-  RECT_SOLID: 'rect-solid',
-  TRIANGLE: 'triangle',
-  TRIANGLE_SOLID: 'triangle-solid',
-}
-
-export const enhancedFields = [
-  '_id',
-  '_lockedbyuser',
-  '_lockedselection',
-  'noScaleCache',
-  'strokeUniform',
-]
 
 export const normalizeFields = (object, fields) => Object.assign(
   object,

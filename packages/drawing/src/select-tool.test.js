@@ -5,6 +5,8 @@ import Adapter from 'enzyme-adapter-react-16' // eslint-disable-line import/no-e
 
 import { Drawing, LockProvider, toolEnum } from '../index'
 
+import SelectTool from './tools/select'
+
 Enzyme.configure({ adapter: new Adapter() })
 
 const { shallow } = Enzyme
@@ -113,5 +115,31 @@ describe('`updateAllSelection` on onlineIds change is ok', () => {
         hoverCursor: 'move',
       },
     ])
+  })
+
+  it('`handleTextEditStartEvent` sets style for hiddenTextarea', () => {
+    const wrap = shallow((
+      <Drawing
+        tokenProvider={tokenProvider}
+        objects={[]}
+        tool={toolEnum.SELECT}
+      />
+    ))
+
+    const instance = wrap.instance()
+    const st = new SelectTool(instance.canvas, {})
+    const opts = {
+      target: {
+        hiddenTextarea: {
+          style: {},
+        },
+      },
+    }
+
+    st.handleTextEditStartEvent(opts)
+
+    expect(opts.target.hiddenTextarea.style).toEqual({
+      width: '10px', height: '10px', fontSize: '10px',
+    })
   })
 })

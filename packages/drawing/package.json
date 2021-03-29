@@ -1,6 +1,6 @@
 {
   "name": "@ulms/ui-drawing",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "",
   "keywords": [
     "lerna"
@@ -32,6 +32,7 @@
     "react": "^16.12.0"
   },
   "peerDependencies": {
+    "fabric": "netology-group/fabric.js#feature/ULMS-509",
     "react": "^15.6 || ^16.x || ^17.x"
   }
 }
