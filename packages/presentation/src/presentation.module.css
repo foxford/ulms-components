@@ -1,0 +1,140 @@
+.root {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex: 1 1 auto;
+  outline: none;
+}
+
+.root .listWrapper {
+  margin-right: 30px;
+  overflow: hidden;
+  overflow-y: auto;
+}
+
+.root .listWrapper .list {
+  padding: 0 10px;
+}
+
+.root .listWrapper .list .preview {
+  display: flex;
+  padding-bottom: 10px;
+}
+
+.root .listWrapper .list .preview .number {
+  margin-right: 5px;
+  flex: 1;
+  font-size: 12px;
+  line-height: 22px;
+  color: #333333;
+}
+
+.root .listWrapper .list .preview .image {
+  width: 120px;
+  height: 68px;
+  position: relative;
+}
+
+.root .listWrapper .list .preview .image img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.root .listWrapper .list .preview .placeholder {
+  width: 120px;
+  height: 68px;
+  position: relative;
+  box-sizing: border-box;
+  border: 2px dashed #EEEEEE;
+}
+
+.root .listWrapper .list .preview:hover .image {
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+}
+
+.root .listWrapper .list .preview.active .image::after {
+  content: "";
+  display: block;
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  border: 2px solid #FF7256;
+}
+
+.root .slideWrapper {
+  flex-grow: 1;
+  display: flex;
+  flex-flow: column;
+}
+
+.root .slideWrapper .slide {
+  flex: 1;
+  position: relative;
+}
+
+.root .slideWrapper .slide .mainImage {
+  position: absolute;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+}
+
+.root .slideWrapper .slide .slotSlide {
+  position: absolute;
+}
+
+.centered {
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.fitToWidth {
+  overflow: hidden;
+  overflow-y: scroll;
+}
+
+.root .slideWrapper .controls {
+  min-height: 30px;
+  margin-top: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.root .slideWrapper .controls .text {
+  font-size: 16px;
+  line-height: 22px;
+  color: #333333;
+}
+
+.root .slideWrapper .controls .linkArrow {
+  background-color: transparent;
+  display: block;
+  border: none;
+  font-size: 16px;
+  line-height: 22px;
+  color: #333333;
+  cursor: pointer;
+  outline: none !important;
+  user-select: none;
+}
+
+.root .slideWrapper .controls .linkArrow:hover,
+.root .slideWrapper .controls .linkArrow:active {
+  color: #48A1E6;
+}
+
+.root .slideWrapper .controls .linkArrow svg path {
+  fill: #333333;
+}
+
+.root .slideWrapper .controls .linkArrow:hover svg path,
+.root .slideWrapper .controls .linkArrow:active svg path {
+  fill: #48A1E6;
+}
+
+.root .slideWrapper .controls .linkArrow .linkArrowIcon {
+  vertical-align: text-top;
+}
