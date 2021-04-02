@@ -1,4 +1,4 @@
-import { fabric } from 'fabric'
+import { fabric } from 'fabric/dist/fabric.min'
 
 fabric.OptimizedPencilBrush = fabric.util.createClass(fabric.PencilBrush, {
   initialize (canvas) {

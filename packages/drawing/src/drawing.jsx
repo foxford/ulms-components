@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types, max-classes-per-file */
 import React from 'react'
-import { fabric } from 'fabric'
+import { fabric } from 'fabric/dist/fabric.min'
 import { queue as Queue } from 'd3-queue'
 import Hammer from 'hammerjs'
 

@@ -1,4 +1,4 @@
-import { fabric } from 'fabric'
+import { fabric } from 'fabric/dist/fabric.min'
 
 import { PositionableObject, makeNotInteractive, adjustPosition } from './object'
 

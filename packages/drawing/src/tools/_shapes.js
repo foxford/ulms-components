@@ -1,5 +1,5 @@
 /* eslint-disable */
-import { fabric } from 'fabric'
+import { fabric } from 'fabric/dist/fabric.min'
 
 const commonDefaults = {
   noScaleCache: false,

@@ -1,5 +1,5 @@
 /* eslint-disable no-param-reassign */
-import { fabric } from 'fabric'
+import { fabric } from 'fabric/dist/fabric.min'
 
 const WhiteboardLine = fabric.util.createClass(fabric.Line, {
   type: 'WhiteboardLine',
