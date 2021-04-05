@@ -36,9 +36,9 @@
   },
   "peerDependencies": {
     "react": "^15.6 || ^16.x || ^17.x",
-    "react-dom": "^16.14 || ^17.x"
+    "react-dom": "^15.6 || ^16.x || ^17.x"
   },
   "devDependencies": {
-    "react-dom": "^16.14.0"
+    "react-dom": "^16.12.0"
   }
 }
