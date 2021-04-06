@@ -27,7 +27,7 @@
   "dependencies": {
     "@foxford/ui": "^1.8.1",
     "classnames-es": "^2.2.6",
-    "react": "^16.12.0"
+    "react": "^16.14.0"
   },
   "peerDependencies": {
     "react": "^15.6 || ^16.x || ^17.x"
