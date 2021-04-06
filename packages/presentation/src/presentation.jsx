@@ -1,14 +1,13 @@
-/* eslint-disable react/prop-types, react/jsx-one-expression-per-line */
-import React, { Component } from 'react'
-import { SizeMe } from 'react-sizeme'
-import VisibilitySensor from 'react-visibility-sensor'
-import scrollIntoView from 'scroll-into-view-if-needed'
+/* eslint-disable max-len, react/prop-types, jsx-a11y/no-static-element-interactions, react/jsx-one-expression-per-line */
+import React from 'react'
 import cx from 'classnames-es'
+import scrollIntoView from 'scroll-into-view-if-needed'
+import VisibilitySensor from 'react-visibility-sensor'
+import { Icons } from '@ulms/ui-icons'
+import { SizeMe } from 'react-sizeme'
+import { Spinner } from '@ulms/ui-spinner'
 
-import { Icons } from '../../../packages/icons/index'
-import { Spinner } from '../spinner/spinner'
-
-import css from './presentation.css'
+import css from './presentation.module.css'
 
 function calculateSize (containerWidth, containerHeight, imageWidth, imageHeight) {
   const scale = Math.min(containerWidth / imageWidth, containerHeight / imageHeight)
@@ -28,15 +27,7 @@ function calculateFitSize (containerWidth, containerHeight, imageWidth, imageHei
   }
 }
 
-class Presentation extends Component {
-  constructor () {
-    super()
-
-    this.handlePrevious = this.handlePrevious.bind(this)
-    this.handleKeyDownEvent = this.handleKeyDownEvent.bind(this)
-    this.handleNext = this.handleNext.bind(this)
-  }
-
+export class Presentation extends React.Component {
   componentDidMount () {
     this.maybeScrollToActive()
   }
@@ -49,7 +40,7 @@ class Presentation extends Component {
     }
   }
 
-  handlePrevious () {
+  handlePrevious = () => {
     const { index, onChange } = this.props
 
     if (index > 0) {
@@ -57,7 +48,7 @@ class Presentation extends Component {
     }
   }
 
-  handleNext () {
+  handleNext = () => {
     const {
       index, collection, onChange,
     } = this.props
@@ -67,7 +58,7 @@ class Presentation extends Component {
     }
   }
 
-  handleKeyDownEvent (e) {
+  handleKeyDownEvent = (e) => {
     switch (e.keyCode) {
       case 33: // PageUp
       // falls through
@@ -90,7 +81,7 @@ class Presentation extends Component {
     }
   }
 
-  maybeScrollToActive () {
+  maybeScrollToActive = () => {
     const { showPreviews } = this.props
 
     if (showPreviews) {
@@ -112,7 +103,14 @@ class Presentation extends Component {
 
   render () {
     const {
-      index, collection, fitToWidth, onChange, showPagesCount, showActions, showPreviews, slotSlide,
+      index,
+      collection,
+      fitToWidth,
+      onChange,
+      showPagesCount,
+      showActions,
+      showPreviews,
+      slotSlide,
     } = this.props
 
     return (
@@ -133,6 +131,9 @@ class Presentation extends Component {
                       className={cx(css.preview, idx === index && css.active)}
                       key={idx}
                       onClick={() => { onChange(idx) }}
+                      onKeyPress={() => { onChange(idx) }}
+                      role='button'
+                      tabIndex={0}
                     >
                       <div className={css.number}>{item.page}</div>
                       <div className={css.image}>
@@ -172,7 +173,7 @@ class Presentation extends Component {
                 result = (
                   <div className={cx(css.slide, { [css.fitToWidth]: fitToWidth })}>
                     <img
-                      alt='image'
+                      alt='mainimage'
                       className={cx(css.mainImage, { [css.centered]: !fitToWidth })}
                       src={collection[index].image}
                       width={imageSize.width}
@@ -246,5 +247,3 @@ class Presentation extends Component {
     )
   }
 }
-
-export { Presentation }

@@ -1,4 +1,4 @@
-import { fabric } from 'fabric'
+import { fabric } from 'fabric/dist/fabric.min'
 
 import { Base } from './base'
 import { LockTool } from './lock' // eslint-disable-line import/no-cycle
