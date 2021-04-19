@@ -26,6 +26,10 @@ export class LockProvider {
     this.listener = fn
   }
 
+  removeUpdateListener () {
+    this.listener = undefined
+  }
+
   _updated (prev, next) {
     if (this.listener) {
       const changed = Boolean(!prev.length && next.length)
