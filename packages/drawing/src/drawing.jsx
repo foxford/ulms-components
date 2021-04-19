@@ -310,6 +310,8 @@ export class Drawing extends React.Component {
     }
 
     if (this.__lockProvider) {
+      this.__lockProvider.removeUpdateListener()
+
       this.__lockProvider = null
     }
 

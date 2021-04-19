@@ -19,5 +19,9 @@ describe('LockProvider', () => {
     provider.labels(['label_1', 'label_3'])
 
     expect(provider.isLocked('label_3')).toBe(true)
+
+    provider.removeUpdateListener()
+
+    expect(provider.listener).toBe(undefined)
   })
 })
