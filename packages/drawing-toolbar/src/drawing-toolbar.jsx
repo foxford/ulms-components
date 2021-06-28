@@ -180,6 +180,7 @@ export class DrawingToolbar extends React.Component {
       grid,
       handleChange,
       hasLockSelection,
+      noSeparator,
       shapeMode,
       tool,
       tools,
@@ -331,7 +332,7 @@ export class DrawingToolbar extends React.Component {
 
           { isZoomEnabled && (
             <>
-              <div className={css.separator} />
+              { !noSeparator && <div className={css.separator} /> }
               <div
                 className={css.button}
                 onClick={this.handleZoomInClick}
