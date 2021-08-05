@@ -22,6 +22,12 @@ export class TextboxTool extends PositionableObject {
     }))
   }
 
+  handleTextEditEndEvent () {
+    if(this.__object && this.__object.__local) {
+      this.__object.set('__local', undefined)
+    }
+  }
+
   handleObjectAddedEvent (opts) {
     this.__lastAdded = opts.target
     // memoize object was created last
@@ -59,6 +65,7 @@ export class TextboxTool extends PositionableObject {
 
     this.__object.set('left', x)
     this.__object.set('top', y)
+    this.__object.set('__local', true)
 
     this._canvas.add(this.__object)
 
