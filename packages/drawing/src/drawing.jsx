@@ -275,7 +275,8 @@ export class Drawing extends React.Component {
         prevProps.tool !== tool
         || prevProps.brushColor !== brushColor
         || prevProps.shapeMode !== shapeMode
-        || tool === toolEnum.PEN // need to update the tool if it's a pen
+        || prevProps.brushMode !== brushMode
+        || (tool === toolEnum.PEN && brushMode !== penToolModeEnum.LINE)// need to update the tool if it's a pen
       )
     ) {
       this.initTool(tool)
@@ -900,7 +901,7 @@ export class Drawing extends React.Component {
     this.canvas.renderOnAddRemove = false
 
     canvasObjects.forEach((_) => {
-      if (!newObjectIds.has(_._id)) {
+      if (!newObjectIds.has(_._id) && !_.__local && !_._draft) {
         objectsToRemove.push(_)
       }
     })
