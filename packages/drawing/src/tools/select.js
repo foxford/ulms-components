@@ -6,7 +6,7 @@ import debounce from 'lodash/debounce'
 
 const POSITION_INCREMENT = 10
 
-const DEBOUNCE_DELAY = 500
+const DELAY = 100
 
 const DEL_KEYCODE = 46
 const BACKSPACE_KEYCODE = 8
@@ -28,9 +28,9 @@ export default class SelectTool extends Base {
     super(canvas)
 
     this.__object = null
-
     this.__options = options
 
+    this._timer = null
     this._shiftPressed = false
     this._mouseMove = false
 
@@ -41,6 +41,8 @@ export default class SelectTool extends Base {
         makeInteractive(_)
       }
     })
+
+    this._initialConfigure()
   }
 
   static isLockedSelection (object) {
@@ -73,14 +75,26 @@ export default class SelectTool extends Base {
   }
 
 
-  configure () {
+  _initialConfigure () {
     this._canvas.isDrawingMode = false
     this._canvas.selection = false
     this._canvas.perPixelTargetFind = true
     this._canvas.defaultCursor = 'default'
     this._canvas.setCursor('default')
-    this.__object = null
-    this._shiftPressed = false
+  }
+
+  configure(opt) {
+    if(this.__object) {
+      const newOpt = { stroke: opt.lineColor }
+
+      // ToDo: вынести в константу!
+      if (this.__object.fill !== 'rgba(0,0,0,0.009)') {
+        newOpt.fill = opt.lineColor
+      }
+
+      this.__object.set(newOpt)
+      this._triggerModified()
+    }
   }
 
   destroy () {
@@ -104,6 +118,9 @@ export default class SelectTool extends Base {
             this.destroy()  // Moving to another page
         }
       } else {
+        if(!this.__object._lockedselection) {
+          this._setObject({delayed: true})
+        }
         const increment = this._shiftPressed ? 10 : 1
         switch (direction) {
           case directions.left:
@@ -119,8 +136,8 @@ export default class SelectTool extends Base {
             this.__object.set({top: this.__object.get('top') + POSITION_INCREMENT * increment})
             break
         }
-        this.__object.setCoords()
-        this.__debouncedUpdateObject()
+          this.__object.setCoords()
+          this._canvas.renderAll()
       }
     }
   }
@@ -130,15 +147,16 @@ export default class SelectTool extends Base {
   _moveUp = () => this._move(directions.up)
   _moveDown = () => this._move(directions.down)
 
-  _setObject (object) {
-    if (object) {
-      object.set({'_lockedselection': this._canvas._id})
-      this._canvas.trigger('object:modified', {target: object})
-      this.__object = object
-
-      this.__debouncedUpdateObject = debounce(() => {
-        this._canvas.trigger('object:modified', {target: this.__object})
-      }, DEBOUNCE_DELAY)
+  _setObject (opt = {}) {
+    if (this.__object) {
+      this.__object.set({'_lockedselection': this._canvas._id})
+      if(opt.delayed) {
+        // пропускаем единичное нажатие клавиши
+        this.__timer = setTimeout(() => {
+          this._triggerModified()
+        }, DELAY)
+      }
+      this._triggerModified()
     }
   }
 
@@ -146,15 +164,23 @@ export default class SelectTool extends Base {
     if (this.__object) {
       this.__object.set({'_lockedselection': undefined})
 
-      if (!this.__object.get('_toDelete')) {
-        this._canvas.trigger('object:modified', { target: this.__object })
-      }
+      this.__timer && clearTimeout(this.__timer)
+      this.__timer = null
 
-      this.__object = null
+      if (!this.__object.get('_toDelete')) {
+        this._triggerModified()
+      }
+    }
+  }
+
+  _triggerModified() {
+    if(this.__object) {
+      this._canvas.trigger('object:modified', {target: this.__object})
     }
   }
 
   handleTextEditStartEvent (opts) {
+    this._setObject()
     if (opts.target && opts.target.hiddenTextarea) {
       opts.target.hiddenTextarea.style.width = '10px'
       opts.target.hiddenTextarea.style.height = '10px'
@@ -166,14 +192,23 @@ export default class SelectTool extends Base {
     this._unsetObject()
   }
 
-  handleMouseDownEvent (opts) {
-    if (!this._active) return
+  handleMouseDownEvent () {
+    if (!this._active || !this.__object) return
 
     this._mouseMove = true
   }
 
-  handleMouseUpEvent (opts) {
+  handleMouseUpEvent () {
+    if(this._mouseMove && this.__object._lockedselection) {
+      this._unsetObject()
+    }
     this._mouseMove = false
+  }
+
+  handleMouseMoveEvent () {
+    if(this._mouseMove && !this.__object._lockedselection) {
+      this._setObject()
+    }
   }
 
   handleKeyDownEvent (e) {
@@ -193,22 +228,18 @@ export default class SelectTool extends Base {
           break
         case UP_KEYCODE:
           this._moveUp()
-          this._canvas.renderAll()
 
           break
         case DOWN_KEYCODE:
           this._moveDown()
-          this._canvas.renderAll()
 
           break
         case LEFT_KEYCODE:
           this._moveLeft()
-          this._canvas.renderAll()
 
           break
         case RIGHT_KEYCODE:
           this._moveRight()
-          this._canvas.renderAll()
 
           break
       }
@@ -219,6 +250,10 @@ export default class SelectTool extends Base {
     if (!this._active) return
 
     this._shiftPressed = e.shiftKey
+
+    if(!this._mouseMove && this.__object._lockedselection) {
+      this._unsetObject()
+    }
   }
 
   handleObjectAddedEvent (opts) {
@@ -231,21 +266,17 @@ export default class SelectTool extends Base {
 
   handleSelectionUpdatedEvent (opts) {
     if (!this._active) return
-
-    this._unsetObject()
-    this._setObject(opts.target)
+    this.__object = opts.target
   }
 
   handleSelectionCreatedEvent (opts) {
     if (!this._active) return
-
-    this._setObject(opts.target)
+    this.__object = opts.target
   }
 
   handleSelectionClearedEvent (opts) {
     if (!this._active) return
-
-    this._unsetObject()
+    this.__object = null
   }
 
   reset () {

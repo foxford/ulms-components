@@ -279,7 +279,9 @@ export class Drawing extends React.Component {
         || (tool === toolEnum.PEN && brushMode !== penToolModeEnum.LINE)// need to update the tool if it's a pen
       )
     ) {
-      this.initTool(tool)
+      if(prevProps.tool !== tool || tool !== toolEnum.SELECT) {
+        this.initTool(tool)
+      }
     }
 
     if (
