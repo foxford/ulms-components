@@ -438,7 +438,8 @@ export class Drawing extends React.Component {
       }
     })
 
-    this.canvas.on('selection:cleared', ({ deselected }) => {
+    this.canvas.on('selection:cleared', (event) => {
+      const { deselected } = event
       if (!deselected || deselected.length !== 1) return
 
       const { onDraw } = this.props
@@ -459,7 +460,7 @@ export class Drawing extends React.Component {
       const object = event.target
 
       // Skipping draft objects
-      if (object._draft) return
+      if (object._draft || !object._id) return
 
       const serializedObj = object.toObject(enhancedFields)
 

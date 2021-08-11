@@ -91,7 +91,7 @@ export class LockTool extends Base {
     const { selected } = event
 
     const maybeProperSelectionForLock = Array.isArray(selected) && selected.length === 1
-    const denyNewTextObject = selected[0].type === 'textbox' && selected[0].text.length !== 0
+    const denyNewTextObject = selected[0] && selected[0].type === 'textbox' && selected[0].text.length !== 0
     // FIXME: we have to forbid knowing about other type of objects for the LockTool later :(
 
     if (
