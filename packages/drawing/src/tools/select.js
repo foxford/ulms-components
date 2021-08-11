@@ -87,8 +87,14 @@ export default class SelectTool extends Base {
     if(this.__object) {
       const newOpt = { stroke: opt.lineColor }
 
+      if(object.type === 'path') {
+        const {a} = fromCSSColor(object.stroke)
+        const {r, g, b} = fromCSSColor(opt.lineColor)
+        newOpt.stroke = toCSSColor({r, g, b, a})
+      }
+
       // ToDo: вынести в константу!
-      if (this.__object.fill !== 'rgba(0,0,0,0.009)') {
+      if (this.__object.fill && (this.__object.fill !== 'rgba(0,0,0,0.009)')) {
         newOpt.fill = opt.lineColor
       }
 
