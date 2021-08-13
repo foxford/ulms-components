@@ -96,7 +96,12 @@ fabric.util.loadImage = function loadImage (url, callback, context, crossOrigin)
     tp.getToken()
       .then((token) => {
         if (url.indexOf('access_token') !== -1) {
-          originalFabricLoadImageFn(url.replace(/\?access_token=(.*)$/i, `?access_token=${token}`), callback, context, crossOrigin)
+          originalFabricLoadImageFn(
+            url.replace(/\?access_token=(.*)$/i, `?access_token=${token}`),
+            callback,
+            context,
+            crossOrigin
+          )
         } else {
           originalFabricLoadImageFn(`${url}?access_token=${token}`, callback, context, crossOrigin)
         }
@@ -276,10 +281,11 @@ export class Drawing extends React.Component {
         || prevProps.brushColor !== brushColor
         || prevProps.shapeMode !== shapeMode
         || prevProps.brushMode !== brushMode
-        || (tool === toolEnum.PEN && brushMode !== penToolModeEnum.LINE)// need to update the tool if it's a pen
+        // need to update the tool if it's a pen
+        || (tool === toolEnum.PEN && brushMode !== penToolModeEnum.LINE)
       )
     ) {
-      if(prevProps.tool !== tool || tool !== toolEnum.SELECT) {
+      if (prevProps.tool !== tool || tool !== toolEnum.SELECT) {
         this.initTool(tool)
       }
     }
@@ -459,8 +465,8 @@ export class Drawing extends React.Component {
       const { onDraw, onDrawUpdate } = this.props
       const object = event.target
 
-      // Skipping draft objects
-      if (object._draft || !object._id) return
+      // Skipping draft objects or active selection
+      if (object._draft || object.type === 'activeSelection') return
 
       const serializedObj = object.toObject(enhancedFields)
 
@@ -932,9 +938,17 @@ export class Drawing extends React.Component {
 
         if (_._lockedselection !== canvasObjects[objIndex]._lockedselection) {
           SelectTool.updateObjectSelection(this.canvas, nextObject)
+          if (_._lockedselection && _._lockedselection !== this.canvas._id) {
+            // Удаляем объект из группы
+            SelectTool.removeFromSelection(this.canvas, canvasObjects[objIndex])
+          }
         }
-
-        canvasObjects[objIndex].set(nextObject)
+        if (canvasObjects[objIndex]._lockedlocal !== this.canvas._id) {
+          canvasObjects[objIndex].set(nextObject)
+        } else {
+          // Тут поправленные координаты для других пользователей - не обновляем, только меняем ревизию
+          canvasObjects[objIndex].set({ _rev: _._rev, _lockedlocal: undefined })
+        }
 
         !LockTool.isLocked(canvasObjects[objIndex])
           ? LockTool.unlockObject(canvasObjects[objIndex])
