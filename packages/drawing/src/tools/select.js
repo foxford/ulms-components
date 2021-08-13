@@ -98,6 +98,7 @@ export default class SelectTool extends Base {
     this._debouncedUnsetSelection = debounce(this._unsetSelection, DELAY)
   }
 
+
   _performAction (action, triggerModified = false) {
     if (this.__selection) {
       if (this.__selection._objects) {
@@ -167,6 +168,7 @@ export default class SelectTool extends Base {
         }
       } else {
         this._setSelection({ delayed: true })
+
         const increment = this._shiftPressed ? 10 : 1
 
         switch (direction) {
