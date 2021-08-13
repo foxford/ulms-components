@@ -943,11 +943,11 @@ export class Drawing extends React.Component {
             SelectTool.removeFromSelection(this.canvas, canvasObjects[objIndex])
           }
         }
-        if (canvasObjects[objIndex]._lockedlocal !== this.canvas._id) {
+        if (_._lockedlocal !== this.canvas._id) {
           canvasObjects[objIndex].set(nextObject)
         } else {
           // Тут поправленные координаты для других пользователей - не обновляем, только меняем ревизию
-          canvasObjects[objIndex].set({ _rev: _._rev, _lockedlocal: undefined })
+          canvasObjects[objIndex].set({ _rev: _._rev })
         }
 
         !LockTool.isLocked(canvasObjects[objIndex])
@@ -975,7 +975,7 @@ export class Drawing extends React.Component {
       enlivenedObjects,
     } = this._updateCanvasObjects(canvasObjects, _objects)
 
-    if (objectsToRemove.length > 0) {
+    if (objectsToRemove.length) {
       this.ignoreObjectRemovedEvent = true
       this.canvas.remove(...objectsToRemove)
       this.ignoreObjectRemovedEvent = false

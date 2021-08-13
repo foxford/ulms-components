@@ -205,7 +205,7 @@ export default class SelectTool extends Base {
       object.set({ '_lockedselection': this._canvas._id })
       const updatedObject = fabric.util.object.clone(object)
 
-      object.set({ '_lockedlocal': this._canvas._id })
+      updatedObject.set({ '_lockedlocal': this._canvas._id })
 
       if (object.group) { // Если объект в группе, то надо пересчитать его координаты
         const matrix = object.group.calcTransformMatrix()
@@ -222,7 +222,7 @@ export default class SelectTool extends Base {
       object.set({ '_lockedselection': undefined })
       const updatedObject = fabric.util.object.clone(object)
 
-      object.set({ '_lockedlocal': this._canvas._id })
+      updatedObject.set({ '_lockedlocal': this._canvas._id })
 
       if (object.group) { // Если объект в группе, то надо пересчитать его координаты
         const matrix = object.group.calcTransformMatrix()
