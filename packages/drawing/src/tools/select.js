@@ -30,7 +30,6 @@ export default class SelectTool extends Base {
   constructor (canvas, options = {}) {
     super(canvas)
 
-    this.__selection = null
     this.__options = options
 
     this.__lockedSelection = false
@@ -81,6 +80,10 @@ export default class SelectTool extends Base {
     }
   }
 
+  _hasSelection () {
+    return this._canvas.getActiveObjects().length > 0
+  }
+
   _initialConfigure () {
     this._canvas.forEachObject((_) => {
       if (_._lockedselection && (_._lockedselection !== this._canvas._id)) {
@@ -98,16 +101,11 @@ export default class SelectTool extends Base {
     this._debouncedUnsetSelection = debounce(this._unsetSelection, DELAY)
   }
 
-
   _performAction (action, triggerModified = false) {
-    if (this.__selection) {
-      if (this.__selection._objects) {
-        this.__selection._objects.forEach((object) => {
-          object && action(object)
-        })
-      } else {
-        action(this.__selection)
-      }
+    if (this._hasSelection()) {
+      this._canvas.getActiveObjects().forEach((object) => {
+        object && action(object)
+      })
       if (triggerModified) {
         this._triggerModified()
       }
@@ -158,7 +156,7 @@ export default class SelectTool extends Base {
   }
 
   _move (direction) {
-    if (this.__selection) {
+    if (this._hasSelection()) {
       if (this.__options.isPresentation) {
         switch (direction) {
           case directions.left:
@@ -169,26 +167,27 @@ export default class SelectTool extends Base {
       } else {
         this._setSelection({ delayed: true })
 
+        const selection = this._canvas.getActiveObject()
         const increment = this._shiftPressed ? 10 : 1
 
         switch (direction) {
           case directions.left:
-            this.__selection.set({ left: this.__selection.get('left') - POSITION_INCREMENT * increment })
+            selection.set({ left: selection.get('left') - POSITION_INCREMENT * increment })
             break
 
           case directions.right:
-            this.__selection.set({ left: this.__selection.get('left') + POSITION_INCREMENT * increment })
+            selection.set({ left: selection.get('left') + POSITION_INCREMENT * increment })
             break
 
           case directions.up:
-            this.__selection.set({ top: this.__selection.get('top') - POSITION_INCREMENT * increment })
+            selection.set({ top: selection.get('top') - POSITION_INCREMENT * increment })
             break
 
           case directions.down:
-            this.__selection.set({ top: this.__selection.get('top') + POSITION_INCREMENT * increment })
+            selection.set({ top: selection.get('top') + POSITION_INCREMENT * increment })
             break
         }
-        this.__selection.setCoords()
+        selection.setCoords()
         this._canvas.requestRenderAll()
       }
     }
@@ -282,7 +281,7 @@ export default class SelectTool extends Base {
   }
 
   handleMouseDownEvent () {
-    if (!this._active || !this.__selection) return
+    if (!this._active || !this._hasSelection()) return
 
     this._mouseMove = true
   }
@@ -362,26 +361,16 @@ export default class SelectTool extends Base {
     })
   }
 
-  handleSelectionUpdatedEvent (opts) {
-    if (!this._active) return
-    this.__selection = opts.target
-  }
+  handleSelectionUpdatedEvent () {}
 
-  handleSelectionCreatedEvent (opts) {
-    if (!this._active) return
-    this.__selection = opts.target
-  }
+  handleSelectionCreatedEvent () {}
 
-  handleSelectionClearedEvent (opts) {
-    if (!this._active) return
-    this.__selection = null
-  }
+  handleSelectionClearedEvent () {}
 
   reset () {
     this.__lockedSelection && this._unsetSelection()
     this._canvas.discardActiveObject()
 
-    this.__selection = null
     this._shiftPressed = false
     this._mouseMove = false
 
