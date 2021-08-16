@@ -1,4 +1,7 @@
-/* eslint-disable no-param-reassign,default-case,no-fallthrough */
+/* eslint-disable default-case,no-fallthrough,no-param-reassign,import/no-extraneous-dependencies */
+import debounce from 'lodash/debounce'
+import { fabric } from 'fabric/dist/fabric.min'
+
 import { fromCSSColor, toCSSColor } from '../util/to-css-color'
 
 import { Base } from './base'
@@ -27,20 +30,13 @@ export default class SelectTool extends Base {
   constructor (canvas, options = {}) {
     super(canvas)
 
-    this.__object = null
+    this.__selection = null
     this.__options = options
 
+    this.__lockedSelection = false
     this._timer = null
     this._shiftPressed = false
     this._mouseMove = false
-
-    this._canvas.forEachObject((_) => {
-      if (_._lockedselection && (_._lockedselection !== this._canvas._id)) {
-        makeNotInteractive(_)
-      } else {
-        makeInteractive(_)
-      }
-    })
 
     this._initialConfigure()
   }
@@ -74,53 +70,95 @@ export default class SelectTool extends Base {
     }
   }
 
+  static removeFromSelection (canvas, object) {
+    if (canvas.getActiveObjects().length > 1) {
+      // Remove one object from ActiveSelection
+      canvas.getActiveObject().removeWithUpdate(object)
+      canvas.renderAll()
+    } else {
+      // Remove last object from ActiveSelection
+      canvas.discardActiveObject()
+    }
+  }
+
   _initialConfigure () {
+    this._canvas.forEachObject((_) => {
+      if (_._lockedselection && (_._lockedselection !== this._canvas._id)) {
+        makeNotInteractive(_)
+      } else {
+        makeInteractive(_)
+      }
+    })
+
     this._canvas.isDrawingMode = false
-    this._canvas.selection = false
+    this._canvas.selection = true
     this._canvas.perPixelTargetFind = true
     this._canvas.defaultCursor = 'default'
     this._canvas.setCursor('default')
+    this._debouncedUnsetSelection = debounce(this._unsetSelection, DELAY)
   }
 
-  configure (opt) {
-    if (this.__object) {
-      const newOpt = { stroke: opt.lineColor }
 
-      if (this.__object.type === 'path') {
-        const { a } = fromCSSColor(this.__object.stroke)
-        const {
-          r, g, b,
-        } = fromCSSColor(opt.lineColor)
-
-        newOpt.stroke = toCSSColor({
-          r, g, b, a,
+  _performAction (action, triggerModified = false) {
+    if (this.__selection) {
+      if (this.__selection._objects) {
+        this.__selection._objects.forEach((object) => {
+          object && action(object)
         })
+      } else {
+        action(this.__selection)
       }
-
-      // ToDo: вынести в константу!
-      if (this.__object.fill && (this.__object.fill !== 'rgba(0,0,0,0.009)')) {
-        newOpt.fill = opt.lineColor
+      if (triggerModified) {
+        this._triggerModified()
       }
-
-      this.__object.set(newOpt)
-      this._triggerModified()
     }
+  }
+
+  configure (options) {
+    if (!options.initial) {
+      this._performAction(object => this._configureObject(object, options), true)
+    }
+  }
+
+  _configureObject (object, options) {
+    const newOpt = { stroke: options.lineColor }
+
+    if (object.type === 'path') {
+      const { a } = fromCSSColor(object.stroke)
+      const {
+        r, g, b,
+      } = fromCSSColor(options.lineColor)
+
+      newOpt.stroke = toCSSColor({
+        r, g, b, a,
+      })
+    }
+    // ToDo: вынести в константу!
+    if (object.fill && (object.fill !== 'rgba(0,0,0,0.009)')) {
+      newOpt.fill = options.lineColor
+    }
+    object.set(newOpt)
   }
 
   destroy () {
-    this._unsetObject()
+    this.__lockedSelection && this._unsetSelection()
     this._canvas.discardActiveObject()
   }
 
-  _deleteObject = () => {
-    if (this.__object) {
-      this.__object.set({ '_toDelete': true })
-      this._canvas.remove(this.__object)
+  _delete = () => {
+    this._performAction(this._deleteObject)
+    this._canvas.discardActiveObject()
+  }
+
+  _deleteObject = (object) => {
+    if (object) {
+      object.set({ '_toDelete': true })
+      this._canvas.remove(object)
     }
   }
 
-  _move = (direction) => {
-    if (this.__object) {
+  _move (direction) {
+    if (this.__selection) {
       if (this.__options.isPresentation) {
         switch (direction) {
           case directions.left:
@@ -129,30 +167,29 @@ export default class SelectTool extends Base {
             this.destroy() // Moving to another page
         }
       } else {
-        if (!this.__object._lockedselection) {
-          this._setObject({ delayed: true })
-        }
+        this._setSelection({ delayed: true })
+
         const increment = this._shiftPressed ? 10 : 1
 
         switch (direction) {
           case directions.left:
-            this.__object.set({ left: this.__object.get('left') - POSITION_INCREMENT * increment })
+            this.__selection.set({ left: this.__selection.get('left') - POSITION_INCREMENT * increment })
             break
 
           case directions.right:
-            this.__object.set({ left: this.__object.get('left') + POSITION_INCREMENT * increment })
+            this.__selection.set({ left: this.__selection.get('left') + POSITION_INCREMENT * increment })
             break
 
           case directions.up:
-            this.__object.set({ top: this.__object.get('top') - POSITION_INCREMENT * increment })
+            this.__selection.set({ top: this.__selection.get('top') - POSITION_INCREMENT * increment })
             break
 
           case directions.down:
-            this.__object.set({ top: this.__object.get('top') + POSITION_INCREMENT * increment })
+            this.__selection.set({ top: this.__selection.get('top') + POSITION_INCREMENT * increment })
             break
         }
-        this.__object.setCoords()
-        this._canvas.renderAll()
+        this.__selection.setCoords()
+        this._canvas.requestRenderAll()
       }
     }
   }
@@ -165,40 +202,74 @@ export default class SelectTool extends Base {
 
   _moveDown = () => this._move(directions.down)
 
-  _setObject (opt = {}) {
-    if (this.__object) {
-      this.__object.set({ '_lockedselection': this._canvas._id })
-      if (opt.delayed) {
-        // пропускаем единичное нажатие клавиши
-        this.__timer = setTimeout(() => {
-          this._triggerModified()
-        }, DELAY)
+  _setObject = (object) => {
+    if (!object.get('_lockedselection')) {
+      object.set({ '_lockedselection': this._canvas._id })
+      const updatedObject = fabric.util.object.clone(object)
+
+      object.set({ '_lockedlocal': this._canvas._id })
+
+      if (object.group) { // Если объект в группе, то надо пересчитать его координаты
+        const matrix = object.group.calcTransformMatrix()
+        const { x: left, y: top } = fabric.util.transformPoint({ x: object.left, y: object.top }, matrix)
+
+        updatedObject.set({ top, left })
       }
-      this._triggerModified()
+      this._canvas.trigger('object:modified', { target: updatedObject })
     }
   }
 
-  _unsetObject () {
-    if (this.__object) {
-      this.__object.set({ '_lockedselection': undefined })
+  _unsetObject = (object) => {
+    if (object.get('_lockedselection')) {
+      object.set({ '_lockedselection': undefined })
+      const updatedObject = fabric.util.object.clone(object)
 
-      this.__timer && clearTimeout(this.__timer)
-      this.__timer = null
+      object.set({ '_lockedlocal': this._canvas._id })
 
-      if (!this.__object.get('_toDelete')) {
-        this._triggerModified()
+      if (object.group) { // Если объект в группе, то надо пересчитать его координаты
+        const matrix = object.group.calcTransformMatrix()
+        const { x: left, y: top } = fabric.util.transformPoint({ x: object.left, y: object.top }, matrix)
+
+        updatedObject.set({ top, left })
       }
+      this._canvas.trigger('object:modified', { target: updatedObject })
+    }
+  }
+
+  _setSelection (opt = {}) {
+    if (!this.__lockedSelection) {
+      if (opt.delayed) {
+        this.__timer = setTimeout(() => {
+          this.__lockedSelection = true
+          this._performAction(this._setObject)
+        }, DELAY)
+      } else {
+        this.__lockedSelection = true
+        this._performAction(this._setObject)
+      }
+    }
+  }
+
+  _unsetSelection () {
+    this._performAction(this._unsetObject)
+
+    this.__lockedSelection = false
+    this.__timer && clearTimeout(this.__timer)
+    this.__timer = null
+  }
+
+  _triggerObjectModified = (object) => {
+    if (!object.get('_toDelete')) {
+      this._canvas.trigger('object:modified', { target: object })
     }
   }
 
   _triggerModified () {
-    if (this.__object) {
-      this._canvas.trigger('object:modified', { target: this.__object })
-    }
+    this._performAction(this._triggerObjectModified)
   }
 
   handleTextEditStartEvent (opts) {
-    this._setObject()
+    this._setSelection()
     if (opts.target && opts.target.hiddenTextarea) {
       opts.target.hiddenTextarea.style.width = '10px'
       opts.target.hiddenTextarea.style.height = '10px'
@@ -207,33 +278,32 @@ export default class SelectTool extends Base {
   }
 
   handleTextEditEndEvent (opts) {
-    this._unsetObject()
+    this._unsetSelection()
   }
 
   handleMouseDownEvent () {
-    if (!this._active || !this.__object) return
+    if (!this._active || !this.__selection) return
 
     this._mouseMove = true
   }
 
   handleMouseUpEvent () {
-    if (this._mouseMove && this.__object._lockedselection) {
-      this._unsetObject()
+    if (this._mouseMove && this.__lockedSelection) {
+      this._unsetSelection()
     }
     this._mouseMove = false
   }
 
   handleMouseMoveEvent () {
-    if (this._mouseMove && !this.__object._lockedselection) {
-      this._setObject()
+    if (this._mouseMove && !this.__lockedSelection) {
+      this._setSelection()
     }
   }
 
   handleKeyDownEvent (e) {
     if (!this._active) return
-    if (this.__object && this.__object.isEditing) return
 
-    if (!this._mouseMove && (this.__object && !this.__object._lockedbyuser)) {
+    if (!this._mouseMove) {
       const { keyCode } = e
 
       this._shiftPressed = e.shiftKey
@@ -242,7 +312,7 @@ export default class SelectTool extends Base {
         case DEL_KEYCODE:
 
         case BACKSPACE_KEYCODE:
-          this._deleteObject()
+          this._delete()
 
           break
 
@@ -274,8 +344,13 @@ export default class SelectTool extends Base {
 
     this._shiftPressed = e.shiftKey
 
-    if (!this._mouseMove && this.__object._lockedselection) {
-      this._unsetObject()
+    if (!this._mouseMove && this.__lockedSelection) {
+      if ((e.keyCode === UP_KEYCODE)
+        || (e.keyCode === DOWN_KEYCODE)
+        || (e.keyCode === LEFT_KEYCODE)
+        || (e.keyCode === RIGHT_KEYCODE)) {
+        this._debouncedUnsetSelection()
+      }
     }
   }
 
@@ -289,26 +364,27 @@ export default class SelectTool extends Base {
 
   handleSelectionUpdatedEvent (opts) {
     if (!this._active) return
-    this.__object = opts.target
+    this.__selection = opts.target
   }
 
   handleSelectionCreatedEvent (opts) {
     if (!this._active) return
-    this.__object = opts.target
+    this.__selection = opts.target
   }
 
   handleSelectionClearedEvent (opts) {
     if (!this._active) return
-    this.__object = null
+    this.__selection = null
   }
 
   reset () {
+    this.__lockedSelection && this._unsetSelection()
+    this._canvas.discardActiveObject()
+
+    this.__selection = null
     this._shiftPressed = false
     this._mouseMove = false
 
     this._canvas._currentTransform = null
-
-    this._unsetObject()
-    this._canvas.discardActiveObject()
   }
 }
