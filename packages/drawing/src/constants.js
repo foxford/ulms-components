@@ -24,6 +24,7 @@ export const shapeToolModeEnum = {
 
 export const enhancedFields = [
   '_id',
+  '_lockedlocal',
   '_lockedbyuser',
   '_lockedselection',
   'noScaleCache',
