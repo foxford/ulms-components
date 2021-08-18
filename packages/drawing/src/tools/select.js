@@ -302,6 +302,15 @@ export default class SelectTool extends Base {
 
     const { keyCode } = e
 
+    if (keyCode === A_KEYCODE && (e.metaKey || e.ctrlKey)) {
+      this._canvas.discardActiveObject()
+      const selection = new fabric.ActiveSelection(this._canvas.getObjects(), {
+        canvas: this._canvas,
+      })
+
+      this._canvas.setActiveObject(selection)
+      this._canvas.requestRenderAll()
+    } else if (!this._mouseMove) {
       this._shiftPressed = e.shiftKey
 
       switch (keyCode) {
