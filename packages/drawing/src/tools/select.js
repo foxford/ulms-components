@@ -80,8 +80,12 @@ export default class SelectTool extends Base {
     }
   }
 
-  _hasSelection () {
-    return this._canvas.getActiveObjects().length > 0
+  get _activeSelection () {
+    if (this._canvas.getActiveObjects().length) {
+      return this._canvas.getActiveObject()
+    }
+
+    return null
   }
 
   _initialConfigure () {
@@ -101,15 +105,40 @@ export default class SelectTool extends Base {
     this._debouncedUnsetSelection = debounce(this._unsetSelection, DELAY)
   }
 
-  _performAction (action, triggerModified = false) {
-    if (this._hasSelection()) {
-      this._canvas.getActiveObjects().forEach((object) => {
+  _performAction (action, triggerModified = false, actionName = 'object:modified') {
+    if (this._activeSelection) {
+      const activeObjects = this._canvas.getActiveObjects()
+
+      const modifiedObjects = activeObjects.map((object) => {
         object && action(object)
+
+        return this._maybeFixCoords(object)
       })
+
       if (triggerModified) {
-        this._triggerModified()
+        this._canvas.trigger(actionName, { target: modifiedObjects })
       }
     }
+  }
+
+  _maybeFixCoords (object) {
+    if (object.group) { // Если объект в группе, то надо пересчитать его координаты
+      const updatedObject = fabric.util.object.clone(object) // Клонируем, чтобы на зааффектить локальные координаты в группе...
+      const matrix = object.group.calcTransformMatrix()
+      const { x: left, y: top } = fabric.util.transformPoint({ x: object.left, y: object.top }, matrix)
+      const angle = (object.angle + object.group.angle) % 360
+
+      updatedObject.set({
+        top,
+        left,
+        angle,
+        '_lockedlocal': this._canvas._id, // ...и локально пропускаем этот объект
+      })
+
+      return updatedObject
+    }
+
+    return object
   }
 
   configure (options) {
@@ -144,19 +173,19 @@ export default class SelectTool extends Base {
   }
 
   _delete = () => {
-    this._performAction(this._deleteObject)
+    this._performAction(this._deleteObject, true, 'object:removed')
     this._canvas.discardActiveObject()
   }
 
   _deleteObject = (object) => {
     if (object) {
-      object.set({ '_toDelete': true })
+      object.set({ _draft: true })
       this._canvas.remove(object)
     }
   }
 
   _move (direction) {
-    if (this._hasSelection()) {
+    if (this._activeSelection) {
       if (this.__options.isPresentation) {
         switch (direction) {
           case directions.left:
@@ -204,34 +233,12 @@ export default class SelectTool extends Base {
   _setObject = (object) => {
     if (!object.get('_lockedselection')) {
       object.set({ '_lockedselection': this._canvas._id })
-      const updatedObject = fabric.util.object.clone(object)
-
-      updatedObject.set({ '_lockedlocal': this._canvas._id })
-
-      if (object.group) { // Если объект в группе, то надо пересчитать его координаты
-        const matrix = object.group.calcTransformMatrix()
-        const { x: left, y: top } = fabric.util.transformPoint({ x: object.left, y: object.top }, matrix)
-
-        updatedObject.set({ top, left })
-      }
-      this._canvas.trigger('object:modified', { target: updatedObject })
     }
   }
 
   _unsetObject = (object) => {
     if (object.get('_lockedselection')) {
       object.set({ '_lockedselection': undefined })
-      const updatedObject = fabric.util.object.clone(object)
-
-      updatedObject.set({ '_lockedlocal': this._canvas._id })
-
-      if (object.group) { // Если объект в группе, то надо пересчитать его координаты
-        const matrix = object.group.calcTransformMatrix()
-        const { x: left, y: top } = fabric.util.transformPoint({ x: object.left, y: object.top }, matrix)
-
-        updatedObject.set({ top, left })
-      }
-      this._canvas.trigger('object:modified', { target: updatedObject })
     }
   }
 
@@ -240,31 +247,21 @@ export default class SelectTool extends Base {
       if (opt.delayed) {
         this.__timer = setTimeout(() => {
           this.__lockedSelection = true
-          this._performAction(this._setObject)
+          this._performAction(this._setObject, true)
         }, DELAY)
       } else {
         this.__lockedSelection = true
-        this._performAction(this._setObject)
+        this._performAction(this._setObject, true)
       }
     }
   }
 
   _unsetSelection () {
-    this._performAction(this._unsetObject)
+    this._performAction(this._unsetObject, true)
 
     this.__lockedSelection = false
     this.__timer && clearTimeout(this.__timer)
     this.__timer = null
-  }
-
-  _triggerObjectModified = (object) => {
-    if (!object.get('_toDelete')) {
-      this._canvas.trigger('object:modified', { target: object })
-    }
-  }
-
-  _triggerModified () {
-    this._performAction(this._triggerObjectModified)
   }
 
   handleTextEditStartEvent (opts) {
@@ -276,12 +273,12 @@ export default class SelectTool extends Base {
     }
   }
 
-  handleTextEditEndEvent (opts) {
+  handleTextEditEndEvent () {
     this._unsetSelection()
   }
 
   handleMouseDownEvent () {
-    if (!this._active || !this._hasSelection()) return
+    if (!this._active || !this._activeSelection) return
 
     this._mouseMove = true
   }

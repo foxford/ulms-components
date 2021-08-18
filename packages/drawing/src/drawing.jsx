@@ -152,6 +152,8 @@ export class Drawing extends React.Component {
     this._hammerPanActive = false
     this._hammerZoom = null
 
+    this._deletedObjects = new Set()
+
     const {
       _lockProvider,
       tokenProvider,
@@ -463,36 +465,53 @@ export class Drawing extends React.Component {
 
     this.canvas.on('object:modified', (event) => {
       const { onDraw, onDrawUpdate } = this.props
-      const object = event.target
 
-      // Skipping draft objects or active selection
-      if (object._draft || object.type === 'activeSelection') return
+      if (Array.isArray(event.target)) {
+        const serializedObjects = event.target.map(object => maybeRemoveToken(object.toObject(enhancedFields)))
 
-      const serializedObj = object.toObject(enhancedFields)
-
-      if (isTextObject(object) && object._textBeforeEdit === '') {
-        onDraw && onDraw(maybeRemoveToken(serializedObj))
-      } else if (isShapeObject(object)) {
-        object._new
-          ? onDraw && onDraw(maybeRemoveToken(serializedObj))
-          : onDrawUpdate && onDrawUpdate(maybeRemoveToken(serializedObj))
-
-        object.set('_new', undefined)
+        onDrawUpdate && onDrawUpdate(serializedObjects)
       } else {
-        onDrawUpdate && onDrawUpdate(maybeRemoveToken(serializedObj))
+        const object = event.target
+
+        // Skipping draft objects or active selection
+        if (object._draft || object.type === 'activeSelection') return
+
+        const serializedObj = object.toObject(enhancedFields)
+
+        if (isTextObject(object) && object._textBeforeEdit === '') {
+          onDraw && onDraw(maybeRemoveToken(serializedObj))
+        } else if (isShapeObject(object)) {
+          object._new
+            ? onDraw && onDraw(maybeRemoveToken(serializedObj))
+            : onDrawUpdate && onDrawUpdate(maybeRemoveToken(serializedObj))
+
+          object.set('_new', undefined)
+        } else {
+          onDrawUpdate && onDrawUpdate(maybeRemoveToken(serializedObj))
+        }
       }
     })
 
     this.canvas.on('object:removed', (event) => {
       if (this.ignoreObjectRemovedEvent) return
-
       const { onObjectRemove } = this.props
-      const object = event.target
 
-      // Skipping draft objects
-      if (object._draft) return
+      if (Array.isArray(event.target)) {
+        const serializedObjects = event.target.map((object) => {
+          this._deletedObjects.add(object._id)
 
-      onObjectRemove && onObjectRemove(maybeRemoveToken(object.toObject(enhancedFields)))
+          return maybeRemoveToken(object.toObject(enhancedFields))
+        })
+
+        onObjectRemove && onObjectRemove(serializedObjects)
+      } else {
+        const object = event.target
+
+        // Skipping draft objects
+        if (object._draft) return
+
+        onObjectRemove && onObjectRemove(maybeRemoveToken(object.toObject(enhancedFields)))
+      }
     })
 
     this.canvas.on('after:render', () => this._handleAfterRender())
@@ -922,14 +941,18 @@ export class Drawing extends React.Component {
 
       if (objIndex === -1) {
         // add
+        if (!this._deletedObjects.has(_._id)) {
+          // if (nextObject._lockedselection && !onlineIds.includes(nextObject._lockedselection)) {
+          if (selection && !this.LockProvider.isLocked(selection)) {
+            nextObject._lockedselection = undefined
+            // cleanup selection if present but is not locked according the provider
+          }
 
-        // if (nextObject._lockedselection && !onlineIds.includes(nextObject._lockedselection)) {
-        if (selection && !this.LockProvider.isLocked(selection)) {
-          nextObject._lockedselection = undefined
-          // cleanup selection if present but is not locked according the provider
+          objectsToAdd.push(nextObject)
         }
-
-        objectsToAdd.push(nextObject)
+        if (_._removed) {
+          this._deletedObjects.delete(_._id)
+        }
       } else {
         // update (only if revision has been changed)
         if (_._rev === canvasObjects[objIndex]._rev) {
