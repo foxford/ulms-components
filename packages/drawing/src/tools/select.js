@@ -19,6 +19,8 @@ const DOWN_KEYCODE = 40
 const LEFT_KEYCODE = 37
 const RIGHT_KEYCODE = 39
 
+const A_KEYCODE = 65
+
 const directions = {
   left: 'left',
   right: 'right',
@@ -30,7 +32,6 @@ export default class SelectTool extends Base {
   constructor (canvas, options = {}) {
     super(canvas)
 
-    this.__selection = null
     this.__options = options
 
     this.__lockedSelection = false
@@ -81,6 +82,14 @@ export default class SelectTool extends Base {
     }
   }
 
+  get _activeSelection () {
+    if (this._canvas.getActiveObjects().length) {
+      return this._canvas.getActiveObject()
+    }
+
+    return null
+  }
+
   _initialConfigure () {
     this._canvas.forEachObject((_) => {
       if (_._lockedselection && (_._lockedselection !== this._canvas._id)) {
@@ -98,19 +107,40 @@ export default class SelectTool extends Base {
     this._debouncedUnsetSelection = debounce(this._unsetSelection, DELAY)
   }
 
-  _performAction (action, triggerModified = false) {
-    if (this.__selection) {
-      if (this.__selection._objects) {
-        this.__selection._objects.forEach((object) => {
-          object && action(object)
-        })
-      } else {
-        action(this.__selection)
-      }
+  _performAction (action, triggerModified = false, actionName = 'object:modified') {
+    if (this._activeSelection) {
+      const activeObjects = this._canvas.getActiveObjects()
+
+      const modifiedObjects = activeObjects.map((object) => {
+        object && action(object)
+
+        return this._maybeFixCoords(object)
+      })
+
       if (triggerModified) {
-        this._triggerModified()
+        this._canvas.trigger(actionName, { target: modifiedObjects })
       }
     }
+  }
+
+  _maybeFixCoords (object) {
+    if (object.group) { // Если объект в группе, то надо пересчитать его координаты
+      const updatedObject = fabric.util.object.clone(object) // Клонируем, чтобы на зааффектить локальные координаты в группе...
+      const matrix = object.group.calcTransformMatrix()
+      const { x: left, y: top } = fabric.util.transformPoint({ x: object.left, y: object.top }, matrix)
+      const angle = (object.angle + object.group.angle) % 360
+
+      updatedObject.set({
+        top,
+        left,
+        angle,
+        '_lockedlocal': this._canvas._id, // ...и локально пропускаем этот объект
+      })
+
+      return updatedObject
+    }
+
+    return object
   }
 
   configure (options) {
@@ -145,19 +175,19 @@ export default class SelectTool extends Base {
   }
 
   _delete = () => {
-    this._performAction(this._deleteObject)
+    this._performAction(this._deleteObject, true, 'object:removed')
     this._canvas.discardActiveObject()
   }
 
   _deleteObject = (object) => {
     if (object) {
-      object.set({ '_toDelete': true })
+      object.set({ _draft: true })
       this._canvas.remove(object)
     }
   }
 
   _move (direction) {
-    if (this.__selection) {
+    if (this._activeSelection) {
       if (this.__options.isPresentation) {
         switch (direction) {
           case directions.left:
@@ -167,26 +197,27 @@ export default class SelectTool extends Base {
         }
       } else {
         this._setSelection({ delayed: true })
+
         const increment = this._shiftPressed ? 10 : 1
 
         switch (direction) {
           case directions.left:
-            this.__selection.set({ left: this.__selection.get('left') - POSITION_INCREMENT * increment })
+            this._activeSelection.set({ left: this._activeSelection.get('left') - POSITION_INCREMENT * increment })
             break
 
           case directions.right:
-            this.__selection.set({ left: this.__selection.get('left') + POSITION_INCREMENT * increment })
+            this._activeSelection.set({ left: this._activeSelection.get('left') + POSITION_INCREMENT * increment })
             break
 
           case directions.up:
-            this.__selection.set({ top: this.__selection.get('top') - POSITION_INCREMENT * increment })
+            this._activeSelection.set({ top: this._activeSelection.get('top') - POSITION_INCREMENT * increment })
             break
 
           case directions.down:
-            this.__selection.set({ top: this.__selection.get('top') + POSITION_INCREMENT * increment })
+            this._activeSelection.set({ top: this._activeSelection.get('top') + POSITION_INCREMENT * increment })
             break
         }
-        this.__selection.setCoords()
+        this._activeSelection.setCoords()
         this._canvas.requestRenderAll()
       }
     }
@@ -203,34 +234,12 @@ export default class SelectTool extends Base {
   _setObject = (object) => {
     if (!object.get('_lockedselection')) {
       object.set({ '_lockedselection': this._canvas._id })
-      const updatedObject = fabric.util.object.clone(object)
-
-      updatedObject.set({ '_lockedlocal': this._canvas._id })
-
-      if (object.group) { // Если объект в группе, то надо пересчитать его координаты
-        const matrix = object.group.calcTransformMatrix()
-        const { x: left, y: top } = fabric.util.transformPoint({ x: object.left, y: object.top }, matrix)
-
-        updatedObject.set({ top, left })
-      }
-      this._canvas.trigger('object:modified', { target: updatedObject })
     }
   }
 
   _unsetObject = (object) => {
     if (object.get('_lockedselection')) {
       object.set({ '_lockedselection': undefined })
-      const updatedObject = fabric.util.object.clone(object)
-
-      updatedObject.set({ '_lockedlocal': this._canvas._id })
-
-      if (object.group) { // Если объект в группе, то надо пересчитать его координаты
-        const matrix = object.group.calcTransformMatrix()
-        const { x: left, y: top } = fabric.util.transformPoint({ x: object.left, y: object.top }, matrix)
-
-        updatedObject.set({ top, left })
-      }
-      this._canvas.trigger('object:modified', { target: updatedObject })
     }
   }
 
@@ -239,31 +248,21 @@ export default class SelectTool extends Base {
       if (opt.delayed) {
         this.__timer = setTimeout(() => {
           this.__lockedSelection = true
-          this._performAction(this._setObject)
+          this._performAction(this._setObject, true)
         }, DELAY)
       } else {
         this.__lockedSelection = true
-        this._performAction(this._setObject)
+        this._performAction(this._setObject, true)
       }
     }
   }
 
   _unsetSelection () {
-    this._performAction(this._unsetObject)
+    this._performAction(this._unsetObject, true)
 
     this.__lockedSelection = false
     this.__timer && clearTimeout(this.__timer)
     this.__timer = null
-  }
-
-  _triggerObjectModified = (object) => {
-    if (!object.get('_toDelete')) {
-      this._canvas.trigger('object:modified', { target: object })
-    }
-  }
-
-  _triggerModified () {
-    this._performAction(this._triggerObjectModified)
   }
 
   handleTextEditStartEvent (opts) {
@@ -275,12 +274,12 @@ export default class SelectTool extends Base {
     }
   }
 
-  handleTextEditEndEvent (opts) {
+  handleTextEditEndEvent () {
     this._unsetSelection()
   }
 
   handleMouseDownEvent () {
-    if (!this._active || !this.__selection) return
+    if (!this._active || !this._activeSelection) return
 
     this._mouseMove = true
   }
@@ -301,8 +300,7 @@ export default class SelectTool extends Base {
   handleKeyDownEvent (e) {
     if (!this._active) return
 
-    if (!this._mouseMove) {
-      const { keyCode } = e
+    const { keyCode } = e
 
       this._shiftPressed = e.shiftKey
 
@@ -360,26 +358,16 @@ export default class SelectTool extends Base {
     })
   }
 
-  handleSelectionUpdatedEvent (opts) {
-    if (!this._active) return
-    this.__selection = opts.target
-  }
+  handleSelectionUpdatedEvent () {}
 
-  handleSelectionCreatedEvent (opts) {
-    if (!this._active) return
-    this.__selection = opts.target
-  }
+  handleSelectionCreatedEvent () {}
 
-  handleSelectionClearedEvent (opts) {
-    if (!this._active) return
-    this.__selection = null
-  }
+  handleSelectionClearedEvent () {}
 
   reset () {
     this.__lockedSelection && this._unsetSelection()
     this._canvas.discardActiveObject()
 
-    this.__selection = null
     this._shiftPressed = false
     this._mouseMove = false
 
