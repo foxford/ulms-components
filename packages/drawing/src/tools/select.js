@@ -373,6 +373,16 @@ export default class SelectTool extends Base {
 
   handleSelectionClearedEvent () {}
 
+  makeInactive () {
+    super.makeInactive()
+    this._canvas.selection = false
+  }
+
+  makeActive () {
+    super.makeActive()
+    this._canvas.selection = true
+  }
+
   reset () {
     this.__lockedSelection && this._unsetSelection()
     this._canvas.discardActiveObject()
