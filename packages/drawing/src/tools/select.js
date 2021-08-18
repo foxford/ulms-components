@@ -78,7 +78,11 @@ export default class SelectTool extends Base {
       canvas.renderAll()
     } else {
       // Remove last object from ActiveSelection
-      canvas.discardActiveObject()
+      const activeObject = canvas.getActiveObject() || {}
+
+      if (activeObject._id === object._id) {
+        canvas.discardActiveObject()
+      }
     }
   }
 
