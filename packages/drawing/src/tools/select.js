@@ -135,13 +135,18 @@ export default class SelectTool extends Base {
     if (object.group) { // Если объект в группе, то надо пересчитать его координаты
       const updatedObject = fabric.util.object.clone(object) // Клонируем, чтобы на зааффектить локальные координаты в группе...
       const matrix = object.group.calcTransformMatrix()
+
       const { x: left, y: top } = fabric.util.transformPoint({ x: object.left, y: object.top }, matrix)
       const angle = (object.angle + object.group.angle) % 360
+      const scaleX = object.scaleX * object.group.scaleX
+      const scaleY = object.scaleX * object.group.scaleY
 
       updatedObject.set({
         top,
         left,
         angle,
+        scaleX,
+        scaleY,
         '_lockedlocal': this._canvas._id, // ...и локально пропускаем этот объект
       })
 
