@@ -27,6 +27,7 @@ export const enhancedFields = [
   '_lockedlocal',
   '_lockedbyuser',
   '_lockedselection',
+  '_onlyState',
   'noScaleCache',
   'strokeUniform',
 ]

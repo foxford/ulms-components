@@ -1,5 +1,4 @@
-/* eslint-disable default-case,no-fallthrough,no-param-reassign,import/no-extraneous-dependencies */
-import debounce from 'lodash/debounce'
+/* eslint-disable default-case,no-fallthrough,no-param-reassign */
 import { fabric } from 'fabric/dist/fabric.min'
 
 import { fromCSSColor, toCSSColor } from '../util/to-css-color'
@@ -114,7 +113,6 @@ export default class SelectTool extends Base {
     this._canvas.perPixelTargetFind = true
     this._canvas.defaultCursor = 'default'
     this._canvas.setCursor('default')
-    this._debouncedUnsetSelection = debounce(this._unsetSelection, DELAY)
   }
 
   _performAction (action, triggerModified = false, actionName = 'object:modified') {
@@ -243,13 +241,13 @@ export default class SelectTool extends Base {
 
   _setObject = (object) => {
     if (!object.get('_lockedselection')) {
-      object.set({ '_lockedselection': this._canvas._id })
+      object.set({ '_lockedselection': this._canvas._id, _onlyState: true })
     }
   }
 
   _unsetObject = (object) => {
     if (object.get('_lockedselection')) {
-      object.set({ '_lockedselection': undefined })
+      object.set({ '_lockedselection': undefined, _onlyState: false })
     }
   }
 
@@ -358,13 +356,12 @@ export default class SelectTool extends Base {
     if (!this._active) return
 
     this._shiftPressed = e.shiftKey
-
-    if (!this._mouseMove && this.__lockedSelection) {
+    if (!this._mouseMove) {
       if ((e.keyCode === UP_KEYCODE)
         || (e.keyCode === DOWN_KEYCODE)
         || (e.keyCode === LEFT_KEYCODE)
         || (e.keyCode === RIGHT_KEYCODE)) {
-        this._debouncedUnsetSelection()
+        this._unsetSelection()
       }
     }
   }
