@@ -494,6 +494,7 @@ export class Drawing extends React.Component {
 
     this.canvas.on('object:removed', (event) => {
       if (this.ignoreObjectRemovedEvent) return
+
       const { onObjectRemove } = this.props
 
       if (Array.isArray(event.target)) {
@@ -941,6 +942,10 @@ export class Drawing extends React.Component {
 
       if (objIndex === -1) {
         // add
+        if (_._restored) {
+          this._deletedObjects.delete(_._id)
+        }
+
         if (!this._deletedObjects.has(_._id)) {
           // if (nextObject._lockedselection && !onlineIds.includes(nextObject._lockedselection)) {
           if (selection && !this.LockProvider.isLocked(selection)) {
@@ -949,9 +954,6 @@ export class Drawing extends React.Component {
           }
 
           objectsToAdd.push(nextObject)
-        }
-        if (_._removed) {
-          this._deletedObjects.delete(_._id)
         }
       } else {
         // update (only if revision has been changed)
@@ -965,6 +967,10 @@ export class Drawing extends React.Component {
             // Удаляем объект из группы
             SelectTool.removeFromSelection(this.canvas, canvasObjects[objIndex])
           }
+        }
+        if (_._restored) {
+          // если объект "восстановленный" - тоже сбрасываем выделение
+          SelectTool.removeFromSelection(this.canvas, canvasObjects[objIndex])
         }
         if (_._lockedlocal !== this.canvas._id) {
           canvasObjects[objIndex].set(nextObject)

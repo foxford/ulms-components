@@ -19,6 +19,8 @@ const DOWN_KEYCODE = 40
 const LEFT_KEYCODE = 37
 const RIGHT_KEYCODE = 39
 
+const A_KEYCODE = 65
+
 const directions = {
   left: 'left',
   right: 'right',
@@ -76,7 +78,17 @@ export default class SelectTool extends Base {
       canvas.renderAll()
     } else {
       // Remove last object from ActiveSelection
-      canvas.discardActiveObject()
+      let activeObject = canvas.getActiveObject()
+
+      if (activeObject) {
+        if (activeObject.type === 'activeSelection') {
+          activeObject = activeObject._objects[0] || {}
+        }
+
+        if (activeObject._id === object._id) {
+          canvas.discardActiveObject()
+        }
+      }
     }
   }
 
@@ -196,27 +208,26 @@ export default class SelectTool extends Base {
       } else {
         this._setSelection({ delayed: true })
 
-        const selection = this._canvas.getActiveObject()
         const increment = this._shiftPressed ? 10 : 1
 
         switch (direction) {
           case directions.left:
-            selection.set({ left: selection.get('left') - POSITION_INCREMENT * increment })
+            this._activeSelection.set({ left: this._activeSelection.get('left') - POSITION_INCREMENT * increment })
             break
 
           case directions.right:
-            selection.set({ left: selection.get('left') + POSITION_INCREMENT * increment })
+            this._activeSelection.set({ left: this._activeSelection.get('left') + POSITION_INCREMENT * increment })
             break
 
           case directions.up:
-            selection.set({ top: selection.get('top') - POSITION_INCREMENT * increment })
+            this._activeSelection.set({ top: this._activeSelection.get('top') - POSITION_INCREMENT * increment })
             break
 
           case directions.down:
-            selection.set({ top: selection.get('top') + POSITION_INCREMENT * increment })
+            this._activeSelection.set({ top: this._activeSelection.get('top') + POSITION_INCREMENT * increment })
             break
         }
-        selection.setCoords()
+        this._activeSelection.setCoords()
         this._canvas.requestRenderAll()
       }
     }
@@ -299,9 +310,17 @@ export default class SelectTool extends Base {
   handleKeyDownEvent (e) {
     if (!this._active) return
 
-    if (!this._mouseMove) {
-      const { keyCode } = e
+    const { keyCode } = e
 
+    if (keyCode === A_KEYCODE && (e.metaKey || e.ctrlKey)) {
+      this._canvas.discardActiveObject()
+      const selection = new fabric.ActiveSelection(this._canvas.getObjects(), {
+        canvas: this._canvas,
+      })
+
+      this._canvas.setActiveObject(selection)
+      this._canvas.requestRenderAll()
+    } else if (!this._mouseMove) {
       this._shiftPressed = e.shiftKey
 
       switch (keyCode) {
@@ -363,6 +382,16 @@ export default class SelectTool extends Base {
   handleSelectionCreatedEvent () {}
 
   handleSelectionClearedEvent () {}
+
+  makeInactive () {
+    super.makeInactive()
+    this._canvas.selection = false
+  }
+
+  makeActive () {
+    super.makeActive()
+    this._canvas.selection = true
+  }
 
   reset () {
     this.__lockedSelection && this._unsetSelection()
