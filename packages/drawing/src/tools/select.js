@@ -187,19 +187,22 @@ export default class SelectTool extends Base {
   _moveDown = () => this._move(directions.down)
 
   _setObject (opt = {}) {
-    if (this.__object) {
-      this.__object._lockedselection = this._canvas._id
+    if (this.__object && !this.__object._lockedselection) {
       if (opt.delayed) {
         // пропускаем единичное нажатие клавиши
         this.__timer = setTimeout(() => {
-          this._triggerModified()
           if (this.__object) {
+            this.__object._lockedselection = this._canvas._id
+            this._triggerModified()
+
             this.__object._draft = true
           }
         }, DELAY)
+      } else {
+        this.__object._lockedselection = this._canvas._id
+        this._triggerModified()
+        this.__object._draft = true
       }
-      this._triggerModified()
-      this.__object._draft = true
     }
   }
 
@@ -232,7 +235,7 @@ export default class SelectTool extends Base {
     }
   }
 
-  handleTextEditEndEvent (opts) {
+  handleTextEditEndEvent () {
     this._unsetObject()
   }
 
@@ -299,9 +302,13 @@ export default class SelectTool extends Base {
     if (!this._active) return
 
     this._shiftPressed = e.shiftKey
-
-    if (!this._mouseMove && (this.__object && this.__object._lockedselection)) {
-      this._unsetObject()
+    if (!this._mouseMove) {
+      if ((e.keyCode === UP_KEYCODE)
+        || (e.keyCode === DOWN_KEYCODE)
+        || (e.keyCode === LEFT_KEYCODE)
+        || (e.keyCode === RIGHT_KEYCODE)) {
+        this._unsetObject()
+      }
     }
   }
 
@@ -323,7 +330,7 @@ export default class SelectTool extends Base {
     this.__object = opts.target
   }
 
-  handleSelectionClearedEvent (opts) {
+  handleSelectionClearedEvent () {
     if (!this._active) return
     this.__object = null
   }
