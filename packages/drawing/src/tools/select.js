@@ -193,7 +193,9 @@ export default class SelectTool extends Base {
         // пропускаем единичное нажатие клавиши
         this.__timer = setTimeout(() => {
           this._triggerModified()
-          this.__object._draft = true
+          if (this.__object) {
+            this.__object._draft = true
+          }
         }, DELAY)
       }
       this._triggerModified()
@@ -237,20 +239,18 @@ export default class SelectTool extends Base {
   handleMouseDownEvent () {
     if (!this._active || !this.__object) return
 
-    console.log('[select:handleMouseDownEvent]')
     this._mouseMove = true
   }
 
   handleMouseUpEvent () {
-    if (this._mouseMove && this.__object._lockedselection) {
+    if (this._mouseMove && (this.__object && this.__object._lockedselection)) {
       this._unsetObject()
     }
     this._mouseMove = false
   }
 
   handleMouseMoveEvent () {
-    this._mouseMove && console.log('[select:handleMouseMoveEvent]', this._mouseMove, this.__object && this.__object._lockedselection)
-    if (this._mouseMove && !this.__object._lockedselection) {
+    if (this._mouseMove && (this.__object && !this.__object._lockedselection)) {
       this._setObject()
     }
   }

@@ -96,7 +96,12 @@ fabric.util.loadImage = function loadImage (url, callback, context, crossOrigin)
     tp.getToken()
       .then((token) => {
         if (url.indexOf('access_token') !== -1) {
-          originalFabricLoadImageFn(url.replace(/\?access_token=(.*)$/i, `?access_token=${token}`), callback, context, crossOrigin)
+          originalFabricLoadImageFn(
+            url.replace(/\?access_token=(.*)$/i, `?access_token=${token}`),
+            callback,
+            context,
+            crossOrigin
+          )
         } else {
           originalFabricLoadImageFn(`${url}?access_token=${token}`, callback, context, crossOrigin)
         }
@@ -439,7 +444,8 @@ export class Drawing extends React.Component {
       }
     })
 
-    this.canvas.on('selection:cleared', ({ deselected }) => {
+    this.canvas.on('selection:cleared', (event) => {
+      const { deselected } = event
       if (!deselected || deselected.length !== 1) return
 
       const { onDraw } = this.props
@@ -969,7 +975,7 @@ export class Drawing extends React.Component {
       enlivenedObjects,
     } = this._updateCanvasObjects(canvasObjects, _objects)
 
-    if (objectsToRemove.length > 0) {
+    if (objectsToRemove.length) {
       this.ignoreObjectRemovedEvent = true
       this.canvas.remove(...objectsToRemove)
       this.ignoreObjectRemovedEvent = false
