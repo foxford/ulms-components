@@ -276,10 +276,11 @@ export class Drawing extends React.Component {
         || prevProps.brushColor !== brushColor
         || prevProps.shapeMode !== shapeMode
         || prevProps.brushMode !== brushMode
-        || (tool === toolEnum.PEN && brushMode !== penToolModeEnum.LINE)// need to update the tool if it's a pen
+        // need to update the tool if it's a pen
+        || (tool === toolEnum.PEN && brushMode !== penToolModeEnum.LINE)
       )
     ) {
-      if(prevProps.tool !== tool || tool !== toolEnum.SELECT) {
+      if (prevProps.tool !== tool || tool !== toolEnum.SELECT) {
         this.initTool(tool)
       }
     }
@@ -892,6 +893,7 @@ export class Drawing extends React.Component {
     const objectsToAdd = []
     const objectsToRemove = []
     const enlivenedObjects = new Map()
+    const { tool } = this.props
 
     // const { onlineIds } = this.props
 
@@ -930,7 +932,14 @@ export class Drawing extends React.Component {
         }
 
         if (_._lockedselection !== canvasObjects[objIndex]._lockedselection) {
-          SelectTool.updateObjectSelection(this.canvas, nextObject)
+          if (tool === toolEnum.SELECT) {
+            SelectTool.updateObjectSelection(this.canvas, nextObject)
+
+            if (_._lockedselection && _._lockedselection !== this.canvas._id) {
+              // Снимаем выделение
+              SelectTool.removeFromSelection(this.canvas, canvasObjects[objIndex])
+            }
+          }
         }
 
         canvasObjects[objIndex].set(nextObject)

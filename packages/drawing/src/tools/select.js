@@ -74,6 +74,27 @@ export default class SelectTool extends Base {
     }
   }
 
+  static removeFromSelection (canvas, object) {
+    if (canvas.getActiveObjects().length > 1) {
+      // Remove one object from ActiveSelection
+      canvas.getActiveObject().removeWithUpdate(object)
+      canvas.renderAll()
+    } else {
+      // Remove last object from ActiveSelection
+      let activeObject = canvas.getActiveObject()
+
+      if (activeObject) {
+        if (activeObject.type === 'activeSelection') {
+          activeObject = activeObject._objects[0] || {}
+        }
+
+        if (activeObject._id === object._id) {
+          canvas.discardActiveObject()
+        }
+      }
+    }
+  }
+
   _initialConfigure () {
     this._canvas.isDrawingMode = false
     this._canvas.selection = false
@@ -167,20 +188,23 @@ export default class SelectTool extends Base {
 
   _setObject (opt = {}) {
     if (this.__object) {
-      this.__object.set({ '_lockedselection': this._canvas._id })
+      this.__object._lockedselection = this._canvas._id
       if (opt.delayed) {
         // пропускаем единичное нажатие клавиши
         this.__timer = setTimeout(() => {
           this._triggerModified()
+          this.__object._draft = true
         }, DELAY)
       }
       this._triggerModified()
+      this.__object._draft = true
     }
   }
 
   _unsetObject () {
     if (this.__object) {
-      this.__object.set({ '_lockedselection': undefined })
+      this.__object._lockedselection = undefined
+      this.__object._draft = false
 
       this.__timer && clearTimeout(this.__timer)
       this.__timer = null
@@ -213,6 +237,7 @@ export default class SelectTool extends Base {
   handleMouseDownEvent () {
     if (!this._active || !this.__object) return
 
+    console.log('[select:handleMouseDownEvent]')
     this._mouseMove = true
   }
 
@@ -224,6 +249,7 @@ export default class SelectTool extends Base {
   }
 
   handleMouseMoveEvent () {
+    this._mouseMove && console.log('[select:handleMouseMoveEvent]', this._mouseMove, this.__object && this.__object._lockedselection)
     if (this._mouseMove && !this.__object._lockedselection) {
       this._setObject()
     }
@@ -274,7 +300,7 @@ export default class SelectTool extends Base {
 
     this._shiftPressed = e.shiftKey
 
-    if (!this._mouseMove && this.__object._lockedselection) {
+    if (!this._mouseMove && (this.__object && this.__object._lockedselection)) {
       this._unsetObject()
     }
   }
