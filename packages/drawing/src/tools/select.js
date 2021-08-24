@@ -1,4 +1,6 @@
-/* eslint-disable no-param-reassign,default-case,no-fallthrough */
+/* eslint-disable no-param-reassign,default-case,no-fallthrough,import/no-extraneous-dependencies */
+import debounce from 'lodash/debounce'
+
 import { fromCSSColor, toCSSColor } from '../util/to-css-color'
 
 import { Base } from './base'
@@ -6,7 +8,7 @@ import { makeInteractive, makeNotInteractive } from './object'
 
 const POSITION_INCREMENT = 10
 
-const DELAY = 100
+const DELAY = 300
 
 const DEL_KEYCODE = 46
 const BACKSPACE_KEYCODE = 8
@@ -74,12 +76,34 @@ export default class SelectTool extends Base {
     }
   }
 
+  static removeFromSelection (canvas, object) {
+    if (canvas.getActiveObjects().length > 1) {
+      // Remove one object from ActiveSelection
+      canvas.getActiveObject().removeWithUpdate(object)
+      canvas.renderAll()
+    } else {
+      // Remove last object from ActiveSelection
+      let activeObject = canvas.getActiveObject()
+
+      if (activeObject) {
+        if (activeObject.type === 'activeSelection') {
+          activeObject = activeObject._objects[0] || {}
+        }
+
+        if (activeObject._id === object._id) {
+          canvas.discardActiveObject()
+        }
+      }
+    }
+  }
+
   _initialConfigure () {
     this._canvas.isDrawingMode = false
     this._canvas.selection = false
     this._canvas.perPixelTargetFind = true
     this._canvas.defaultCursor = 'default'
     this._canvas.setCursor('default')
+    this._debouncedUnsetSelection = debounce(this._unsetObject, DELAY)
   }
 
   configure (opt) {
@@ -130,7 +154,7 @@ export default class SelectTool extends Base {
         }
       } else {
         if (!this.__object._lockedselection) {
-          this._setObject({ delayed: true })
+          this._setObject()
         }
         const increment = this._shiftPressed ? 10 : 1
 
@@ -165,23 +189,24 @@ export default class SelectTool extends Base {
 
   _moveDown = () => this._move(directions.down)
 
-  _setObject (opt = {}) {
-    if (this.__object) {
-      this.__object.set({ '_lockedselection': this._canvas._id })
-      if (opt.delayed) {
-        // пропускаем единичное нажатие клавиши
-        this.__timer = setTimeout(() => {
-          this._triggerModified()
-        }, DELAY)
-      }
+  _setObject () {
+    if (this.__object && !this.__object._lockedselection) {
+      this.__object.set({
+        _lockedselection: this._canvas._id,
+        _onlyState: true,
+      })
       this._triggerModified()
+      this.__object._draft = true // пропускаем лишний object:modified от fabric
     }
   }
 
   _unsetObject () {
     if (this.__object) {
-      this.__object.set({ '_lockedselection': undefined })
-
+      this.__object.set({
+        _lockedselection: undefined,
+        _draft: false,
+        _onlyState: false,
+      })
       this.__timer && clearTimeout(this.__timer)
       this.__timer = null
 
@@ -206,7 +231,7 @@ export default class SelectTool extends Base {
     }
   }
 
-  handleTextEditEndEvent (opts) {
+  handleTextEditEndEvent () {
     this._unsetObject()
   }
 
@@ -217,14 +242,14 @@ export default class SelectTool extends Base {
   }
 
   handleMouseUpEvent () {
-    if (this._mouseMove && this.__object._lockedselection) {
+    if (this._mouseMove && (this.__object && this.__object._lockedselection)) {
       this._unsetObject()
     }
     this._mouseMove = false
   }
 
   handleMouseMoveEvent () {
-    if (this._mouseMove && !this.__object._lockedselection) {
+    if (this._mouseMove && (this.__object && !this.__object._lockedselection)) {
       this._setObject()
     }
   }
@@ -273,9 +298,13 @@ export default class SelectTool extends Base {
     if (!this._active) return
 
     this._shiftPressed = e.shiftKey
-
-    if (!this._mouseMove && this.__object._lockedselection) {
-      this._unsetObject()
+    if (!this._mouseMove) {
+      if ((e.keyCode === UP_KEYCODE)
+        || (e.keyCode === DOWN_KEYCODE)
+        || (e.keyCode === LEFT_KEYCODE)
+        || (e.keyCode === RIGHT_KEYCODE)) {
+        this._debouncedUnsetSelection()
+      }
     }
   }
 
@@ -297,7 +326,7 @@ export default class SelectTool extends Base {
     this.__object = opts.target
   }
 
-  handleSelectionClearedEvent (opts) {
+  handleSelectionClearedEvent () {
     if (!this._active) return
     this.__object = null
   }

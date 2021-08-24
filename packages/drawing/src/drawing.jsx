@@ -96,7 +96,12 @@ fabric.util.loadImage = function loadImage (url, callback, context, crossOrigin)
     tp.getToken()
       .then((token) => {
         if (url.indexOf('access_token') !== -1) {
-          originalFabricLoadImageFn(url.replace(/\?access_token=(.*)$/i, `?access_token=${token}`), callback, context, crossOrigin)
+          originalFabricLoadImageFn(
+            url.replace(/\?access_token=(.*)$/i, `?access_token=${token}`),
+            callback,
+            context,
+            crossOrigin
+          )
         } else {
           originalFabricLoadImageFn(`${url}?access_token=${token}`, callback, context, crossOrigin)
         }
@@ -276,10 +281,11 @@ export class Drawing extends React.Component {
         || prevProps.brushColor !== brushColor
         || prevProps.shapeMode !== shapeMode
         || prevProps.brushMode !== brushMode
-        || (tool === toolEnum.PEN && brushMode !== penToolModeEnum.LINE)// need to update the tool if it's a pen
+        // need to update the tool if it's a pen
+        || (tool === toolEnum.PEN && brushMode !== penToolModeEnum.LINE)
       )
     ) {
-      if(prevProps.tool !== tool || tool !== toolEnum.SELECT) {
+      if (prevProps.tool !== tool || tool !== toolEnum.SELECT) {
         this.initTool(tool)
       }
     }
@@ -438,7 +444,8 @@ export class Drawing extends React.Component {
       }
     })
 
-    this.canvas.on('selection:cleared', ({ deselected }) => {
+    this.canvas.on('selection:cleared', (event) => {
+      const { deselected } = event
       if (!deselected || deselected.length !== 1) return
 
       const { onDraw } = this.props
@@ -892,6 +899,7 @@ export class Drawing extends React.Component {
     const objectsToAdd = []
     const objectsToRemove = []
     const enlivenedObjects = new Map()
+    const { tool } = this.props
 
     // const { onlineIds } = this.props
 
@@ -930,10 +938,25 @@ export class Drawing extends React.Component {
         }
 
         if (_._lockedselection !== canvasObjects[objIndex]._lockedselection) {
-          SelectTool.updateObjectSelection(this.canvas, nextObject)
-        }
+          if (tool === toolEnum.SELECT) {
+            SelectTool.updateObjectSelection(this.canvas, nextObject)
 
-        canvasObjects[objIndex].set(nextObject)
+            if (_._lockedselection && _._lockedselection !== this.canvas._id) {
+              // Снимаем выделение
+              SelectTool.removeFromSelection(this.canvas, canvasObjects[objIndex])
+            }
+          }
+        }
+        if (_._restored) {
+          // если объект "восстановленный" - тоже сбрасываем выделение
+          SelectTool.removeFromSelection(this.canvas, canvasObjects[objIndex])
+        }
+        if (_._lockedselection !== this.canvas._id) {
+          canvasObjects[objIndex].set(nextObject)
+        } else {
+          // локальные изменения уже есть - только обновляем _rev
+          canvasObjects[objIndex].set({ _rev: _._rev })
+        }
 
         !LockTool.isLocked(canvasObjects[objIndex])
           ? LockTool.unlockObject(canvasObjects[objIndex])
@@ -960,7 +983,7 @@ export class Drawing extends React.Component {
       enlivenedObjects,
     } = this._updateCanvasObjects(canvasObjects, _objects)
 
-    if (objectsToRemove.length > 0) {
+    if (objectsToRemove.length) {
       this.ignoreObjectRemovedEvent = true
       this.canvas.remove(...objectsToRemove)
       this.ignoreObjectRemovedEvent = false
