@@ -1,4 +1,6 @@
-/* eslint-disable no-param-reassign,default-case,no-fallthrough */
+/* eslint-disable no-param-reassign,default-case,no-fallthrough,import/no-extraneous-dependencies */
+import debounce from 'lodash/debounce'
+
 import { fromCSSColor, toCSSColor } from '../util/to-css-color'
 
 import { Base } from './base'
@@ -6,7 +8,7 @@ import { makeInteractive, makeNotInteractive } from './object'
 
 const POSITION_INCREMENT = 10
 
-const DELAY = 100
+const DELAY = 300
 
 const DEL_KEYCODE = 46
 const BACKSPACE_KEYCODE = 8
@@ -101,6 +103,7 @@ export default class SelectTool extends Base {
     this._canvas.perPixelTargetFind = true
     this._canvas.defaultCursor = 'default'
     this._canvas.setCursor('default')
+    this._debouncedUnsetSelection = debounce(this._unsetObject, DELAY)
   }
 
   configure (opt) {
@@ -151,7 +154,7 @@ export default class SelectTool extends Base {
         }
       } else {
         if (!this.__object._lockedselection) {
-          this._setObject({ delayed: true })
+          this._setObject()
         }
         const increment = this._shiftPressed ? 10 : 1
 
@@ -186,31 +189,24 @@ export default class SelectTool extends Base {
 
   _moveDown = () => this._move(directions.down)
 
-  _setObject (opt = {}) {
+  _setObject () {
     if (this.__object && !this.__object._lockedselection) {
-      if (opt.delayed) {
-        // пропускаем единичное нажатие клавиши
-        this.__timer = setTimeout(() => {
-          if (this.__object) {
-            this.__object._lockedselection = this._canvas._id
-            this._triggerModified()
-
-            this.__object._draft = true
-          }
-        }, DELAY)
-      } else {
-        this.__object._lockedselection = this._canvas._id
-        this._triggerModified()
-        this.__object._draft = true
-      }
+      this.__object.set({
+        _lockedselection: this._canvas._id,
+        _onlyState: true,
+      })
+      this._triggerModified()
+      this.__object._draft = true // пропускаем лишний object:modified от fabric
     }
   }
 
   _unsetObject () {
     if (this.__object) {
-      this.__object._lockedselection = undefined
-      this.__object._draft = false
-
+      this.__object.set({
+        _lockedselection: undefined,
+        _draft: false,
+        _onlyState: false,
+      })
       this.__timer && clearTimeout(this.__timer)
       this.__timer = null
 
@@ -307,7 +303,7 @@ export default class SelectTool extends Base {
         || (e.keyCode === DOWN_KEYCODE)
         || (e.keyCode === LEFT_KEYCODE)
         || (e.keyCode === RIGHT_KEYCODE)) {
-        this._unsetObject()
+        this._debouncedUnsetSelection()
       }
     }
   }

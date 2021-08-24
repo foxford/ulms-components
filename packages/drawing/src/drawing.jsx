@@ -947,8 +947,16 @@ export class Drawing extends React.Component {
             }
           }
         }
-
-        canvasObjects[objIndex].set(nextObject)
+        if (_._restored) {
+          // если объект "восстановленный" - тоже сбрасываем выделение
+          SelectTool.removeFromSelection(this.canvas, canvasObjects[objIndex])
+        }
+        if (_._lockedselection !== this.canvas._id) {
+          canvasObjects[objIndex].set(nextObject)
+        } else {
+          // локальные изменения уже есть - только обновляем _rev
+          canvasObjects[objIndex].set({ _rev: _._rev })
+        }
 
         !LockTool.isLocked(canvasObjects[objIndex])
           ? LockTool.unlockObject(canvasObjects[objIndex])
