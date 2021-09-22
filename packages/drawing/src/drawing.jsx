@@ -402,10 +402,12 @@ export class Drawing extends React.Component {
       selectOnInit,
       clientId,
       uniqId,
+      disableMobileGestures,
     } = this.props
 
     this.canvas = new fabric.Canvas('canvas', {
       enablePointerEvents: 'PointerEvent' in window,
+      allowTouchScrolling: !disableMobileGestures,
     })
     this.canvas._id = clientId
     this.canvas.freeDrawingBrush = new fabric.OptimizedPencilBrush(this.canvas)
@@ -497,7 +499,7 @@ export class Drawing extends React.Component {
 
     this.canvas.on('after:render', () => this._handleAfterRender())
 
-    if (!this._hammer) {
+    if (!this._hammer && !disableMobileGestures) {
       this.initHammer(this.canvas.upperCanvasEl)
     }
 
