@@ -4,17 +4,19 @@ import React from 'react'
 import cn from 'classnames-es'
 import Floater from 'react-floater'
 import Slider from 'rc-slider/lib/Slider'
+import { FormattedMessage, injectIntl } from 'react-intl'
 import { penToolModeEnum, toolEnum } from '@ulms/ui-drawing'
 
 import IconLine from './icons/icon-tool-line.svg'
 import IconMarker from './icons/icon-tool-marker.svg'
 import IconPencil from './icons/icon-tool-pencil.svg'
 
-export const GroupPen = ({
+const _GroupPen = ({
   brushMode,
   brushWidth,
   css,
   handleChange,
+  intl,
   opened,
   tool,
 }) => (
@@ -29,7 +31,7 @@ export const GroupPen = ({
             onClick={() => handleChange({ brushMode: penToolModeEnum.PENCIL, tool: toolEnum.PEN })}
             role='button'
             tabIndex='0'
-            title='Карандаш (P)'
+            title={intl.formatMessage({ id: 'PENCIL' })}
           >
             <IconPencil />
           </div>
@@ -51,14 +53,14 @@ export const GroupPen = ({
             onClick={() => handleChange({ brushMode: penToolModeEnum.LINE, tool: toolEnum.PEN })}
             role='button'
             tabIndex='0'
-            title='Линия (L)'
+            title={intl.formatMessage({ id: 'LINE' })}
           >
             <IconLine />
           </div>
         </div>
         <div className={css.separator} />
         <div>
-          <div>Толщина линии</div>
+          <div><FormattedMessage id='LINE_THICKNESS' /></div>
           <br />
           <Slider
             min={2}
@@ -80,3 +82,5 @@ export const GroupPen = ({
     target={`.${css.root} .group-pen`}
   />
 )
+
+export const GroupPen = injectIntl(_GroupPen)
