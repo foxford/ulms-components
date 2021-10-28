@@ -522,7 +522,10 @@ export class Drawing extends React.Component {
   }
 
   initStaticCanvas () {
+    const { clientId } = this.props
+
     this.canvas = new fabric.StaticCanvas('canvas')
+    this.canvas._id = clientId
   }
 
   updateCanvasPattern () {
