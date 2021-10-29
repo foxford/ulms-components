@@ -1,11 +1,14 @@
-/* eslint-disable max-len, react/prop-types, jsx-a11y/no-static-element-interactions, react/jsx-one-expression-per-line */
+/* eslint-disable max-len, react/prop-types, jsx-a11y/no-static-element-interactions, react/jsx-one-expression-per-line,max-classes-per-file */
 import React from 'react'
+import { injectIntl, IntlProvider } from 'react-intl'
 import cx from 'classnames-es'
 import scrollIntoView from 'scroll-into-view-if-needed'
 import VisibilitySensor from 'react-visibility-sensor'
 import { Icons } from '@ulms/ui-icons'
 import { SizeMe } from 'react-sizeme'
 import { Spinner } from '@ulms/ui-spinner'
+
+import { messagesIntl } from '../lang'
 
 import css from './presentation.module.css'
 
@@ -27,7 +30,7 @@ function calculateFitSize (containerWidth, containerHeight, imageWidth, imageHei
   }
 }
 
-export class Presentation extends React.Component {
+class PresentationComponent extends React.Component {
   componentDidMount () {
     this.maybeScrollToActive()
   }
@@ -104,6 +107,7 @@ export class Presentation extends React.Component {
   render () {
     const {
       index,
+      intl,
       collection,
       fitToWidth,
       onChange,
@@ -212,7 +216,8 @@ export class Presentation extends React.Component {
                         disabled={index === 0}
                         data-presentation-previous
                       >
-                        <span className={css.linkArrowIcon}><Icons name='arrow-left' size='xs' /></span> Назад
+                        <span className={css.linkArrowIcon}><Icons name='arrow-left' size='xs' /></span>
+                        {intl.formatMessage({ id: 'PREVIOUS' })}
                       </button>
                     </div>
                   )
@@ -220,7 +225,7 @@ export class Presentation extends React.Component {
                 {
                   showPagesCount && (
                     <div className={css.text}>
-                      Страница {collection[index].page} из {collection.length}
+                      {intl.formatMessage({ id: 'PAGES' }, { page: collection[index].page, total: collection.length })}
                     </div>
                   )
                 }
@@ -234,7 +239,8 @@ export class Presentation extends React.Component {
                         disabled={index === collection.length - 1}
                         data-presentation-next
                       >
-                        Вперед <span className={css.linkArrowIcon}><Icons name='arrow-right' size='xs' /></span>
+                        {intl.formatMessage({ id: 'NEXT' })}
+                        <span className={css.linkArrowIcon}><Icons name='arrow-right' size='xs' /></span>
                       </button>
                     </div>
                   )
@@ -247,3 +253,29 @@ export class Presentation extends React.Component {
     )
   }
 }
+
+const PresentationComponentIntl = injectIntl(PresentationComponent)
+
+export class PresentationIntl extends React.PureComponent {
+  render () {
+    const {
+      defaultLocale = 'ru',
+      locale = 'ru',
+      ...props
+    } = this.props
+
+    return (
+      <IntlProvider
+        defaultLocale={defaultLocale}
+        key={locale}
+        locale={locale}
+        messages={messagesIntl[locale]}
+      >
+        {/* eslint-disable-next-line react/jsx-props-no-spreading */}
+        <PresentationComponentIntl {...props} />
+      </IntlProvider>
+    )
+  }
+}
+
+export { PresentationIntl as Presentation }
