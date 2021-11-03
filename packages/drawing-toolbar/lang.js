@@ -44,7 +44,7 @@ export const messagesIntl = {
     HIGHLIGHTER: 'Pennarello',
     LINE: 'Linea (L)',
     LINE_THICKNESS: 'Larghezza linea',
-    LOCK: 'bloccare/sbloccare',
+    LOCK: 'Bloccare/Sbloccare',
     PENCIL: 'Matita (P)',
     SELECT: 'Selezionare (V)',
     SHAPE: 'Figura',
