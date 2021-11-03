@@ -42,7 +42,7 @@ const _GroupPen = ({
             onClick={() => handleChange({ brushMode: penToolModeEnum.MARKER, tool: toolEnum.PEN })}
             role='button'
             tabIndex='0'
-            title='Маркер'
+            title={intl.formatMessage({ id: 'HIGHLIGHTER' })}
           >
             <IconMarker />
           </div>
