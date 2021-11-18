@@ -424,9 +424,27 @@ export class Drawing extends React.Component {
     this.canvasRef.current.ownerDocument.addEventListener('keyup', this._handleKeyUp)
 
     this.canvas.on('object:added', (event) => {
-      const { onDraw } = this.props
+      const { onDraw, onUploadSvg } = this.props
       const object = event.target
       let serializedObj
+
+      if (object.type === 'path') {
+        const path = fabric.util.object.clone(object)
+        const objectPosition = {
+          top: path.top,
+          left: path.left,
+        }
+
+        path.set({ top: 0, left: 0 })
+        const boundingBox = path.getBoundingRect()
+        const SVG = `<svg width="${boundingBox.width.toFixed(4)}" height="${boundingBox.height.toFixed(4)}" viewBox="0 0 ${boundingBox.width.toFixed(4)} ${boundingBox.height.toFixed(4)}" fill="none" xmlns="http://www.w3.org/2000/svg">`
+          + `${path.toSVG()}`
+          + '</svg>'
+
+        onUploadSvg && onUploadSvg(SVG, objectPosition)
+
+        return
+      }
 
       // Skipping draft objects
       if (object._draft) return
@@ -840,6 +858,14 @@ export class Drawing extends React.Component {
         left: br.x - (br.x - tl.x) / 2 - image.width / 2,
         top: br.y - (br.y - tl.y) / 2 - image.height / 2,
       })
+
+      this.canvas.add(image)
+    }, options)
+  }
+
+  addSVG (url, options, position) {
+    fabric.Image.fromURL(url, (image) => {
+      image.set({ top: position.top, left: position.left })
 
       this.canvas.add(image)
     }, options)
