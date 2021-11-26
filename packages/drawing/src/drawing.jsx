@@ -470,6 +470,9 @@ export class Drawing extends React.Component {
 
       const serializedObj = object.toObject(enhancedFields)
 
+      if (isTextObject(object)) {
+        object.styles = {}
+      }
       if (isTextObject(object) && object._textBeforeEdit === '') {
         onDraw && onDraw(maybeRemoveToken(serializedObj))
       } else if (isShapeObject(object)) {
