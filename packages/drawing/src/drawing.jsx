@@ -89,6 +89,7 @@ function matchesStorageURIScheme (url) {
   return url.match(re)
 }
 
+fabric.disableStyleCopyPaste = true
 const originalFabricLoadImageFn = fabric.util.loadImage
 
 fabric.util.loadImage = function loadImage (url, callback, context, crossOrigin) {
