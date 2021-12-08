@@ -27,12 +27,12 @@
   "dependencies": {
     "classnames-es": "^2.2.6",
     "d3-queue": "~3.0.7",
-    "fabric": "^4.6.0",
+    "fabric": "4.6.0",
     "hammerjs": "~2.0.8",
     "react": "^16.14.0"
   },
   "peerDependencies": {
-    "fabric": "^4.6.0",
+    "fabric": "4.6.0",
     "react": "^15.6 || ^16.x || ^17.x"
   }
 }
