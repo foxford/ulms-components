@@ -1,6 +1,6 @@
 {
   "name": "@ulms/components",
-  "version": "1.5.0",
+  "version": "1.5.1",
   "description": "UI components library",
   "homepage": "https://github.com/netology-group/ulms-media-ui",
   "bugs": {
@@ -122,7 +122,7 @@
     "rollup": "^0.67.3",
     "rollup-plugin-alias": "^1.4.0",
     "rollup-plugin-babel": "^4.3.0",
-    "rollup-plugin-commonjs": "^9.1.5",
+    "rollup-plugin-commonjs": "^9.3.4",
     "rollup-plugin-json": "^3.0.0",
     "rollup-plugin-node-resolve": "^3.3.0",
     "rollup-plugin-postcss": "^1.6.2",

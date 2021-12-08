@@ -83,7 +83,8 @@ const rollupPlugins = [ // order matters
   cjs({
     include: 'node_modules/**',
     namedExports: {
-      'react-sizeme': ['SizeMe']
+      'react-sizeme': ['SizeMe'],
+      'fabric': ['fabric']
     }
   }),
   babel({
