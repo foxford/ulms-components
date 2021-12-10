@@ -89,6 +89,7 @@ function matchesStorageURIScheme (url) {
   return url.match(re)
 }
 
+fabric.disableStyleCopyPaste = true
 const originalFabricLoadImageFn = fabric.util.loadImage
 
 fabric.util.loadImage = function loadImage (url, callback, context, crossOrigin) {
@@ -540,6 +541,7 @@ export class Drawing extends React.Component {
 
   destroyCanvas () {
     if (this.canvas !== null) {
+      this.ignoreObjectRemovedEvent = true
       this.canvas.clear()
       this.canvas.dispose()
 
@@ -548,6 +550,7 @@ export class Drawing extends React.Component {
       this.canvasRef.current.ownerDocument.removeEventListener('keyup', this._handleKeyUp)
 
       this.canvas = null
+      this.ignoreObjectRemovedEvent = false
     }
   }
 
