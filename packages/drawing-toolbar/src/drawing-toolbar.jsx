@@ -1,8 +1,12 @@
+// eslint-disable-next-line max-classes-per-file
 import React from 'react'
+import { injectIntl, IntlProvider } from 'react-intl'
 import cn from 'classnames-es'
 import { cond } from 'ramda'
 import { Icons } from '@ulms/ui-icons'
 import { penToolModeEnum, shapeToolModeEnum, toolEnum } from '@ulms/ui-drawing'
+
+import { messagesIntl } from '../lang'
 
 import { GroupColor } from './group-color'
 import { GroupEraser } from './group-eraser'
@@ -35,7 +39,7 @@ function supportPointerEvent () {
 
 const eventName = supportPointerEvent() ? 'pointerdown' : 'mousedown'
 
-export class DrawingToolbar extends React.Component {
+class _DrawingToolbarComponent extends React.Component {
   state = { opened: null }
 
   constructor () {
@@ -180,6 +184,7 @@ export class DrawingToolbar extends React.Component {
       grid,
       handleChange,
       hasLockSelection,
+      intl,
       noSeparator,
       shapeMode,
       tool,
@@ -211,7 +216,7 @@ export class DrawingToolbar extends React.Component {
               onKeyDown={this.handleSelectClick}
               role='button'
               tabIndex='0'
-              title='Выбрать (V)'
+              title={intl.formatMessage({ id: 'SELECT' })}
             >
               <IconSelect />
             </div>
@@ -224,7 +229,11 @@ export class DrawingToolbar extends React.Component {
               onKeyDown={this.handlePenClick}
               role='button'
               tabIndex='0'
-              title={brushMode === penToolModeEnum.MARKER ? 'Маркер' : brushMode === penToolModeEnum.LINE ? 'Линия (L)' : 'Карандаш (P)'}
+              title={brushMode === penToolModeEnum.MARKER
+                ? intl.formatMessage({ id: 'HIGHLIGHTER' })
+                : brushMode === penToolModeEnum.LINE
+                  ? intl.formatMessage({ id: 'LINE' })
+                  : intl.formatMessage({ id: 'PENCIL' })}
             >
               {
                     cond([
@@ -244,7 +253,7 @@ export class DrawingToolbar extends React.Component {
               onKeyDown={this.handleEraserClick}
               role='button'
               tabIndex='0'
-              title='Ластик (E)'
+              title={intl.formatMessage({ id: 'ERASER' })}
             >
               <IconElementEraser />
             </div>
@@ -257,7 +266,7 @@ export class DrawingToolbar extends React.Component {
               onKeyDown={this.handleColorClick}
               role='button'
               tabIndex='0'
-              title='Цвет'
+              title={intl.formatMessage({ id: 'COLOUR' })}
             >
               <div
                 className={css.colorButtonInner}
@@ -273,7 +282,7 @@ export class DrawingToolbar extends React.Component {
               onKeyDown={this.handleImageClick}
               role='button'
               tabIndex='0'
-              title='Загрузить изображение'
+              title={intl.formatMessage({ id: 'UPLOAD_IMAGE' })}
             >
               <IconImage />
             </div>
@@ -286,7 +295,7 @@ export class DrawingToolbar extends React.Component {
               onKeyDown={this.handleShapeClick}
               role='button'
               tabIndex='0'
-              title='Фигура'
+              title={intl.formatMessage({ id: 'SHAPE' })}
             >
               {
                 cond([
@@ -309,7 +318,7 @@ export class DrawingToolbar extends React.Component {
               onKeyDown={this.handleTextClick}
               role='button'
               tabIndex='0'
-              title='Текст (T)'
+              title={intl.formatMessage({ id: 'TEXT' })}
             >
               <div className={css.buttonInner}>
                 <IconText />
@@ -324,7 +333,7 @@ export class DrawingToolbar extends React.Component {
               onClick={this.handleLockClick}
               type='button'
             >
-              <div className={cn(css.buttonInner, css.svgStroke)} title='Изменить блокировку'>
+              <div className={cn(css.buttonInner, css.svgStroke)} title={intl.formatMessage({ id: 'LOCK' })}>
                 <Icons name='lock-outline' />
               </div>
             </button>
@@ -339,7 +348,7 @@ export class DrawingToolbar extends React.Component {
                 onKeyDown={this.handleZoomInClick}
                 role='button'
                 tabIndex='0'
-                title='Увеличить'
+                title={intl.formatMessage({ id: 'ZOOM_IN' })}
               >
                 <IconZoomIn />
               </div>
@@ -350,7 +359,7 @@ export class DrawingToolbar extends React.Component {
                 onKeyDown={this.handleZoomOutClick}
                 role='button'
                 tabIndex='0'
-                title='Уменьшить'
+                title={intl.formatMessage({ id: 'ZOOM_OUT' })}
               >
                 <IconZoomOut />
               </div>
@@ -376,7 +385,7 @@ export class DrawingToolbar extends React.Component {
               onKeyDown={this.handlePanClick}
               role='button'
               tabIndex='0'
-              title='Перемещение доски'
+              title={intl.formatMessage({ id: 'HAND' })}
             >
               <IconPan />
             </div>
@@ -389,7 +398,7 @@ export class DrawingToolbar extends React.Component {
               onKeyDown={this.handleGridClick}
               role='button'
               tabIndex='0'
-              title='Фоновая сетка'
+              title={intl.formatMessage({ id: 'GRID' })}
             >
               <IconGrid />
             </div>
@@ -439,3 +448,29 @@ export class DrawingToolbar extends React.Component {
     )
   }
 }
+
+const DrawingToolbarComponent = injectIntl(_DrawingToolbarComponent)
+
+export class DrawingToolbarIntl extends React.PureComponent {
+  render () {
+    const {
+      defaultLocale = 'ru',
+      locale = 'ru',
+      ...props
+    } = this.props
+
+    return (
+      <IntlProvider
+        defaultLocale={defaultLocale}
+        key={locale}
+        locale={locale}
+        messages={messagesIntl[locale]}
+      >
+        {/* eslint-disable-next-line react/jsx-props-no-spreading */}
+        <DrawingToolbarComponent {...props} />
+      </IntlProvider>
+    )
+  }
+}
+
+export { DrawingToolbarIntl as DrawingToolbar }

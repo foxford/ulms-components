@@ -110,8 +110,9 @@
 }
 
 .root .slideWrapper .controls .linkArrow {
+  display: inline-flex;
+  align-items: center;
   background-color: transparent;
-  display: block;
   border: none;
   font-size: 16px;
   line-height: 22px;
@@ -137,4 +138,5 @@
 
 .root .slideWrapper .controls .linkArrow .linkArrowIcon {
   vertical-align: text-top;
+  line-height: 1em;
 }

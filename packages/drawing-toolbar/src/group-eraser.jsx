@@ -2,6 +2,7 @@ import React from 'react'
 import cn from 'classnames-es'
 import Floater from 'react-floater'
 import Slider from 'rc-slider/lib/Slider'
+import { FormattedMessage } from 'react-intl'
 
 export const GroupEraser = ({
   css,
@@ -13,7 +14,7 @@ export const GroupEraser = ({
     component={() => (
       <div className={cn(css.popover, css.floater)}>
         <div>
-          <div>Чувствительность</div>
+          <div><FormattedMessage id='ERASER_SENSITIVITY' /></div>
           <br />
           <Slider
             min={1}

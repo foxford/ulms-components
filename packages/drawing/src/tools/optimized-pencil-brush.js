@@ -9,7 +9,15 @@ fabric.OptimizedPencilBrush = fabric.util.createClass(fabric.PencilBrush, {
   convertPointsToSVGPath (points) {
     const path = this.callSuper('convertPointsToSVGPath', points)
 
-    return path.map(_ => typeof _ === 'string' ? _ : fabric.util.toFixed(_, 2))
+    return path.map((_) => {
+      if (typeof _ === 'number') return fabric.util.toFixed(_, 2)
+      if (typeof _ === 'object') {
+        // eslint-disable-next-line no-param-reassign
+        Object.keys(_).forEach((key) => { _[key] = (typeof _[key] === 'number') ? fabric.util.toFixed(_[key], 2) : _[key] })
+      }
+
+      return _
+    })
   },
   _render () {
     if (!this._active) return

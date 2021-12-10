@@ -77,6 +77,8 @@ export default class SelectTool extends Base {
   }
 
   static removeFromSelection (canvas, object) {
+    if (!canvas || !canvas.getActiveObjects || !canvas.getActiveObject) return
+
     if (canvas.getActiveObjects().length > 1) {
       // Remove one object from ActiveSelection
       canvas.getActiveObject().removeWithUpdate(object)
@@ -218,7 +220,7 @@ export default class SelectTool extends Base {
 
   _triggerModified () {
     if (this.__object) {
-      this._canvas.trigger('object:modified', { target: this.__object })
+      this._canvas.fire('object:modified', { target: this.__object })
     }
   }
 

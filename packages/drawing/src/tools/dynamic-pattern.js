@@ -15,7 +15,7 @@ export default class DynamicPattern {
     this._zoom = 1
   }
 
-  _getPatternSource () {
+  _getPatternSource = () => {
     this._patternCanvas.setDimensions({
       width: this._patternImageWidth * this._zoom,
       height: this._patternImageHeight * this._zoom,
@@ -51,7 +51,7 @@ export default class DynamicPattern {
 
       if (!this._pattern) {
         this._pattern = new fabric.Pattern({
-          source: this._getPatternSource.bind(this),
+          source: this._getPatternSource(),
           repeat: 'repeat',
         })
       }
