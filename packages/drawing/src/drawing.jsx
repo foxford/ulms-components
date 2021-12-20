@@ -1092,7 +1092,9 @@ export class Drawing extends React.Component {
 
     return (
       <>
-        <canvas id='canvasPattern' ref={this.canvasPatternRef} width={width} height={height} style={{ display: pattern ? 'block' : 'none', position: 'absolute' }} />
+        <div style={{ position: 'absolute' }}>
+          <canvas id='canvasPattern' ref={this.canvasPatternRef} width={width} height={height} style={{ display: pattern ? 'block' : 'none' }} />
+        </div>
         <canvas id='canvas' ref={this.canvasRef} width={width} height={height} />
       </>
     )
