@@ -6,7 +6,6 @@ import Hammer from 'hammerjs'
 
 import { enhancedFields, penToolModeEnum, shapeToolModeEnum, toolEnum } from './constants'
 import { toCSSColor } from './util/to-css-color'
-import { LockProvider } from './lock-provider'
 
 import DynamicPattern from './tools/dynamic-pattern'
 // FIXME: fix cycle dep
@@ -41,7 +40,7 @@ export const normalizeFields = (object, fields) => Object.assign(
   }, {})
 )
 
-// TODO: use common tokenprovider
+// TODO: use common token provider
 class TokenProvider {
   constructor () {
     this._provider = null
@@ -154,12 +153,8 @@ export class Drawing extends React.Component {
     this._hammerZoom = null
 
     const {
-      _lockProvider,
       tokenProvider,
     } = this.props
-
-    this.__lockProvider = _lockProvider || new LockProvider()
-    this.__lockProvider.onUpdate(this._handleSelectionUpdate)
 
     if (!tokenProvider) throw new TypeError('Absent tokenProvider')
 
@@ -204,7 +199,7 @@ export class Drawing extends React.Component {
       height,
       objects,
       pattern,
-      // onlineIds,
+      lockedObjectsIds,
       shapeMode,
       tool,
       width,
@@ -230,12 +225,13 @@ export class Drawing extends React.Component {
       this.updateCanvasObjects(objects)
     }
 
-    /* if (tool === prevProps.tool && tool === toolEnum.SELECT) {
-      // FIXME: might not work for for three users (one come and one leave)
-      if (onlineIds && (onlineIds.length !== prevProps.onlineIds.length)) {
-        // SelectTool.updateAllSelection(this.canvas, onlineIds)
+    if (lockedObjectsIds !== prevProps.lockedObjectsIds) {
+      if (tool === prevProps.tool && tool === toolEnum.SELECT) {
+        this.__lockModeTool.updateAllLock(lockedObjectsIds)
       }
-    } */
+
+      return
+    }
 
     if (prevProps.pattern !== pattern) {
       if (pattern !== null) {
@@ -319,28 +315,7 @@ export class Drawing extends React.Component {
       this.dynamicPattern = null
     }
 
-    if (this.__lockProvider) {
-      this.__lockProvider.removeUpdateListener()
-
-      this.__lockProvider = null
-    }
-
     this.destroyCanvas()
-  }
-
-  get LockProvider () {
-    return this.__lockProvider
-  }
-
-  _handleSelectionUpdate = (prev, changed) => {
-    const { tool } = this.props
-
-    if (tool === toolEnum.SELECT && changed) {
-      const isLocked = this.LockProvider.isLocked.bind(this.LockProvider)
-      const isOwner = this.LockProvider.isOwner.bind(this.LockProvider)
-
-      SelectTool.updateAllSelection(this.canvas, isLocked, isOwner)
-    }
   }
 
   _handleKeyDown = (opts) => {
@@ -404,6 +379,8 @@ export class Drawing extends React.Component {
       clientId,
       uniqId,
       disableMobileGestures,
+      onLockSelection,
+      onSelection,
     } = this.props
 
     this.canvas = new fabric.Canvas('canvas', {
@@ -412,6 +389,10 @@ export class Drawing extends React.Component {
     })
     this.canvas._id = clientId
     this.canvas.freeDrawingBrush = new fabric.OptimizedPencilBrush(this.canvas)
+
+    this.__lockModeTool = new LockTool(this.canvas, onLockSelection, onSelection)
+    this.canvasRef.current.ownerDocument.addEventListener('keydown', this.__lockModeTool.handleKeyDownEvent)
+    this.canvasRef.current.ownerDocument.addEventListener('keyup', this.__lockModeTool.handleKeyUpEvent)
 
     this.canvas.on('mouse:down', opt => this._handleMouseDown(opt))
     this.canvas.on('mouse:move', opt => this._handleMouseMove(opt))
@@ -547,6 +528,8 @@ export class Drawing extends React.Component {
       this.canvas.clear()
       this.canvas.dispose()
 
+      this.canvasRef.current.ownerDocument.removeEventListener('keydown', this.__lockModeTool.handleKeyDownEvent)
+      this.canvasRef.current.ownerDocument.removeEventListener('keyup', this.__lockModeTool.handleKeyUpEvent)
       this.__cleanTools()
       this.canvasRef.current.ownerDocument.removeEventListener('keydown', this._handleKeyDown)
       this.canvasRef.current.ownerDocument.removeEventListener('keyup', this._handleKeyUp)
@@ -584,8 +567,7 @@ export class Drawing extends React.Component {
       brushColor,
       brushMode,
       isPresentation,
-      onLockDeselection,
-      onLockSelection,
+      lockedObjectsIds,
       selectOnInit,
       shapeMode,
     } = this.props
@@ -613,6 +595,7 @@ export class Drawing extends React.Component {
 
       case toolEnum.SELECT:
         this.tool = new SelectTool(this.canvas, { isPresentation })
+        this.__lockModeTool.updateAllLock(lockedObjectsIds)
 
         break
 
@@ -734,9 +717,6 @@ export class Drawing extends React.Component {
       default:
         this.tool = new PenTool(this.canvas)
     }
-
-    this.__cleanTools()
-    this.__lockModeTool = new LockTool(this.canvas, onLockSelection, onLockDeselection)
 
     this.configureTool(true)
   }
@@ -907,9 +887,6 @@ export class Drawing extends React.Component {
     const objectsToAdd = []
     const objectsToRemove = []
     const enlivenedObjects = new Map()
-    const { tool } = this.props
-
-    // const { onlineIds } = this.props
 
     this.destroyQueues()
 
@@ -927,17 +904,9 @@ export class Drawing extends React.Component {
     objects.forEach((_) => {
       const objIndex = canvasObjectIds.indexOf(_._id)
       const nextObject = normalizeFields(_, enhancedFields)
-      const { _lockedselection: selection } = nextObject
 
       if (objIndex === -1) {
         // add
-
-        // if (nextObject._lockedselection && !onlineIds.includes(nextObject._lockedselection)) {
-        if (selection && !this.LockProvider.isLocked(selection)) {
-          nextObject._lockedselection = undefined
-          // cleanup selection if present but is not locked according the provider
-        }
-
         objectsToAdd.push(nextObject)
       } else {
         // update (only if revision has been changed)
@@ -945,26 +914,12 @@ export class Drawing extends React.Component {
           return
         }
 
-        if (_._lockedselection !== canvasObjects[objIndex]._lockedselection) {
-          if (tool === toolEnum.SELECT) {
-            SelectTool.updateObjectSelection(this.canvas, nextObject)
-
-            if (_._lockedselection && _._lockedselection !== this.canvas._id) {
-              // Снимаем выделение
-              SelectTool.removeFromSelection(this.canvas, canvasObjects[objIndex])
-            }
-          }
-        }
         if (_._restored) {
           // если объект "восстановленный" - тоже сбрасываем выделение
           SelectTool.removeFromSelection(this.canvas, canvasObjects[objIndex])
         }
-        if (_._lockedselection !== this.canvas._id) {
-          canvasObjects[objIndex].set(nextObject)
-        } else {
-          // локальные изменения уже есть - только обновляем _rev
-          canvasObjects[objIndex].set({ _rev: _._rev })
-        }
+
+        canvasObjects[objIndex].set(nextObject)
 
         !LockTool.isLocked(canvasObjects[objIndex])
           ? LockTool.unlockObject(canvasObjects[objIndex])

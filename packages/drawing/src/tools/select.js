@@ -3,20 +3,11 @@ import debounce from 'lodash/debounce'
 
 import { fromCSSColor, toCSSColor } from '../util/to-css-color'
 
+import { keycodes, DEBOUNCE_DELAY } from '../constants'
+
 import { Base } from './base'
-import { makeInteractive, makeNotInteractive } from './object'
 
 const POSITION_INCREMENT = 10
-
-const DELAY = 300
-
-const DEL_KEYCODE = 46
-const BACKSPACE_KEYCODE = 8
-
-const UP_KEYCODE = 38
-const DOWN_KEYCODE = 40
-const LEFT_KEYCODE = 37
-const RIGHT_KEYCODE = 39
 
 const directions = {
   left: 'left',
@@ -32,48 +23,11 @@ export default class SelectTool extends Base {
     this.__object = null
     this.__options = options
 
-    this._timer = null
-    this._shiftPressed = false
-    this._mouseMove = false
-
-    this._canvas.forEachObject((_) => {
-      if (_._lockedselection && (_._lockedselection !== this._canvas._id)) {
-        makeNotInteractive(_)
-      } else {
-        makeInteractive(_)
-      }
-    })
+    this.__timer = null
+    this.__shiftPressed = false
+    this.__mouseDown = false
 
     this._initialConfigure()
-  }
-
-  static isLockedSelection (object) {
-    return !!object._lockedselection
-  }
-
-  static updateAllSelection (canvas, isSelected, isOwner) {
-    canvas.forEachObject((_) => {
-      const { _lockedselection: selection } = (_ || {})
-
-      if (_ && selection) {
-        if (isSelected(selection)) {
-          makeNotInteractive(_)
-        } else {
-          makeInteractive(_)
-          if (!isOwner(selection)) {
-            _.set({ '_lockedselection': undefined })
-          }
-        }
-      }
-    })
-  }
-
-  static updateObjectSelection (canvas, object) {
-    if (object._lockedselection && (object._lockedselection !== canvas._id)) {
-      makeNotInteractive(object)
-    } else {
-      makeInteractive(object)
-    }
   }
 
   static removeFromSelection (canvas, object) {
@@ -105,7 +59,7 @@ export default class SelectTool extends Base {
     this._canvas.perPixelTargetFind = true
     this._canvas.defaultCursor = 'default'
     this._canvas.setCursor('default')
-    this._debouncedUnsetSelection = debounce(this._unsetObject, DELAY)
+    this._debouncedTriggerModified = debounce(this._triggerModified, DEBOUNCE_DELAY)
   }
 
   configure (opt) {
@@ -134,7 +88,6 @@ export default class SelectTool extends Base {
   }
 
   destroy () {
-    this._unsetObject()
     this._canvas.discardActiveObject()
   }
 
@@ -155,10 +108,7 @@ export default class SelectTool extends Base {
             this.destroy() // Moving to another page
         }
       } else {
-        if (!this.__object._lockedselection) {
-          this._setObject()
-        }
-        const increment = this._shiftPressed ? 10 : 1
+        const increment = this.__shiftPressed ? 10 : 1
 
         switch (direction) {
           case directions.left:
@@ -179,6 +129,7 @@ export default class SelectTool extends Base {
         }
         this.__object.setCoords()
         this._canvas.renderAll()
+        this._debouncedTriggerModified()
       }
     }
   }
@@ -191,33 +142,6 @@ export default class SelectTool extends Base {
 
   _moveDown = () => this._move(directions.down)
 
-  _setObject () {
-    if (this.__object && !this.__object._lockedselection) {
-      this.__object.set({
-        _lockedselection: this._canvas._id,
-        _onlyState: true,
-      })
-      this._triggerModified()
-      this.__object._draft = true // пропускаем лишний object:modified от fabric
-    }
-  }
-
-  _unsetObject () {
-    if (this.__object) {
-      this.__object.set({
-        _lockedselection: undefined,
-        _draft: false,
-        _onlyState: false,
-      })
-      this.__timer && clearTimeout(this.__timer)
-      this.__timer = null
-
-      if (!this.__object.get('_toDelete')) {
-        this._triggerModified()
-      }
-    }
-  }
-
   _triggerModified () {
     if (this.__object) {
       this._canvas.fire('object:modified', { target: this.__object })
@@ -225,7 +149,6 @@ export default class SelectTool extends Base {
   }
 
   handleTextEditStartEvent (opts) {
-    this._setObject()
     if (opts.target && opts.target.hiddenTextarea) {
       opts.target.hiddenTextarea.style.width = '10px'
       opts.target.hiddenTextarea.style.height = '10px'
@@ -234,61 +157,50 @@ export default class SelectTool extends Base {
   }
 
   handleTextEditEndEvent () {
-    this._unsetObject()
+    this._triggerModified()
   }
 
   handleMouseDownEvent () {
-    if (!this._active || !this.__object) return
-
-    this._mouseMove = true
+    this.__mouseDown = true
   }
 
   handleMouseUpEvent () {
-    if (this._mouseMove && (this.__object && this.__object._lockedselection)) {
-      this._unsetObject()
-    }
-    this._mouseMove = false
-  }
-
-  handleMouseMoveEvent () {
-    if (this._mouseMove && (this.__object && !this.__object._lockedselection)) {
-      this._setObject()
-    }
+    this.__mouseDown = false
   }
 
   handleKeyDownEvent (e) {
     if (!this._active) return
     if (this.__object && this.__object.isEditing) return
 
-    if (!this._mouseMove && (this.__object && !this.__object._lockedbyuser)) {
+    if (!this.__mouseDown && (this.__object && !this.__object._lockedbyuser)) {
       const { keyCode } = e
 
-      this._shiftPressed = e.shiftKey
+      this.__shiftPressed = e.shiftKey
 
       switch (keyCode) {
-        case DEL_KEYCODE:
+        case keycodes.DEL_KEYCODE:
 
-        case BACKSPACE_KEYCODE:
+        case keycodes.BACKSPACE_KEYCODE:
           this._deleteObject()
 
           break
 
-        case UP_KEYCODE:
+        case keycodes.UP_KEYCODE:
           this._moveUp()
 
           break
 
-        case DOWN_KEYCODE:
+        case keycodes.DOWN_KEYCODE:
           this._moveDown()
 
           break
 
-        case LEFT_KEYCODE:
+        case keycodes.LEFT_KEYCODE:
           this._moveLeft()
 
           break
 
-        case RIGHT_KEYCODE:
+        case keycodes.RIGHT_KEYCODE:
           this._moveRight()
 
           break
@@ -299,15 +211,7 @@ export default class SelectTool extends Base {
   handleKeyUpEvent (e) {
     if (!this._active) return
 
-    this._shiftPressed = e.shiftKey
-    if (!this._mouseMove) {
-      if ((e.keyCode === UP_KEYCODE)
-        || (e.keyCode === DOWN_KEYCODE)
-        || (e.keyCode === LEFT_KEYCODE)
-        || (e.keyCode === RIGHT_KEYCODE)) {
-        this._debouncedUnsetSelection()
-      }
-    }
+    this.__shiftPressed = e.shiftKey
   }
 
   handleObjectAddedEvent (opts) {
@@ -334,12 +238,11 @@ export default class SelectTool extends Base {
   }
 
   reset () {
-    this._shiftPressed = false
-    this._mouseMove = false
+    this.__shiftPressed = false
+    this.__mouseDown = false
 
     this._canvas._currentTransform = null
 
-    this._unsetObject()
     this._canvas.discardActiveObject()
   }
 }
