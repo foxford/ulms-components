@@ -229,8 +229,6 @@ export class Drawing extends React.Component {
       if (tool === prevProps.tool && tool === toolEnum.SELECT) {
         this.__lockModeTool.updateAllLock(lockedObjectsIds)
       }
-
-      return
     }
 
     if (prevProps.pattern !== pattern) {
@@ -886,7 +884,6 @@ export class Drawing extends React.Component {
     const newObjectIds = new Set(objects.map(_ => _._id))
     const objectsToAdd = []
     const objectsToRemove = []
-    const enlivenedObjects = new Map()
 
     this.destroyQueues()
 
@@ -933,17 +930,16 @@ export class Drawing extends React.Component {
       objects,
       objectsToAdd,
       objectsToRemove,
-      enlivenedObjects,
     }
   }
 
   updateCanvasObjects (_objects) {
     const canvasObjects = this.canvas.getObjects()
+    const enlivenedObjects = new Map()
     const {
       objects,
       objectsToAdd,
       objectsToRemove,
-      enlivenedObjects,
     } = this._updateCanvasObjects(canvasObjects, _objects)
 
     if (objectsToRemove.length) {
