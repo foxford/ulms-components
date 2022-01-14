@@ -6,6 +6,7 @@ import Hammer from 'hammerjs'
 
 import { enhancedFields, penToolModeEnum, shapeToolModeEnum, toolEnum } from './constants'
 import { toCSSColor } from './util/to-css-color'
+import { LockProvider } from './lock-provider'
 
 import DynamicPattern from './tools/dynamic-pattern'
 // FIXME: fix cycle dep
@@ -175,6 +176,8 @@ export class Drawing extends React.Component {
       this.initStaticCanvas()
     }
 
+    LockProvider.canvas = this.canvas
+
     if (pattern) {
       this.initCanvasPattern()
 
@@ -199,7 +202,6 @@ export class Drawing extends React.Component {
       height,
       objects,
       pattern,
-      lockedObjectsIds,
       shapeMode,
       tool,
       width,
@@ -223,12 +225,6 @@ export class Drawing extends React.Component {
 
       this.updateCanvasParameters(true)
       this.updateCanvasObjects(objects)
-    }
-
-    if (lockedObjectsIds !== prevProps.lockedObjectsIds) {
-      if (tool === prevProps.tool && tool === toolEnum.SELECT) {
-        this.__lockModeTool.updateAllLock(lockedObjectsIds)
-      }
     }
 
     if (prevProps.pattern !== pattern) {
@@ -565,12 +561,13 @@ export class Drawing extends React.Component {
       brushColor,
       brushMode,
       isPresentation,
-      lockedObjectsIds,
       selectOnInit,
       shapeMode,
     } = this.props
 
     this.tool && this.tool.destroy()
+
+    LockProvider.tool = tool
 
     switch (tool) {
       case toolEnum.ERASER:
@@ -593,7 +590,7 @@ export class Drawing extends React.Component {
 
       case toolEnum.SELECT:
         this.tool = new SelectTool(this.canvas, { isPresentation })
-        this.__lockModeTool.updateAllLock(lockedObjectsIds)
+        LockTool.updateAllLock(this.canvas)
 
         break
 
@@ -918,10 +915,6 @@ export class Drawing extends React.Component {
 
         canvasObjects[objIndex].set(nextObject)
 
-        !LockTool.isLocked(canvasObjects[objIndex])
-          ? LockTool.unlockObject(canvasObjects[objIndex])
-          : LockTool.lockObject(canvasObjects[objIndex])
-
         canvasObjects[objIndex].setCoords()
       }
     })
@@ -996,10 +989,6 @@ export class Drawing extends React.Component {
             }
 
             const objectToAdd = enlivenedObjects.get(object._id)
-
-            if (LockTool.isLocked(objectToAdd)) {
-              LockTool.lockObject(objectToAdd)
-            }
 
             this.canvas.add(objectToAdd)
 

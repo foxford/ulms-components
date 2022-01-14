@@ -1,7 +1,8 @@
 import { fabric } from 'fabric/dist/fabric.min'
 
+import { LockProvider } from '../lock-provider'
+
 import { Base } from './base'
-import { LockTool } from './lock' // eslint-disable-line import/no-cycle
 
 const areSamePoints = ([xy1, xy2]) => xy1[0] === xy2[0] && xy1[1] === xy2[1]
 
@@ -136,7 +137,7 @@ export default class EraserTool extends Base {
 
     this._canvas.forEachObject((object) => {
       if (!object.isOnScreen()) return
-      if (LockTool.isLocked(object)) return
+      if (LockProvider.isLocked(object)) return
 
       realPath.forEach((point) => {
         const p = new fabric.Point(point[0], point[1])
@@ -158,7 +159,7 @@ export default class EraserTool extends Base {
 
     this._canvas.forEachObject((object) => {
       if (!object.isOnScreen() || !object.containsPoint(point)) return
-      if (LockTool.isLocked(object)) return
+      if (LockProvider.isLocked(object)) return
 
       const isNotTransparent = isNotTransparentOnArea(this._canvas, object, {
         r: this._width, x, y,

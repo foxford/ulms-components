@@ -1,51 +1,106 @@
-export class LockProvider {
+/* eslint-disable class-methods-use-this */
+import { LockTool } from './tools/lock'
+import { toolEnum, USER_LOCK_LABEL } from './constants'
+
+class CLockProvider {
   constructor () {
-    this._label = null
-    this.prev = null
-    this.next = null
-    this.listener = undefined
+    this.__lockedIds = []
+    this.__canvas = null
+    this.__tool = null
   }
 
-  get label () {
-    return this._label
-  }
+  set canvas (canvas) { this.__canvas = canvas }
 
-  set label (label) {
-    if (!label) throw new TypeError('Absent label')
-    this._label = label
-  }
+  get lockedIds () { return this.__lockedIds }
 
-  labels (labels) {
-    this.prev = this.next ? [...this.next] : []
-    this.next = labels
+  set tool (tool) { this.__tool = tool }
 
-    this._updated(this.prev, this.next)
-  }
+  set lockedIds (ids) {
+    this.__lockedIds = Array.isArray(ids) ? ids : [ids]
 
-  onUpdate (fn) {
-    this.listener = fn
-  }
-
-  removeUpdateListener () {
-    this.listener = undefined
-  }
-
-  _updated (prev, next) {
-    if (this.listener) {
-      const changed = Boolean(!prev.length && next.length)
-        || (next.length !== prev.length)
-        || next.some((n, i) => n !== prev[i])
-
-      this.listener(prev, changed, next)
+    if (this.__canvas && this.__tool === toolEnum.SELECT) {
+      LockTool.updateAllLock(this.__canvas)
     }
   }
 
-  isLocked (label) {
-    return label && this.next && this.next.includes(label)
+  isLockedByUser (object) {
+    return object && object._lockedbyuser
   }
 
-  isOwner (label) {
-    return this.label === label
+  isLockedBySelection (object) {
+    return this.__lockedIds.includes(object._id)
+  }
+
+  isLocked (object) {
+    return this.isLockedByUser(object) || this.isLockedBySelection(object)
+  }
+
+  lockUserObject (object, options = {}) {
+    const opts = {
+      ...options,
+      borderColor: 'rgba(255,0,0,0.75)',
+    }
+
+    const props = {
+      borderColor: opts.borderColor,
+      hasControls: false,
+      lockMovementX: true,
+      lockMovementY: true,
+      lockRotation: true,
+      lockScalingX: true,
+      lockScalingY: true,
+      lockUniScaling: true,
+      editable: false,
+
+      [USER_LOCK_LABEL]: true,
+    }
+
+    object.set(props)
+
+    return object
+  }
+
+  unlockUserObject (object, options = {}) {
+    const opts = {
+      ...options,
+      borderColor: 'rgba(102,153,255,0.75)',
+    }
+
+    const props = {
+      borderColor: opts.borderColor,
+      hasControls: true,
+      lockMovementX: false,
+      lockMovementY: false,
+      lockRotation: false,
+      lockScalingX: false,
+      lockScalingY: false,
+      lockUniScaling: false,
+      editable: true,
+
+      [USER_LOCK_LABEL]: undefined,
+    }
+
+    object.set(props)
+
+    return object
+  }
+
+  resetObjectUserLock (object) {
+    // eslint-disable-next-line no-unused-vars
+    const { [USER_LOCK_LABEL]: userLockLabel, ...restObject } = object
+
+    return restObject
+  }
+
+  toggleUserLock (obj) {
+    // ToDo: Заглушка. Пока работаем с одним объектом.
+    // Когда появится множественное выделение - надо переработать
+    const object = Array.isArray(obj) ? obj[0] : obj
+
+    this.isLockedByUser(object) ? this.unlockUserObject(object) : this.lockUserObject(object)
+
+    this.__canvas && this.__canvas.fire('object:modified', { target: object })
   }
 }
 
+export const LockProvider = new CLockProvider()

@@ -22,9 +22,11 @@ export const shapeToolModeEnum = {
   TRIANGLE_SOLID: 'triangle-solid',
 }
 
+export const USER_LOCK_LABEL = '_lockedbyuser'
+
 export const enhancedFields = [
   '_id',
-  '_lockedbyuser',
+  USER_LOCK_LABEL,
   'noScaleCache',
   'strokeUniform',
 ]

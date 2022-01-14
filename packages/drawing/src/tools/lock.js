@@ -2,66 +2,35 @@
 import debounce from 'lodash/debounce'
 
 import { keycodes, DEBOUNCE_DELAY } from '../constants'
+import { LockProvider } from '../lock-provider'
 
 import { Base } from './base'
 import { makeInteractive, makeNotInteractive } from './object'
 import SelectTool from './select'
 
 export class LockTool extends Base {
-  static lockObject (object, options = {}) {
-    const opts = {
-      ...options,
-      borderColor: 'rgba(255,0,0,0.75)',
-    }
-
-    const props = {
-      borderColor: opts.borderColor,
-      hasControls: false,
-      lockMovementX: true,
-      lockMovementY: true,
-      lockRotation: true,
-      lockScalingX: true,
-      lockScalingY: true,
-      lockUniScaling: true,
-      editable: false,
-    }
-
-    object.set(props)
-
-    return object
+  static updateAllLock = (canvas) => {
+    canvas.forEachObject((object) => {
+      if (LockProvider.isLockedBySelection(object)) {
+        makeNotInteractive(object)
+        SelectTool.removeFromSelection(canvas, object)
+      } else {
+        makeInteractive(object)
+      }
+    })
   }
 
-  static unlockObject (object, options = {}) {
-    const opts = {
-      ...options,
-      borderColor: 'rgba(102,153,255,0.75)',
+  static updateObjectLock (object) {
+    if (LockProvider.isLockedBySelection(object)) {
+      makeNotInteractive(object)
+    } else {
+      makeInteractive(object)
     }
-
-    const props = {
-      borderColor: opts.borderColor,
-      hasControls: true,
-      lockMovementX: false,
-      lockMovementY: false,
-      lockRotation: false,
-      lockScalingX: false,
-      lockScalingY: false,
-      lockUniScaling: false,
-      editable: true,
-    }
-
-    object.set(props)
-
-    return object
-  }
-
-  static isLocked (object) {
-    return object && object._lockedbyuser
   }
 
   constructor (ctx, onLock, onSelect) {
     super(ctx)
 
-    this.__lockIds = []
     this.__mouseDown = false
     this.__selectionLocked = false
     this.__textEditing = false
@@ -83,26 +52,6 @@ export class LockTool extends Base {
     this._debouncedUnlock = debounce(() => {
       this._unlock()
     }, DEBOUNCE_DELAY)
-  }
-
-  updateAllLock = (lockIds) => {
-    this.__lockIds = lockIds
-    this._canvas.forEachObject((_) => {
-      if (this.__lockIds.includes(_._id)) {
-        makeNotInteractive(_)
-        SelectTool.removeFromSelection(this._canvas, _)
-      } else {
-        makeInteractive(_)
-      }
-    })
-  }
-
-  updateObjectLock (object) {
-    if (this.__lockIds.includes(object._id)) {
-      makeNotInteractive(object)
-    } else {
-      makeInteractive(object)
-    }
   }
 
   get activeSelection () {
