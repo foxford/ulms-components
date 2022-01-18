@@ -81,7 +81,7 @@ export class LockTool extends Base {
       const lockedIds = []
 
       this.activeSelection.forEach((_) => {
-        if (!_._lockedbyuser) {
+        if (!LockProvider.isLockedByUser(_)) {
           lockedIds.push(_._id)
         }
       })

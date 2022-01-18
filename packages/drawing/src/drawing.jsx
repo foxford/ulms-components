@@ -913,7 +913,16 @@ export class Drawing extends React.Component {
           SelectTool.removeFromSelection(this.canvas, canvasObjects[objIndex])
         }
 
-        canvasObjects[objIndex].set(nextObject)
+        if (LockProvider.isLockedByUser(_) !== LockProvider.isLockedByUser(canvasObjects[objIndex])) {
+          canvasObjects[objIndex].set(nextObject)
+          if (LockProvider.isLockedByUser(_)) {
+            LockProvider.lockUserObject(canvasObjects[objIndex])
+          } else {
+            LockProvider.unlockUserObject(canvasObjects[objIndex])
+          }
+        } else {
+          canvasObjects[objIndex].set(nextObject)
+        }
 
         canvasObjects[objIndex].setCoords()
       }
@@ -991,6 +1000,9 @@ export class Drawing extends React.Component {
             const objectToAdd = enlivenedObjects.get(object._id)
 
             this.canvas.add(objectToAdd)
+            if (LockProvider.isLockedByUser(objectToAdd)) {
+              LockProvider.lockUserObject(objectToAdd)
+            }
 
             done(null)
           })
@@ -1033,6 +1045,7 @@ export class Drawing extends React.Component {
     return (
       <>
         <div style={{ position: 'absolute' }}>
+          {/* eslint-disable-next-line max-len */}
           <canvas id='canvasPattern' ref={this.canvasPatternRef} width={width} height={height} style={{ display: pattern ? 'block' : 'none' }} />
         </div>
         <canvas id='canvas' ref={this.canvasRef} width={width} height={height} />

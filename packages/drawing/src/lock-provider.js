@@ -24,7 +24,7 @@ class CLockProvider {
   }
 
   isLockedByUser (object) {
-    return object && object._lockedbyuser
+    return object && object[USER_LOCK_LABEL]
   }
 
   isLockedBySelection (object) {

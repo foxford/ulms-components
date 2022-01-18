@@ -1,9 +1,11 @@
-/* eslint-disable no-param-reassign,default-case,no-fallthrough,import/no-extraneous-dependencies */
+/* eslint-disable no-param-reassign,default-case,no-fallthrough,import/no-extraneous-dependencies,class-methods-use-this */
 import debounce from 'lodash/debounce'
 
 import { fromCSSColor, toCSSColor } from '../util/to-css-color'
 
 import { keycodes, DEBOUNCE_DELAY } from '../constants'
+
+import { LockProvider } from '../lock-provider'
 
 import { Base } from './base'
 
@@ -172,7 +174,7 @@ export default class SelectTool extends Base {
     if (!this._active) return
     if (this.__object && this.__object.isEditing) return
 
-    if (!this.__mouseDown && (this.__object && !this.__object._lockedbyuser)) {
+    if (!this.__mouseDown && !LockProvider.isLockedByUser(this.__object)) {
       const { keyCode } = e
 
       this.__shiftPressed = e.shiftKey
