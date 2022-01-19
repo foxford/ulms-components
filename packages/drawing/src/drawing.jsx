@@ -522,8 +522,10 @@ export class Drawing extends React.Component {
       this.canvas.clear()
       this.canvas.dispose()
 
-      this.canvasRef.current.ownerDocument.removeEventListener('keydown', this.__lockModeTool.handleKeyDownEvent)
-      this.canvasRef.current.ownerDocument.removeEventListener('keyup', this.__lockModeTool.handleKeyUpEvent)
+      if (this.__lockModeTool) {
+        this.canvasRef.current.ownerDocument.removeEventListener('keydown', this.__lockModeTool.handleKeyDownEvent)
+        this.canvasRef.current.ownerDocument.removeEventListener('keyup', this.__lockModeTool.handleKeyUpEvent)
+      }
       this.__cleanTools()
       this.canvasRef.current.ownerDocument.removeEventListener('keydown', this._handleKeyDown)
       this.canvasRef.current.ownerDocument.removeEventListener('keyup', this._handleKeyUp)
