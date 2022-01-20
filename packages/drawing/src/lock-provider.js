@@ -7,9 +7,21 @@ class CLockProvider {
     this.__lockedIds = []
     this.__canvas = null
     this.__tool = null
+    // Возможна ситуация, когда lockedIds получили, а canvas еще не задана
+    this.__waitForCanvas = false
   }
 
-  set canvas (canvas) { this.__canvas = canvas }
+  set canvas (canvas) {
+    this.__canvas = canvas
+
+    if (this.__waitForCanvas) {
+      this.__waitForCanvas = false
+
+      if (this.__tool === toolEnum.SELECT) {
+        LockTool.updateAllLock(this.__canvas)
+      }
+    }
+  }
 
   get lockedIds () { return this.__lockedIds }
 
@@ -18,8 +30,12 @@ class CLockProvider {
   set lockedIds (ids) {
     this.__lockedIds = Array.isArray(ids) ? ids : [ids]
 
-    if (this.__canvas && this.__tool === toolEnum.SELECT) {
-      LockTool.updateAllLock(this.__canvas)
+    if (this.__canvas) {
+      if (this.__tool === toolEnum.SELECT) {
+        LockTool.updateAllLock(this.__canvas)
+      }
+    } else {
+      this.__waitForCanvas = true
     }
   }
 
