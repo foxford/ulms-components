@@ -22,11 +22,22 @@ export const shapeToolModeEnum = {
   TRIANGLE_SOLID: 'triangle-solid',
 }
 
+export const USER_LOCK_LABEL = '_lockedbyuser'
+
 export const enhancedFields = [
   '_id',
-  '_lockedbyuser',
-  '_lockedselection',
-  '_onlyState',
+  USER_LOCK_LABEL,
   'noScaleCache',
   'strokeUniform',
 ]
+
+export const keycodes = {
+  UP_KEYCODE: 38,
+  DOWN_KEYCODE: 40,
+  LEFT_KEYCODE: 37,
+  RIGHT_KEYCODE: 39,
+  DEL_KEYCODE: 46,
+  BACKSPACE_KEYCODE: 8,
+}
+
+export const DEBOUNCE_DELAY = 300
