@@ -176,8 +176,6 @@ export class Drawing extends React.Component {
       this.initStaticCanvas()
     }
 
-    LockProvider.canvas = this.canvas
-
     if (pattern) {
       this.initCanvasPattern()
 
@@ -190,6 +188,8 @@ export class Drawing extends React.Component {
 
     this.updateCanvasParameters(true)
     this.updateCanvasObjects(objects)
+
+    LockProvider.canvas = this.canvas
   }
 
   componentDidUpdate (prevProps) {
