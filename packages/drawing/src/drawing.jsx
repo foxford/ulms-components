@@ -4,7 +4,7 @@ import { fabric } from 'fabric/dist/fabric.min'
 import { queue as Queue } from 'd3-queue'
 import Hammer from 'hammerjs'
 
-import { enhancedFields, penToolModeEnum, shapeToolModeEnum, toolEnum } from './constants'
+import { BROADCAST_MESSAGE_TYPE, enhancedFields, penToolModeEnum, shapeToolModeEnum, toolEnum } from './constants'
 import { toCSSColor } from './util/to-css-color'
 import { LockProvider } from './lock-provider'
 
@@ -160,14 +160,21 @@ export class Drawing extends React.Component {
     if (!tokenProvider) throw new TypeError('Absent tokenProvider')
 
     this.__lockModeTool = null
+    this.__broadcastProvider = null
   }
 
   componentDidMount () {
     const {
-      canDraw, tool, objects, pattern, tokenProvider,
+      canDraw, tool, objects, pattern, tokenProvider, broadcastProvider,
     } = this.props
 
     tp.setProvider(tokenProvider)
+
+    if (broadcastProvider) {
+      this.__broadcastProvider = broadcastProvider
+
+      this.__broadcastProvider.subscribe(BROADCAST_MESSAGE_TYPE, this._drawUpdateHandler)
+    }
 
     if (canDraw) {
       this.initCanvas()
@@ -343,6 +350,10 @@ export class Drawing extends React.Component {
     this.tool.handleTextEditEndEvent(opts)
   }
 
+  _handleTextChangedEvent = (opts) => {
+    this.tool.handleTextChangedEvent(opts)
+  }
+
   _handleSelectionUpdatedEvent = (opts) => {
     this.tool.handleSelectionUpdatedEvent(opts)
   }
@@ -367,6 +378,7 @@ export class Drawing extends React.Component {
     onAfterRender && onAfterRender()
   }
 
+  // eslint-disable-next-line react/sort-comp
   initCanvas () {
     const {
       selectOnInit,
@@ -394,6 +406,7 @@ export class Drawing extends React.Component {
     this.canvas.on('object:added', opt => this._handleObjectAdded(opt))
     this.canvas.on('text:editing:entered', opt => this._handleTextEditStartEvent(opt))
     this.canvas.on('text:editing:exited', opt => this._handleTextEditEndEvent(opt))
+    this.canvas.on('text:changed', opt => this._handleTextChangedEvent(opt))
     this.canvas.on('selection:updated', opt => this._handleSelectionUpdatedEvent(opt))
     this.canvas.on('selection:created', opt => this._handleSelectionCreatedEvent(opt))
     this.canvas.on('selection:cleared', opt => this._handleSelectionClearedEvent(opt))
@@ -414,7 +427,6 @@ export class Drawing extends React.Component {
         serializedObj = object.toObject(enhancedFields)
 
         if (selectOnInit && isShapeObject(object)) return
-        if (isTextObject(object)) return
 
         onDraw && onDraw(maybeRemoveToken(serializedObj))
       } else {
@@ -593,6 +605,10 @@ export class Drawing extends React.Component {
       case toolEnum.SELECT:
         this.tool = new SelectTool(this.canvas, { isPresentation })
         LockTool.updateAllLock(this.canvas)
+
+        if (this.__broadcastProvider) {
+          this.tool.onBroadcast = data => this.__broadcastProvider.publish(BROADCAST_MESSAGE_TYPE, data)
+        }
 
         break
 
@@ -937,6 +953,16 @@ export class Drawing extends React.Component {
     }
   }
 
+  _drawUpdateHandler = (data) => {
+    const objectId = data.id
+
+    const object = this.canvas.getObjects().find(_ => _._id === objectId)
+
+    object.set(data.diff)
+
+    this.canvas.requestRenderAll()
+  }
+
   updateCanvasObjects (_objects) {
     const canvasObjects = this.canvas.getObjects()
     const enlivenedObjects = new Map()
@@ -1037,6 +1063,14 @@ export class Drawing extends React.Component {
     this.__lockModeTool && this.__lockModeTool.destroy()
 
     this.__lockModeTool = undefined
+  }
+
+  destroy () {
+    if (this.__broadcastProvider) {
+      this.__broadcastProvider.unsubscribe(BROADCAST_MESSAGE_TYPE)
+
+      this.__broadcastProvider = null
+    }
   }
 
   render () {

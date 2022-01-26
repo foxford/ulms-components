@@ -40,4 +40,8 @@ export const keycodes = {
   BACKSPACE_KEYCODE: 8,
 }
 
+export const BROADCAST_MESSAGE_TYPE = 'draw-update'
+
 export const DEBOUNCE_DELAY = 300
+
+export const THROTTLE_DELAY = 500

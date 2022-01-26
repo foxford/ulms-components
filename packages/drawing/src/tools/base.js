@@ -14,6 +14,8 @@ export class Base {
 
   handleTextEditEndEvent () {}
 
+  handleTextChangedEvent () {}
+
   handleKeyDownEvent () {}
 
   handleKeyUpEvent () {}

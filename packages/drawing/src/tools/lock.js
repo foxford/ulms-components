@@ -70,7 +70,7 @@ export class LockTool extends Base {
   _handleEditingEntered = (event) => {
     const { target } = event
 
-    if (target.type === 'textbox' && target._textBeforeEdit !== '') {
+    if (target.type === 'textbox') {
       this.__textEditing = true
       this._lock()
     }
