@@ -180,6 +180,9 @@ export default class SelectTool extends Base {
   }
 
   handleTextEditEndEvent () {
+    if (this.__object && this.__object.__local) {
+      this.__object.set('__local', undefined)
+    }
     this._triggerModified()
   }
 
