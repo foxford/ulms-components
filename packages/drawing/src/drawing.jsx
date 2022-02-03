@@ -958,9 +958,11 @@ export class Drawing extends React.Component {
 
     const object = this.canvas.getObjects().find(_ => _._id === objectId)
 
-    object.set(data.diff)
+    if (object) {
+      object.set(data.diff)
 
-    this.canvas.requestRenderAll()
+      this.canvas.requestRenderAll()
+    }
   }
 
   updateCanvasObjects (_objects) {
@@ -983,7 +985,17 @@ export class Drawing extends React.Component {
         .map(_ => ({ ..._, remote: true }))
         .forEach((_) => {
           this.q.defer((done) => {
-            window.requestAnimationFrame(() => {
+            if (!document.hidden) {
+              window.requestAnimationFrame(() => {
+                fabric.util.enlivenObjects([_], ([fObject]) => {
+                  if (fObject) {
+                    enlivenedObjects.set(fObject._id, fObject)
+                  }
+
+                  done(null)
+                })
+              })
+            } else {
               fabric.util.enlivenObjects([_], ([fObject]) => {
                 if (fObject) {
                   enlivenedObjects.set(fObject._id, fObject)
@@ -991,7 +1003,7 @@ export class Drawing extends React.Component {
 
                 done(null)
               })
-            })
+            }
           })
         })
 
