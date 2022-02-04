@@ -1,9 +1,10 @@
 /* eslint-disable no-param-reassign,default-case,no-fallthrough,import/no-extraneous-dependencies,class-methods-use-this */
 import debounce from 'lodash/debounce'
+import throttle from 'lodash/throttle'
 
 import { fromCSSColor, toCSSColor } from '../util/to-css-color'
 
-import { keycodes, DEBOUNCE_DELAY } from '../constants'
+import { keycodes, DEBOUNCE_DELAY, THROTTLE_DELAY } from '../constants'
 
 import { LockProvider } from '../lock-provider'
 
@@ -29,7 +30,14 @@ export default class SelectTool extends Base {
     this.__shiftPressed = false
     this.__mouseDown = false
 
+    this._onBroadcast = null
+    this._debouncedTriggerModified = null
+
     this._initialConfigure()
+  }
+
+  set onBroadcast (func) {
+    this._onBroadcast = func
   }
 
   static removeFromSelection (canvas, object) {
@@ -62,6 +70,7 @@ export default class SelectTool extends Base {
     this._canvas.defaultCursor = 'default'
     this._canvas.setCursor('default')
     this._debouncedTriggerModified = debounce(this._triggerModified, DEBOUNCE_DELAY)
+    this._throttledTriggerUpdate = throttle((id, diff) => this._triggerUpdate(id, diff), THROTTLE_DELAY)
   }
 
   configure (opt) {
@@ -91,6 +100,9 @@ export default class SelectTool extends Base {
 
   destroy () {
     this._canvas.discardActiveObject()
+
+    this._onBroadcast = null
+    this._debouncedTriggerModified = null
   }
 
   _deleteObject = () => {
@@ -150,6 +162,15 @@ export default class SelectTool extends Base {
     }
   }
 
+  _triggerUpdate (id, diff) {
+    if (id && this._onBroadcast) {
+      this._onBroadcast({
+        id,
+        diff,
+      })
+    }
+  }
+
   handleTextEditStartEvent (opts) {
     if (opts.target && opts.target.hiddenTextarea) {
       opts.target.hiddenTextarea.style.width = '10px'
@@ -159,11 +180,23 @@ export default class SelectTool extends Base {
   }
 
   handleTextEditEndEvent () {
+    if (this.__object && this.__object.__local) {
+      this.__object.set('__local', undefined)
+    }
     this._triggerModified()
   }
 
   handleMouseDownEvent () {
     this.__mouseDown = true
+  }
+
+  handleMouseMoveEvent (e) {
+    if (!this._active) return
+    if (this.__mouseDown && e.target) {
+      const { target } = e
+
+      this._throttledTriggerUpdate(target._id, { top: target.top, left: target.left })
+    }
   }
 
   handleMouseUpEvent () {
@@ -224,19 +257,25 @@ export default class SelectTool extends Base {
     })
   }
 
-  handleSelectionUpdatedEvent (opts) {
+  handleSelectionUpdatedEvent = (opts) => {
     if (!this._active) return
     this.__object = opts.target
   }
 
-  handleSelectionCreatedEvent (opts) {
+  handleSelectionCreatedEvent = (opts) => {
     if (!this._active) return
     this.__object = opts.target
   }
 
-  handleSelectionClearedEvent () {
+  handleSelectionClearedEvent = () => {
     if (!this._active) return
     this.__object = null
+  }
+
+  handleTextChangedEvent = (e) => {
+    const { target } = e
+
+    this._throttledTriggerUpdate(target._id, { text: target.text })
   }
 
   reset () {
