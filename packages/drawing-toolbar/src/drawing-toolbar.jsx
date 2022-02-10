@@ -6,7 +6,7 @@ import { cond } from 'ramda'
 import { Icons } from '@ulms/ui-icons'
 import { penToolModeEnum, shapeToolModeEnum, toolEnum } from '@ulms/ui-drawing'
 
-import { messagesIntl } from '../lang'
+import { messagesIntl } from '../lang/index'
 
 import { GroupColor } from './group-color'
 import { GroupEraser } from './group-eraser'
