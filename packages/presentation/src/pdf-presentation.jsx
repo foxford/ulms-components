@@ -39,10 +39,11 @@ export class PDFPresentation extends React.Component {
   }
 
   componentDidUpdate (prevProps) {
-    const { url } = this.props
+    const { url, onPagesUpdated } = this.props
 
     if (url !== prevProps.url) {
       this.setState({ pagesCollection: [] }) // eslint-disable-line
+      onPagesUpdated && onPagesUpdated(0)
       this.updateCollection()
     }
   }
@@ -118,11 +119,14 @@ export class PDFPresentation extends React.Component {
   }
 
   updateCollection = () => {
-    const { tokenProvider, url } = this.props
+    const {
+      tokenProvider, url, onPagesUpdated,
+    } = this.props
 
     tokenProvider()
       .then(token => getDocument(url, { httpHeaders: { authorization: `Bearer ${token}` } }))
       .then((document) => {
+        onPagesUpdated && onPagesUpdated(document.numPages)
         if (this.mounted) {
           this.setState({
             pagesCollection: this.createCollection(document.numPages),
