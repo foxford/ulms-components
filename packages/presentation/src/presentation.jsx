@@ -8,7 +8,7 @@ import { Icons } from '@ulms/ui-icons'
 import { SizeMe } from 'react-sizeme'
 import { Spinner } from '@ulms/ui-spinner'
 
-import { messagesIntl } from '../lang'
+import { messagesIntl } from '../lang/index'
 
 import css from './presentation.module.css'
 

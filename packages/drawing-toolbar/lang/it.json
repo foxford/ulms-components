@@ -1,0 +1,18 @@
+{
+  "COLOUR": "Colore",
+  "ERASER": "Gomma (E)",
+  "ERASER_SENSITIVITY": "Sensibilità",
+  "GRID": "Griglia",
+  "HAND": "Spostare la lavagna",
+  "HIGHLIGHTER": "Pennarello",
+  "LINE": "Linea (L)",
+  "LINE_THICKNESS": "Larghezza linea",
+  "LOCK": "Bloccare\/Sbloccare",
+  "PENCIL": "Matita (P)",
+  "SELECT": "Selezionare (V)",
+  "SHAPE": "Figura",
+  "TEXT": "Testo (T)",
+  "UPLOAD_IMAGE": "Caricare immagine",
+  "ZOOM_IN": "Ingrandire",
+  "ZOOM_OUT": "Ridurre"
+}

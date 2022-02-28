@@ -1,0 +1,18 @@
+{
+  "COLOUR": "Colour",
+  "ERASER": "Eraser (E)",
+  "ERASER_SENSITIVITY": "Eraser sensitivity",
+  "GRID": "Grid",
+  "HAND": "Hand",
+  "HIGHLIGHTER": "Highlighter",
+  "LINE": "Line (L)",
+  "LINE_THICKNESS": "Line thickness",
+  "LOCK": "Lock",
+  "PENCIL": "Pencil (P)",
+  "SELECT": "Select (V)",
+  "SHAPE": "Shape",
+  "TEXT": "Text (T)",
+  "UPLOAD_IMAGE": "Upload image",
+  "ZOOM_IN": "Zoom in",
+  "ZOOM_OUT": "Zoom out"
+}
