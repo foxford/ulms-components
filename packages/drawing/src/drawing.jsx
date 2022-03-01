@@ -7,6 +7,7 @@ import Hammer from 'hammerjs'
 import { BROADCAST_MESSAGE_TYPE, enhancedFields, penToolModeEnum, shapeToolModeEnum, toolEnum } from './constants'
 import { toCSSColor } from './util/to-css-color'
 import { LockProvider } from './lock-provider'
+import { CopyPasteProvider } from './copy-paste-provider'
 
 import DynamicPattern from './tools/dynamic-pattern'
 // FIXME: fix cycle dep
@@ -197,6 +198,7 @@ export class Drawing extends React.Component {
     this.updateCanvasObjects(objects)
 
     LockProvider.canvas = this.canvas
+    CopyPasteProvider.canvas = this.canvas
   }
 
   componentDidUpdate (prevProps) {
@@ -317,6 +319,9 @@ export class Drawing extends React.Component {
     }
 
     this.destroyCanvas()
+
+    LockProvider.canvas = null
+    CopyPasteProvider.canvas = null
   }
 
   _handleKeyDown = (opts) => {
