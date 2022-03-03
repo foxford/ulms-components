@@ -8,6 +8,7 @@ import { BROADCAST_MESSAGE_TYPE, enhancedFields, penToolModeEnum, shapeToolModeE
 import { toCSSColor } from './util/to-css-color'
 import { LockProvider } from './lock-provider'
 import { CopyPasteProvider } from './copy-paste-provider'
+import { keyboardEvents, KeyboardListenerProvider } from './keyboard-listener-provider'
 
 import DynamicPattern from './tools/dynamic-pattern'
 // FIXME: fix cycle dep
@@ -31,6 +32,7 @@ import {
   triangle,
   triangleSolid,
 } from './tools/_shapes'
+import { makeNotInteractive } from './tools/object'
 
 export const normalizeFields = (object, fields) => Object.assign(
   object,
@@ -401,9 +403,9 @@ export class Drawing extends React.Component {
     this.canvas._id = clientId
     this.canvas.freeDrawingBrush = new fabric.OptimizedPencilBrush(this.canvas)
 
+    KeyboardListenerProvider.init(this.canvasRef.current.ownerDocument)
+
     this.__lockModeTool = new LockTool(this.canvas, onLockSelection, onSelection)
-    this.canvasRef.current.ownerDocument.addEventListener('keydown', this.__lockModeTool.handleKeyDownEvent)
-    this.canvasRef.current.ownerDocument.addEventListener('keyup', this.__lockModeTool.handleKeyUpEvent)
 
     this.canvas.on('mouse:down', opt => this._handleMouseDown(opt))
     this.canvas.on('mouse:move', opt => this._handleMouseMove(opt))
@@ -416,8 +418,10 @@ export class Drawing extends React.Component {
     this.canvas.on('selection:created', opt => this._handleSelectionCreatedEvent(opt))
     this.canvas.on('selection:cleared', opt => this._handleSelectionClearedEvent(opt))
 
-    this.canvasRef.current.ownerDocument.addEventListener('keydown', this._handleKeyDown)
-    this.canvasRef.current.ownerDocument.addEventListener('keyup', this._handleKeyUp)
+    KeyboardListenerProvider.on(keyboardEvents.keyDown, this.__lockModeTool.handleKeyDownEvent)
+    KeyboardListenerProvider.on(keyboardEvents.keyUp, this.__lockModeTool.handleKeyUpEvent)
+    KeyboardListenerProvider.on(keyboardEvents.keyDown, this._handleKeyDown)
+    KeyboardListenerProvider.on(keyboardEvents.keyUp, this._handleKeyUp)
 
     this.canvas.on('object:added', (event) => {
       const { onDraw } = this.props
@@ -539,13 +543,9 @@ export class Drawing extends React.Component {
       this.canvas.clear()
       this.canvas.dispose()
 
-      if (this.__lockModeTool) {
-        this.canvasRef.current.ownerDocument.removeEventListener('keydown', this.__lockModeTool.handleKeyDownEvent)
-        this.canvasRef.current.ownerDocument.removeEventListener('keyup', this.__lockModeTool.handleKeyUpEvent)
-      }
       this.__cleanTools()
-      this.canvasRef.current.ownerDocument.removeEventListener('keydown', this._handleKeyDown)
-      this.canvasRef.current.ownerDocument.removeEventListener('keyup', this._handleKeyUp)
+
+      KeyboardListenerProvider.destroy()
 
       this.canvas = null
       this.ignoreObjectRemovedEvent = false
@@ -1047,6 +1047,9 @@ export class Drawing extends React.Component {
             this.canvas.add(objectToAdd)
             if (LockProvider.isLockedByUser(objectToAdd)) {
               LockProvider.lockUserObject(objectToAdd)
+            }
+            if (LockProvider.isLockedBySelection(objectToAdd)) {
+              makeNotInteractive(objectToAdd)
             }
 
             done(null)
