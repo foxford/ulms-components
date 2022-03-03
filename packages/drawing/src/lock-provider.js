@@ -14,7 +14,7 @@ class CLockProvider {
   set canvas (canvas) {
     this.__canvas = canvas
 
-    if (this.__waitForCanvas) {
+    if (canvas && this.__waitForCanvas) {
       this.__waitForCanvas = false
 
       if (this.__tool === toolEnum.SELECT) {
