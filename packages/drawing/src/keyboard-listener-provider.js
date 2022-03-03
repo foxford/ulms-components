@@ -99,14 +99,14 @@ class CKeyboardListenerProvider {
       case keyboardEvents.keyDown:
         index = this.__keyDownListeners.findIndex(item => item === handler)
         if (index !== -1) {
-          this.__keyDownListeners = this.__keyDownListeners.splice(index, 1)
+          this.__keyDownListeners.splice(index, 1)
         }
         break
 
       case keyboardEvents.keyUp:
         index = this.__keyUpListeners.findIndex(item => item === handler)
         if (index !== -1) {
-          this.__keyUpListeners = this.__keyUpListeners.splice(index, 1)
+          this.__keyUpListeners.splice(index, 1)
         }
         break
 
