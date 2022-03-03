@@ -1048,6 +1048,9 @@ export class Drawing extends React.Component {
             if (LockProvider.isLockedByUser(objectToAdd)) {
               LockProvider.lockUserObject(objectToAdd)
             }
+            if (LockProvider.isLockedBySelection(objectToAdd)) {
+              makeNotInteractive(objectToAdd)
+            }
 
             done(null)
           })
