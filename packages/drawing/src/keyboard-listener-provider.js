@@ -17,6 +17,13 @@ class CKeyboardListenerProvider {
    * @param {HTMLElement, HTMLDocument} el Dom element
    */
   init (el) {
+    if (this.__element) {
+      this.__element.removeEventListener
+      && this.__element.removeEventListener(keyboardEvents.keyDown, this._handleKeyDownEvent)
+      this.__element.removeEventListener
+      && this.__element.removeEventListener(keyboardEvents.keyUp, this._handleKeyUpEvent)
+    }
+
     if (el) {
       this.__element = el
 
