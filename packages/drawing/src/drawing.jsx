@@ -394,6 +394,8 @@ export class Drawing extends React.Component {
       disableMobileGestures,
       onLockSelection,
       onSelection,
+      onKeyDown,
+      onKeyUp,
     } = this.props
 
     this.canvas = new fabric.Canvas('canvas', {
@@ -422,6 +424,8 @@ export class Drawing extends React.Component {
     KeyboardListenerProvider.on(keyboardEvents.keyUp, this.__lockModeTool.handleKeyUpEvent)
     KeyboardListenerProvider.on(keyboardEvents.keyDown, this._handleKeyDown)
     KeyboardListenerProvider.on(keyboardEvents.keyUp, this._handleKeyUp)
+    onKeyDown && KeyboardListenerProvider.on(keyboardEvents.keyDown, onKeyDown)
+    onKeyUp && KeyboardListenerProvider.on(keyboardEvents.keyUp, onKeyUp)
 
     this.canvas.on('object:added', (event) => {
       const { onDraw } = this.props
