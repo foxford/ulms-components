@@ -9,8 +9,6 @@ class CCopyPasteProvider {
 
   set canvas (canvas) {
     this.__canvas = canvas
-
-    this.__clipboard = null
   }
 
   copy = () => {
