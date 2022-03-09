@@ -96,6 +96,13 @@ export default class DynamicPattern {
       this._pattern.offsetY = this._offsetY
     }
 
+    if (this._pattern) {
+      this._pattern.setOptions({
+        source: this._getPatternSource(),
+        repeat: 'repeat',
+      })
+    }
+
     if (this._canvas) {
       this._canvas.requestRenderAll()
     }

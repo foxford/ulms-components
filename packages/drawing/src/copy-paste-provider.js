@@ -9,8 +9,10 @@ class CCopyPasteProvider {
 
   set canvas (canvas) {
     this.__canvas = canvas
+  }
 
-    this.__clipboard = null
+  get isEmpty () {
+    return !this.__clipboard
   }
 
   copy = () => {
@@ -18,6 +20,8 @@ class CCopyPasteProvider {
       this.__canvas.getActiveObject().clone((cloned) => {
         this.__clipboard = cloned
       })
+    } else {
+      this.__clipboard = null
     }
   }
 
@@ -29,6 +33,7 @@ class CCopyPasteProvider {
           left: clonedObj.left + COPY_PASTE_SHIFT,
           top: clonedObj.top + COPY_PASTE_SHIFT,
           evented: true,
+          __local: true,
         })
         if (clonedObj.type === 'activeSelection') {
           // active selection needs a reference to the canvas.
