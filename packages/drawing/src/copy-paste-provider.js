@@ -27,6 +27,7 @@ class CCopyPasteProvider {
           left: clonedObj.left + COPY_PASTE_SHIFT,
           top: clonedObj.top + COPY_PASTE_SHIFT,
           evented: true,
+          __local: true,
         })
         if (clonedObj.type === 'activeSelection') {
           // active selection needs a reference to the canvas.

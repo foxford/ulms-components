@@ -917,8 +917,12 @@ export class Drawing extends React.Component {
     this.canvas.renderOnAddRemove = false
 
     canvasObjects.forEach((_) => {
-      if (!newObjectIds.has(_._id) && !_.__local && !_._draft) {
-        objectsToRemove.push(_)
+      if (!newObjectIds.has(_._id)) {
+        if (!_.__local && !_._draft) {
+          objectsToRemove.push(_)
+        }
+      } else if (_.__local) {
+        _.set('__local', undefined)
       }
     })
 
