@@ -969,12 +969,14 @@ export class Drawing extends React.Component {
   _drawUpdateHandler = (data) => {
     const objectId = data.id
 
-    const object = this.canvas.getObjects().find(_ => _._id === objectId)
+    if (this.canvas) {
+      const object = this.canvas.getObjects().find(_ => _._id === objectId)
 
-    if (object) {
-      object.set(data.diff)
+      if (object) {
+        object.set(data.diff)
 
-      this.canvas.requestRenderAll()
+        this.canvas.requestRenderAll()
+      }
     }
   }
 
