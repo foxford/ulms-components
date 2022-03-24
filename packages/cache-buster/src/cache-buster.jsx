@@ -126,7 +126,7 @@ class CacheBuster extends React.Component {
 
 CacheBuster.defaultProps = {
   interval: 30,
-  url: '/meta.json',
+  url: './meta.json',
   version: '',
 }
 
