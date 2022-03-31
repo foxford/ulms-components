@@ -198,9 +198,6 @@ export class Drawing extends React.Component {
 
     this.updateCanvasParameters(true)
     this.updateCanvasObjects(objects)
-
-    LockProvider.canvas = this.canvas
-    CopyPasteProvider.canvas = this.canvas
   }
 
   componentDidUpdate (prevProps) {
@@ -504,6 +501,9 @@ export class Drawing extends React.Component {
       this.initHammer(this.canvas.upperCanvasEl)
     }
 
+    LockProvider.canvas = this.canvas
+    CopyPasteProvider.canvas = this.canvas
+
     // this.canvas.on('mouse:wheel', (opt) => {
     //   const delta = opt.e.deltaY
     //   let zoom = this.canvas.getZoom()
@@ -529,6 +529,9 @@ export class Drawing extends React.Component {
 
     this.canvas = new fabric.StaticCanvas('canvas')
     this.canvas._id = clientId
+
+    LockProvider.canvas = null
+    CopyPasteProvider.canvas = null
   }
 
   updateCanvasPattern () {
