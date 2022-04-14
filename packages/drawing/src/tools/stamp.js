@@ -86,10 +86,14 @@ export class StampTool extends PositionableObject {
   }
 
   get _stampUrl () {
+    if (!this._stamp.name) return ''
+
     return this._publicStorage.getUrl(this._publicStorage.types.STAMP, this._stamp.name, 'svg')
   }
 
   get _stampPreviewUrl () {
+    if (!this._stamp.name) return ''
+
     return this._publicStorage.getUrl(this._publicStorage.types.STAMP, `${this._stamp.name}_preview`, 'svg')
   }
 
