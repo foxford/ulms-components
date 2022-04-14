@@ -10,6 +10,7 @@ import { penToolModeEnum, toolEnum } from '@ulms/ui-drawing'
 import IconLine from './icons/icon-tool-line.svg'
 import IconMarker from './icons/icon-tool-marker.svg'
 import IconPencil from './icons/icon-tool-pencil.svg'
+import { groupTypes } from './constants'
 
 const _GroupPen = ({
   brushMode,
@@ -78,8 +79,8 @@ const _GroupPen = ({
         filter: 'none',
       },
     }}
-    open={opened === 'group-pen'}
-    target={`.${css.root} .group-pen`}
+    open={opened === groupTypes.GROUP_PEN}
+    target={`.${css.root} .${groupTypes.GROUP_PEN}`}
   />
 )
 

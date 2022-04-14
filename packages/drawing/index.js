@@ -1,4 +1,4 @@
-export { penToolModeEnum, shapeToolModeEnum, toolEnum, keycodes } from './src/constants'
+export { penToolModeEnum, shapeToolModeEnum, stampToolModeEnum, toolEnum, keycodes } from './src/constants'
 
 export { Drawing } from './src/drawing'
 

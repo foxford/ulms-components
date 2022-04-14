@@ -2,6 +2,8 @@ import React from 'react'
 import Floater from 'react-floater'
 import { TwitterPicker } from 'react-color'
 
+import { groupTypes } from './constants'
+
 const PICKER_COLORS = [
   '#000000', // black
   '#FF6900', // blaze-orange
@@ -50,7 +52,7 @@ export const GroupColor = ({
         filter: 'none',
       },
     }}
-    open={opened === 'group-color'}
-    target={`.${css.root} .group-color`}
+    open={opened === groupTypes.GROUP_COLOR}
+    target={`.${css.root} .${groupTypes.GROUP_COLOR}`}
   />
 )
