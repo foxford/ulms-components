@@ -8,6 +8,7 @@ import { BROADCAST_MESSAGE_TYPE, enhancedFields, penToolModeEnum, shapeToolModeE
 import { toCSSColor } from './util/to-css-color'
 import { LockProvider } from './lock-provider'
 import { CopyPasteProvider } from './copy-paste-provider'
+import { CursorProvider } from './cursor-provider'
 import { keyboardEvents, KeyboardListenerProvider } from './keyboard-listener-provider'
 
 import DynamicPattern from './tools/dynamic-pattern'
@@ -324,6 +325,7 @@ export class Drawing extends React.Component {
     this.destroyCanvas()
 
     LockProvider.canvas = null
+    CursorProvider.canvas = null
     CopyPasteProvider.canvas = null
   }
 
@@ -342,6 +344,7 @@ export class Drawing extends React.Component {
   _handleMouseMove = (opts) => {
     const { onMouseMove } = this.props
 
+    CursorProvider.onMouseMove(opts)
     this.tool.handleMouseMoveEvent(opts)
     onMouseMove && onMouseMove({ ...opts, vptCoords: this.canvas.vptCoords })
   }
@@ -505,6 +508,7 @@ export class Drawing extends React.Component {
       this.initHammer(this.canvas.upperCanvasEl)
     }
 
+    CursorProvider.canvas = this.canvas
     LockProvider.canvas = this.canvas
     CopyPasteProvider.canvas = this.canvas
 
@@ -535,6 +539,7 @@ export class Drawing extends React.Component {
     this.canvas._id = clientId
 
     LockProvider.canvas = null
+    CursorProvider.canvas = null
     CopyPasteProvider.canvas = null
   }
 

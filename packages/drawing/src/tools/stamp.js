@@ -1,5 +1,6 @@
 import { fabric } from 'fabric/dist/fabric.min'
 
+import { CursorProvider } from '../cursor-provider'
 import { stampToolModeEnum } from '../constants'
 
 import { PositionableObject, adjustPosition, makeNotInteractive } from './object'
@@ -59,8 +60,6 @@ export class StampTool extends PositionableObject {
     super(canvas, () => {}, options)
 
     this.__mode = mode
-    this.__previewStamp = null
-    this.__previewOnBoard = false
 
     this._publicStorage = publicStorageProvider
   }
@@ -68,14 +67,10 @@ export class StampTool extends PositionableObject {
   configure (props) {
     super.configure(props)
 
-    if (this.__previewStamp) {
-      this._canvas.remove(this.__previewStamp)
-      this.__previewStamp = null
-      this.__previewOnBoard = false
-    }
-
     if (this._stampPreviewUrl) {
       createStampFromUrl(this._stampPreviewUrl, this._onPreviewLoad)
+    } else {
+      CursorProvider.setCursor()
     }
 
     this._canvas.defaultCursor = this._cursorString
@@ -100,10 +95,9 @@ export class StampTool extends PositionableObject {
 
   _onPreviewLoad = (image) => {
     if (image) {
-      this.__previewStamp = image
-
-      makeNotInteractive(this.__previewStamp)
-      this.__previewStamp.set('_draft', true)
+      CursorProvider.setCursor(image, '-1 0')
+    } else {
+      CursorProvider.setCursor()
     }
   }
 
@@ -123,21 +117,6 @@ export class StampTool extends PositionableObject {
   // eslint-disable-next-line class-methods-use-this
   handleObjectAddedEvent () { }
 
-  handleMouseMoveEvent (event) {
-    if (this.__previewStamp) {
-      const [x, y] = adjustPosition(this.__previewStamp, event.absolutePointer, '-1 0')
-
-      this.__previewStamp.set({ left: x, top: y }).setCoords()
-
-      if (!this.__previewOnBoard) {
-        this._canvas.add(this.__previewStamp)
-        this.__previewOnBoard = true
-      } else {
-        this._canvas.renderAll()
-      }
-    }
-  }
-
   handleMouseUpEvent () {
     this._canvas.defaultCursor = this._cursorString
     this._canvas.setCursor(this._cursorString)
@@ -152,11 +131,8 @@ export class StampTool extends PositionableObject {
     }
   }
 
+  // eslint-disable-next-line class-methods-use-this
   destroy () {
-    if (this.__previewStamp) {
-      this._canvas.remove(this.__previewStamp)
-      this.__previewStamp = null
-      this.__previewOnBoard = false
-    }
+    CursorProvider.setCursor()
   }
 }
