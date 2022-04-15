@@ -5,47 +5,32 @@ import { stampToolModeEnum } from '../constants'
 
 import { PositionableObject, adjustPosition, makeNotInteractive } from './object'
 
-const stampsArray = {
-  [stampToolModeEnum.DISLIKE]: {
-    name: 'dislike',
-  },
-  [stampToolModeEnum.HEART]: {
-    name: 'heart',
-  },
-  [stampToolModeEnum.LIKE]: {
-    name: 'like',
+const stampsArray = [
+  {
+    mode: stampToolModeEnum.LIKE,
     offsetX: 6,
     offsetY: -6,
   },
-  [stampToolModeEnum.LOVE]: {
-    name: 'love',
-  },
-  [stampToolModeEnum.PLEASED]: {
-    name: 'pleased',
-  },
-  [stampToolModeEnum.QUESTION]: {
-    name: 'question',
-  },
-  [stampToolModeEnum.SAD]: {
-    name: 'sad',
-  },
-  [stampToolModeEnum.SMART]: {
-    name: 'smart',
+  {
+    mode: stampToolModeEnum.SMART,
     offsetX: 8,
   },
-  [stampToolModeEnum.STAR]: {
-    name: 'star',
+  {
+    mode: stampToolModeEnum.STAR,
     offsetX: 8,
     offsetY: -8,
   },
-  [stampToolModeEnum.TRYMORE]: {
-    name: 'trymore',
-  },
-  [stampToolModeEnum.WELLDONE]: {
-    name: 'welldone',
+  {
+    mode: stampToolModeEnum.WELLDONE,
     offsetY: -20,
   },
-}
+]
+
+const stampsMap = {}
+
+stampsArray.forEach((stamp) => {
+  stampsMap[stamp.mode] = stamp
+})
 
 const createStampFromUrl = (url, callback, event) => {
   fabric.Image.fromURL(url, (image) => {
@@ -81,20 +66,16 @@ export class StampTool extends PositionableObject {
     return `url("${this._publicStorage.getUrl(this._publicStorage.types.STAMP, cursorName)}") 5 19, crosshair`
   }
 
-  get _stamp () {
-    return stampsArray[this.__mode] || {}
-  }
-
   get _stampUrl () {
-    if (!this._stamp.name) return ''
+    if (!this.__mode) return ''
 
-    return this._publicStorage.getUrl(this._publicStorage.types.STAMP, this._stamp.name, 'svg')
+    return this._publicStorage.getUrl(this._publicStorage.types.STAMP, this.__mode, 'svg')
   }
 
   get _stampPreviewUrl () {
-    if (!this._stamp.name) return ''
+    if (!this.__mode) return ''
 
-    return this._publicStorage.getUrl(this._publicStorage.types.STAMP, `${this._stamp.name}_preview`, 'svg')
+    return this._publicStorage.getUrl(this._publicStorage.types.STAMP, `${this.__mode}_preview`, 'svg')
   }
 
   _onPreviewLoad = (image) => {
@@ -110,7 +91,14 @@ export class StampTool extends PositionableObject {
       this.__object = image
       const [x, y] = adjustPosition(this.__object, event.absolutePointer, '-1 0')
 
-      this.__object.set({ left: x + (this._stamp.offsetX || 0), top: y + (this._stamp.offsetY || 0) })
+      if (stampsMap[this.__mode]) {
+        this.__object.set({
+          left: x + (stampsMap[this.__mode].offsetX || 0),
+          top: y + (stampsMap[this.__mode].offsetY || 0),
+        })
+      } else {
+        this.__object.set({ left: x, top: y })
+      }
 
       this._canvas.add(this.__object)
 
