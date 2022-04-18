@@ -1,6 +1,6 @@
 {
   "name": "@ulms/ui-drawing-toolbar",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "description": "",
   "keywords": [
     "lerna"
@@ -25,20 +25,19 @@
     "build": "rm -rf ./es/* && BABEL_ENV=es rollup --config ./rollup.config.js index.js"
   },
   "dependencies": {
-    "@ulms/ui-drawing": "^2.2.2",
+    "@ulms/ui-drawing": "^2.4.0-dev.0",
     "@ulms/ui-icons": "^1.0.0",
     "classnames-es": "^2.2.6",
     "ramda": "^0.26.1",
     "rc-slider": "^8.6.13",
-    "react": "^16.14.0",
     "react-color": "^2.17.3",
-    "react-floater": "^0.6.5",
-    "react-intl": "^5.21.0"
+    "react-floater": "^0.6.5"
   },
   "devDependencies": {
     "react-dom": "^16.14.0"
   },
   "peerDependencies": {
+    "react-intl": "^5.20 || 5.21",
     "react": "^15.6 || ^16.x || ^17.x",
     "react-dom": "^15.6 || ^16.x || ^17.x"
   }

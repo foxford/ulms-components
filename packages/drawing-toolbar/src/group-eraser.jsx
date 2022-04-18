@@ -4,6 +4,8 @@ import Floater from 'react-floater'
 import Slider from 'rc-slider/lib/Slider'
 import { FormattedMessage } from 'react-intl'
 
+import { groupTypes } from './constants'
+
 export const GroupEraser = ({
   css,
   eraserWidth,
@@ -32,7 +34,7 @@ export const GroupEraser = ({
         filter: 'none',
       },
     }}
-    open={opened === 'group-eraser'}
-    target={`.${css.root} .group-eraser`}
+    open={opened === groupTypes.GROUP_ERASER}
+    target={`.${css.root} .${groupTypes.GROUP_ERASER}`}
   />
 )

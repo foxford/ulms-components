@@ -19,6 +19,9 @@
   align-items: center;
   justify-content: center;
 }
+.button.fillWidth {
+  width: auto;
+}
 .button:hover {
   background-color: #F6F6F6;
 }

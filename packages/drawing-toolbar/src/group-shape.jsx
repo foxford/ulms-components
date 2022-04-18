@@ -7,6 +7,7 @@ import { shapeToolModeEnum, toolEnum } from '@ulms/ui-drawing'
 
 import { toCSSColor } from './utils'
 import { Shapes } from './shapes'
+import { groupTypes } from './constants'
 
 const shapeToolModeList = [
   {
@@ -83,7 +84,7 @@ export const GroupShape = ({
         filter: 'none',
       },
     }}
-    open={opened === 'group-shape'}
-    target={`.${css.root} .group-shape`}
+    open={opened === groupTypes.GROUP_SHAPE}
+    target={`.${css.root} .${groupTypes.GROUP_SHAPE}`}
   />
 )

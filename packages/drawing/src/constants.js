@@ -5,6 +5,12 @@ export const toolEnum = {
   SELECT: 'select',
   SHAPE: 'shape',
   TEXT: 'textbox',
+  COLOR: 'color',
+  GRID: 'grid',
+  IMAGE: 'image',
+  LOCK: 'lock',
+  STAMP: 'stamp',
+  LIB: 'lib',
 }
 
 export const penToolModeEnum = {
@@ -20,6 +26,20 @@ export const shapeToolModeEnum = {
   RECT_SOLID: 'rect-solid',
   TRIANGLE: 'triangle',
   TRIANGLE_SOLID: 'triangle-solid',
+}
+
+export const stampToolModeEnum = {
+  DISLIKE: 'dislike',
+  HEART: 'heart',
+  LIKE: 'like',
+  LOVE: 'love',
+  PLEASED: 'pleased',
+  QUESTION: 'question',
+  SAD: 'sad',
+  SMART: 'smart',
+  STAR: 'star',
+  TRYMORE: 'trymore',
+  WELLDONE: 'welldone',
 }
 
 export const USER_LOCK_LABEL = '_lockedbyuser'

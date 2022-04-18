@@ -19,6 +19,7 @@ export const Template = ({
   hasLockSelection,
   locale,
   shapeMode,
+  stampMode,
   tool,
   tools,
   zoom,
@@ -50,6 +51,7 @@ export const Template = ({
     locale={locale}
     onImageToolClick={() => console.log('Image was clicked')}
     shapeMode={shapeMode}
+    stampMode={stampMode}
     tokenProvider={{ getToken: () => Promise.resolve('access_token') }}
     tool={tool}
     tools={tools}
@@ -69,6 +71,7 @@ export const Template = ({
     hasLockSelection: false,
     locale: 'ru',
     shapeMode: 'rect',
+    stampMode: 'pleased',
     tool: 'pen',
     tools: ['color', 'eraser', 'fit', 'grid', 'image', 'lock', 'pan', 'pen', 'select', 'shape', 'text', 'zoom'],
     zoom: 1,

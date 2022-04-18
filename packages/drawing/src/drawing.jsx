@@ -4,10 +4,11 @@ import { fabric } from 'fabric/dist/fabric.min'
 import { queue as Queue } from 'd3-queue'
 import Hammer from 'hammerjs'
 
-import { BROADCAST_MESSAGE_TYPE, enhancedFields, penToolModeEnum, shapeToolModeEnum, toolEnum } from './constants'
+import { BROADCAST_MESSAGE_TYPE, enhancedFields, penToolModeEnum, shapeToolModeEnum, stampToolModeEnum, toolEnum } from './constants'
 import { toCSSColor } from './util/to-css-color'
 import { LockProvider } from './lock-provider'
 import { CopyPasteProvider } from './copy-paste-provider'
+import { CursorProvider } from './cursor-provider'
 import { keyboardEvents, KeyboardListenerProvider } from './keyboard-listener-provider'
 
 import DynamicPattern from './tools/dynamic-pattern'
@@ -20,6 +21,7 @@ import PenTool from './tools/pen'
 import SelectTool from './tools/select'
 import { LineTool } from './tools/line'
 import { ShapeTool } from './tools/shape'
+import { StampTool } from './tools/stamp'
 import { TextboxTool } from './tools/textbox'
 // FIXME: fix cycle dep
 // eslint-disable-next-line import/no-cycle
@@ -211,6 +213,7 @@ export class Drawing extends React.Component {
       objects,
       pattern,
       shapeMode,
+      stampMode,
       tool,
       width,
       x,
@@ -279,6 +282,7 @@ export class Drawing extends React.Component {
         prevProps.tool !== tool
         || prevProps.brushColor !== brushColor
         || prevProps.shapeMode !== shapeMode
+        || prevProps.stampMode !== stampMode
         || prevProps.brushMode !== brushMode
         // need to update the tool if it's a pen
         || (tool === toolEnum.PEN && brushMode !== penToolModeEnum.LINE)
@@ -297,6 +301,7 @@ export class Drawing extends React.Component {
         || prevProps.brushWidth !== brushWidth
         || prevProps.eraserWidth !== eraserWidth
         || prevProps.shapeMode !== shapeMode
+        || prevProps.stampMode !== stampMode
       )
     ) {
       this.configureTool()
@@ -320,6 +325,7 @@ export class Drawing extends React.Component {
     this.destroyCanvas()
 
     LockProvider.canvas = null
+    CursorProvider.canvas = null
     CopyPasteProvider.canvas = null
   }
 
@@ -338,6 +344,7 @@ export class Drawing extends React.Component {
   _handleMouseMove = (opts) => {
     const { onMouseMove } = this.props
 
+    CursorProvider.onMouseMove(opts)
     this.tool.handleMouseMoveEvent(opts)
     onMouseMove && onMouseMove({ ...opts, vptCoords: this.canvas.vptCoords })
   }
@@ -501,6 +508,7 @@ export class Drawing extends React.Component {
       this.initHammer(this.canvas.upperCanvasEl)
     }
 
+    CursorProvider.canvas = this.canvas
     LockProvider.canvas = this.canvas
     CopyPasteProvider.canvas = this.canvas
 
@@ -531,6 +539,7 @@ export class Drawing extends React.Component {
     this.canvas._id = clientId
 
     LockProvider.canvas = null
+    CursorProvider.canvas = null
     CopyPasteProvider.canvas = null
   }
 
@@ -589,6 +598,8 @@ export class Drawing extends React.Component {
       isPresentation,
       selectOnInit,
       shapeMode,
+      stampMode,
+      publicStorageProvider,
     } = this.props
 
     this.tool && this.tool.destroy()
@@ -629,6 +640,15 @@ export class Drawing extends React.Component {
           fill: toCSSColor(brushColor),
           fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif',
         })
+
+        break
+
+      case toolEnum.STAMP:
+        this.tool = new StampTool(
+          this.canvas,
+          stampMode,
+          publicStorageProvider,
+        )
 
         break
 
@@ -1129,6 +1149,7 @@ Drawing.defaultProps = {
   },
   brushWidth: 12,
   shapeMode: shapeToolModeEnum.RECT,
+  stampMode: stampToolModeEnum.PLEASED,
   tool: toolEnum.PEN,
   x: 0,
   y: 0,
