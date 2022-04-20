@@ -1,10 +1,11 @@
 /* eslint-disable no-param-reassign,default-case,no-fallthrough,import/no-extraneous-dependencies,class-methods-use-this */
 import debounce from 'lodash/debounce'
-import throttle from 'lodash/throttle'
+
+import throttle from '../util/throttle'
 
 import { fromCSSColor, toCSSColor } from '../util/to-css-color'
 
-import { keycodes, DEBOUNCE_DELAY, THROTTLE_DELAY } from '../constants'
+import { keycodes, DEBOUNCE_DELAY, THROTTLE_DELAY, MAX_TEXT_LENGTH } from '../constants'
 
 import { LockProvider } from '../lock-provider'
 
@@ -29,6 +30,7 @@ export default class SelectTool extends Base {
     this.__timer = null
     this.__shiftPressed = false
     this.__mouseDown = false
+    this.__delayMultipler = 1
 
     this._onBroadcast = null
     this._debouncedTriggerModified = null
@@ -70,7 +72,7 @@ export default class SelectTool extends Base {
     this._canvas.defaultCursor = 'default'
     this._canvas.setCursor('default')
     this._debouncedTriggerModified = debounce(this._triggerModified, DEBOUNCE_DELAY)
-    this._throttledTriggerUpdate = throttle((id, diff) => this._triggerUpdate(id, diff), THROTTLE_DELAY)
+    this._throttledTriggerUpdate = throttle((id, diff) => this._triggerUpdate(id, diff), this._floatingDelay)
   }
 
   configure (opt) {
@@ -104,6 +106,8 @@ export default class SelectTool extends Base {
     this._onBroadcast = null
     this._debouncedTriggerModified = null
   }
+
+  _floatingDelay = () => this.__delayMultipler * THROTTLE_DELAY
 
   _deleteObject = () => {
     if (this.__object) {
@@ -195,6 +199,8 @@ export default class SelectTool extends Base {
     if (this.__mouseDown && e.target) {
       const { target } = e
 
+      this.__delayMultipler = 1
+
       this._throttledTriggerUpdate(target._id, { top: target.top, left: target.left })
     }
   }
@@ -274,6 +280,14 @@ export default class SelectTool extends Base {
 
   handleTextChangedEvent = (e) => {
     const { target } = e
+
+    if (target.text.length <= MAX_TEXT_LENGTH / 4) {
+      this.__delayMultipler = 1
+    } else if (target.text.length > (MAX_TEXT_LENGTH / 4) && target.text.length < (MAX_TEXT_LENGTH / 2)) {
+      this.__delayMultipler = 2
+    } else {
+      this.__delayMultipler = 6
+    }
 
     this._throttledTriggerUpdate(target._id, { text: target.text })
   }

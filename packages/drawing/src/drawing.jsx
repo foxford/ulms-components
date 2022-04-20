@@ -16,6 +16,7 @@ import DynamicPattern from './tools/dynamic-pattern'
 // eslint-disable-next-line import/no-cycle
 import EraserTool from './tools/eraser'
 import './tools/optimized-pencil-brush'
+import './tools/limited-text-box'
 import PanTool from './tools/pan'
 import PenTool from './tools/pen'
 import SelectTool from './tools/select'

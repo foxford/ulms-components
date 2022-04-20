@@ -1,5 +1,7 @@
 import { fabric } from 'fabric/dist/fabric.min'
 
+import { MAX_TEXT_LENGTH } from '../constants'
+
 import { PositionableObject, makeNotInteractive, adjustPosition } from './object'
 
 export class TextboxTool extends PositionableObject {
@@ -8,7 +10,7 @@ export class TextboxTool extends PositionableObject {
 
     this.__lastAdded = undefined
 
-    this.__objectFn = objectFn || (() => new fabric.Textbox('', {
+    this.__objectFn = objectFn || (() => new fabric.LimitedTextbox('', {
       backgroundColor: 'rgba(0,0,0,0.009)', // FIXME: should be removed on select & eraser update
       borderScaleFactor: 1,
       fill: 'rgba(0,0,0,1)',
@@ -18,6 +20,7 @@ export class TextboxTool extends PositionableObject {
       scaleY: 0.5,
       strokeUniform: true,
       width: 600,
+      maxTextLength: MAX_TEXT_LENGTH,
       ...options,
     }))
   }
