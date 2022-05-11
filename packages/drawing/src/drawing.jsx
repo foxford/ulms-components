@@ -876,51 +876,29 @@ export class Drawing extends React.Component {
   }
 
   /**
-   * Place set of library images on board
+   * Place set of images on board
    *
    * @param {Set} imageSet Set of image src's
    * @param {number} [offsetInc] offset of each image
    */
-  addLibSet (imageSet, offsetInc = 16) {
+  addImageSet (imageSet, offsetInc = 16) {
     const { publicStorageProvider } = this.props
     const { tl, br } = this.canvas.calcViewportBoundaries()
     let offset = 0
 
     imageSet.forEach((src) => {
-      const ext = src.split('.').pop()
+      fabric.Image.fromURL(publicStorageProvider.getUrl(publicStorageProvider.types.LIB, src), (image) => {
+        image.set({
+          left: br.x - (br.x - tl.x) / 2 - image.width / 2 + offset,
+          top: br.y - (br.y - tl.y) / 2 - image.height / 2 + offset,
+          evented: true,
+          __local: true,
+        })
 
-      if (ext === 'svg') {
-        fabric.loadSVGFromURL(
-          publicStorageProvider.getUrl(publicStorageProvider.types.LIB, src),
-          (objects, options) => {
-            const svg = fabric.util.groupSVGElements(objects, options)
+        offset += offsetInc
 
-            svg.set({
-              left: br.x - (br.x - tl.x) / 2 - svg.width / 2 + offset,
-              top: br.y - (br.y - tl.y) / 2 - svg.height / 2 + offset,
-              evented: true,
-              __local: true,
-            })
-
-            offset += offsetInc
-
-            this.canvas.add(svg)
-          }
-        )
-      } else {
-        fabric.Image.fromURL(publicStorageProvider.getUrl(publicStorageProvider.types.LIB, src), (image) => {
-          image.set({
-            left: br.x - (br.x - tl.x) / 2 - image.width / 2 + offset,
-            top: br.y - (br.y - tl.y) / 2 - image.height / 2 + offset,
-            evented: true,
-            __local: true,
-          })
-
-          offset += offsetInc
-
-          this.canvas.add(image)
-        }, { crossOrigin: 'anonymous' })
-      }
+        this.canvas.add(image)
+      }, { crossOrigin: 'anonymous' })
     })
   }
 
