@@ -875,6 +875,33 @@ export class Drawing extends React.Component {
     }, options)
   }
 
+  /**
+   * Place set of images on board
+   *
+   * @param {Set} imageSet Set of image src's
+   * @param {number} [offsetInc] offset of each image
+   */
+  addImageSet (imageSet, offsetInc = 16) {
+    const { publicStorageProvider } = this.props
+    const { tl, br } = this.canvas.calcViewportBoundaries()
+    let offset = 0
+
+    imageSet.forEach((src) => {
+      fabric.Image.fromURL(publicStorageProvider.getUrl(publicStorageProvider.types.LIB, src), (image) => {
+        image.set({
+          left: br.x - (br.x - tl.x) / 2 - image.width / 2 + offset,
+          top: br.y - (br.y - tl.y) / 2 - image.height / 2 + offset,
+          evented: true,
+          __local: true,
+        })
+
+        offset += offsetInc
+
+        this.canvas.add(image)
+      }, { crossOrigin: 'anonymous' })
+    })
+  }
+
   updateCanvasParameters (forced = false) {
     const {
       height,

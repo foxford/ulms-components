@@ -219,7 +219,9 @@ class _DrawingToolbarComponent extends React.Component {
           { isPenEnabled && (
             <div
               className={cn(
-                css.button, css.group, groupTypes.GROUP_PEN,
+                css.button,
+                css.group,
+                groupTypes.GROUP_PEN,
                 { [css.active]: tool === toolEnum.PEN || opened === groupTypes.GROUP_PEN }
               )}
               onClick={this.handlePenClick}
@@ -383,7 +385,7 @@ class _DrawingToolbarComponent extends React.Component {
                 css.button,
                 css.group,
                 groupTypes.GROUP_STAMP,
-                { [css.active]: opened === groupTypes.GROUP_STAMP }
+                { [css.active]: tool === toolEnum.STAMP || opened === groupTypes.GROUP_STAMP }
               )}
               onClick={this.handleStampClick}
               onKeyDown={this.handleStampClick}
