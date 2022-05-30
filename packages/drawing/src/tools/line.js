@@ -26,6 +26,10 @@ export class LineTool extends Base {
     this._shiftPressed = false
     this._startX = 0
     this._startY = 0
+
+    this._canvas.forEachObject((_) => {
+      Object.assign(_, { evented: false, selectable: false })
+    })
   }
 
   __pointCkick (x, y) {
