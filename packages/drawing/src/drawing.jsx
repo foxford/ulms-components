@@ -4,7 +4,15 @@ import { fabric } from 'fabric/dist/fabric.min'
 import { queue as Queue } from 'd3-queue'
 import Hammer from 'hammerjs'
 
-import { BROADCAST_MESSAGE_TYPE, enhancedFields, penToolModeEnum, shapeToolModeEnum, stampToolModeEnum, toolEnum } from './constants'
+import {
+  BROADCAST_MESSAGE_TYPE,
+  COPY_PASTE_SHIFT,
+  enhancedFields,
+  penToolModeEnum,
+  shapeToolModeEnum,
+  stampToolModeEnum,
+  toolEnum,
+} from './constants'
 import { toCSSColor } from './util/to-css-color'
 import { LockProvider } from './lock-provider'
 import { CursorProvider } from './cursor-provider'
@@ -156,6 +164,8 @@ export class Drawing extends React.Component {
     this._hammerDistance = null
     this._hammerPanActive = false
     this._hammerZoom = null
+
+    this.state = { copyPasteIncrement: 1 }
 
     const {
       tokenProvider,
@@ -328,41 +338,64 @@ export class Drawing extends React.Component {
   }
 
   _handleCopy = (event) => {
-    const clipboardData = event.clipboardData || event.originalEvent.clipboardData || window.clipboardData
+    console.dir(event)
+    if (KeyboardListenerProvider.canHandleEvent(event) && this.canvas && this.canvas.getActiveObject()) {
+      this.canvas.getActiveObject().clone(async (clonedObj) => {
+        const serializedObj = clonedObj.toObject(enhancedFields)
 
-    if (clipboardData) {
-      if (this.canvas && this.canvas.getActiveObject()) {
-        this.canvas.getActiveObject().clone((clonedObj) => {
-          const serializedObj = clonedObj.toObject(enhancedFields)
+        serializedObj.isUlms = true
 
-          clipboardData.setData('ulms/fabric', JSON.stringify(maybeRemoveToken(serializedObj)))
+        // event.clipboardData.setData('', JSON.stringify(maybeRemoveToken(serializedObj)))
+        try {
+          const type = 'text/plain'
+          const blob = new Blob([JSON.stringify(maybeRemoveToken(serializedObj))], { type })
+          const data = [new ClipboardItem({ [type]: blob })]
+
+          await navigator.clipboard.write(data)
+
+          this.setState({ copyPasteIncrement: 1 })
           event.preventDefault()
-        })
-      }
+        } catch (error) {
+          console.warn('Error copy to clipboard: ', error)
+        }
+      })
     }
+
+    // if (clipboardData) {
+    //   if (this.canvas && this.canvas.getActiveObject()) {
+    //     this.canvas.getActiveObject().clone((clonedObj) => {
+    //       const serializedObj = clonedObj.toObject(enhancedFields)
+    //
+    //       serializedObj.isUlms = true
+    //       // event.clipboardData.setData('', JSON.stringify(maybeRemoveToken(serializedObj)))
+    //       event.clipboardData.setData('text/plain', JSON.stringify(maybeRemoveToken(serializedObj)))
+    //       event.clipboardData.setData('ulms/fabric', JSON.stringify(maybeRemoveToken(serializedObj)))
+    //
+    //       console.log(1111111, event.clipboardData)
+    //
+    //       this.setState({ copyPasteIncrement: 1 })
+    //       event.preventDefault()
+    //     })
+    //   }
+    // }
   }
 
   _handlePaste = (event) => {
     const clipboardData = event.clipboardData || event.originalEvent.clipboardData || window.clipboardData
 
-    if (clipboardData) {
-      if (clipboardData.types.indexOf('ulms/fabric') !== -1) {
-        let clipboardDataSrc
+    // if (KeyboardListenerProvider.canHandleEvent(event) && clipboardData && clipboardData.types.indexOf('text/plain') !== -1) {
+    if (clipboardData && clipboardData.types.indexOf('text/plain') !== -1) {
+      try {
+        const clipboardDataSrc = JSON.parse(clipboardData.getData('text/plain'))
 
-        try {
-          clipboardDataSrc = JSON.parse(clipboardData.getData('ulms/fabric'))
-        } catch (error) {
-          // eslint-disable-next-line no-console
-          console.warn('Cannot parse clipboard data. ', error)
-        }
-        if (clipboardDataSrc) {
+        if (clipboardDataSrc && clipboardDataSrc.isUlms) {
+          const { copyPasteIncrement } = this.state
+
           fabric.util.enlivenObjects([clipboardDataSrc], ([fObject]) => {
             if (fObject) {
-              const { tl, br } = this.canvas && this.canvas.calcViewportBoundaries()
-
               fObject.set({
-                left: br.x - (br.x - tl.x) / 2 - fObject.width / 2,
-                top: br.y - (br.y - tl.y) / 2 - fObject.height / 2,
+                left: fObject.left + COPY_PASTE_SHIFT * copyPasteIncrement,
+                top: fObject.top + COPY_PASTE_SHIFT * copyPasteIncrement,
                 evented: true,
                 __local: true,
               })
@@ -371,9 +404,13 @@ export class Drawing extends React.Component {
               this.canvas.setActiveObject(fObject)
               this.canvas.requestRenderAll()
             }
+            this.setState({ copyPasteIncrement: copyPasteIncrement + 1 })
             event.preventDefault()
           })
         }
+      } catch (error) {
+        // eslint-disable-next-line no-console
+        console.warn('Cannot parse clipboard data. ', error)
       }
     }
   }
@@ -458,8 +495,8 @@ export class Drawing extends React.Component {
     this.canvas._id = clientId
     this.canvas.freeDrawingBrush = new fabric.OptimizedPencilBrush(this.canvas)
 
-    document.addEventListener('copy', this._handleCopy)
-    document.addEventListener('paste', this._handlePaste)
+    this.canvasRef.current.ownerDocument.addEventListener('copy', this._handleCopy, false)
+    this.canvasRef.current.ownerDocument.addEventListener('paste', this._handlePaste, false)
 
     KeyboardListenerProvider.init(this.canvasRef.current.ownerDocument)
 
@@ -611,8 +648,8 @@ export class Drawing extends React.Component {
 
       this.__cleanTools()
 
-      document.removeEventListener('copy', this._handleCopy)
-      document.removeEventListener('paste', this._handlePaste)
+      this.canvasRef.current.ownerDocument.removeEventListener('copy', this._handleCopy)
+      this.canvasRef.current.ownerDocument.removeEventListener('paste', this._handlePaste)
 
       KeyboardListenerProvider.destroy()
 

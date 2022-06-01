@@ -91,3 +91,5 @@ export const BROADCAST_MESSAGE_TYPE = 'draw-update'
 export const DEBOUNCE_DELAY = 300
 
 export const THROTTLE_DELAY = 500
+
+export const COPY_PASTE_SHIFT = 30
