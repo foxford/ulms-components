@@ -338,7 +338,7 @@ export class Drawing extends React.Component {
   }
 
   _handleCut = (event) => {
-    if (event.target.tagName === 'BODY' && this.canvas && this.canvas.getActiveObject()) {
+    if (KeyboardListenerProvider.canHandleEvent(event) && this.canvas && this.canvas.getActiveObject()) {
       this.canvas.getActiveObject().clone(async (clonedObj) => {
         const serializedObj = clonedObj.toObject(enhancedFields)
 
@@ -365,7 +365,7 @@ export class Drawing extends React.Component {
   }
 
   _handleCopy = (event) => {
-    if (event.target.tagName === 'BODY' && this.canvas && this.canvas.getActiveObject()) {
+    if (KeyboardListenerProvider.canHandleEvent(event) && this.canvas && this.canvas.getActiveObject()) {
       this.canvas.getActiveObject().clone(async (clonedObj) => {
         const serializedObj = clonedObj.toObject(enhancedFields)
 
@@ -397,13 +397,12 @@ export class Drawing extends React.Component {
     if (!(clipboardData && clipboardData.types.indexOf('text/plain') !== -1)) {
       return true
     }
+    if (KeyboardListenerProvider.canHandleEvent(event)) {
+      try {
+        const clipboardDataSrc = JSON.parse(clipboardData.getData('text/plain'))
 
-    try {
-      const clipboardDataSrc = JSON.parse(clipboardData.getData('text/plain'))
-
-      if (clipboardDataSrc && clipboardDataSrc.isUlms) {
-        // отрабатываем только на доске, пропускаем другие элементы
-        if (event.target.tagName === 'BODY') {
+        if (clipboardDataSrc && clipboardDataSrc.isUlms) {
+          // отрабатываем только на доске, пропускаем другие элементы
           const { copyPasteIncrement } = this.state
 
           fabric.util.enlivenObjects([clipboardDataSrc], ([fObject]) => {
@@ -425,9 +424,35 @@ export class Drawing extends React.Component {
             return false
           })
         }
+      } catch {
+        // если не получается перевести в JSON - пробуем вставить как текст на доску
+        const text = new fabric.Textbox(clipboardData.getData('text/plain'), {
+          backgroundColor: 'rgba(0,0,0,0.009)',
+          borderScaleFactor: 1,
+          fill: 'rgba(0,0,0,1)',
+          padding: 7,
+          perPixelTargetFind: false,
+          scaleX: 0.5,
+          scaleY: 0.5,
+          strokeUniform: true,
+        })
+
+        if (text._unwrappedTextLines.length === 1 && text._textLines.length === 1) {
+          const w = text.measureLine(0).width
+
+          if ((text.get('width') - w) < 50) {
+            text.set('width', w + 50)
+          }
+        }
+        const { tl, br } = this.canvas.calcViewportBoundaries()
+
+        text.set({
+          left: br.x - (br.x - tl.x) / 2 - text.width / 2,
+          top: br.y - (br.y - tl.y) / 2 - text.height / 2,
+        })
+
+        this.canvas.add(text)
       }
-    } catch {
-      return true
     }
 
     return true
