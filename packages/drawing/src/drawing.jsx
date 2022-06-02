@@ -146,6 +146,8 @@ function isTextObject (object) {
 }
 
 export class Drawing extends React.Component {
+  state = { copyPasteIncrement: 1 }
+
   constructor (props) {
     super(props)
 
@@ -164,8 +166,6 @@ export class Drawing extends React.Component {
     this._hammerDistance = null
     this._hammerPanActive = false
     this._hammerZoom = null
-
-    this.state = { copyPasteIncrement: 1 }
 
     const {
       tokenProvider,
@@ -337,58 +337,73 @@ export class Drawing extends React.Component {
     CursorProvider.canvas = null
   }
 
-  _handleCopy = (event) => {
-    console.dir(event)
-    if (KeyboardListenerProvider.canHandleEvent(event) && this.canvas && this.canvas.getActiveObject()) {
+  _handleCut = (event) => {
+    if (event.target.tagName === 'BODY' && this.canvas && this.canvas.getActiveObject()) {
       this.canvas.getActiveObject().clone(async (clonedObj) => {
         const serializedObj = clonedObj.toObject(enhancedFields)
 
         serializedObj.isUlms = true
 
-        // event.clipboardData.setData('', JSON.stringify(maybeRemoveToken(serializedObj)))
         try {
           const type = 'text/plain'
           const blob = new Blob([JSON.stringify(maybeRemoveToken(serializedObj))], { type })
+          // eslint-disable-next-line no-undef
           const data = [new ClipboardItem({ [type]: blob })]
 
+          await navigator.clipboard.write(data)
+
+          this.setState({ copyPasteIncrement: 0 })
+          event.preventDefault()
+
+          this.canvas.remove(this.canvas.getActiveObject())
+        } catch (error) {
+          // eslint-disable-next-line no-console
+          console.warn('Error copy to clipboard: ', error)
+        }
+      })
+    }
+  }
+
+  _handleCopy = (event) => {
+    if (event.target.tagName === 'BODY' && this.canvas && this.canvas.getActiveObject()) {
+      this.canvas.getActiveObject().clone(async (clonedObj) => {
+        const serializedObj = clonedObj.toObject(enhancedFields)
+
+        serializedObj.isUlms = true // признак, что это наш объект
+
+        try {
+          // Custom type не поддерживает chrome
+          const type = 'text/plain'
+          const blob = new Blob([JSON.stringify(maybeRemoveToken(serializedObj))], { type })
+          // eslint-disable-next-line no-undef
+          const data = [new ClipboardItem({ [type]: blob })]
+
+          // записываем через navigator.clipboard.write, так как через clipboardData не получается записать данные картинок
           await navigator.clipboard.write(data)
 
           this.setState({ copyPasteIncrement: 1 })
           event.preventDefault()
         } catch (error) {
+          // eslint-disable-next-line no-console
           console.warn('Error copy to clipboard: ', error)
         }
       })
     }
-
-    // if (clipboardData) {
-    //   if (this.canvas && this.canvas.getActiveObject()) {
-    //     this.canvas.getActiveObject().clone((clonedObj) => {
-    //       const serializedObj = clonedObj.toObject(enhancedFields)
-    //
-    //       serializedObj.isUlms = true
-    //       // event.clipboardData.setData('', JSON.stringify(maybeRemoveToken(serializedObj)))
-    //       event.clipboardData.setData('text/plain', JSON.stringify(maybeRemoveToken(serializedObj)))
-    //       event.clipboardData.setData('ulms/fabric', JSON.stringify(maybeRemoveToken(serializedObj)))
-    //
-    //       console.log(1111111, event.clipboardData)
-    //
-    //       this.setState({ copyPasteIncrement: 1 })
-    //       event.preventDefault()
-    //     })
-    //   }
-    // }
   }
 
   _handlePaste = (event) => {
     const clipboardData = event.clipboardData || event.originalEvent.clipboardData || window.clipboardData
 
-    // if (KeyboardListenerProvider.canHandleEvent(event) && clipboardData && clipboardData.types.indexOf('text/plain') !== -1) {
-    if (clipboardData && clipboardData.types.indexOf('text/plain') !== -1) {
-      try {
-        const clipboardDataSrc = JSON.parse(clipboardData.getData('text/plain'))
+    if (!(clipboardData && clipboardData.types.indexOf('text/plain') !== -1)) {
+      return true
+    }
 
-        if (clipboardDataSrc && clipboardDataSrc.isUlms) {
+    try {
+      const clipboardDataSrc = JSON.parse(clipboardData.getData('text/plain'))
+
+      if (clipboardDataSrc && clipboardDataSrc.isUlms) {
+        // отрабатываем только на доске, пропускаем другие элементы
+        if (event.target.tagName === 'BODY') {
           const { copyPasteIncrement } = this.state
 
           fabric.util.enlivenObjects([clipboardDataSrc], ([fObject]) => {
@@ -406,13 +421,16 @@ export class Drawing extends React.Component {
             }
             this.setState({ copyPasteIncrement: copyPasteIncrement + 1 })
             event.preventDefault()
+
+            return false
           })
         }
-      } catch (error) {
-        // eslint-disable-next-line no-console
-        console.warn('Cannot parse clipboard data. ', error)
       }
+    } catch {
+      return true
     }
+
+    return true
   }
 
   _handleKeyDown = (opts) => {
@@ -496,6 +514,7 @@ export class Drawing extends React.Component {
     this.canvas.freeDrawingBrush = new fabric.OptimizedPencilBrush(this.canvas)
 
     this.canvasRef.current.ownerDocument.addEventListener('copy', this._handleCopy, false)
+    this.canvasRef.current.ownerDocument.addEventListener('cut', this._handleCut, false)
     this.canvasRef.current.ownerDocument.addEventListener('paste', this._handlePaste, false)
 
     KeyboardListenerProvider.init(this.canvasRef.current.ownerDocument)
@@ -648,8 +667,9 @@ export class Drawing extends React.Component {
 
       this.__cleanTools()
 
-      this.canvasRef.current.ownerDocument.removeEventListener('copy', this._handleCopy)
-      this.canvasRef.current.ownerDocument.removeEventListener('paste', this._handlePaste)
+      this.canvasRef.current.ownerDocument.removeEventListener('copy', this._handleCopy, false)
+      this.canvasRef.current.ownerDocument.removeEventListener('cut', this._handleCut, false)
+      this.canvasRef.current.ownerDocument.removeEventListener('paste', this._handlePaste, false)
 
       KeyboardListenerProvider.destroy()
 

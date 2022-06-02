@@ -50,20 +50,20 @@ class CKeyboardListenerProvider {
     this.__element = null
   }
 
-  canHandleEvent (e) {
+  _canHandleEvent (e) {
     const { tagName } = (e.target || e.srcElement)
 
     return !(tagName.isContentEditable || tagName === 'INPUT' || tagName === 'SELECT' || tagName === 'TEXTAREA' || tagName === 'ULMS-IM')
   }
 
   _handleKeyDownEvent = (e) => {
-    if (this.canHandleEvent(e)) {
+    if (this._canHandleEvent(e)) {
       this.__keyDownListeners.forEach((handler) => { handler(e) })
     }
   }
 
   _handleKeyUpEvent = (e) => {
-    if (this.canHandleEvent(e)) {
+    if (this._canHandleEvent(e)) {
       this.__keyUpListeners.forEach((handler) => { handler(e) })
     }
   }
