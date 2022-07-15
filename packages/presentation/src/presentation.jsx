@@ -125,37 +125,34 @@ class PresentationComponent extends React.Component {
         tabIndex={-1}
         data-presentation-root
       >
-        {
-          showPreviews && (
-            <div className={css.listWrapper}>
-              <div className={css.list}>
-                {
-                  collection.map((item, idx) => (
-                    <div
-                      className={cx(css.preview, idx === index && css.active)}
-                      key={idx}
-                      onClick={() => { onChange(idx) }}
-                      onKeyPress={() => { onChange(idx) }}
-                      role='button'
-                      tabIndex={0}
-                    >
-                      <div className={css.number}>{item.page}</div>
-                      <div className={css.image}>
-                        <VisibilitySensor partialVisibility>
-                          {({ isVisible }) => isVisible && item.preview
-                            ? <img alt='preview' src={item.preview} />
-                            : <div className={css.placeholder} />}
-                        </VisibilitySensor>
-                      </div>
-                    </div>
-                  ))
-                }
-              </div>
-            </div>
-          )
-        }
+        <div className={cx(css.listWrapper, showPreviews && css.isShown)}>
+          <div className={css.list}>
+            {
+              collection.map((item, idx) => (
+                <div
+                  className={cx(css.preview, idx === index && css.active)}
+                  key={idx}
+                  onClick={() => { onChange(idx) }}
+                  onKeyPress={() => { onChange(idx) }}
+                  role='button'
+                  tabIndex={0}
+                >
+                  <div className={css.number}>{item.page}</div>
+                  <div className={css.image}>
+                    <VisibilitySensor partialVisibility>
+                      {({ isVisible }) => isVisible && item.preview
+                        ? <img alt='preview' src={item.preview} />
+                        : <div className={css.placeholder} />}
+                    </VisibilitySensor>
+                  </div>
+                </div>
+              ))
+            }
+          </div>
+        </div>
+
         <div className={css.slideWrapper}>
-          <SizeMe monitorHeight>
+          <SizeMe monitorHeight refreshRate={150}>
             {({ size: { height, width } }) => {
               let result
 

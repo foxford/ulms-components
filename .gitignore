@@ -12,5 +12,4 @@ lerna-debug.log
 !/packages/*/es/.gitkeep
 
 /packages/*/rollup
-/packages/*/rollup.config.js
 /packages/*/.babelrc.json
