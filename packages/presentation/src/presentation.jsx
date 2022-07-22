@@ -110,6 +110,7 @@ class PresentationComponent extends React.Component {
       intl,
       collection,
       fitToWidth,
+      onPageResize,
       onChange,
       showPagesCount,
       showActions,
@@ -171,8 +172,10 @@ class PresentationComponent extends React.Component {
                     collection[index].imageHeight
                   )
 
+                onPageResize && onPageResize(imageSize.width, imageSize.height)
+
                 result = (
-                  <div className={cx(css.slide, { [css.fitToWidth]: fitToWidth })}>
+                  <div className={cx(css.slide, { [css.fitToWidth]: fitToWidth })} data-id='presentation-slide'>
                     <img
                       alt='mainimage'
                       className={cx(css.mainImage, { [css.centered]: !fitToWidth })}
@@ -191,7 +194,7 @@ class PresentationComponent extends React.Component {
                 )
               } else {
                 result = (
-                  <div className={css.slide}>
+                  <div className={cx(css.slide, { [css.fitToWidth]: fitToWidth })} data-id='presentation-slide'>
                     <Spinner />
                   </div>
                 )

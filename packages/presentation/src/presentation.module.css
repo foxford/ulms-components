@@ -8,15 +8,18 @@
 
 .root .listWrapper {
   margin-right: var(--presentation-preview-mr, 30px);
+  margin-bottom: var(--presentation-preview-mb, 0);
   width: 0;
   overflow: hidden;
   overflow-y: auto;
-  transition: width .15s linear;
+  transform: translateX(-100%);
+  transition: transform .15s linear;
   will-change: width;
 }
 
 .root .listWrapper.isShown {
   width: var(--presentation-preview-width, auto);
+  transform: translateX(0);
 }
 
 .root .listWrapper .list {
@@ -26,6 +29,10 @@
 .root .listWrapper .list .preview {
   display: flex;
   padding-bottom: 10px;
+}
+
+.root .listWrapper .list .preview:last-child {
+  padding-bottom: 0;
 }
 
 .root .listWrapper .list .preview .number {
