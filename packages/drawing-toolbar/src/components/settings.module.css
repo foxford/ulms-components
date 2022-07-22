@@ -1,0 +1,52 @@
+.wrapper {
+  width: 100%;
+  height: 100%;
+  padding: 12px;
+  margin: 0;
+}
+
+.row {
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+}
+
+.item {
+  width: 36px;
+  height: 36px;
+  border-radius: 5px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.item.item_active:hover,
+.item.item_active {
+  background-color: #E9E9E9;
+}
+
+.item:hover {
+  background-color: #E9E9E999;
+}
+
+.colorCircle {
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+}
+
+.fontItem {
+  width: 100%;
+  text-align: center;
+  line-height: 1;
+  margin-top: -2px;
+}
+
+.lineItem {
+  width: 20px;
+  height: 0;
+  transform: rotate(-45deg);
+}

@@ -1,6 +1,6 @@
 {
   "name": "@ulms/ui-drawing-toolbar",
-  "version": "1.4.1",
+  "version": "1.4.1-dev.0-ULMS-1919",
   "description": "",
   "keywords": [
     "lerna"
@@ -32,9 +32,6 @@
     "rc-slider": "^8.6.13",
     "react-color": "^2.17.3",
     "react-floater": "^0.6.5"
-  },
-  "devDependencies": {
-    "react-dom": "^16.14.0"
   },
   "peerDependencies": {
     "react-intl": "^5.20 || 5.21",
