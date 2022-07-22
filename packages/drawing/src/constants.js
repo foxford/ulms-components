@@ -84,6 +84,7 @@ export const keycodes = {
   M_KEYCODE: 77,
   DEL_KEYCODE: 46,
   BACKSPACE_KEYCODE: 8,
+  SPACE_KEYCODE: 32,
 }
 
 export const BROADCAST_MESSAGE_TYPE = 'draw-update'

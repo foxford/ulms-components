@@ -1,6 +1,6 @@
 /* eslint-disable class-methods-use-this */
-import { LockTool } from './tools/lock'
 import { toolEnum, USER_LOCK_LABEL } from './constants'
+import { makeInteractive, makeNotInteractive } from './tools/object'
 
 class CLockProvider {
   constructor () {
@@ -18,7 +18,11 @@ class CLockProvider {
       this.__waitForCanvas = false
 
       if (this.__tool === toolEnum.SELECT) {
-        LockTool.updateAllLock(this.__canvas)
+        this.__lockedIds.forEach((id) => {
+          if (this.__canvas._objectsMap.has(id)) {
+            makeNotInteractive(this.__canvas._objectsMap.get(id))
+          }
+        })
       }
     }
   }
@@ -28,15 +32,41 @@ class CLockProvider {
   set tool (tool) { this.__tool = tool }
 
   set lockedIds (ids) {
-    this.__lockedIds = Array.isArray(ids) ? ids : [ids]
+    const newIds = Array.isArray(ids) ? ids : [ids]
 
     if (this.__canvas) {
       if (this.__tool === toolEnum.SELECT) {
-        LockTool.updateAllLock(this.__canvas)
+        const removedIds = []
+        const addedIds = []
+
+        this.__lockedIds.forEach((id) => {
+          if (newIds.indexOf(id) === -1) {
+            removedIds.push(id)
+          }
+        })
+
+        newIds.forEach((id) => {
+          if (this.__lockedIds.indexOf(id) === -1) {
+            addedIds.push(id)
+          }
+        })
+
+        addedIds.forEach((id) => {
+          if (this.__canvas._objectsMap.has(id)) {
+            makeNotInteractive(this.__canvas._objectsMap.get(id))
+          }
+        })
+
+        removedIds.forEach((id) => {
+          if (this.__canvas._objectsMap.has(id)) {
+            makeInteractive(this.__canvas._objectsMap.get(id))
+          }
+        })
       }
     } else {
       this.__waitForCanvas = true
     }
+    this.__lockedIds = newIds
   }
 
   isLockedByUser (object) {
@@ -52,13 +82,9 @@ class CLockProvider {
   }
 
   lockUserObject (object, options = {}) {
-    const opts = {
+    const props = {
       ...options,
       borderColor: 'rgba(255,0,0,0.75)',
-    }
-
-    const props = {
-      borderColor: opts.borderColor,
       hasControls: false,
       lockMovementX: true,
       lockMovementY: true,
@@ -77,13 +103,9 @@ class CLockProvider {
   }
 
   unlockUserObject (object, options = {}) {
-    const opts = {
+    const props = {
       ...options,
       borderColor: 'rgba(102,153,255,0.75)',
-    }
-
-    const props = {
-      borderColor: opts.borderColor,
       hasControls: true,
       lockMovementX: false,
       lockMovementY: false,

@@ -6,6 +6,7 @@ import Hammer from 'hammerjs'
 
 import { BROADCAST_MESSAGE_TYPE, enhancedFields, penToolModeEnum, shapeToolModeEnum, stampToolModeEnum, toolEnum } from './constants'
 import { toCSSColor } from './util/to-css-color'
+import { serializeObject } from './util/serialize-object'
 import { LockProvider } from './lock-provider'
 import { CopyPasteProvider } from './copy-paste-provider'
 import { CursorProvider } from './cursor-provider'
@@ -120,12 +121,19 @@ fabric.util.loadImage = function loadImage (url, callback, context, crossOrigin)
   }
 }
 
-function maybeRemoveToken (object) {
-  if (object.type === 'image' && object.src.indexOf('?access_token=') !== -1) {
-    object.src = object.src.split('?')[0] // eslint-disable-line
-  }
+// Вычисляет абсолютные координаты объекта во вьюпорте документа
+fabric.Canvas.prototype.getAbsoluteCoords = function getAbsoluteCoords (object) {
+  const canvasZoom = this.getZoom()
+  const x = this.viewportTransform[4]
+  const y = this.viewportTransform[5]
+  const { tl } = object.calcCoords() // Top-Left координата ограничивающего прямоугольника
 
-  return object
+  return {
+    left: x + this._offset.left + (tl.x * canvasZoom),
+    top: y + this._offset.top + (tl.y * canvasZoom),
+    width: object.scaleX * object.width * canvasZoom,
+    height: object.scaleY * object.height * canvasZoom,
+  }
 }
 
 function isShapeObject (object) {
@@ -272,6 +280,11 @@ export class Drawing extends React.Component {
       }
     }
 
+    // Обновляем значение зум в Селектк, чтобы пересчитать координаты и размеры объекта для контекстного меню
+    if (prevProps.zoom !== zoom && tool === toolEnum.SELECT) {
+      this.tool.zoom = zoom
+    }
+
     if (prevProps.objects && objects && prevProps.objects !== objects) {
       this.updateCanvasObjects(objects)
     }
@@ -397,7 +410,6 @@ export class Drawing extends React.Component {
       uniqId,
       disableMobileGestures,
       onLockSelection,
-      onSelection,
       onKeyDown,
       onKeyUp,
     } = this.props
@@ -405,13 +417,14 @@ export class Drawing extends React.Component {
     this.canvas = new fabric.Canvas('canvas', {
       enablePointerEvents: 'PointerEvent' in window,
       allowTouchScrolling: !disableMobileGestures,
+      preserveObjectStacking: true, // Чтобы выделенный объект не выходил на верхний слой
     })
     this.canvas._id = clientId
     this.canvas.freeDrawingBrush = new fabric.OptimizedPencilBrush(this.canvas)
 
     KeyboardListenerProvider.init(this.canvasRef.current.ownerDocument)
 
-    this.__lockModeTool = new LockTool(this.canvas, onLockSelection, onSelection)
+    this.__lockModeTool = new LockTool(this.canvas, onLockSelection)
 
     this.canvas.on('mouse:down', opt => this._handleMouseDown(opt))
     this.canvas.on('mouse:move', opt => this._handleMouseMove(opt))
@@ -434,18 +447,16 @@ export class Drawing extends React.Component {
     this.canvas.on('object:added', (event) => {
       const { onDraw } = this.props
       const object = event.target
-      let serializedObj
 
       // Skipping draft objects
       if (object._draft) return
 
       if (!object.remote) {
         object._id = uniqId()
-        serializedObj = object.toObject(enhancedFields)
 
         if (selectOnInit && isShapeObject(object)) return
 
-        onDraw && onDraw(maybeRemoveToken(serializedObj))
+        onDraw && onDraw(serializeObject(object))
       } else {
         delete object.remote
       }
@@ -459,10 +470,8 @@ export class Drawing extends React.Component {
       const [object] = deselected
 
       if (isShapeObject(object)) {
-        const serializedObj = object.toObject(enhancedFields)
-
         if (object._new) {
-          onDraw && onDraw(maybeRemoveToken(serializedObj))
+          onDraw && onDraw(serializeObject(object))
           object.set('_new', undefined)
         }
       }
@@ -475,18 +484,16 @@ export class Drawing extends React.Component {
       // Skipping draft objects
       if (object._draft) return
 
-      const serializedObj = object.toObject(enhancedFields)
-
       if (isTextObject(object) && object._textBeforeEdit === '') {
-        onDraw && onDraw(maybeRemoveToken(serializedObj))
+        onDraw && onDraw(serializeObject(object))
       } else if (isShapeObject(object)) {
         object._new
-          ? onDraw && onDraw(maybeRemoveToken(serializedObj))
-          : onDrawUpdate && onDrawUpdate(maybeRemoveToken(serializedObj))
+          ? onDraw && onDraw(serializeObject(object))
+          : onDrawUpdate && onDrawUpdate(serializeObject(object))
 
         object.set('_new', undefined)
       } else {
-        onDrawUpdate && onDrawUpdate(maybeRemoveToken(serializedObj))
+        onDrawUpdate && onDrawUpdate(serializeObject(object))
       }
     })
 
@@ -499,7 +506,7 @@ export class Drawing extends React.Component {
       // Skipping draft objects
       if (object._draft) return
 
-      onObjectRemove && onObjectRemove(maybeRemoveToken(object.toObject(enhancedFields)))
+      onObjectRemove && onObjectRemove(serializeObject(object))
     })
 
     this.canvas.on('after:render', () => this._handleAfterRender())
@@ -507,6 +514,8 @@ export class Drawing extends React.Component {
     if (!this._hammer && !disableMobileGestures) {
       this.initHammer(this.canvas.upperCanvasEl)
     }
+
+    this.canvas._objectsMap = new Map()
 
     CursorProvider.canvas = this.canvas
     LockProvider.canvas = this.canvas
@@ -563,6 +572,7 @@ export class Drawing extends React.Component {
 
       KeyboardListenerProvider.destroy()
 
+      this.canvas._objectsMap = null
       this.canvas = null
       this.ignoreObjectRemovedEvent = false
     }
@@ -599,6 +609,9 @@ export class Drawing extends React.Component {
       selectOnInit,
       shapeMode,
       stampMode,
+      onSelection,
+      showContextMenu,
+      zoom,
       publicStorageProvider,
     } = this.props
 
@@ -629,6 +642,9 @@ export class Drawing extends React.Component {
         this.tool = new SelectTool(this.canvas, { isPresentation })
         LockTool.updateAllLock(this.canvas)
 
+        this.tool.zoom = zoom
+        this.tool.onSelection = onSelection
+        this.tool.showContextMenu = showContextMenu
         if (this.__broadcastProvider) {
           this.tool.onBroadcast = data => this.__broadcastProvider.publish(BROADCAST_MESSAGE_TYPE, data)
         }
@@ -902,6 +918,31 @@ export class Drawing extends React.Component {
     })
   }
 
+  deleteSelection () {
+    const activeObject = this.canvas.getActiveObject()
+
+    if (activeObject) {
+      activeObject.set({ '_toDelete': true })
+      this.canvas.remove(activeObject)
+    }
+  }
+
+  sendSelectionToBack () {
+    const activeObject = this.canvas.getActiveObject()
+
+    if (activeObject) {
+      this.canvas.sendToBack(activeObject)
+    }
+  }
+
+  bringSelectionToFront () {
+    const activeObject = this.canvas.getActiveObject()
+
+    if (activeObject) {
+      this.canvas.bringToFront(activeObject)
+    }
+  }
+
   updateCanvasParameters (forced = false) {
     const {
       height,
@@ -1042,6 +1083,9 @@ export class Drawing extends React.Component {
     if (objectsToRemove.length) {
       this.ignoreObjectRemovedEvent = true
       this.canvas.remove(...objectsToRemove)
+      objectsToRemove.forEach((object) => {
+        this.canvas._objectsMap.delete(object._id)
+      })
       this.ignoreObjectRemovedEvent = false
     }
 
@@ -1105,6 +1149,7 @@ export class Drawing extends React.Component {
             const objectToAdd = enlivenedObjects.get(object._id)
 
             this.canvas.add(objectToAdd)
+            this.canvas._objectsMap.set(objectToAdd._id, objectToAdd)
             if (LockProvider.isLockedByUser(objectToAdd)) {
               LockProvider.lockUserObject(objectToAdd)
             }

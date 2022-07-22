@@ -28,7 +28,7 @@ export class LockTool extends Base {
     }
   }
 
-  constructor (ctx, onLock, onSelect) {
+  constructor (ctx, onLock) {
     super(ctx)
 
     this.__mouseDown = false
@@ -36,11 +36,6 @@ export class LockTool extends Base {
     this.__textEditing = false
 
     this.__onLockListener = onLock
-    this.__onSelectListener = onSelect
-
-    onSelect && this._canvas.on('selection:created', this._handleSelect)
-    onSelect && this._canvas.on('selection:updated', this._handleSelect)
-    onSelect && this._canvas.on('selection:cleared', this._handleDeselect)
 
     onLock && this._canvas.on('text:editing:exited', this._handleEditingExited)
     onLock && this._canvas.on('text:editing:entered', this._handleEditingEntered)
@@ -97,14 +92,6 @@ export class LockTool extends Base {
     this.__selectionLocked = false
   }
 
-  _handleSelect = () => {
-    this.__onSelectListener(this.activeSelection)
-  }
-
-  _handleDeselect = () => {
-    this.__onSelectListener(null)
-  }
-
   handleKeyDownEvent = (e) => {
     if (!this._mouseMove && !this.__selectionLocked && !this.__textEditing) {
       if ((e.keyCode === keycodes.UP_KEYCODE)
@@ -147,10 +134,6 @@ export class LockTool extends Base {
   }
 
   destroy () {
-    this.__onSelectListener && this._canvas.on('selection:created', this._handleSelect)
-    this.__onSelectListener && this._canvas.on('selection:updated', this._handleSelect)
-    this.__onSelectListener && this._canvas.on('selection:cleared', this._handleDeselect)
-
     this.__onLockListener && this._canvas.on('text:editing:exited', this._handleEditingExited)
     this.__onLockListener && this._canvas.on('text:editing:entered', this._handleEditingEntered)
 
