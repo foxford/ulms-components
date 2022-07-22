@@ -124,13 +124,11 @@ fabric.util.loadImage = function loadImage (url, callback, context, crossOrigin)
 // Вычисляет абсолютные координаты объекта во вьюпорте документа
 fabric.Canvas.prototype.getAbsoluteCoords = function getAbsoluteCoords (object) {
   const canvasZoom = this.getZoom()
-  const x = this.viewportTransform[4]
-  const y = this.viewportTransform[5]
   const { tl } = object.calcCoords() // Top-Left координата ограничивающего прямоугольника
 
   return {
-    left: x + this._offset.left + (tl.x * canvasZoom),
-    top: y + this._offset.top + (tl.y * canvasZoom),
+    left: this._offset.left + tl.x, // this._offset - смещение канвас относительно окна
+    top: this._offset.top + tl.y,
     width: object.scaleX * object.width * canvasZoom,
     height: object.scaleY * object.height * canvasZoom,
   }
