@@ -140,11 +140,13 @@ class PresentationComponent extends React.Component {
                 >
                   <div className={css.number}>{item.page}</div>
                   <div className={css.image}>
-                    <VisibilitySensor partialVisibility>
-                      {({ isVisible }) => isVisible && item.preview
-                        ? <img alt='preview' src={item.preview} />
-                        : <div className={css.placeholder} />}
-                    </VisibilitySensor>
+                    {showPreviews && (
+                      <VisibilitySensor partialVisibility>
+                        {({ isVisible }) => isVisible && item.preview
+                          ? <img alt='preview' src={item.preview} />
+                          : <div className={css.placeholder} />}
+                      </VisibilitySensor>
+                    )}
                   </div>
                 </div>
               ))
