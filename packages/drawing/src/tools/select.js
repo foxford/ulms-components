@@ -4,7 +4,7 @@ import throttle from 'lodash/throttle'
 
 import { fromCSSColor, toCSSColor } from '../util/to-css-color'
 
-import { keycodes, DEBOUNCE_DELAY, THROTTLE_DELAY } from '../constants'
+import { keycodes, DEBOUNCE_DELAY, THROTTLE_DELAY, toolEnum } from '../constants'
 
 import { LockProvider } from '../lock-provider'
 
@@ -365,6 +365,9 @@ export default class SelectTool extends Base {
       object.set({
         hasBorders: false, hasControls: false, _selected: false,
       })
+      if (object.type === toolEnum.TEXT && object.text === '') {
+        this._canvas.remove(object)
+      }
     })
     this._sendContextMenuEvent(true)
     if (this._onSelection && sendSelectionEvent) {
