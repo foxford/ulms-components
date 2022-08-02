@@ -877,12 +877,14 @@ export class Drawing extends React.Component {
   }
 
   addImage (url, options) {
+    this.canvas.discardActiveObject()
     fabric.Image.fromURL(url, (image) => {
       const { tl, br } = this.canvas.calcViewportBoundaries()
 
       image.set({
         left: br.x - (br.x - tl.x) / 2 - image.width / 2,
         top: br.y - (br.y - tl.y) / 2 - image.height / 2,
+        _selected: true, // Чтобы сработало выделение на новом объекте
       })
 
       this.canvas.add(image)
@@ -900,6 +902,7 @@ export class Drawing extends React.Component {
     const { tl, br } = this.canvas.calcViewportBoundaries()
     let offset = 0
 
+    this.canvas.discardActiveObject()
     imageSet.forEach((src) => {
       fabric.Image.fromURL(publicStorageProvider.getUrl(publicStorageProvider.types.LIB, src), (image) => {
         image.set({
