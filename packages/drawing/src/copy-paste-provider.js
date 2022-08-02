@@ -15,6 +15,10 @@ class CCopyPasteProvider {
     return !this.__clipboard
   }
 
+  clear = () => {
+    this.__clipboard = null
+  }
+
   copy = () => {
     if (this.__canvas && this.__canvas.getActiveObject()) {
       this.__canvas.getActiveObject().clone((cloned) => {
