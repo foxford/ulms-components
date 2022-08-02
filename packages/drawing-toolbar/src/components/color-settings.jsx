@@ -7,8 +7,8 @@ import css from './settings.module.css'
 
 const colors = [
   [
-    '#333333',
-    '#939393',
+    '#000000',
+    '#ABB8C3',
     '#FFFFFF',
     '#A45C3D',
   ],
@@ -20,8 +20,8 @@ const colors = [
   ],
   [
     '#FF9900',
-    '#FFADD9',
-    '#882AA6',
+    '#FFADDA',
+    '#A30BF8',
     '#9DF1F7',
   ],
 ]

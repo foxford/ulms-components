@@ -34,26 +34,26 @@ const markerToLineMap = {
 }
 
 export class ContextToolbar extends React.Component {
-  state = {
-    showColorTool: false,
-    currentColor: '',
-    showFontTool: false,
-    currentFontSize: 0,
-    showLineTool: false,
-    currentSize: 0,
-    isMarker: false,
-
-    colorSettingsOpened: false,
-    fontSettingsOpened: false,
-    lineSettingsOpened: false,
-  }
-
   constructor (props) {
     super(props)
 
     this.lineSettingsRef = React.createRef()
     this.colorSettingsRef = React.createRef()
     this.fontSettingsRef = React.createRef()
+
+    this.state = {
+      showColorTool: false,
+      currentColor: '',
+      showFontTool: false,
+      currentFontSize: 0,
+      showLineTool: false,
+      currentSize: 0,
+      isMarker: false,
+
+      colorSettingsOpened: false,
+      fontSettingsOpened: false,
+      lineSettingsOpened: false,
+    }
   }
 
   componentDidMount () {
@@ -64,11 +64,11 @@ export class ContextToolbar extends React.Component {
     }
   }
 
-  componentWillReceiveProps (nextProps) {
+  componentDidUpdate (prevProps) {
     const { selectedObject } = this.props
 
-    if (selectedObject !== nextProps.selectedObject) {
-      nextProps.selectedObject && this.processSelectedObject(nextProps.selectedObject)
+    if (selectedObject !== prevProps.selectedObject) {
+      selectedObject && this.processSelectedObject(selectedObject)
       this.setState({
         colorSettingsOpened: false, fontSettingsOpened: false, lineSettingsOpened: false,
       })
@@ -212,8 +212,16 @@ export class ContextToolbar extends React.Component {
             >
               <div
                 className={cn(css.button, lineSettingsOpened && css.button_active)}
-                onClick={() => this.setState({ lineSettingsOpened: !lineSettingsOpened })}
-                onKeyDown={() => this.setState({ lineSettingsOpened: !lineSettingsOpened })}
+                onClick={() => this.setState({
+                  lineSettingsOpened: !lineSettingsOpened,
+                  colorSettingsOpened: false,
+                  fontSettingsOpened: false,
+                })}
+                onKeyDown={() => this.setState({
+                  lineSettingsOpened: !lineSettingsOpened,
+                  colorSettingsOpened: false,
+                  fontSettingsOpened: false,
+                })}
                 ref={this.lineSettingsRef}
               >
                 <IconLineTool />
@@ -237,7 +245,11 @@ export class ContextToolbar extends React.Component {
                 fontSize={24}
                 innerRef={this.fontSettingsRef}
                 isActive={fontSettingsOpened}
-                handleClick={() => this.setState({ fontSettingsOpened: !fontSettingsOpened })}
+                handleClick={() => this.setState({
+                  fontSettingsOpened: !fontSettingsOpened,
+                  lineSettingsOpened: false,
+                  colorSettingsOpened: false,
+                })}
               />
             </SettingsGroup>
             )}
@@ -258,7 +270,11 @@ export class ContextToolbar extends React.Component {
                 webColor={currentColor}
                 innerRef={this.colorSettingsRef}
                 isActive={colorSettingsOpened}
-                handleClick={() => this.setState({ colorSettingsOpened: !colorSettingsOpened })}
+                handleClick={() => this.setState({
+                  colorSettingsOpened: !colorSettingsOpened,
+                  fontSettingsOpened: false,
+                  lineSettingsOpened: false,
+                })}
               />
             </SettingsGroup>
             )}
