@@ -1,7 +1,7 @@
 import React from 'react'
 import cn from 'classnames-es'
 
-import { WEBtoRGB } from '../utils'
+import { HEXtoRGB } from '../utils'
 
 import css from './settings.module.css'
 
@@ -33,7 +33,7 @@ export const ColorItem = ({
   <div
     ref={innerRef}
     className={cn(css.item, isActive && css.item_active)}
-    onClick={() => handleClick(WEBtoRGB(webColor))}
+    onClick={() => handleClick(HEXtoRGB(webColor))}
   >
     <div
       className={css.colorCircle}

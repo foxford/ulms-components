@@ -13,7 +13,7 @@ import { Base } from './base'
 const POSITION_INCREMENT = 10
 
 /**
- * calcDistance - вычисьляет расстояние между двумя точками на доске
+ * calcDistance - вычисляет расстояние между двумя точками на доске
  * @param point1 - Point(x, y)
  * @param point2 - Point(x, y)
  * @return {number}
@@ -26,7 +26,7 @@ const calcDistance = (point1, point2) => {
   return 0
 }
 
-const DELTA = 3 // Максимальное расстояние при клике, при котором срабатывает выдиление
+const DELTA = 3 // Максимальное расстояние при клике, при котором срабатывает выделение
 
 const directions = {
   left: 'left',
@@ -262,7 +262,7 @@ export default class SelectTool extends Base {
     const mouseDistance = calcDistance(event.pointer, this.__mouseDownPoint)
 
     if (event.target) {
-      // _selected - признак того, что на объекте уже есть рыделение
+      // _selected - признак того, что на объекте уже есть выделение
       if (mouseDistance < DELTA || event.target._selected) {
         this._onSelection && this._onSelection(event.target)
         this._sendContextMenuEvent()

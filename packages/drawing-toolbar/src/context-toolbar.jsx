@@ -7,7 +7,7 @@ import { FontItem, FontSettings } from './components/font-settings'
 import { LineSettings } from './components/line-settings'
 import { SettingsGroup } from './components/settings-group'
 
-import { RGBtoWEB, fromCSSColor, toCSSColor } from './utils'
+import { RGBtoHEX, fromCSSColor, toCSSColor } from './utils'
 import { ObjectTypes, ShapeTypes, LineTypes, ColorTypes } from './constants'
 
 import IconLineTool from './icons-new/line-tool-icon.svg'
@@ -128,7 +128,7 @@ export class ContextToolbar extends React.Component {
       })
     }
     onDrawUpdate(selectedObject)
-    this.setState({ currentColor: RGBtoWEB(newColor) })
+    this.setState({ currentColor: RGBtoHEX(newColor) })
   }
 
   processSelectedObject (selectedObject) {
@@ -158,11 +158,11 @@ export class ContextToolbar extends React.Component {
 
     if (showColorTool) {
       if (LineTypes.includes(type)) {
-        currentColor = RGBtoWEB(fromCSSColor(stroke))
+        currentColor = RGBtoHEX(fromCSSColor(stroke))
       } else if (type === ObjectTypes.TEXT) {
-        currentColor = RGBtoWEB(fromCSSColor(fill))
+        currentColor = RGBtoHEX(fromCSSColor(fill))
       } else {
-        currentColor = RGBtoWEB(fromCSSColor(stroke))
+        currentColor = RGBtoHEX(fromCSSColor(stroke))
       }
     }
 

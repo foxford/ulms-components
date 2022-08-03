@@ -39,13 +39,13 @@ export const fromCSSColor = (str) => {
 
 const toTwoDigitsHex = number => (`0${number.toString(16)}`).slice(-2)
 
-export function RGBtoWEB ({
+export function RGBtoHEX ({
   r, g, b,
 }) {
   return `#${toTwoDigitsHex(r)}${toTwoDigitsHex(g)}${toTwoDigitsHex(b)}`
 }
 
-export function WEBtoRGB (str) {
+export function HEXtoRGB (str) {
   const regex = new RegExp('#([\\da-fA-F]{2})([\\da-fA-F]{2})([\\da-fA-F]{2})')
   const [
     dummy,
