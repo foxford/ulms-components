@@ -3,7 +3,7 @@ import cn from 'classnames-es'
 
 import css from './settings.module.css'
 
-const fontSizes = [18, 24, 32]
+const fontSizes = [32, 48, 64]
 
 export const FontItem = ({
   fontSize, isActive = false, handleClick, innerRef,
@@ -16,7 +16,7 @@ export const FontItem = ({
   >
     <div
       className={css.fontItem}
-      style={{ fontSize: `${fontSize}px` }}
+      style={{ fontSize: `${fontSize / 2}px` }}
     >
       a
     </div>

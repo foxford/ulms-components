@@ -242,7 +242,7 @@ export class ContextToolbar extends React.Component {
               )}
             >
               <FontItem
-                fontSize={24}
+                fontSize={48}
                 innerRef={this.fontSettingsRef}
                 isActive={fontSettingsOpened}
                 handleClick={() => this.setState({
