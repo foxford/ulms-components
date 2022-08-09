@@ -23,20 +23,6 @@ import { ColorSettings } from './color-settings'
 
 import css from './settings.module.css'
 
-const iconsMap = {
-  [shapeToolModeEnum.RECT]: (<IconRect />),
-  [shapeToolModeEnum.CIRCLE]: (<IconCircle />),
-  [shapeToolModeEnum.TRIANGLE]: (<IconTriangle />),
-  [shapeToolModeEnum.RIGHT_TRIANGLE]: (<IconRightTriangle />),
-}
-
-const iconsSolidMap = {
-  [shapeToolModeEnum.RECT_SOLID]: (<IconSolidRect />),
-  [shapeToolModeEnum.CIRCLE_SOLID]: (<IconSolidCircle />),
-  [shapeToolModeEnum.TRIANGLE_SOLID]: (<IconSolidTriangle />),
-  [shapeToolModeEnum.RIGHT_TRIANGLE_SOLID]: (<IconSolidRightTriangle />),
-}
-
 export class ShapeGroup extends React.Component {
   constructor (props) {
     super(props)
@@ -49,26 +35,40 @@ export class ShapeGroup extends React.Component {
       toolMode: defaultToolSettings.shape,
     }
 
+    this.iconsMap = {
+      [shapeToolModeEnum.RECT]: (<IconRect />),
+      [shapeToolModeEnum.CIRCLE]: (<IconCircle />),
+      [shapeToolModeEnum.TRIANGLE]: (<IconTriangle />),
+      [shapeToolModeEnum.RIGHT_TRIANGLE]: (<IconRightTriangle />),
+    }
+
+    this.iconsSolidMap = {
+      [shapeToolModeEnum.RECT_SOLID]: (<IconSolidRect />),
+      [shapeToolModeEnum.CIRCLE_SOLID]: (<IconSolidCircle />),
+      [shapeToolModeEnum.TRIANGLE_SOLID]: (<IconSolidTriangle />),
+      [shapeToolModeEnum.RIGHT_TRIANGLE_SOLID]: (<IconSolidRightTriangle />),
+    }
+
     this.iconsSet = [
       {
         key: shapeToolModeEnum.RECT,
-        icon: iconsMap[shapeToolModeEnum.RECT],
+        icon: this.iconsMap[shapeToolModeEnum.RECT],
         // title: intl.formatMessage({ id: intlID.RECT }),
       },
       {
         key: shapeToolModeEnum.CIRCLE,
-        icon: iconsMap[shapeToolModeEnum.CIRCLE],
+        icon: this.iconsMap[shapeToolModeEnum.CIRCLE],
         // title: intl.formatMessage({ id: intlID.CIRCLE }),
       },
       {
         key: shapeToolModeEnum.TRIANGLE,
-        icon: iconsMap[shapeToolModeEnum.TRIANGLE],
+        icon: this.iconsMap[shapeToolModeEnum.TRIANGLE],
         // title: intl.formatMessage({ id: intlID.TRIANGLE }),
       },
       // ToDo: Пока не реализовано!
       // {
       //   key: shapeToolModeEnum.RIGHT_TRIANGLE,
-      //   icon: iconsMap[shapeToolModeEnum.RIGHT_TRIANGLE],
+      //   icon: this.iconsMap[shapeToolModeEnum.RIGHT_TRIANGLE],
       //   title: intl.formatMessage({ id: intlID.RIGHT_TRIANGLE }),
       // },
     ]
@@ -76,23 +76,23 @@ export class ShapeGroup extends React.Component {
     this.solidIconsSet = [
       {
         key: shapeToolModeEnum.RECT_SOLID,
-        icon: iconsSolidMap[shapeToolModeEnum.RECT_SOLID],
+        icon: this.iconsSolidMap[shapeToolModeEnum.RECT_SOLID],
         // title: intl.formatMessage({ id: intlID.RECT_SOLID }),
       },
       {
         key: shapeToolModeEnum.CIRCLE_SOLID,
-        icon: iconsSolidMap[shapeToolModeEnum.CIRCLE_SOLID],
+        icon: this.iconsSolidMap[shapeToolModeEnum.CIRCLE_SOLID],
         // title: intl.formatMessage({ id: intlID.CIRCLE_SOLID }),
       },
       {
         key: shapeToolModeEnum.TRIANGLE_SOLID,
-        icon: iconsSolidMap[shapeToolModeEnum.TRIANGLE_SOLID],
+        icon: this.iconsSolidMap[shapeToolModeEnum.TRIANGLE_SOLID],
         // title: intl.formatMessage({ id: intlID.TRIANGLE_SOLID }),
       },
       // ToDo: Пока не реализовано!
       // {
       //   key: shapeToolModeEnum.RIGHT_TRIANGLE_SOLID,
-      //   icon: iconsSolidMap[shapeToolModeEnum.RIGHT_TRIANGLE_SOLID],
+      //   icon: this.iconsSolidMap[shapeToolModeEnum.RIGHT_TRIANGLE_SOLID],
       //   title: intl.formatMessage({ id: intlID.RIGHT_TRIANGLE_SOLID }),
       // },
     ]
@@ -162,7 +162,7 @@ export class ShapeGroup extends React.Component {
           })}
           innerRef={this.buttonRef}
         >
-          {iconsMap[toolMode] || iconsSolidMap[toolMode]}
+          {this.iconsMap[toolMode] || this.iconsSolidMap[toolMode]}
         </ToolbarButton>
       </SettingsGroup>
     )

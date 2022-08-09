@@ -18,64 +18,66 @@ const lineSizes = {
   EIGHT: 8,
 }
 
-const iconsMap = {
-  [lineSizes.ONE]: (<IconLine1 />),
-  [lineSizes.TWO]: (<IconLine2 />),
-  [lineSizes.FOUR]: (<IconLine4 />),
-  [lineSizes.EIGHT]: (<IconLine8 />),
-}
-
-const dashedIconsMap = {
-  [lineSizes.ONE]: (<IconDashedLine1 />),
-  [lineSizes.TWO]: (<IconDashedLine2 />),
-  [lineSizes.FOUR]: (<IconDashedLine4 />),
-  [lineSizes.EIGHT]: (<IconDashedLine8 />),
-}
-
-const iconsSet = [
-  {
-    key: lineSizes.ONE,
-    icon: iconsMap[lineSizes.ONE],
-  },
-  {
-    key: lineSizes.TWO,
-    icon: iconsMap[lineSizes.TWO],
-  },
-  {
-    key: lineSizes.FOUR,
-    icon: iconsMap[lineSizes.FOUR],
-  },
-  {
-    key: lineSizes.EIGHT,
-    icon: iconsMap[lineSizes.EIGHT],
-  },
-]
-
-const dashedIconsSet = [
-  {
-    key: lineSizes.ONE,
-    icon: dashedIconsMap[lineSizes.ONE],
-  },
-  {
-    key: lineSizes.TWO,
-    icon: dashedIconsMap[lineSizes.TWO],
-  },
-  {
-    key: lineSizes.FOUR,
-    icon: dashedIconsMap[lineSizes.FOUR],
-  },
-  {
-    key: lineSizes.EIGHT,
-    icon: dashedIconsMap[lineSizes.EIGHT],
-  },
-]
-
 export const LineSettings = ({
   currentSize, handleClick, dashed = false,
-}) => (
-  <IconGroupSettings
-    iconsSet={dashed ? dashedIconsSet : iconsSet}
-    currentSelection={currentSize}
-    handleClick={handleClick}
-  />
-)
+}) => {
+  const iconsMap = {
+    [lineSizes.ONE]: (<IconLine1 />),
+    [lineSizes.TWO]: (<IconLine2 />),
+    [lineSizes.FOUR]: (<IconLine4 />),
+    [lineSizes.EIGHT]: (<IconLine8 />),
+  }
+
+  const dashedIconsMap = {
+    [lineSizes.ONE]: (<IconDashedLine1 />),
+    [lineSizes.TWO]: (<IconDashedLine2 />),
+    [lineSizes.FOUR]: (<IconDashedLine4 />),
+    [lineSizes.EIGHT]: (<IconDashedLine8 />),
+  }
+
+  const iconsSet = [
+    {
+      key: lineSizes.ONE,
+      icon: iconsMap[lineSizes.ONE],
+    },
+    {
+      key: lineSizes.TWO,
+      icon: iconsMap[lineSizes.TWO],
+    },
+    {
+      key: lineSizes.FOUR,
+      icon: iconsMap[lineSizes.FOUR],
+    },
+    {
+      key: lineSizes.EIGHT,
+      icon: iconsMap[lineSizes.EIGHT],
+    },
+  ]
+
+  const dashedIconsSet = [
+    {
+      key: lineSizes.ONE,
+      icon: dashedIconsMap[lineSizes.ONE],
+    },
+    {
+      key: lineSizes.TWO,
+      icon: dashedIconsMap[lineSizes.TWO],
+    },
+    {
+      key: lineSizes.FOUR,
+      icon: dashedIconsMap[lineSizes.FOUR],
+    },
+    {
+      key: lineSizes.EIGHT,
+      icon: dashedIconsMap[lineSizes.EIGHT],
+    },
+  ]
+
+  return (
+    <IconGroupSettings
+      iconsSet={dashed ? dashedIconsSet : iconsSet}
+      currentSelection={currentSize}
+      handleClick={handleClick}
+    />
+  )
+}

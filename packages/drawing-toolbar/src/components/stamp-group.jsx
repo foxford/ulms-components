@@ -23,20 +23,6 @@ import { SettingsGroup } from './settings-group'
 
 import css from './settings.module.css'
 
-const iconsMap = {
-  [stampToolModeEnum.PLEASED]: (<IconPleased />),
-  [stampToolModeEnum.SAD]: (<IconSad />),
-  [stampToolModeEnum.LOVE]: (<IconLove />),
-  [stampToolModeEnum.STAR]: (<IconStar />),
-  [stampToolModeEnum.HEART]: (<IconHeart />),
-  [stampToolModeEnum.LIKE]: (<IconLike />),
-  [stampToolModeEnum.DISLIKE]: (<IconDislike />),
-  [stampToolModeEnum.QUESTION]: (<IconQuestion />),
-  [stampToolModeEnum.WELLDONE]: (<IconWellDone />),
-  [stampToolModeEnum.SMART]: (<IconSmart />),
-  [stampToolModeEnum.TRYMORE]: (<IconTryMore />),
-}
-
 export class StampGroup extends React.Component {
   constructor (props) {
     super(props)
@@ -48,60 +34,74 @@ export class StampGroup extends React.Component {
       toolMode: defaultToolSettings.stamp,
     }
 
+    this.iconsMap = {
+      [stampToolModeEnum.PLEASED]: (<IconPleased />),
+      [stampToolModeEnum.SAD]: (<IconSad />),
+      [stampToolModeEnum.LOVE]: (<IconLove />),
+      [stampToolModeEnum.STAR]: (<IconStar />),
+      [stampToolModeEnum.HEART]: (<IconHeart />),
+      [stampToolModeEnum.LIKE]: (<IconLike />),
+      [stampToolModeEnum.DISLIKE]: (<IconDislike />),
+      [stampToolModeEnum.QUESTION]: (<IconQuestion />),
+      [stampToolModeEnum.WELLDONE]: (<IconWellDone />),
+      [stampToolModeEnum.SMART]: (<IconSmart />),
+      [stampToolModeEnum.TRYMORE]: (<IconTryMore />),
+    }
+
     this.iconsSet = [
       {
         key: stampToolModeEnum.PLEASED,
-        icon: iconsMap[stampToolModeEnum.PLEASED],
+        icon: this.iconsMap[stampToolModeEnum.PLEASED],
         // title: intl.formatMessage({ id: intlID.STAMP_PLEASED }),
       },
       {
         key: stampToolModeEnum.SAD,
-        icon: iconsMap[stampToolModeEnum.SAD],
+        icon: this.iconsMap[stampToolModeEnum.SAD],
         // title: intl.formatMessage({ id: intlID.STAMP_SAD }),
       },
       {
         key: stampToolModeEnum.LOVE,
-        icon: iconsMap[stampToolModeEnum.LOVE],
+        icon: this.iconsMap[stampToolModeEnum.LOVE],
         // title: intl.formatMessage({ id: intlID.STAMP_LOVE }),
       },
       {
         key: stampToolModeEnum.STAR,
-        icon: iconsMap[stampToolModeEnum.STAR],
+        icon: this.iconsMap[stampToolModeEnum.STAR],
         // title: intl.formatMessage({ id: intlID.STAMP_STAR }),
       },
       {
         key: stampToolModeEnum.HEART,
-        icon: iconsMap[stampToolModeEnum.HEART],
+        icon: this.iconsMap[stampToolModeEnum.HEART],
         // title: intl.formatMessage({ id: intlID.STAMP_HEART }),
       },
       {
         key: stampToolModeEnum.LIKE,
-        icon: iconsMap[stampToolModeEnum.LIKE],
+        icon: this.iconsMap[stampToolModeEnum.LIKE],
         // title: intl.formatMessage({ id: intlID.STAMP_LIKE }),
       },
       {
         key: stampToolModeEnum.DISLIKE,
-        icon: iconsMap[stampToolModeEnum.DISLIKE],
+        icon: this.iconsMap[stampToolModeEnum.DISLIKE],
         // title: intl.formatMessage({ id: intlID.STAMP_DISLIKE }),
       },
       {
         key: stampToolModeEnum.QUESTION,
-        icon: iconsMap[stampToolModeEnum.QUESTION],
+        icon: this.iconsMap[stampToolModeEnum.QUESTION],
         // title: intl.formatMessage({ id: intlID.STAMP_QUESTION }),
       },
       {
         key: stampToolModeEnum.WELLDONE,
-        icon: iconsMap[stampToolModeEnum.WELLDONE],
+        icon: this.iconsMap[stampToolModeEnum.WELLDONE],
         // title: intl.formatMessage({ id: intlID.STAMP_WELLDONE }),
       },
       {
         key: stampToolModeEnum.SMART,
-        icon: iconsMap[stampToolModeEnum.SMART],
+        icon: this.iconsMap[stampToolModeEnum.SMART],
         // title: intl.formatMessage({ id: intlID.STAMP_SMART }),
       },
       {
         key: stampToolModeEnum.TRYMORE,
-        icon: iconsMap[stampToolModeEnum.TRYMORE],
+        icon: this.iconsMap[stampToolModeEnum.TRYMORE],
         // title: intl.formatMessage({ id: intlID.STAMP_TRYMORE }),
       },
     ]
@@ -141,12 +141,13 @@ export class StampGroup extends React.Component {
         target={this.buttonRef.current}
         content={(
           <div className={cn(css.column, className)}>
-            {this.stampToolRows.map(iconsRow => (
+            {this.stampToolRows.map((iconsRow, i) => (
               <IconGroupSettings
                 iconsSet={iconsRow}
                 fillWidth
                 currentSelection={toolMode}
                 handleClick={this.handleClick}
+                key={i}
               />
             )) }
           </div>

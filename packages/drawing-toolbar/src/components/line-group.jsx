@@ -19,16 +19,16 @@ import { ColorSettings } from './color-settings'
 
 import css from './settings.module.css'
 
-const iconsMap = {
-  [lineToolModeEnum.LINE]: (<IconLine />),
-  [lineToolModeEnum.DASHED_LINE]: (<IconDashedLine />),
-  [lineToolModeEnum.ARROW]: (<IconArrow />),
-}
-
 export class LineGroup extends React.Component {
   constructor (props) {
     super(props)
     const { intl } = props
+
+    this.iconsMap = {
+      [lineToolModeEnum.LINE]: <IconLine />,
+      [lineToolModeEnum.DASHED_LINE]: <IconDashedLine />,
+      [lineToolModeEnum.ARROW]: <IconArrow />,
+    }
 
     this.buttonRef = React.createRef()
 
@@ -41,18 +41,18 @@ export class LineGroup extends React.Component {
     this.iconsSet = [
       {
         key: lineToolModeEnum.LINE,
-        icon: iconsMap[lineToolModeEnum.LINE],
+        icon: this.iconsMap[lineToolModeEnum.LINE],
         title: intl.formatMessage({ id: intlID.LINE }),
       },
       {
         key: lineToolModeEnum.DASHED_LINE,
-        icon: iconsMap[lineToolModeEnum.DASHED_LINE],
+        icon: this.iconsMap[lineToolModeEnum.DASHED_LINE],
         title: intl.formatMessage({ id: intlID.DASHED_LINE }),
       },
       // ToDo: Пока не реализовано
       // {
       //   key: lineToolModeEnum.ARROW,
-      //   icon: iconsMap[lineToolModeEnum.ARROW],
+      //   icon: this.iconsMap[lineToolModeEnum.ARROW],
       //   title: intl.formatMessage({ id: intlID.ARROW }),
       // },
     ]
@@ -125,7 +125,7 @@ export class LineGroup extends React.Component {
           })}
           innerRef={this.buttonRef}
         >
-          {iconsMap[toolMode]}
+          {this.iconsMap[toolMode]}
         </ToolbarButton>
       </SettingsGroup>
     )

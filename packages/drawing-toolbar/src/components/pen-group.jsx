@@ -19,12 +19,6 @@ import { ColorSettings } from './color-settings'
 
 import css from './settings.module.css'
 
-const iconsMap = {
-  [penToolModeEnum.PENCIL]: (<IconPen />),
-  [penToolModeEnum.DASHED_PENCIL]: (<IconDashedPen />),
-  [penToolModeEnum.MARKER]: (<IconMarker />),
-}
-
 const lineToMarkerMap = {
   1: 5,
   2: 10,
@@ -45,20 +39,26 @@ export class PenGroup extends React.Component {
       toolMode: penToolModeEnum.PENCIL,
     }
 
+    this.iconsMap = {
+      [penToolModeEnum.PENCIL]: (<IconPen />),
+      [penToolModeEnum.DASHED_PENCIL]: (<IconDashedPen />),
+      [penToolModeEnum.MARKER]: (<IconMarker />),
+    }
+
     this.iconsSet = [
       {
         key: penToolModeEnum.PENCIL,
-        icon: iconsMap[penToolModeEnum.PENCIL],
+        icon: this.iconsMap[penToolModeEnum.PENCIL],
         title: intl.formatMessage({ id: intlID.PENCIL }),
       },
       {
         key: penToolModeEnum.DASHED_PENCIL,
-        icon: iconsMap[penToolModeEnum.DASHED_PENCIL],
+        icon: this.iconsMap[penToolModeEnum.DASHED_PENCIL],
         title: intl.formatMessage({ id: intlID.DASHED_PENCIL }),
       },
       {
         key: penToolModeEnum.MARKER,
-        icon: iconsMap[penToolModeEnum.MARKER],
+        icon: this.iconsMap[penToolModeEnum.MARKER],
         title: intl.formatMessage({ id: intlID.HIGHLIGHTER }),
       },
     ]
@@ -131,7 +131,7 @@ export class PenGroup extends React.Component {
           })}
           innerRef={this.buttonRef}
         >
-          {iconsMap[toolMode]}
+          {this.iconsMap[toolMode]}
         </ToolbarButton>
       </SettingsGroup>
     )
