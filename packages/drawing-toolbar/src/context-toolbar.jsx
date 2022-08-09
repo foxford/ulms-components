@@ -15,8 +15,8 @@ import IconCopyPaste from './icons-new/copy-paste-tool-icon.svg'
 import IconDelete from './icons-new/delete-tool-icon.svg'
 import IconLockUnlocked from './icons-new/lock-tool-unlocked-icon.svg'
 import IconLockLocked from './icons-new/lock-tool-locked-icon.svg'
-import IconBringFront from './icons-new/bring-front-tool-icon.svg'
-import IconBringBack from './icons-new/bring-back-tool-icon.svg'
+// import IconBringFront from './icons-new/bring-front-tool-icon.svg'
+// import IconBringBack from './icons-new/bring-back-tool-icon.svg'
 
 import css from './context-toolbar.module.css'
 
@@ -177,8 +177,8 @@ export class ContextToolbar extends React.Component {
       onLock,
       onCopyPaste,
       onDelete,
-      onBringToFront,
-      onSendToBack,
+      // onBringToFront,
+      // onSendToBack,
     } = this.props
     const {
       showColorTool,
@@ -306,21 +306,22 @@ export class ContextToolbar extends React.Component {
             >
               <IconDelete />
             </div>
-            <div className={css.divider} />
-            <div
-              className={cn(css.button)}
-              onClick={() => this.handleAction(onBringToFront)}
-              onKeyDown={() => this.handleAction(onBringToFront)}
-            >
-              <IconBringFront />
-            </div>
-            <div
-              className={cn(css.button)}
-              onClick={() => this.handleAction(onSendToBack)}
-              onKeyDown={() => this.handleAction(onSendToBack)}
-            >
-              <IconBringBack />
-            </div>
+            {/* ToDo: Пока не реализовано! */}
+            {/* <div className={css.divider} /> */}
+            {/* <div */}
+            {/*  className={cn(css.button)} */}
+            {/*  onClick={() => this.handleAction(onBringToFront)} */}
+            {/*  onKeyDown={() => this.handleAction(onBringToFront)} */}
+            {/* > */}
+            {/*  <IconBringFront /> */}
+            {/* </div> */}
+            {/* <div */}
+            {/*  className={cn(css.button)} */}
+            {/*  onClick={() => this.handleAction(onSendToBack)} */}
+            {/*  onKeyDown={() => this.handleAction(onSendToBack)} */}
+            {/* > */}
+            {/*  <IconBringBack /> */}
+            {/* </div> */}
           </>
         )}
       </div>
