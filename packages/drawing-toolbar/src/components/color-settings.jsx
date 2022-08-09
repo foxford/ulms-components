@@ -1,7 +1,6 @@
 import React from 'react'
-import cn from 'classnames-es'
 
-import { HEXtoRGB } from '../utils'
+import { ToolbarButton } from './toolbar-button'
 
 import css from './settings.module.css'
 
@@ -27,19 +26,18 @@ const colors = [
 ]
 
 export const ColorItem = ({
-  webColor, isActive = false, handleClick, innerRef,
+  color, active = false, handleClick, innerRef,
 }) => (
-  // eslint-disable-next-line jsx-a11y/no-static-element-interactions,jsx-a11y/click-events-have-key-events
-  <div
-    ref={innerRef}
-    className={cn(css.item, isActive && css.item_active)}
-    onClick={() => handleClick(HEXtoRGB(webColor))}
+  <ToolbarButton
+    active={active}
+    innerRef={innerRef}
+    onClick={() => handleClick(color)}
   >
     <div
       className={css.colorCircle}
-      style={{ backgroundColor: webColor, border: webColor.toLowerCase() === '#ffffff' ? '1px solid #B8B8B8' : 'none' }}
+      style={{ backgroundColor: color, border: color.toLowerCase() === '#ffffff' ? '1px solid #B8B8B8' : 'none' }}
     />
-  </div>
+  </ToolbarButton>
 )
 
 export const ColorSettings = ({
@@ -50,8 +48,8 @@ export const ColorSettings = ({
       <div className={css.row} key={i}>
         {colorsRow.map(color => (
           <ColorItem
-            isActive={currentColor === color.toLowerCase()}
-            webColor={color}
+            active={currentColor.toLowerCase() === color.toLowerCase()}
+            color={color}
             handleClick={handleClick}
             key={color}
           />

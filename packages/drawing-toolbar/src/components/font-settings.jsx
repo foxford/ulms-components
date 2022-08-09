@@ -1,17 +1,17 @@
 import React from 'react'
-import cn from 'classnames-es'
+
+import { ToolbarButton } from './toolbar-button'
 
 import css from './settings.module.css'
 
 const fontSizes = [32, 48, 64]
 
 export const FontItem = ({
-  fontSize, isActive = false, handleClick, innerRef,
+  fontSize, active = false, handleClick, innerRef,
 }) => (
-  // eslint-disable-next-line jsx-a11y/no-static-element-interactions,jsx-a11y/click-events-have-key-events
-  <div
-    ref={innerRef}
-    className={cn(css.item, isActive && css.item_active)}
+  <ToolbarButton
+    active={active}
+    innerRef={innerRef}
     onClick={() => handleClick(fontSize)}
   >
     <div
@@ -20,7 +20,7 @@ export const FontItem = ({
     >
       a
     </div>
-  </div>
+  </ToolbarButton>
 )
 
 export const FontSettings = ({ currentFontSize, handleClick }) => (
@@ -28,7 +28,7 @@ export const FontSettings = ({ currentFontSize, handleClick }) => (
     <div className={css.row}>
       {fontSizes.map(itemFontSize => (
         <FontItem
-          isActive={currentFontSize === itemFontSize}
+          active={currentFontSize === itemFontSize}
           fontSize={itemFontSize}
           handleClick={handleClick}
           key={itemFontSize}

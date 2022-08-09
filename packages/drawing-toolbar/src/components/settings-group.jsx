@@ -4,7 +4,7 @@ import Floater from 'react-floater'
 import css from './settings-group.module.css'
 
 export const SettingsGroup = ({
-  children, direction, target, isOpen, handleClose, content, overlay,
+  children, direction, target, isOpen, handleClose, content, overlay, containerStyles,
 }) => (
   <div>
     <Floater
@@ -22,10 +22,12 @@ export const SettingsGroup = ({
           backgroundColor: '#fff',
           borderRadius: 5,
           minWidth: 0,
-          minHeight: '52px',
+          minHeight: 0,
+          ...containerStyles,
         },
         wrapper: { cursor: 'pointer' },
         options: { zIndex: 250 },
+
       }}
       target={target}
       open={isOpen}
