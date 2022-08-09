@@ -2,21 +2,26 @@ export const toolEnum = {
   ERASER: 'eraser',
   PAN: 'pan',
   PEN: 'pen',
+  LINE: 'line',
   SELECT: 'select',
   SHAPE: 'shape',
   TEXT: 'textbox',
-  COLOR: 'color',
   GRID: 'grid',
   IMAGE: 'image',
-  LOCK: 'lock',
   STAMP: 'stamp',
   LIB: 'lib',
 }
 
 export const penToolModeEnum = {
   PENCIL: 'pencil',
+  DASHED_PENCIL: 'dashed-pencil',
   MARKER: 'marker',
+}
+
+export const lineToolModeEnum = {
   LINE: 'line',
+  DASHED_LINE: 'dashed-line',
+  ARROW: 'arrow',
 }
 
 export const shapeToolModeEnum = {
@@ -26,6 +31,8 @@ export const shapeToolModeEnum = {
   RECT_SOLID: 'rect-solid',
   TRIANGLE: 'triangle',
   TRIANGLE_SOLID: 'triangle-solid',
+  RIGHT_TRIANGLE: 'right-triangle',
+  RIGHT_TRIANGLE_SOLID: 'right-triangle-solid',
 }
 
 export const stampToolModeEnum = {
@@ -94,3 +101,13 @@ export const DEBOUNCE_DELAY = 300
 export const THROTTLE_DELAY = 500
 
 export const COPY_PASTE_SHIFT = 30
+
+export const defaultToolSettings = {
+  tool: toolEnum.PEN,
+  color: '#000000',
+  size: 2,
+  fontSize: 48,
+  shape: shapeToolModeEnum.RECT,
+  line: lineToolModeEnum.LINE,
+  stamp: stampToolModeEnum.PLEASED,
+}

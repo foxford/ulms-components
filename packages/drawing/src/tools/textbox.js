@@ -1,10 +1,16 @@
 import { fabric } from 'fabric/dist/fabric.min'
 
+import { defaultToolSettings } from '../constants'
+
 import { PositionableObject, makeNotInteractive, adjustPosition } from './object'
 
 export class TextboxTool extends PositionableObject {
   constructor (canvas, objectFn, options = {}) {
     super(canvas, objectFn, options)
+
+    const { fontSize, ...restOptions } = options
+
+    this.__fontSize = fontSize || defaultToolSettings.fontSize
 
     this.__lastAdded = undefined
 
@@ -18,7 +24,7 @@ export class TextboxTool extends PositionableObject {
       scaleY: 0.5,
       strokeUniform: true,
       width: 600,
-      ...options,
+      ...restOptions,
     }))
   }
 
@@ -63,9 +69,13 @@ export class TextboxTool extends PositionableObject {
 
     const [x, y] = adjustPosition(this.__object, opts.absolutePointer, this.__options.adjustCenter)
 
-    this.__object.set('left', x)
-    this.__object.set('top', y)
-    this.__object.set('__local', true)
+    this.__object.set({
+      left: x,
+      top: y,
+      fontSize: this.__fontSize,
+      __local: true,
+      _selected: true, // Чтобы сработало выделение на новом объекте
+    })
 
     this._canvas.add(this.__object)
 

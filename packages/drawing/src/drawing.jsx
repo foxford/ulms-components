@@ -4,8 +4,16 @@ import { fabric } from 'fabric/dist/fabric.min'
 import { queue as Queue } from 'd3-queue'
 import Hammer from 'hammerjs'
 
-import { BROADCAST_MESSAGE_TYPE, enhancedFields, penToolModeEnum, shapeToolModeEnum, stampToolModeEnum, toolEnum } from './constants'
-import { toCSSColor } from './util/to-css-color'
+import {
+  BROADCAST_MESSAGE_TYPE,
+  enhancedFields,
+  penToolModeEnum,
+  lineToolModeEnum,
+  shapeToolModeEnum,
+  toolEnum,
+  defaultToolSettings,
+} from './constants'
+import { HEXtoRGB, toCSSColor } from './util/to-css-color'
 import { serializeObject } from './util/serialize-object'
 import { LockProvider } from './lock-provider'
 import { CopyPasteProvider } from './copy-paste-provider'
@@ -218,8 +226,6 @@ export class Drawing extends React.Component {
       height,
       objects,
       pattern,
-      shapeMode,
-      stampMode,
       tool,
       width,
       x,
@@ -292,11 +298,9 @@ export class Drawing extends React.Component {
       && (
         prevProps.tool !== tool
         || prevProps.brushColor !== brushColor
-        || prevProps.shapeMode !== shapeMode
-        || prevProps.stampMode !== stampMode
         || prevProps.brushMode !== brushMode
         // need to update the tool if it's a pen
-        || (tool === toolEnum.PEN && brushMode !== penToolModeEnum.LINE)
+        || tool === toolEnum.PEN
       )
     ) {
       if (prevProps.tool !== tool || tool !== toolEnum.SELECT) {
@@ -311,8 +315,6 @@ export class Drawing extends React.Component {
         || prevProps.brushMode !== brushMode
         || prevProps.brushWidth !== brushWidth
         || prevProps.eraserWidth !== eraserWidth
-        || prevProps.shapeMode !== shapeMode
-        || prevProps.stampMode !== stampMode
       )
     ) {
       this.configureTool()
@@ -605,8 +607,7 @@ export class Drawing extends React.Component {
       brushMode,
       isPresentation,
       selectOnInit,
-      shapeMode,
-      stampMode,
+      fontSize,
       onSelection,
       showContextMenu,
       zoom,
@@ -629,10 +630,15 @@ export class Drawing extends React.Component {
         break
 
       case toolEnum.PEN:
-        if (brushMode === penToolModeEnum.LINE) {
+        this.tool = new PenTool(this.canvas)
+        break
+
+      case toolEnum.LINE:
+        if (brushMode === lineToolModeEnum.LINE || brushMode === lineToolModeEnum.DASHED_LINE) {
           this.tool = new LineTool(this.canvas)
         } else {
-          this.tool = new PenTool(this.canvas)
+          // ToDo: Пока не реализовано
+          // this.tool = new ArrowTool(this.canvas)
         }
         break
 
@@ -652,6 +658,7 @@ export class Drawing extends React.Component {
       case toolEnum.TEXT:
         this.tool = new TextboxTool(this.canvas, undefined, {
           fill: toCSSColor(brushColor),
+          fontSize,
           fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif',
         })
 
@@ -660,14 +667,14 @@ export class Drawing extends React.Component {
       case toolEnum.STAMP:
         this.tool = new StampTool(
           this.canvas,
-          stampMode,
+          brushMode,
           publicStorageProvider,
         )
 
         break
 
       case toolEnum.SHAPE:
-        switch (shapeMode) {
+        switch (brushMode) {
           case shapeToolModeEnum.CIRCLE:
             this.tool = new ShapeTool(
               this.canvas,
@@ -785,14 +792,18 @@ export class Drawing extends React.Component {
       brushColor, brushMode, brushWidth, eraserWidth, eraserPrecision, tool,
     } = this.props
 
-    if (tool === toolEnum.PEN) {
+    if (tool === toolEnum.PEN || tool === toolEnum.LINE) {
       const color = brushMode === penToolModeEnum.MARKER
         ? { ...brushColor, a: 0.5 }
         : brushColor
+      const dashArray = (brushMode === penToolModeEnum.DASHED_PENCIL) || (brushMode === lineToolModeEnum.DASHED_LINE)
+        ? [6, 6]
+        : undefined
 
       this.tool.configure({
         lineColor: toCSSColor(color),
         lineWidth: brushWidth,
+        dashArray,
       })
     } else {
       this.tool.configure({
@@ -1217,13 +1228,9 @@ export class Drawing extends React.Component {
 }
 
 Drawing.defaultProps = {
-  brushColor: {
-    r: 255, g: 255, b: 255, a: 1,
-  },
-  brushWidth: 12,
-  shapeMode: shapeToolModeEnum.RECT,
-  stampMode: stampToolModeEnum.PLEASED,
-  tool: toolEnum.PEN,
+  brushColor: { ...HEXtoRGB(defaultToolSettings.color), a: 1 },
+  brushWidth: defaultToolSettings.size,
+  tool: defaultToolSettings.tool,
   x: 0,
   y: 0,
   zoom: 1,
