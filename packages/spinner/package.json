@@ -26,8 +26,7 @@
   },
   "dependencies": {
     "@ulms/ui-icons": "^1.0.0",
-    "classnames-es": "^2.2.6",
-    "react": "^16.14.0"
+    "classnames-es": "^2.2.6"
   },
   "peerDependencies": {
     "react": "^15.6 || ^16.x || ^17.x"
