@@ -299,6 +299,7 @@ export class ContextToolbar extends React.Component {
               onClick={() => this.handleAction(onDelete)}
             >
               <IconDelete />
+
             </ToolbarButton>
             {/* ToDo: Пока не реализовано */}
             {/* <Divider /> */}
