@@ -102,6 +102,7 @@ export default class SelectTool extends Base {
     this._canvas.isDrawingMode = false
     this._canvas.selection = false
     this._canvas.perPixelTargetFind = true
+    this._canvas.targetFindTolerance = 15
     this._canvas.defaultCursor = 'default'
     this._canvas.setCursor('default')
     this._debouncedTriggerModified = debounce(this._triggerModified, DEBOUNCE_DELAY)
@@ -251,7 +252,6 @@ export default class SelectTool extends Base {
         this.__isMoving = true
         this._sendContextMenuEvent(true)
       }
-      target.set({ hasBorders: false, hasControls: false })
       this._throttledTriggerUpdate(target._id, { top: target.top, left: target.left })
     }
   }

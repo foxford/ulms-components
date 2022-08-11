@@ -13,16 +13,16 @@ import {
   toolEnum,
   defaultToolSettings,
 } from './constants'
+import './util/fabric-presets'
 import { HEXtoRGB, toCSSColor } from './util/to-css-color'
 import { serializeObject } from './util/serialize-object'
 import { LockProvider } from './lock-provider'
 import { CopyPasteProvider } from './copy-paste-provider'
 import { CursorProvider } from './cursor-provider'
 import { keyboardEvents, KeyboardListenerProvider } from './keyboard-listener-provider'
+import TokenProvider from './util/token-provider'
 
 import DynamicPattern from './tools/dynamic-pattern'
-// FIXME: fix cycle dep
-// eslint-disable-next-line import/no-cycle
 import EraserTool from './tools/eraser'
 import './tools/optimized-pencil-brush'
 import PanTool from './tools/pan'
@@ -32,8 +32,6 @@ import { LineTool } from './tools/line'
 import { ShapeTool } from './tools/shape'
 import { StampTool } from './tools/stamp'
 import { TextboxTool } from './tools/textbox'
-// FIXME: fix cycle dep
-// eslint-disable-next-line import/no-cycle
 import { LockTool } from './tools/lock'
 import {
   circle,
@@ -54,93 +52,6 @@ export const normalizeFields = (object, fields) => Object.assign(
     return a
   }, {})
 )
-
-// TODO: use common token provider
-class TokenProvider {
-  constructor () {
-    this._provider = null
-    this._rq = []
-  }
-
-  setProvider (provider) {
-    this._provider = provider
-
-    if (this._provider !== null) {
-      this._provider()
-        .then((token) => {
-          this._rq.forEach((p) => {
-            p.resolve(token)
-          })
-
-          this._rq = []
-
-          return null
-        })
-        .catch(error => console.log(error)) // eslint-disable-line no-console
-    }
-  }
-
-  getToken () {
-    let p
-
-    if (this._provider === null) {
-      p = new Promise((resolve, reject) => {
-        this._rq.push({ resolve, reject })
-      })
-    } else {
-      p = this._provider()
-    }
-
-    return p
-  }
-}
-
-const tp = new TokenProvider()
-
-function matchesStorageURIScheme (url) {
-  const re = /^.*\/api\/(.*)\/sets\/(.*)\/objects\/(.*)$/
-
-  return url.match(re)
-}
-
-fabric.disableStyleCopyPaste = true
-const originalFabricLoadImageFn = fabric.util.loadImage
-
-fabric.util.loadImage = function loadImage (url, callback, context, crossOrigin) {
-  if (matchesStorageURIScheme(url)) {
-    tp.getToken()
-      .then((token) => {
-        if (url.indexOf('access_token') !== -1) {
-          originalFabricLoadImageFn(
-            url.replace(/\?access_token=(.*)$/i, `?access_token=${token}`),
-            callback,
-            context,
-            crossOrigin
-          )
-        } else {
-          originalFabricLoadImageFn(`${url}?access_token=${token}`, callback, context, crossOrigin)
-        }
-
-        return null
-      })
-      .catch(error => console.log(error)) // eslint-disable-line no-console
-  } else {
-    originalFabricLoadImageFn(url, callback, context, crossOrigin)
-  }
-}
-
-// Вычисляет абсолютные координаты объекта во вьюпорте документа
-fabric.Canvas.prototype.getAbsoluteCoords = function getAbsoluteCoords (object) {
-  const canvasZoom = this.getZoom()
-  const { tl } = object.calcCoords() // Top-Left координата ограничивающего прямоугольника
-
-  return {
-    left: this._offset.left + tl.x, // this._offset - смещение канвас относительно окна
-    top: this._offset.top + tl.y,
-    width: object.scaleX * object.width * canvasZoom,
-    height: object.scaleY * object.height * canvasZoom,
-  }
-}
 
 function isShapeObject (object) {
   return object.type === shapeToolModeEnum.CIRCLE
@@ -187,7 +98,7 @@ export class Drawing extends React.Component {
       canDraw, tool, objects, pattern, tokenProvider, broadcastProvider,
     } = this.props
 
-    tp.setProvider(tokenProvider)
+    TokenProvider.setProvider(tokenProvider)
 
     if (broadcastProvider) {
       this.__broadcastProvider = broadcastProvider
@@ -322,7 +233,7 @@ export class Drawing extends React.Component {
   }
 
   componentWillUnmount () {
-    tp.setProvider(null)
+    TokenProvider.setProvider(null)
 
     this.destroyQueues()
 

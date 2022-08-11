@@ -1,5 +1,5 @@
 .wrapper {
-  padding: 2px;
+  padding: 5px 4px;
 }
 
 .button {
@@ -23,7 +23,7 @@
 }
 
 .button.button_padded {
-  margin-bottom: 12px;
+  margin-bottom: 8px;
 }
 
 .button:hover {

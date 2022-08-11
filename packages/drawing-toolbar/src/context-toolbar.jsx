@@ -203,7 +203,8 @@ export class ContextToolbar extends React.Component {
           <>
             {showLineTool && (
             <SettingsGroup
-              direction='top'
+              direction='top-start'
+              containerStyles={{ marginLeft: '-12px' }}
               isOpen={lineSettingsOpened}
               handleClose={() => this.setState({ lineSettingsOpened: false })}
               target={this.lineSettingsRef.current}
@@ -230,7 +231,8 @@ export class ContextToolbar extends React.Component {
             )}
             {showFontTool && (
             <SettingsGroup
-              direction='top'
+              direction='top-start'
+              containerStyles={{ marginLeft: '-12px' }}
               isOpen={fontSettingsOpened}
               handleClose={() => this.setState({ fontSettingsOpened: false })}
               target={this.fontSettingsRef.current}
@@ -255,7 +257,8 @@ export class ContextToolbar extends React.Component {
             )}
             {showColorTool && (
             <SettingsGroup
-              direction='top'
+              direction='top-start'
+              containerStyles={{ marginLeft: '-12px' }}
               isOpen={colorSettingsOpened}
               handleClose={() => this.setState({ colorSettingsOpened: false })}
               target={this.colorSettingsRef.current}
@@ -279,7 +282,7 @@ export class ContextToolbar extends React.Component {
             </SettingsGroup>
             )}
             {showColorTool && (
-              <Divider horizontal />
+              <Divider />
             )}
           </>
         )}

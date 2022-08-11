@@ -20,6 +20,7 @@ export const SettingsGroup = ({
         container: {
           padding: 0,
           backgroundColor: '#fff',
+          border: '1px solid #E9E9E9',
           borderRadius: 5,
           minWidth: 0,
           minHeight: 0,
