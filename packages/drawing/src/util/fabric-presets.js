@@ -52,7 +52,7 @@ fabric.Canvas.prototype.getAbsoluteCoords = function getAbsoluteCoords (object) 
   }
 }
 
-const rotateIcon = "data:image/svg+xml,%3Csvg width='17' height='17' viewBox='0 0 17 17' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M3.24268 1C2.65342 3.23917 2.18202 8.42462 5.01044 11.253C7.83887 14.0815 13.0243 13.6101 15.2635 13.0208M3.24268 1L5.01044 3.82843M3.24268 1L0.414249 3.82843M15.2635 13.0208L12.4351 15.8492M15.2635 13.0208L11.6318 11.1318' stroke='%231A96F6'/%3E%3C/svg%3E%0A"
+const rotateIcon = "data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M16 4C16.5893 6.23917 17.0607 11.4246 14.2322 14.253C11.4038 17.0815 6.21836 16.6101 3.97918 16.0208M16 4L14.2322 6.82843M16 4L18.8284 6.82843M3.97918 16.0208L6.80761 18.8492M3.97918 16.0208L7.61084 14.1318' stroke='%231A96F6'/%3E%3C/svg%3E%0A"
 
 const rotateImg = document.createElement('img')
 
@@ -76,27 +76,27 @@ fabric.Object.prototype.transparentCorners = false
 fabric.Object.prototype.cornerSize = 8
 
 fabric.Object.prototype.controls.mtr = new fabric.Control({
-  x: -0.5,
+  x: +0.5,
   y: +0.5,
-  offsetY: 8,
-  offsetX: -8,
+  offsetY: 12,
+  offsetX: 12,
   actionHandler: fabric.controlsUtils.rotationWithSnapping,
   cursorStyleHandler: fabric.controlsUtils.rotationStyleHandler,
   render: renderRotateIcon(),
   actionName: 'rotate',
-  cornerSize: 24,
+  cornerSize: 32,
   withConnection: false,
 })
 
 fabric.Textbox.prototype.controls.mtr = new fabric.Control({
   x: -0.5,
   y: +0.5,
-  offsetY: 8,
-  offsetX: -8,
+  offsetY: 12,
+  offsetX: -12,
   actionHandler: fabric.controlsUtils.rotationWithSnapping,
   cursorStyleHandler: fabric.controlsUtils.rotationStyleHandler,
   render: renderRotateIcon(),
   actionName: 'rotate',
-  cornerSize: 24,
+  cornerSize: 32,
   withConnection: false,
 })

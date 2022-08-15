@@ -180,6 +180,7 @@ export class ContextToolbar extends React.Component {
       onLock,
       onCopyPaste,
       onDelete,
+      direction = 'top',
       // onBringToFront,
       // onSendToBack,
     } = this.props
@@ -203,7 +204,7 @@ export class ContextToolbar extends React.Component {
           <>
             {showLineTool && (
             <SettingsGroup
-              direction='top-start'
+              direction={`${direction}-start`}
               containerStyles={{ marginLeft: '-12px' }}
               isOpen={lineSettingsOpened}
               handleClose={() => this.setState({ lineSettingsOpened: false })}
@@ -231,7 +232,7 @@ export class ContextToolbar extends React.Component {
             )}
             {showFontTool && (
             <SettingsGroup
-              direction='top-start'
+              direction={`${direction}-start`}
               containerStyles={{ marginLeft: '-12px' }}
               isOpen={fontSettingsOpened}
               handleClose={() => this.setState({ fontSettingsOpened: false })}
@@ -257,7 +258,7 @@ export class ContextToolbar extends React.Component {
             )}
             {showColorTool && (
             <SettingsGroup
-              direction='top-start'
+              direction={`${direction}-start`}
               containerStyles={{ marginLeft: '-12px' }}
               isOpen={colorSettingsOpened}
               handleClose={() => this.setState({ colorSettingsOpened: false })}
