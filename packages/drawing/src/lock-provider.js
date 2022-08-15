@@ -85,7 +85,6 @@ class CLockProvider {
     const props = {
       ...options,
       borderColor: 'rgba(255,0,0,0.75)',
-      hasControls: false,
       lockMovementX: true,
       lockMovementY: true,
       lockRotation: true,
@@ -106,7 +105,6 @@ class CLockProvider {
     const props = {
       ...options,
       borderColor: 'rgba(102,153,255,0.75)',
-      hasControls: true,
       lockMovementX: false,
       lockMovementY: false,
       lockRotation: false,

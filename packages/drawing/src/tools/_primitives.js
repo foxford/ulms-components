@@ -1,6 +1,32 @@
 /* eslint-disable no-param-reassign */
 import { fabric } from 'fabric/dist/fabric.min'
 
+// define a function that can locate the controls.
+// this function will be used both for drawing and for interaction.
+function linePositionHandler (dim, finalMatrix, fabricObject) {
+  const { startCoords, endCoords } = fabricObject.calcLineEndpointCoords()
+
+  if (this.pointType === 'start') {
+    return startCoords
+  }
+
+  return endCoords
+}
+
+function anchorWrapper (pointType) {
+  return function anchorHandler (eventData, transform, x, y) {
+    const fabricObject = transform.target
+
+    if (pointType === 'start') {
+      fabricObject.set({ 'x1': x, 'y1': y })
+    } else {
+      fabricObject.set({ 'x2': x, 'y2': y })
+    }
+
+    return true
+  }
+}
+
 const WhiteboardLine = fabric.util.createClass(fabric.Line, {
   type: 'WhiteboardLine',
   initialize (points, options) {
@@ -13,6 +39,25 @@ const WhiteboardLine = fabric.util.createClass(fabric.Line, {
     options.strokeUniform = true
 
     this.callSuper('initialize', points, options)
+    this.cornerStrokeColor = '#1A96F6'
+    this.cornerColor = '#1A96F6'
+    this.cornerStyle = 'rect'
+    this.controls = {
+      start: new fabric.Control({
+        positionHandler: linePositionHandler,
+        actionHandler: anchorWrapper('start'),
+        actionName: 'modifyLine',
+        pointType: 'start',
+        withConnection: true,
+      }),
+      end: new fabric.Control({
+        positionHandler: linePositionHandler,
+        actionHandler: anchorWrapper('end'),
+        actionName: 'modifyLine',
+        pointType: 'end',
+        withConnection: true,
+      }),
+    }
   },
   toObject (enhancedFields) {
     const resObject = fabric.util.object.extend(this.callSuper('toObject', enhancedFields))

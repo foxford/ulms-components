@@ -32,7 +32,7 @@ export class LineTool extends Base {
     })
   }
 
-  __pointCkick (x, y) {
+  __pointClick (x, y) {
     return (Math.abs(this._startX - x) < POINT_DELTA)
       && (Math.abs(this._startY - y) < POINT_DELTA)
   }
@@ -128,7 +128,7 @@ export class LineTool extends Base {
     const { x, y } = this._canvas.getPointer(opts.e)
 
     // Skipping point click
-    if (this.__pointCkick(x, y)) {
+    if (this.__pointClick(x, y)) {
       this._canvas.remove(this._draftLine)
       this._isDrawing = false
       this._canvas.renderAll()
