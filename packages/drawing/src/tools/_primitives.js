@@ -90,4 +90,53 @@ WhiteboardLine.fromObject = function fromObject (object, callback) {
 
 fabric.WhiteboardLine = fabric.WhiteboardLine || WhiteboardLine
 
-export { WhiteboardLine }
+const WhiteboardArrowLine = fabric.util.createClass(fabric.WhiteboardLine, {
+  type: 'WhiteboardArrowLine',
+  initialize (points, options) {
+    this.callSuper('initialize', points, options)
+  },
+  _render (ctx) {
+    this.callSuper('_render', ctx)
+
+    // do not render if width/height are zeros or object is not visible
+    if (this.width === 0 || this.height === 0 || !this.visible) return
+
+    ctx.save()
+
+    const shiftX = this.strokeWidth / 2 - 2
+    const arrowSize = 10 + Math.log10(this.strokeWidth) * 24
+    const xDiff = this.x2 - this.x1
+    const yDiff = this.y2 - this.y1
+    const angle = Math.atan2(yDiff, xDiff)
+
+    ctx.translate((this.x2 - this.x1) / 2, (this.y2 - this.y1) / 2)
+    ctx.rotate(angle)
+    ctx.beginPath()
+    ctx.moveTo(-arrowSize - shiftX, arrowSize)
+    ctx.lineTo(0 - shiftX, 0)
+    ctx.lineTo(-arrowSize - shiftX, -arrowSize)
+
+    ctx.strokeWidth = this.strokeWidth
+    ctx.strokeStyle = this.stroke
+    ctx.lineCap = 'round'
+    ctx.lineJoin = 'miter'
+    ctx.miterLimit = 4
+    ctx.stroke()
+
+    ctx.restore()
+  },
+})
+
+WhiteboardArrowLine.fromObject = function fromObject (object, callback) {
+  // Correct the coordinates relative to top/left
+  callback && callback(new fabric.WhiteboardArrowLine([
+    object.x1 + object.left,
+    object.y1 + object.top,
+    object.x2 + object.left,
+    object.y2 + object.top,
+  ], object))
+}
+
+fabric.WhiteboardArrowLine = fabric.WhiteboardArrowLine || WhiteboardArrowLine
+
+export { WhiteboardLine, WhiteboardArrowLine }

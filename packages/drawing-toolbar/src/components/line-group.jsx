@@ -49,12 +49,11 @@ export class LineGroup extends React.Component {
         icon: this.iconsMap[lineToolModeEnum.DASHED_LINE],
         title: intl.formatMessage({ id: intlID.DASHED_LINE }),
       },
-      // ToDo: Пока не реализовано
-      // {
-      //   key: lineToolModeEnum.ARROW,
-      //   icon: this.iconsMap[lineToolModeEnum.ARROW],
-      //   title: intl.formatMessage({ id: intlID.ARROW }),
-      // },
+      {
+        key: lineToolModeEnum.ARROW,
+        icon: this.iconsMap[lineToolModeEnum.ARROW],
+        title: intl.formatMessage({ id: intlID.ARROW }),
+      },
     ]
   }
 
