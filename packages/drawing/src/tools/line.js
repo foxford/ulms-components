@@ -1,5 +1,7 @@
 import { fabric } from 'fabric/dist/fabric.min'
 
+import { calcDistance } from '../util'
+
 import { Base } from './base'
 import { makeNotInteractive } from './object'
 import { WhiteboardLine } from './_primitives'
@@ -11,30 +13,18 @@ export class LineTool extends Base {
   constructor (canvas) {
     super(canvas)
 
-    this._draftLine = new fabric.Line([], {
-      fill: 'red',
-      stroke: 'red',
-      strokeDashArray: [5, 5],
-      strokeWidth: 3,
+    this.__draftLine = new fabric.Line([], {
       hasControls: false,
       hasBorders: false,
       selectable: false,
+      _draft: true,
     })
-    this._draftLine.set('_draft', true)
 
-    this._isDrawing = false
-    this._shiftPressed = false
-    this._startX = 0
-    this._startY = 0
+    this.__isDrawing = false
+    this.__shiftPressed = false
+    this.__startPoint = null
 
-    this._canvas.forEachObject((_) => {
-      Object.assign(_, { evented: false, selectable: false })
-    })
-  }
-
-  __pointClick (x, y) {
-    return (Math.abs(this._startX - x) < POINT_DELTA)
-      && (Math.abs(this._startY - y) < POINT_DELTA)
+    this._canvas.forEachObject(_ => makeNotInteractive(_))
   }
 
   configure (props) {
@@ -42,7 +32,7 @@ export class LineTool extends Base {
     this._width = props.lineWidth
     this._dash = props.dashArray
 
-    this._draftLine.set({
+    this.__draftLine.set({
       fill: this._color,
       stroke: this._color,
       strokeWidth: this._width,
@@ -63,13 +53,13 @@ export class LineTool extends Base {
   handleKeyDownEvent (e) {
     if (!this._active) return
 
-    this._shiftPressed = e.shiftKey
+    this.__shiftPressed = e.shiftKey
   }
 
   handleKeyUpEvent (e) {
     if (!this._active) return
 
-    this._shiftPressed = e.shiftKey
+    this.__shiftPressed = e.shiftKey
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -80,42 +70,39 @@ export class LineTool extends Base {
   handleMouseDownEvent (opts) {
     if (!this._active) return
 
-    const { x, y } = this._canvas.getPointer(opts.e)
-
-    this._startX = x
-    this._startY = y
-    this._draftLine.set({
-      'x1': x, 'y1': y, 'x2': x, 'y2': y,
+    this.__startPoint = this._canvas.getPointer(opts.e)
+    this.__draftLine.set({
+      'x1': this.__startPoint.x, 'y1': this.__startPoint.y, 'x2': this.__startPoint.x, 'y2': this.__startPoint.y,
     })
 
-    this._canvas.add(this._draftLine)
-    this._isDrawing = true
+    this._canvas.add(this.__draftLine)
+    this.__isDrawing = true
   }
 
   handleMouseMoveEvent (opts) {
     if (!this._active) return
-    if (!this._isDrawing) return
+    if (!this.__isDrawing) return
 
     const { x, y } = this._canvas.getPointer(opts.e)
 
-    if (this._shiftPressed) {
-      const deltaX = Math.abs(this._startX - x)
-      const signX = Math.sign(this._startX - x)
-      const deltaY = Math.abs(this._startY - y)
-      const signY = Math.sign(this._startY - y)
+    if (this.__shiftPressed) {
+      const deltaX = Math.abs(this.__startPoint.x - x)
+      const signX = Math.sign(this.__startPoint.x - x)
+      const deltaY = Math.abs(this.__startPoint.y - y)
+      const signY = Math.sign(this.__startPoint.y - y)
       const maxDelta = Math.max(deltaX, deltaY)
       const minDelta = Math.min(deltaX, deltaY)
       const delta = deltaX - deltaY
 
       if (Math.abs(delta) < (maxDelta * MIN_DELTA)) {
-        this._draftLine.set({ 'x2': this._startX - signX * minDelta, 'y2': this._startY - signY * minDelta })
+        this.__draftLine.set({ 'x2': this.this.__startPoint.x - signX * minDelta, 'y2': this.__startPoint.y - signY * minDelta })
       } else if (delta > 0) {
-        this._draftLine.set({ 'x2': x, 'y2': this._startY })
+        this.__draftLine.set({ 'x2': x, 'y2': this.__startPoint.y })
       } else {
-        this._draftLine.set({ 'x2': this._startX, 'y2': y })
+        this.__draftLine.set({ 'x2': this.__startPoint.x, 'y2': y })
       }
     } else {
-      this._draftLine.set({ 'x2': x, 'y2': y })
+      this.__draftLine.set({ 'x2': x, 'y2': y })
     }
 
     this._canvas.requestRenderAll()
@@ -123,24 +110,22 @@ export class LineTool extends Base {
 
   handleMouseUpEvent (opts) {
     if (!this._active) return
-    if (!this._isDrawing) return
-
-    const { x, y } = this._canvas.getPointer(opts.e)
+    if (!this.__isDrawing) return
 
     // Skipping point click
-    if (this.__pointClick(x, y)) {
-      this._canvas.remove(this._draftLine)
-      this._isDrawing = false
+    if (calcDistance(this.__startPoint, this._canvas.getPointer(opts.e)) > POINT_DELTA) {
+      this._canvas.remove(this.__draftLine)
+      this.__isDrawing = false
       this._canvas.renderAll()
 
       return
     }
 
     const line = new WhiteboardLine([
-      this._draftLine.x1,
-      this._draftLine.y1,
-      this._draftLine.x2,
-      this._draftLine.y2,
+      this.__draftLine.x1,
+      this.__draftLine.y1,
+      this.__draftLine.x2,
+      this.__draftLine.y2,
     ], {
       fill: this._color,
       stroke: this._color,
@@ -152,18 +137,17 @@ export class LineTool extends Base {
 
     this._canvas.add(line)
 
-    this._canvas.remove(this._draftLine)
-    this._isDrawing = false
+    this._canvas.remove(this.__draftLine)
+    this.__isDrawing = false
     this._canvas.renderAll()
   }
 
   reset () {
-    this._canvas.remove(this._draftLine)
+    this._canvas.remove(this.__draftLine)
     this._canvas.renderAll()
 
-    this._isDrawing = false
-    this._shiftPressed = false
-    this._startX = 0
-    this._startY = 0
+    this.__isDrawing = false
+    this.__shiftPressed = false
+    this.__startPoint = null
   }
 }

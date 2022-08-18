@@ -3,28 +3,14 @@ import debounce from 'lodash/debounce'
 import throttle from 'lodash/throttle'
 
 import { fromCSSColor, toCSSColor } from '../util/to-css-color'
+import { calcDistance } from '../util'
 
 import { keycodes, DEBOUNCE_DELAY, THROTTLE_DELAY, toolEnum } from '../constants'
-
 import { LockProvider } from '../lock-provider'
 
 import { Base } from './base'
 
 const POSITION_INCREMENT = 10
-
-/**
- * calcDistance - вычисляет расстояние между двумя точками на доске
- * @param point1 - Point(x, y)
- * @param point2 - Point(x, y)
- * @return {number}
- */
-const calcDistance = (point1, point2) => {
-  if (point1 && point2) {
-    return Math.sqrt((point2.x - point1.x) ** 2 + (point2.y - point1.y) ** 2)
-  }
-
-  return 0
-}
 
 const DELTA = 3 // Максимальное расстояние при клике, при котором срабатывает выделение
 

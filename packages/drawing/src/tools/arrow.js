@@ -25,9 +25,7 @@ export class ArrowTool extends Base {
     this._startX = 0
     this._startY = 0
 
-    this._canvas.forEachObject((_) => {
-      Object.assign(_, { evented: false, selectable: false })
-    })
+    this._canvas.forEachObject(_ => makeNotInteractive(_))
   }
 
   __pointClick (x, y) {

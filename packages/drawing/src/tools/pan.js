@@ -1,6 +1,7 @@
 /* eslint-disable */
 
 import { Base } from './base'
+import {makeNotInteractive} from "./object";
 
 export default class PanTool extends Base {
   constructor (canvas) {
@@ -10,9 +11,7 @@ export default class PanTool extends Base {
     this._lastPosX = null
     this._lastPosY = null
 
-    this._canvas.forEachObject((_) => {
-      Object.assign(_, { evented: false, selectable: false })
-    })
+    this._canvas.forEachObject(_ => makeNotInteractive(_))
   }
 
   configure () {

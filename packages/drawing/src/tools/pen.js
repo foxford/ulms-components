@@ -1,14 +1,13 @@
 /* eslint-disable */
 
 import { Base } from './base'
+import { makeNotInteractive } from "./object";
 
 export default class PenTool extends Base {
   constructor (canvas) {
     super(canvas)
 
-    this._canvas.forEachObject((_) => {
-      Object.assign(_, { evented: false, selectable: false })
-    })
+    this._canvas.forEachObject(_ => makeNotInteractive(_))
   }
 
   configure (props) {
