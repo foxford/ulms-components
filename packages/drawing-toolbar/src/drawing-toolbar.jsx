@@ -33,11 +33,60 @@ class _DrawingToolbarComponent extends React.Component {
   constructor (props) {
     super(props)
 
+    this.lineGroupRef = React.createRef()
+    this.penGroupRef = React.createRef()
+    this.shapeGroupRef = React.createRef()
+    this.stampGroupRef = React.createRef()
+    this.textGroupRef = React.createRef()
+
     this.state = { opened: '' }
   }
 
   componentDidMount () {
     document.addEventListener(eventName, this.handleDocumentClickEvent)
+  }
+
+  componentDidUpdate (prevProps) {
+    const {
+      tool, brushMode, handleChange,
+    } = this.props
+    const { opened } = this.state
+
+    if (tool !== prevProps.tool || brushMode !== prevProps.brushMode) {
+      let options = null
+
+      if (tool === toolEnum.TEXT) options = this.textGroupRef.current.getOptions()
+      if (tool === toolEnum.STAMP) options = this.stampGroupRef.current.getOptions()
+      if (tool === toolEnum.SHAPE) options = this.shapeGroupRef.current.getOptions()
+      if (tool === toolEnum.PEN) options = this.penGroupRef.current.getOptions()
+      if (tool === toolEnum.LINE) options = this.lineGroupRef.current.getOptions()
+      if (tool === toolEnum.LIB) {
+        this.handleLibClick()
+
+        return
+      }
+      if (tool === toolEnum.IMAGE) {
+        this.handleImageClick()
+
+        return
+      }
+
+      if (options) {
+        if (tool === toolEnum.STAMP) {
+          handleChange({
+            ...options, tool,
+          })
+        } else {
+          handleChange({
+            ...options, tool, brushMode,
+          })
+        }
+      }
+
+      if (tool !== opened) {
+        this.setState({ opened: '' })
+      }
+    }
   }
 
   componentWillUnmount () {
@@ -102,6 +151,7 @@ class _DrawingToolbarComponent extends React.Component {
   render () {
     const {
       brushColor,
+      brushMode,
       handleChange,
       intl,
       noSeparator,
@@ -151,6 +201,8 @@ class _DrawingToolbarComponent extends React.Component {
               className={css.floater}
               intl={intl}
               tool={tool}
+              brushMode={brushMode}
+              ref={this.penGroupRef}
               handleOpen={options => this.handleOpen(toolEnum.PEN, options)}
               handleChange={handleChange}
             />
@@ -162,6 +214,8 @@ class _DrawingToolbarComponent extends React.Component {
               className={css.floater}
               intl={intl}
               tool={tool}
+              brushMode={brushMode}
+              ref={this.shapeGroupRef}
               handleOpen={options => this.handleOpen(toolEnum.SHAPE, options)}
               handleChange={handleChange}
             />
@@ -173,6 +227,8 @@ class _DrawingToolbarComponent extends React.Component {
               className={css.floater}
               intl={intl}
               tool={tool}
+              brushMode={brushMode}
+              ref={this.lineGroupRef}
               handleOpen={options => this.handleOpen(toolEnum.LINE, options)}
               handleChange={handleChange}
             />
@@ -184,6 +240,7 @@ class _DrawingToolbarComponent extends React.Component {
               className={css.floater}
               intl={intl}
               tool={tool}
+              ref={this.textGroupRef}
               handleOpen={options => this.handleOpen(toolEnum.TEXT, options)}
               handleChange={handleChange}
             />
@@ -217,6 +274,7 @@ class _DrawingToolbarComponent extends React.Component {
               className={css.floater}
               intl={intl}
               tool={tool}
+              ref={this.stampGroupRef}
               handleOpen={options => this.handleOpen(toolEnum.STAMP, options)}
               handleChange={handleChange}
             />

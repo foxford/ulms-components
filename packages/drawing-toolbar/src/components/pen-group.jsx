@@ -36,7 +36,7 @@ export class PenGroup extends React.Component {
     this.state = {
       color: defaultToolSettings.color,
       size: defaultToolSettings.size,
-      toolMode: penToolModeEnum.PENCIL,
+      brushMode: penToolModeEnum.PENCIL,
     }
 
     this.iconsMap = {
@@ -64,19 +64,41 @@ export class PenGroup extends React.Component {
     ]
   }
 
+  componentDidUpdate (prevProps) {
+    const { brushMode, tool } = this.props
+
+    if (tool === toolEnum.PEN && brushMode !== prevProps.brushMode) {
+      this.setState({ brushMode })
+    }
+  }
+
   handleClick = (name, value) => {
     const { handleChange } = this.props
     const {
-      toolMode, color, size,
+      brushMode, color, size,
     } = { ...this.state, [name]: value }
 
     this.setState({ [name]: value })
     handleChange({
       tool: toolEnum.PEN,
-      brushMode: toolMode,
+      brushMode,
       brushColor: { ...HEXtoRGB(color), a: 1 },
-      brushWidth: (toolMode === penToolModeEnum.MARKER) ? lineToMarkerMap[size] : size,
+      brushWidth: (brushMode === penToolModeEnum.MARKER) ? lineToMarkerMap[size] : size,
     })
+  }
+
+  getOptions = () => {
+    const {
+      brushMode,
+      size,
+      color,
+    } = this.state
+
+    return {
+      brushMode,
+      brushColor: { ...HEXtoRGB(color), a: 1 },
+      brushWidth: (brushMode === penToolModeEnum.MARKER) ? lineToMarkerMap[size] : size,
+    }
   }
 
   render () {
@@ -88,7 +110,7 @@ export class PenGroup extends React.Component {
       className,
     } = this.props
     const {
-      toolMode,
+      brushMode,
       size,
       color,
     } = this.state
@@ -104,13 +126,13 @@ export class PenGroup extends React.Component {
           <div className={cn(css.column, className)}>
             <IconGroupSettings
               iconsSet={this.iconsSet}
-              currentSelection={toolMode}
-              handleClick={value => this.handleClick('toolMode', value)}
+              currentSelection={brushMode}
+              handleClick={value => this.handleClick('brushMode', value)}
             />
             <Divider horizontal />
             <LineSettings
               currentSize={size}
-              dashed={toolMode === penToolModeEnum.DASHED_PENCIL}
+              dashed={brushMode === penToolModeEnum.DASHED_PENCIL}
               handleClick={value => this.handleClick('size', value)}
             />
             <Divider horizontal />
@@ -124,14 +146,10 @@ export class PenGroup extends React.Component {
         <ToolbarButton
           active={tool === toolEnum.PEN}
           group
-          onClick={() => handleOpen({
-            brushMode: toolMode,
-            brushColor: { ...HEXtoRGB(color), a: 1 },
-            brushWidth: (toolMode === penToolModeEnum.MARKER) ? lineToMarkerMap[size] : size,
-          })}
+          onClick={() => handleOpen(this.getOptions())}
           innerRef={this.buttonRef}
         >
-          {this.iconsMap[toolMode]}
+          {this.iconsMap[brushMode]}
         </ToolbarButton>
       </SettingsGroup>
     )

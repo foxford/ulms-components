@@ -9,13 +9,19 @@ export const groupTypes = {
 export const ObjectTypes = {
   RECT: 'rect',
   CIRCLE: 'circle',
+  NEW_CIRCLE: 'WhiteboardCircle',
   TRIANGLE: 'triangle',
   TEXT: 'textbox',
   PATH: 'path',
   LINE: 'WhiteboardLine',
 }
 
-export const ShapeTypes = [ObjectTypes.RECT, ObjectTypes.CIRCLE, ObjectTypes.TRIANGLE]
+export const ShapeTypes = [
+  ObjectTypes.RECT,
+  ObjectTypes.CIRCLE,
+  ObjectTypes.NEW_CIRCLE,
+  ObjectTypes.TRIANGLE,
+]
 
 export const LineTypes = [ObjectTypes.LINE, ObjectTypes.PATH]
 

@@ -32,7 +32,7 @@ export class ShapeGroup extends React.Component {
 
     this.state = {
       color: defaultToolSettings.color,
-      toolMode: defaultToolSettings.shape,
+      brushMode: defaultToolSettings.shape,
     }
 
     this.iconsMap = {
@@ -65,12 +65,11 @@ export class ShapeGroup extends React.Component {
         icon: this.iconsMap[shapeToolModeEnum.TRIANGLE],
         // title: intl.formatMessage({ id: intlID.TRIANGLE }),
       },
-      // ToDo: Пока не реализовано!
-      // {
-      //   key: shapeToolModeEnum.RIGHT_TRIANGLE,
-      //   icon: this.iconsMap[shapeToolModeEnum.RIGHT_TRIANGLE],
-      //   title: intl.formatMessage({ id: intlID.RIGHT_TRIANGLE }),
-      // },
+      {
+        key: shapeToolModeEnum.RIGHT_TRIANGLE,
+        icon: this.iconsMap[shapeToolModeEnum.RIGHT_TRIANGLE],
+        // title: intl.formatMessage({ id: intlID.RIGHT_TRIANGLE }),
+      },
     ]
 
     this.solidIconsSet = [
@@ -89,27 +88,46 @@ export class ShapeGroup extends React.Component {
         icon: this.iconsSolidMap[shapeToolModeEnum.TRIANGLE_SOLID],
         // title: intl.formatMessage({ id: intlID.TRIANGLE_SOLID }),
       },
-      // ToDo: Пока не реализовано!
-      // {
-      //   key: shapeToolModeEnum.RIGHT_TRIANGLE_SOLID,
-      //   icon: this.iconsSolidMap[shapeToolModeEnum.RIGHT_TRIANGLE_SOLID],
-      //   title: intl.formatMessage({ id: intlID.RIGHT_TRIANGLE_SOLID }),
-      // },
+      {
+        key: shapeToolModeEnum.RIGHT_TRIANGLE_SOLID,
+        icon: this.iconsSolidMap[shapeToolModeEnum.RIGHT_TRIANGLE_SOLID],
+        // title: intl.formatMessage({ id: intlID.RIGHT_TRIANGLE_SOLID }),
+      },
     ]
+  }
+
+  componentDidUpdate (prevProps) {
+    const { brushMode, tool } = this.props
+
+    if (tool === toolEnum.SHAPE && brushMode !== prevProps.brushMode) {
+      this.setState({ brushMode })
+    }
   }
 
   handleClick = (name, value) => {
     const { handleChange } = this.props
     const {
-      toolMode, color,
+      brushMode, color,
     } = { ...this.state, [name]: value }
 
     this.setState({ [name]: value })
     handleChange({
       tool: toolEnum.SHAPE,
-      brushMode: toolMode,
+      brushMode,
       brushColor: { ...HEXtoRGB(color), a: 1 },
     })
+  }
+
+  getOptions = () => {
+    const {
+      brushMode,
+      color,
+    } = this.state
+
+    return {
+      brushMode,
+      brushColor: { ...HEXtoRGB(color), a: 1 },
+    }
   }
 
   render () {
@@ -121,7 +139,7 @@ export class ShapeGroup extends React.Component {
       className,
     } = this.props
     const {
-      toolMode,
+      brushMode,
       color,
     } = this.state
 
@@ -136,14 +154,14 @@ export class ShapeGroup extends React.Component {
           <div className={cn(css.column, className)}>
             <IconGroupSettings
               iconsSet={this.iconsSet}
-              currentSelection={toolMode}
-              handleClick={value => this.handleClick('toolMode', value)}
+              currentSelection={brushMode}
+              handleClick={value => this.handleClick('brushMode', value)}
             />
             <Divider horizontal />
             <IconGroupSettings
               iconsSet={this.solidIconsSet}
-              currentSelection={toolMode}
-              handleClick={value => this.handleClick('toolMode', value)}
+              currentSelection={brushMode}
+              handleClick={value => this.handleClick('brushMode', value)}
             />
             <Divider horizontal />
             <ColorSettings
@@ -156,13 +174,10 @@ export class ShapeGroup extends React.Component {
         <ToolbarButton
           active={tool === toolEnum.SHAPE}
           group
-          onClick={() => handleOpen({
-            brushMode: toolMode,
-            brushColor: { ...HEXtoRGB(color), a: 1 },
-          })}
+          onClick={() => handleOpen(this.getOptions())}
           innerRef={this.buttonRef}
         >
-          {this.iconsMap[toolMode] || this.iconsSolidMap[toolMode]}
+          {this.iconsMap[brushMode] || this.iconsSolidMap[brushMode]}
         </ToolbarButton>
       </SettingsGroup>
     )

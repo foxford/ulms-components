@@ -35,7 +35,7 @@ export class LineGroup extends React.Component {
     this.state = {
       color: defaultToolSettings.color,
       size: defaultToolSettings.size,
-      toolMode: defaultToolSettings.line,
+      brushMode: defaultToolSettings.line,
     }
 
     this.iconsSet = [
@@ -57,19 +57,41 @@ export class LineGroup extends React.Component {
     ]
   }
 
+  componentDidUpdate (prevProps) {
+    const { brushMode, tool } = this.props
+
+    if (tool === toolEnum.LINE && brushMode !== prevProps.brushMode) {
+      this.setState({ brushMode })
+    }
+  }
+
   handleClick = (name, value) => {
     const { handleChange } = this.props
     const {
-      toolMode, color, size,
+      brushMode, color, size,
     } = { ...this.state, [name]: value }
 
     this.setState({ [name]: value })
     handleChange({
       tool: toolEnum.LINE,
-      brushMode: toolMode,
+      brushMode,
       brushColor: { ...HEXtoRGB(color), a: 1 },
       brushWidth: size,
     })
+  }
+
+  getOptions = () => {
+    const {
+      brushMode,
+      size,
+      color,
+    } = this.state
+
+    return {
+      brushMode,
+      brushColor: { ...HEXtoRGB(color), a: 1 },
+      brushWidth: size,
+    }
   }
 
   render () {
@@ -81,7 +103,7 @@ export class LineGroup extends React.Component {
       className,
     } = this.props
     const {
-      toolMode,
+      brushMode,
       size,
       color,
     } = this.state
@@ -97,13 +119,13 @@ export class LineGroup extends React.Component {
           <div className={cn(css.column, className)}>
             <IconGroupSettings
               iconsSet={this.iconsSet}
-              currentSelection={toolMode}
-              handleClick={value => this.handleClick('toolMode', value)}
+              currentSelection={brushMode}
+              handleClick={value => this.handleClick('brushMode', value)}
             />
             <Divider horizontal />
             <LineSettings
               currentSize={size}
-              dashed={toolMode === lineToolModeEnum.DASHED_LINE}
+              dashed={brushMode === lineToolModeEnum.DASHED_LINE}
               handleClick={value => this.handleClick('size', value)}
             />
             <Divider horizontal />
@@ -117,14 +139,10 @@ export class LineGroup extends React.Component {
         <ToolbarButton
           active={tool === toolEnum.LINE}
           group
-          onClick={() => handleOpen({
-            brushMode: toolMode,
-            brushColor: { ...HEXtoRGB(color), a: 1 },
-            brushWidth: size,
-          })}
+          onClick={() => handleOpen(this.getOptions())}
           innerRef={this.buttonRef}
         >
-          {this.iconsMap[toolMode]}
+          {this.iconsMap[brushMode]}
         </ToolbarButton>
       </SettingsGroup>
     )
