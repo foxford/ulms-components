@@ -1,11 +1,10 @@
 /* eslint-disable no-param-reassign,default-case,no-fallthrough,import/no-extraneous-dependencies,class-methods-use-this */
 import debounce from 'lodash/debounce'
-import throttle from 'lodash/throttle'
 
 import { fromCSSColor, toCSSColor } from '../util/to-css-color'
 import { calcDistance } from '../util'
 
-import { keycodes, DEBOUNCE_DELAY, THROTTLE_DELAY, toolEnum } from '../constants'
+import { keycodes, DEBOUNCE_DELAY, toolEnum } from '../constants'
 import { LockProvider } from '../lock-provider'
 
 import { Base } from './base'
@@ -35,16 +34,11 @@ export default class SelectTool extends Base {
     this.__isMoving = false
     this.__zoom = 0
 
-    this._onBroadcast = null
     this._onSelection = null
     this._showContextMenuFunc = null
     this._debouncedTriggerModified = null
 
     this._initialConfigure()
-  }
-
-  set onBroadcast (func) {
-    this._onBroadcast = func
   }
 
   set onSelection (func) {
@@ -92,7 +86,6 @@ export default class SelectTool extends Base {
     this._canvas.defaultCursor = 'default'
     this._canvas.setCursor('default')
     this._debouncedTriggerModified = debounce(this._triggerModified, DEBOUNCE_DELAY)
-    this._throttledTriggerUpdate = throttle((id, diff) => this._triggerUpdate(id, diff), THROTTLE_DELAY)
   }
 
   configure (opt) {
@@ -123,7 +116,6 @@ export default class SelectTool extends Base {
   destroy () {
     this._canvas.discardActiveObject()
 
-    this._onBroadcast = null
     this._onSelection = null
     this._showContextMenuFunc = null
     this._debouncedTriggerModified = null
@@ -196,15 +188,6 @@ export default class SelectTool extends Base {
     }
   }
 
-  _triggerUpdate (id, diff) {
-    if (id && this._onBroadcast) {
-      this._onBroadcast({
-        id,
-        diff,
-      })
-    }
-  }
-
   handleTextEditStartEvent (opts) {
     if (opts.target && opts.target.hiddenTextarea) {
       opts.target.hiddenTextarea.style.width = '10px'
@@ -232,13 +215,43 @@ export default class SelectTool extends Base {
   handleMouseMoveEvent (event) {
     if (!this._active) return
     if (this.__mouseDown && event.target) {
-      const { target } = event
+      const { target, transform } = event
 
       if (!this.__isMoving) { // Отсылаем только один раз в начале движения
         this.__isMoving = true
         this._sendContextMenuEvent(true)
       }
-      this._throttledTriggerUpdate(target._id, { top: target.top, left: target.left })
+
+      // if (target.type === 'WhiteboardArrowLine' || target.type === 'WhiteboardLine') {
+      if (transform.action === 'modifyLine') {
+        this._throttledSendMessage(target._id, {
+          x1: target.x1,
+          y1: target.y1,
+          x2: target.x2,
+          y2: target.y2,
+        })
+      } else if (transform.action === 'drag') {
+        this._throttledSendMessage(target._id, {
+          top: target.top,
+          left: target.left,
+        })
+      } else {
+        this._throttledSendMessage(target._id, {
+          top: target.top,
+          left: target.left,
+          scaleX: target.scaleX,
+          scaleY: target.scaleY,
+          skewX: target.skewX,
+          skewY: target.skewY,
+          flipX: target.flipX,
+          flipY: target.flipY,
+          zoomX: target.zoomX,
+          zoomY: target.zoomY,
+          originX: target.originX,
+          originY: target.originY,
+          angle: target.angle,
+        })
+      }
     }
   }
 
@@ -369,7 +382,7 @@ export default class SelectTool extends Base {
   handleTextChangedEvent = (e) => {
     const { target } = e
 
-    this._throttledTriggerUpdate(target._id, { text: target.text })
+    this._throttledSendMessage(target._id, { text: target.text })
   }
 
   reset () {

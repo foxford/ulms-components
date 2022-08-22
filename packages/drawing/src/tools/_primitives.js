@@ -139,4 +139,34 @@ WhiteboardArrowLine.fromObject = function fromObject (object, callback) {
 
 fabric.WhiteboardArrowLine = fabric.WhiteboardArrowLine || WhiteboardArrowLine
 
-export { WhiteboardLine, WhiteboardArrowLine }
+const WhiteboardCircle = fabric.util.createClass(fabric.Circle, {
+  type: 'WhiteboardCircle',
+  _render (ctx) {
+    this.callSuper('_render', ctx)
+
+    // для кругов с обводкой рисуем дополнительный кружочек по центру
+    if (this.fill === 'rgba(0,0,0,0.009)') {
+      ctx.save()
+      ctx.beginPath()
+      ctx.arc(
+        0,
+        0,
+        this.strokeWidth / 2,
+        fabric.util.degreesToRadians(0),
+        fabric.util.degreesToRadians(360),
+        false
+      )
+      ctx.fillStyle = this.stroke
+      ctx.fill()
+      ctx.restore()
+    }
+  },
+})
+
+WhiteboardCircle.fromObject = function fromObject (object, callback) {
+  callback && callback(new fabric.WhiteboardCircle(object, callback))
+}
+
+fabric.WhiteboardCircle = fabric.WhiteboardCircle || WhiteboardCircle
+
+export { WhiteboardLine, WhiteboardArrowLine, WhiteboardCircle }

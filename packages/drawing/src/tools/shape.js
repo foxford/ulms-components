@@ -46,22 +46,39 @@ export class ShapeTool extends PositionableObject {
       const height = y - this.__startPoint.y
       const radius = calcDistance({ x, y }, this.__startPoint)
 
-      if (this.__object.type === 'circle') {
-        this.__object.set({
+      let diff
+
+      if (this.__object.type === 'circle' || this.__object.type === 'WhiteboardCircle') {
+        diff = {
           radius,
           originX: 'center',
           originY: 'center',
-        })
+        }
+      } else if (this.__object.type === 'path') {
+        const { width: originalWidth, height: originalHeight } = this.__object
+
+        diff = {
+          originX: (width < 0) ? 'right' : 'left',
+          originY: (height < 0) ? 'bottom' : 'top',
+          flipX: false,
+          flipY: false,
+          scaleX: width / originalWidth,
+          scaleY: height / originalHeight,
+        }
       } else {
-        this.__object.set({
+        diff = {
           width: Math.abs(width),
           height: Math.abs(height),
           originX: (width < 0) ? 'right' : 'left',
           originY: (height < 0) ? 'bottom' : 'top',
           flipX: width < 0,
           flipY: height < 0,
-        })
+        }
       }
+
+      this.__object.set(diff)
+
+      this.__object._id && this._throttledSendMessage(this.__object._id, diff)
       if (!this.__isOnCanvas) {
         this.__isOnCanvas = true
         this._canvas.add(this.__object)
@@ -84,6 +101,7 @@ export class ShapeTool extends PositionableObject {
       })
       this._canvas.add(this.__object)
     } else {
+      // Фиксируем изменения в эвенте
       this._canvas.fire('object:modified', { target: this.__object })
     }
 

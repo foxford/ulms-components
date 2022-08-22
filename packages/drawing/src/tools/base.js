@@ -1,9 +1,16 @@
-/* eslint-disable */
+/* eslint-disable class-methods-use-this */
+// eslint-disable-next-line import/no-extraneous-dependencies
+import throttle from 'lodash/throttle'
+
+import { BroadcastProvider } from '../broadcast-provider'
+import { THROTTLE_DELAY } from '../constants'
 
 export class Base {
   constructor (canvas) {
     this._active = true
     this._canvas = canvas
+
+    this._throttledSendMessage = throttle((id, diff) => BroadcastProvider.sendMessage({ id, diff }), THROTTLE_DELAY)
   }
 
   configure () {}

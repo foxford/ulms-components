@@ -1,5 +1,3 @@
-import { fabric } from 'fabric/dist/fabric.min'
-
 import { calcDistance } from '../util'
 
 import { Base } from './base'
@@ -7,20 +5,16 @@ import { makeNotInteractive } from './object'
 import { WhiteboardLine } from './_primitives'
 
 const MIN_DELTA = 0.2
-const POINT_DELTA = 5
+const POINT_DELTA = 2
 
 export class LineTool extends Base {
   constructor (canvas) {
     super(canvas)
 
-    this.__draftLine = new fabric.Line([], {
-      hasControls: false,
-      hasBorders: false,
-      selectable: false,
-      _draft: true,
-    })
+    this.__object = null
 
     this.__isDrawing = false
+    this.__isOnCanvas = false
     this.__shiftPressed = false
     this.__startPoint = null
 
@@ -28,16 +22,9 @@ export class LineTool extends Base {
   }
 
   configure (props) {
-    this._color = props.lineColor
-    this._width = props.lineWidth
-    this._dash = props.dashArray
-
-    this.__draftLine.set({
-      fill: this._color,
-      stroke: this._color,
-      strokeWidth: this._width,
-      strokeDashArray: this._dash,
-    })
+    this.__color = props.lineColor
+    this.__width = props.lineWidth
+    this.__dash = props.dashArray
 
     this._canvas.isDrawingMode = false
     this._canvas.selection = false
@@ -71,11 +58,23 @@ export class LineTool extends Base {
     if (!this._active) return
 
     this.__startPoint = this._canvas.getPointer(opts.e)
-    this.__draftLine.set({
-      'x1': this.__startPoint.x, 'y1': this.__startPoint.y, 'x2': this.__startPoint.x, 'y2': this.__startPoint.y,
+    this.__object = new WhiteboardLine([], {
+      fill: this.__color,
+      stroke: this.__color,
+      strokeDashArray: this.__dash,
+      strokeWidth: this.__width,
+      hasControls: false,
+      hasBorders: false,
+      selectable: false,
+      _new: true,
     })
 
-    this._canvas.add(this.__draftLine)
+    this.__object.set({
+      x1: this.__startPoint.x,
+      y1: this.__startPoint.y,
+      x2: this.__startPoint.x,
+      y2: this.__startPoint.y,
+    })
     this.__isDrawing = true
   }
 
@@ -85,60 +84,63 @@ export class LineTool extends Base {
 
     const { x, y } = this._canvas.getPointer(opts.e)
 
-    if (this.__shiftPressed) {
-      const deltaX = Math.abs(this.__startPoint.x - x)
-      const signX = Math.sign(this.__startPoint.x - x)
-      const deltaY = Math.abs(this.__startPoint.y - y)
-      const signY = Math.sign(this.__startPoint.y - y)
-      const maxDelta = Math.max(deltaX, deltaY)
-      const minDelta = Math.min(deltaX, deltaY)
-      const delta = deltaX - deltaY
-
-      if (Math.abs(delta) < (maxDelta * MIN_DELTA)) {
-        this.__draftLine.set({ 'x2': this.this.__startPoint.x - signX * minDelta, 'y2': this.__startPoint.y - signY * minDelta })
-      } else if (delta > 0) {
-        this.__draftLine.set({ 'x2': x, 'y2': this.__startPoint.y })
-      } else {
-        this.__draftLine.set({ 'x2': this.__startPoint.x, 'y2': y })
+    if (this.__isOnCanvas || calcDistance(this.__startPoint, { x, y }) > POINT_DELTA) {
+      let diff = {
+        x1: this.__startPoint.x,
+        y1: this.__startPoint.y,
       }
-    } else {
-      this.__draftLine.set({ 'x2': x, 'y2': y })
-    }
 
-    this._canvas.requestRenderAll()
+      if (this.__shiftPressed) {
+        const deltaX = Math.abs(this.__startPoint.x - x)
+        const signX = Math.sign(this.__startPoint.x - x)
+        const deltaY = Math.abs(this.__startPoint.y - y)
+        const signY = Math.sign(this.__startPoint.y - y)
+        const maxDelta = Math.max(deltaX, deltaY)
+        const minDelta = Math.min(deltaX, deltaY)
+        const delta = deltaX - deltaY
+
+        if (Math.abs(delta) < (maxDelta * MIN_DELTA)) {
+          diff = {
+            ...diff, x2: this.__startPoint.x - signX * minDelta, y2: this.__startPoint.y - signY * minDelta,
+          }
+        } else if (delta > 0) {
+          diff = {
+            ...diff, x2: x, y2: this.__startPoint.y,
+          }
+        } else {
+          diff = {
+            ...diff, x2: this.__startPoint.x, y2: y,
+          }
+        }
+      } else {
+        diff = {
+          ...diff, x2: x, y2: y,
+        }
+      }
+
+      this.__object.set(diff)
+
+      this.__object._id && this._throttledSendMessage(this.__object._id, diff)
+      if (!this.__isOnCanvas) {
+        this.__isOnCanvas = true
+        this._canvas.add(this.__object)
+      }
+
+      this._canvas.requestRenderAll()
+    }
   }
 
-  handleMouseUpEvent (opts) {
+  handleMouseUpEvent () {
     if (!this._active) return
     if (!this.__isDrawing) return
 
-    // Skipping point click
-    if (calcDistance(this.__startPoint, this._canvas.getPointer(opts.e)) > POINT_DELTA) {
-      this._canvas.remove(this.__draftLine)
-      this.__isDrawing = false
-      this._canvas.renderAll()
-
-      return
+    if (this.__isOnCanvas) {
+      // Фиксируем изменения в эвенте
+      this._canvas.fire('object:modified', { target: this.__object })
     }
 
-    const line = new WhiteboardLine([
-      this.__draftLine.x1,
-      this.__draftLine.y1,
-      this.__draftLine.x2,
-      this.__draftLine.y2,
-    ], {
-      fill: this._color,
-      stroke: this._color,
-      strokeWidth: this._width,
-      strokeDashArray: this._dash,
-    })
-
-    line.set({ '_new': true })
-
-    this._canvas.add(line)
-
-    this._canvas.remove(this.__draftLine)
     this.__isDrawing = false
+    this.__isOnCanvas = false
     this._canvas.renderAll()
   }
 
@@ -147,7 +149,7 @@ export class LineTool extends Base {
     this._canvas.renderAll()
 
     this.__isDrawing = false
-    this.__shiftPressed = false
+    this.__isOnCanvas = false
     this.__startPoint = null
   }
 }
