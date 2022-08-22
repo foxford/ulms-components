@@ -29,6 +29,7 @@ import PanTool from './tools/pan'
 import PenTool from './tools/pen'
 import SelectTool from './tools/select'
 import { LineTool } from './tools/line'
+import { ArrowTool } from './tools/arrow'
 import { ShapeTool } from './tools/shape'
 import { StampTool } from './tools/stamp'
 import { TextboxTool } from './tools/textbox'
@@ -548,8 +549,7 @@ export class Drawing extends React.Component {
         if (brushMode === lineToolModeEnum.LINE || brushMode === lineToolModeEnum.DASHED_LINE) {
           this.tool = new LineTool(this.canvas)
         } else {
-          // ToDo: Пока не реализовано
-          // this.tool = new ArrowTool(this.canvas)
+          this.tool = new ArrowTool(this.canvas)
         }
         break
 

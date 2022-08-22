@@ -1,17 +1,15 @@
-import { fabric } from 'fabric/dist/fabric.min'
-
 import { Base } from './base'
 import { makeNotInteractive } from './object'
-import { WhiteboardLine } from './_primitives'
+import { WhiteboardArrowLine } from './_primitives'
 
 const MIN_DELTA = 0.2
 const POINT_DELTA = 5
 
-export class LineTool extends Base {
+export class ArrowTool extends Base {
   constructor (canvas) {
     super(canvas)
 
-    this._draftLine = new fabric.Line([], {
+    this._draftLine = new WhiteboardArrowLine([], {
       fill: 'red',
       stroke: 'red',
       strokeDashArray: [5, 5],
@@ -136,7 +134,7 @@ export class LineTool extends Base {
       return
     }
 
-    const line = new WhiteboardLine([
+    const line = new WhiteboardArrowLine([
       this._draftLine.x1,
       this._draftLine.y1,
       this._draftLine.x2,

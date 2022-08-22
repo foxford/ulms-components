@@ -272,6 +272,10 @@ export default class SelectTool extends Base {
             _selected: true,
             hasBorders: true,
           })
+        } else if (event.target.type === 'WhiteboardLine' || event.target.type === 'WhiteboardArrowLine') {
+          event.target.set({
+            hasControls: true, _selected: true,
+          })
         } else {
           event.target.set({
             hasBorders: true, hasControls: true, _selected: true,

@@ -8,7 +8,7 @@ export const makeNotInteractive = (_) => {
 
 export const makeInteractive = (_) => {
   _.set({
-    selectable: true, hasBorders: false, hasControls: false, evented: true, hoverCursor: 'move',
+    selectable: true, evented: true, hoverCursor: 'move',
   })
 }
 

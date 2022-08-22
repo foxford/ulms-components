@@ -34,6 +34,37 @@ fabric.util.loadImage = function loadImage (url, callback, context, crossOrigin)
   }
 }
 
+fabric.Line.prototype.calcLineEndpointCoords = function calcLineEndpointCoords () {
+  const linePoints = this.calcLinePoints()
+  const scaleX = this.scaleX || 1
+  const scaleY = this.scaleY || 1
+
+  let startCoords
+  let endCoords
+
+  if ((this.flipY && this.flipX) || (!this.flipY && !this.flipX)) {
+    startCoords = {
+      x: this.left + linePoints.x1 * scaleX,
+      y: this.top + linePoints.y1 * scaleY,
+    }
+    endCoords = {
+      x: this.left + linePoints.x2 * scaleX,
+      y: this.top + linePoints.y2 * scaleY,
+    }
+  } else {
+    startCoords = {
+      x: this.left + linePoints.x1 * scaleX,
+      y: this.top + linePoints.y2 * scaleY,
+    }
+    endCoords = {
+      x: this.left + linePoints.x2 * scaleX,
+      y: this.top + linePoints.y1 * scaleY,
+    }
+  }
+
+  return { startCoords, endCoords }
+}
+
 // Вычисляет абсолютные координаты объекта во вьюпорте документа
 fabric.Canvas.prototype.getAbsoluteCoords = function getAbsoluteCoords (object) {
   const canvasZoom = this.getZoom()
@@ -70,8 +101,11 @@ function renderRotateIcon () {
   }
 }
 
+fabric.Object.prototype.hasBorders = false
+fabric.Object.prototype.hasControls = false
 fabric.Object.prototype.borderColor = '#1A96F6'
 fabric.Object.prototype.cornerStrokeColor = '#1A96F6'
+fabric.Object.prototype.cornerColor = '#1A96F6'
 fabric.Object.prototype.transparentCorners = false
 fabric.Object.prototype.cornerSize = 8
 
