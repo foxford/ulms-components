@@ -1,22 +1,23 @@
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 import React from 'react'
-import cn from 'classnames-es'
 
+import { ToolbarButton } from './components/toolbar-button'
 import { ColorItem, ColorSettings } from './components/color-settings'
 import { FontItem, FontSettings } from './components/font-settings'
 import { LineSettings } from './components/line-settings'
 import { SettingsGroup } from './components/settings-group'
+import { Divider } from './components/divider'
 
-import { RGBtoHEX, fromCSSColor, toCSSColor } from './utils'
+import { RGBtoHEX, fromCSSColor, toCSSColor, HEXtoRGB } from './utils'
 import { ObjectTypes, ShapeTypes, LineTypes, ColorTypes } from './constants'
 
-import IconLineTool from './icons-new/line-tool-icon.svg'
-import IconCopyPaste from './icons-new/copy-paste-tool-icon.svg'
-import IconDelete from './icons-new/delete-tool-icon.svg'
-import IconLockUnlocked from './icons-new/lock-tool-unlocked-icon.svg'
-import IconLockLocked from './icons-new/lock-tool-locked-icon.svg'
-// import IconBringFront from './icons-new/bring-front-tool-icon.svg'
-// import IconBringBack from './icons-new/bring-back-tool-icon.svg'
+import IconLineSettingsTool from './icons/line-settings-tool-icon.svg'
+import IconCopyPaste from './icons/copy-paste-tool-icon.svg'
+import IconDelete from './icons/delete-tool-icon.svg'
+import IconLockUnlocked from './icons/lock-tool-unlocked-icon.svg'
+import IconLockLocked from './icons/lock-tool-locked-icon.svg'
+// import IconBringFront from './icons/bring-front-tool-icon.svg'
+// import IconBringBack from './icons/bring-back-tool-icon.svg'
 
 import css from './context-toolbar.module.css'
 
@@ -107,7 +108,8 @@ export class ContextToolbar extends React.Component {
     this.setState({ currentFontSize: newFontSize })
   }
 
-  handleColorChanged = (newColor) => {
+  handleColorChanged = (color) => {
+    const newColor = HEXtoRGB(color)
     const { selectedObject, onDrawUpdate } = this.props
     const {
       type, fill, stroke,
@@ -128,15 +130,16 @@ export class ContextToolbar extends React.Component {
       })
     }
     onDrawUpdate(selectedObject)
-    this.setState({ currentColor: RGBtoHEX(newColor) })
+    this.setState({ currentColor: color })
   }
 
   processSelectedObject (selectedObject) {
     const {
-      type, fill, stroke, fontSize, strokeWidth,
+      type, fill, stroke, fontSize, strokeWidth, strokeDashArray,
     } = selectedObject
 
     const { a: fillA } = fill ? fromCSSColor(fill) : {}
+    const dashed = !!strokeDashArray
     const showColorTool = ColorTypes.includes(type)
     const showFontTool = type === ObjectTypes.TEXT
     const showLineTool = LineTypes.includes(type) || (ShapeTypes.includes(type) && fillA < 0.01)
@@ -167,7 +170,7 @@ export class ContextToolbar extends React.Component {
     }
 
     this.setState({
-      showColorTool, currentColor, showFontTool, currentFontSize, showLineTool, currentSize, isMarker,
+      showColorTool, currentColor, showFontTool, currentFontSize, showLineTool, currentSize, isMarker, dashed,
     })
   }
 
@@ -177,6 +180,7 @@ export class ContextToolbar extends React.Component {
       onLock,
       onCopyPaste,
       onDelete,
+      direction = 'top',
       // onBringToFront,
       // onSendToBack,
     } = this.props
@@ -191,6 +195,7 @@ export class ContextToolbar extends React.Component {
       currentSize,
       showLineTool,
       isMarker,
+      dashed,
     } = this.state
 
     return (
@@ -199,38 +204,36 @@ export class ContextToolbar extends React.Component {
           <>
             {showLineTool && (
             <SettingsGroup
-              direction='top'
+              direction={`${direction}-start`}
+              containerStyles={{ marginLeft: '-12px' }}
               isOpen={lineSettingsOpened}
               handleClose={() => this.setState({ lineSettingsOpened: false })}
               target={this.lineSettingsRef.current}
               content={(
                 <LineSettings
+                  dashed={dashed}
                   currentSize={isMarker ? markerToLineMap[currentSize] : currentSize}
                   handleClick={this.handleLineChanged}
                 />
               )}
             >
-              <div
-                className={cn(css.button, lineSettingsOpened && css.button_active)}
+              <ToolbarButton
+                active={lineSettingsOpened}
                 onClick={() => this.setState({
                   lineSettingsOpened: !lineSettingsOpened,
                   colorSettingsOpened: false,
                   fontSettingsOpened: false,
                 })}
-                onKeyDown={() => this.setState({
-                  lineSettingsOpened: !lineSettingsOpened,
-                  colorSettingsOpened: false,
-                  fontSettingsOpened: false,
-                })}
-                ref={this.lineSettingsRef}
+                innerRef={this.lineSettingsRef}
               >
-                <IconLineTool />
-              </div>
+                <IconLineSettingsTool />
+              </ToolbarButton>
             </SettingsGroup>
             )}
             {showFontTool && (
             <SettingsGroup
-              direction='top'
+              direction={`${direction}-start`}
+              containerStyles={{ marginLeft: '-12px' }}
               isOpen={fontSettingsOpened}
               handleClose={() => this.setState({ fontSettingsOpened: false })}
               target={this.fontSettingsRef.current}
@@ -244,7 +247,7 @@ export class ContextToolbar extends React.Component {
               <FontItem
                 fontSize={48}
                 innerRef={this.fontSettingsRef}
-                isActive={fontSettingsOpened}
+                active={fontSettingsOpened}
                 handleClick={() => this.setState({
                   fontSettingsOpened: !fontSettingsOpened,
                   lineSettingsOpened: false,
@@ -255,7 +258,8 @@ export class ContextToolbar extends React.Component {
             )}
             {showColorTool && (
             <SettingsGroup
-              direction='top'
+              direction={`${direction}-start`}
+              containerStyles={{ marginLeft: '-12px' }}
               isOpen={colorSettingsOpened}
               handleClose={() => this.setState({ colorSettingsOpened: false })}
               target={this.colorSettingsRef.current}
@@ -267,9 +271,9 @@ export class ContextToolbar extends React.Component {
               )}
             >
               <ColorItem
-                webColor={currentColor}
+                color={currentColor}
                 innerRef={this.colorSettingsRef}
-                isActive={colorSettingsOpened}
+                active={colorSettingsOpened}
                 handleClick={() => this.setState({
                   colorSettingsOpened: !colorSettingsOpened,
                   fontSettingsOpened: false,
@@ -279,49 +283,40 @@ export class ContextToolbar extends React.Component {
             </SettingsGroup>
             )}
             {showColorTool && (
-            <div className={css.divider} />
+              <Divider />
             )}
           </>
         )}
-        <div
-          className={cn(css.button)}
+        <ToolbarButton
           onClick={() => this.handleAction(onLock)}
-          onKeyDown={() => this.handleAction(onLock)}
         >
           {isLocked ? <IconLockLocked /> : <IconLockUnlocked />}
-        </div>
+        </ToolbarButton>
         {!isLocked && (
           <>
-            <div
-              className={cn(css.button)}
-              onClick={onCopyPaste}
-              onKeyDown={onCopyPaste}
+            <ToolbarButton
+              onClick={() => this.handleAction(onCopyPaste)}
             >
               <IconCopyPaste />
-            </div>
-            <div
-              className={cn(css.button)}
-              onClick={onDelete}
-              onKeyDown={onDelete}
+            </ToolbarButton>
+            <ToolbarButton
+              onClick={() => this.handleAction(onDelete)}
             >
               <IconDelete />
-            </div>
-            {/* ToDo: Пока не реализовано! */}
-            {/* <div className={css.divider} /> */}
-            {/* <div */}
-            {/*  className={cn(css.button)} */}
+
+            </ToolbarButton>
+            {/* ToDo: Пока не реализовано */}
+            {/* <Divider /> */}
+            {/* <ToolbarButton */}
             {/*  onClick={() => this.handleAction(onBringToFront)} */}
-            {/*  onKeyDown={() => this.handleAction(onBringToFront)} */}
             {/* > */}
             {/*  <IconBringFront /> */}
-            {/* </div> */}
-            {/* <div */}
-            {/*  className={cn(css.button)} */}
+            {/* </ToolbarButton> */}
+            {/* <ToolbarButton */}
             {/*  onClick={() => this.handleAction(onSendToBack)} */}
-            {/*  onKeyDown={() => this.handleAction(onSendToBack)} */}
             {/* > */}
             {/*  <IconBringBack /> */}
-            {/* </div> */}
+            {/* </ToolbarButton> */}
           </>
         )}
       </div>

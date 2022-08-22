@@ -25,8 +25,7 @@
     "build": "rm -rf ./es/* && BABEL_ENV=es rollup --config ./rollup.config.js index.js"
   },
   "dependencies": {
-    "classnames-es": "^2.2.6",
-    "react": "^16.14.0"
+    "classnames-es": "^2.2.6"
   },
   "peerDependencies": {
     "react": "^15.6 || ^16.x || ^17.x"

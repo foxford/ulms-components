@@ -1,31 +1,10 @@
 .contextMenuWrapper {
   width: min-content;
-  padding: 8px;
+  background: #fff;
+  padding: 3px 8px;
   margin: 0;
   display: flex;
   flex-flow: row nowrap;
-}
-
-.button {
-  width: 36px;
-  height: 36px;
   border-radius: 5px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.button.button_active:hover,
-.button.button_active {
-  background-color: #E9E9E9;
-}
-
-.button:hover {
-  background-color: #F6F6F6;
-}
-
-.divider {
-  border-left: 1px solid #E9E9E9;
-  margin: 0 12px;
+  border: 1px solid #E9E9E9;
 }

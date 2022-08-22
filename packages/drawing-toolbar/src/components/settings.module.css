@@ -1,7 +1,7 @@
 .wrapper {
   width: 100%;
   height: 100%;
-  padding: 12px;
+  padding: 0;
   margin: 0;
 }
 
@@ -13,23 +13,12 @@
   align-items: center;
 }
 
-.item {
-  width: 36px;
-  height: 36px;
-  border-radius: 5px;
-
+.column {
+  padding: 0;
+  margin: 0;
   display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.item.item_active:hover,
-.item.item_active {
-  background-color: #E9E9E9;
-}
-
-.item:hover {
-  background-color: #E9E9E999;
+  flex-flow: column nowrap;
+  align-items: flex-start;
 }
 
 .colorCircle {

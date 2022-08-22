@@ -4,17 +4,25 @@ import { fabric } from 'fabric/dist/fabric.min'
 import { queue as Queue } from 'd3-queue'
 import Hammer from 'hammerjs'
 
-import { BROADCAST_MESSAGE_TYPE, enhancedFields, penToolModeEnum, shapeToolModeEnum, stampToolModeEnum, toolEnum } from './constants'
-import { toCSSColor } from './util/to-css-color'
+import {
+  BROADCAST_MESSAGE_TYPE,
+  enhancedFields,
+  penToolModeEnum,
+  lineToolModeEnum,
+  shapeToolModeEnum,
+  toolEnum,
+  defaultToolSettings,
+} from './constants'
+import './util/fabric-presets'
+import { HEXtoRGB, toCSSColor } from './util/to-css-color'
 import { serializeObject } from './util/serialize-object'
 import { LockProvider } from './lock-provider'
 import { CopyPasteProvider } from './copy-paste-provider'
 import { CursorProvider } from './cursor-provider'
 import { keyboardEvents, KeyboardListenerProvider } from './keyboard-listener-provider'
+import TokenProvider from './util/token-provider'
 
 import DynamicPattern from './tools/dynamic-pattern'
-// FIXME: fix cycle dep
-// eslint-disable-next-line import/no-cycle
 import EraserTool from './tools/eraser'
 import './tools/optimized-pencil-brush'
 import PanTool from './tools/pan'
@@ -24,8 +32,6 @@ import { LineTool } from './tools/line'
 import { ShapeTool } from './tools/shape'
 import { StampTool } from './tools/stamp'
 import { TextboxTool } from './tools/textbox'
-// FIXME: fix cycle dep
-// eslint-disable-next-line import/no-cycle
 import { LockTool } from './tools/lock'
 import {
   circle,
@@ -46,93 +52,6 @@ export const normalizeFields = (object, fields) => Object.assign(
     return a
   }, {})
 )
-
-// TODO: use common token provider
-class TokenProvider {
-  constructor () {
-    this._provider = null
-    this._rq = []
-  }
-
-  setProvider (provider) {
-    this._provider = provider
-
-    if (this._provider !== null) {
-      this._provider()
-        .then((token) => {
-          this._rq.forEach((p) => {
-            p.resolve(token)
-          })
-
-          this._rq = []
-
-          return null
-        })
-        .catch(error => console.log(error)) // eslint-disable-line no-console
-    }
-  }
-
-  getToken () {
-    let p
-
-    if (this._provider === null) {
-      p = new Promise((resolve, reject) => {
-        this._rq.push({ resolve, reject })
-      })
-    } else {
-      p = this._provider()
-    }
-
-    return p
-  }
-}
-
-const tp = new TokenProvider()
-
-function matchesStorageURIScheme (url) {
-  const re = /^.*\/api\/(.*)\/sets\/(.*)\/objects\/(.*)$/
-
-  return url.match(re)
-}
-
-fabric.disableStyleCopyPaste = true
-const originalFabricLoadImageFn = fabric.util.loadImage
-
-fabric.util.loadImage = function loadImage (url, callback, context, crossOrigin) {
-  if (matchesStorageURIScheme(url)) {
-    tp.getToken()
-      .then((token) => {
-        if (url.indexOf('access_token') !== -1) {
-          originalFabricLoadImageFn(
-            url.replace(/\?access_token=(.*)$/i, `?access_token=${token}`),
-            callback,
-            context,
-            crossOrigin
-          )
-        } else {
-          originalFabricLoadImageFn(`${url}?access_token=${token}`, callback, context, crossOrigin)
-        }
-
-        return null
-      })
-      .catch(error => console.log(error)) // eslint-disable-line no-console
-  } else {
-    originalFabricLoadImageFn(url, callback, context, crossOrigin)
-  }
-}
-
-// Вычисляет абсолютные координаты объекта во вьюпорте документа
-fabric.Canvas.prototype.getAbsoluteCoords = function getAbsoluteCoords (object) {
-  const canvasZoom = this.getZoom()
-  const { tl } = object.calcCoords() // Top-Left координата ограничивающего прямоугольника
-
-  return {
-    left: this._offset.left + tl.x, // this._offset - смещение канвас относительно окна
-    top: this._offset.top + tl.y,
-    width: object.scaleX * object.width * canvasZoom,
-    height: object.scaleY * object.height * canvasZoom,
-  }
-}
 
 function isShapeObject (object) {
   return object.type === shapeToolModeEnum.CIRCLE
@@ -179,7 +98,7 @@ export class Drawing extends React.Component {
       canDraw, tool, objects, pattern, tokenProvider, broadcastProvider,
     } = this.props
 
-    tp.setProvider(tokenProvider)
+    TokenProvider.setProvider(tokenProvider)
 
     if (broadcastProvider) {
       this.__broadcastProvider = broadcastProvider
@@ -218,8 +137,6 @@ export class Drawing extends React.Component {
       height,
       objects,
       pattern,
-      shapeMode,
-      stampMode,
       tool,
       width,
       x,
@@ -292,11 +209,9 @@ export class Drawing extends React.Component {
       && (
         prevProps.tool !== tool
         || prevProps.brushColor !== brushColor
-        || prevProps.shapeMode !== shapeMode
-        || prevProps.stampMode !== stampMode
         || prevProps.brushMode !== brushMode
         // need to update the tool if it's a pen
-        || (tool === toolEnum.PEN && brushMode !== penToolModeEnum.LINE)
+        || tool === toolEnum.PEN
       )
     ) {
       if (prevProps.tool !== tool || tool !== toolEnum.SELECT) {
@@ -311,8 +226,6 @@ export class Drawing extends React.Component {
         || prevProps.brushMode !== brushMode
         || prevProps.brushWidth !== brushWidth
         || prevProps.eraserWidth !== eraserWidth
-        || prevProps.shapeMode !== shapeMode
-        || prevProps.stampMode !== stampMode
       )
     ) {
       this.configureTool()
@@ -320,7 +233,7 @@ export class Drawing extends React.Component {
   }
 
   componentWillUnmount () {
-    tp.setProvider(null)
+    TokenProvider.setProvider(null)
 
     this.destroyQueues()
 
@@ -605,8 +518,7 @@ export class Drawing extends React.Component {
       brushMode,
       isPresentation,
       selectOnInit,
-      shapeMode,
-      stampMode,
+      fontSize,
       onSelection,
       showContextMenu,
       zoom,
@@ -629,10 +541,15 @@ export class Drawing extends React.Component {
         break
 
       case toolEnum.PEN:
-        if (brushMode === penToolModeEnum.LINE) {
+        this.tool = new PenTool(this.canvas)
+        break
+
+      case toolEnum.LINE:
+        if (brushMode === lineToolModeEnum.LINE || brushMode === lineToolModeEnum.DASHED_LINE) {
           this.tool = new LineTool(this.canvas)
         } else {
-          this.tool = new PenTool(this.canvas)
+          // ToDo: Пока не реализовано
+          // this.tool = new ArrowTool(this.canvas)
         }
         break
 
@@ -652,6 +569,7 @@ export class Drawing extends React.Component {
       case toolEnum.TEXT:
         this.tool = new TextboxTool(this.canvas, undefined, {
           fill: toCSSColor(brushColor),
+          fontSize,
           fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif',
         })
 
@@ -660,14 +578,14 @@ export class Drawing extends React.Component {
       case toolEnum.STAMP:
         this.tool = new StampTool(
           this.canvas,
-          stampMode,
+          brushMode,
           publicStorageProvider,
         )
 
         break
 
       case toolEnum.SHAPE:
-        switch (shapeMode) {
+        switch (brushMode) {
           case shapeToolModeEnum.CIRCLE:
             this.tool = new ShapeTool(
               this.canvas,
@@ -785,14 +703,18 @@ export class Drawing extends React.Component {
       brushColor, brushMode, brushWidth, eraserWidth, eraserPrecision, tool,
     } = this.props
 
-    if (tool === toolEnum.PEN) {
+    if (tool === toolEnum.PEN || tool === toolEnum.LINE) {
       const color = brushMode === penToolModeEnum.MARKER
         ? { ...brushColor, a: 0.5 }
         : brushColor
+      const dashArray = (brushMode === penToolModeEnum.DASHED_PENCIL) || (brushMode === lineToolModeEnum.DASHED_LINE)
+        ? [6, 6]
+        : undefined
 
       this.tool.configure({
         lineColor: toCSSColor(color),
         lineWidth: brushWidth,
+        dashArray,
       })
     } else {
       this.tool.configure({
@@ -1217,13 +1139,9 @@ export class Drawing extends React.Component {
 }
 
 Drawing.defaultProps = {
-  brushColor: {
-    r: 255, g: 255, b: 255, a: 1,
-  },
-  brushWidth: 12,
-  shapeMode: shapeToolModeEnum.RECT,
-  stampMode: stampToolModeEnum.PLEASED,
-  tool: toolEnum.PEN,
+  brushColor: { ...HEXtoRGB(defaultToolSettings.color), a: 1 },
+  brushWidth: defaultToolSettings.size,
+  tool: defaultToolSettings.tool,
   x: 0,
   y: 0,
   zoom: 1,

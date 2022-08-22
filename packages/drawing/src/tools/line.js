@@ -40,6 +40,14 @@ export class LineTool extends Base {
   configure (props) {
     this._color = props.lineColor
     this._width = props.lineWidth
+    this._dash = props.dashArray
+
+    this._draftLine.set({
+      fill: this._color,
+      stroke: this._color,
+      strokeWidth: this._width,
+      strokeDashArray: this._dash,
+    })
 
     this._canvas.isDrawingMode = false
     this._canvas.selection = false
@@ -137,6 +145,7 @@ export class LineTool extends Base {
       fill: this._color,
       stroke: this._color,
       strokeWidth: this._width,
+      strokeDashArray: this._dash,
     })
 
     line.set({ '_new': true })

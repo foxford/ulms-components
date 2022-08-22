@@ -1,12 +1,14 @@
 .root {
   width: 62px;
-  padding: 12px;
+  padding: 5px 10px 5px 6px;
   background-color: #FFFFFF;
   border: 1px solid #E9E9E9;
   border-top-right-radius: 5px;
   border-bottom-right-radius: 5px;
   user-select: none;
   z-index: 2;
+
+  line-height: 1;
 }
 
 .button {
