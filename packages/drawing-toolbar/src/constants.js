@@ -22,8 +22,9 @@ export const ShapeTypes = [
   ObjectTypes.CIRCLE,
   ObjectTypes.NEW_CIRCLE,
   ObjectTypes.TRIANGLE,
+  ObjectTypes.PATH,
 ]
 
-export const LineTypes = [ObjectTypes.LINE, ObjectTypes.PATH, ObjectTypes.ARROW]
+export const LineTypes = [ObjectTypes.LINE, ObjectTypes.ARROW]
 
 export const ColorTypes = [...ShapeTypes, ...LineTypes, ObjectTypes.TEXT]

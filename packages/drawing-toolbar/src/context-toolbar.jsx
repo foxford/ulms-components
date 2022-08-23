@@ -138,7 +138,8 @@ export class ContextToolbar extends React.Component {
       type, fill, stroke, fontSize, strokeWidth, strokeDashArray,
     } = selectedObject
 
-    const { a: fillA } = fill ? fromCSSColor(fill) : {}
+    const { a: fillA } = fill ? fromCSSColor(fill) : { a: 0 }
+
     const dashed = !!strokeDashArray
     const showColorTool = ColorTypes.includes(type)
     const showFontTool = type === ObjectTypes.TEXT
