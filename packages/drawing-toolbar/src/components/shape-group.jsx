@@ -146,7 +146,7 @@ export class ShapeGroup extends React.Component {
     return (
       <SettingsGroup
         direction='right-start'
-        containerStyles={{ marginTop: '-12px' }}
+        containerStyles={{ marginTop: '-12px', marginLeft: '4px' }}
         isOpen={opened}
         handleClose={handleClose}
         target={this.buttonRef.current}

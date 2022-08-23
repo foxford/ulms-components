@@ -71,17 +71,6 @@
   right: 3px;
 }
 
-/* TODO: get rid of duplicated popover and floater styles */
-.popover {
-  padding: 12px;
-  position: relative;
-  top: -13px;
-  /*left: 55px;*/
-  background-color: #FFFFFF;
-  border: 1px solid #E9E9E9;
-  border-radius: 5px;
-  user-select: none;
-}
 .floater {
   user-select: none;
 }
