@@ -222,35 +222,36 @@ export default class SelectTool extends Base {
         this._sendContextMenuEvent(true)
       }
 
-      // if (target.type === 'WhiteboardArrowLine' || target.type === 'WhiteboardLine') {
-      if (transform.action === 'modifyLine') {
-        this._throttledSendMessage(target._id, {
-          x1: target.x1,
-          y1: target.y1,
-          x2: target.x2,
-          y2: target.y2,
-        })
-      } else if (transform.action === 'drag') {
-        this._throttledSendMessage(target._id, {
-          top: target.top,
-          left: target.left,
-        })
-      } else {
-        this._throttledSendMessage(target._id, {
-          top: target.top,
-          left: target.left,
-          scaleX: target.scaleX,
-          scaleY: target.scaleY,
-          skewX: target.skewX,
-          skewY: target.skewY,
-          flipX: target.flipX,
-          flipY: target.flipY,
-          zoomX: target.zoomX,
-          zoomY: target.zoomY,
-          originX: target.originX,
-          originY: target.originY,
-          angle: target.angle,
-        })
+      if (transform && transform.action) {
+        if (transform.action === 'modifyLine') {
+          this._throttledSendMessage(target._id, {
+            x1: target.x1,
+            y1: target.y1,
+            x2: target.x2,
+            y2: target.y2,
+          })
+        } else if (transform.action === 'drag') {
+          this._throttledSendMessage(target._id, {
+            top: target.top,
+            left: target.left,
+          })
+        } else {
+          this._throttledSendMessage(target._id, {
+            top: target.top,
+            left: target.left,
+            scaleX: target.scaleX,
+            scaleY: target.scaleY,
+            skewX: target.skewX,
+            skewY: target.skewY,
+            flipX: target.flipX,
+            flipY: target.flipY,
+            zoomX: target.zoomX,
+            zoomY: target.zoomY,
+            originX: target.originX,
+            originY: target.originY,
+            angle: target.angle,
+          })
+        }
       }
     }
   }

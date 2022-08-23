@@ -14,6 +14,7 @@ export const ObjectTypes = {
   TEXT: 'textbox',
   PATH: 'path',
   LINE: 'WhiteboardLine',
+  ARROW: 'WhiteboardArrowLine',
 }
 
 export const ShapeTypes = [
@@ -23,6 +24,6 @@ export const ShapeTypes = [
   ObjectTypes.TRIANGLE,
 ]
 
-export const LineTypes = [ObjectTypes.LINE, ObjectTypes.PATH]
+export const LineTypes = [ObjectTypes.LINE, ObjectTypes.PATH, ObjectTypes.ARROW]
 
 export const ColorTypes = [...ShapeTypes, ...LineTypes, ObjectTypes.TEXT]

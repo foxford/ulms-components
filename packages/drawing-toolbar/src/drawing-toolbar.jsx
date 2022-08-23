@@ -95,6 +95,13 @@ class _DrawingToolbarComponent extends React.Component {
 
   handleOpen = (tool, options = {}) => {
     const { handleChange } = this.props
+    const { opened } = this.state
+
+    if (tool === opened) {
+      this.setState({ opened: '' })
+
+      return
+    }
 
     this.setState({ opened: tool })
 

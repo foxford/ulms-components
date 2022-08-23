@@ -91,7 +91,7 @@ export class LineGroup extends React.Component {
       brushMode,
       brushColor: { ...HEXtoRGB(color), a: 1 },
       brushWidth: size,
-    })
+    }
   }
 
   render () {

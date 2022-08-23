@@ -264,7 +264,11 @@ export class Drawing extends React.Component {
   }
 
   _handleMouseDown = (opts) => {
+    const { onMouseDown } = this.props
+
     this.tool.handleMouseDownEvent(opts)
+
+    onMouseDown && onMouseDown({ ...opts, vptCoords: this.canvas.vptCoords })
   }
 
   _handleMouseMove = (opts) => {
@@ -276,7 +280,11 @@ export class Drawing extends React.Component {
   }
 
   _handleMouseUp = (opts) => {
+    const { onMouseUp } = this.props
+
     this.tool.handleMouseUpEvent(opts)
+
+    onMouseUp && onMouseUp({ ...opts, vptCoords: this.canvas.vptCoords })
   }
 
   _handleTextEditStartEvent = (opts) => {

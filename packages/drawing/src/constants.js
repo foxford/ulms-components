@@ -60,6 +60,10 @@ export const enhancedFields = [
 ]
 
 export const keycodes = {
+  SHIFT_KEYCODE: 16,
+  ALT_KEYCODE: 18,
+  CTRL_KEYCODE: 17,
+  META_KEYCODE: 91,
   UP_KEYCODE: 38,
   DOWN_KEYCODE: 40,
   LEFT_KEYCODE: 37,
