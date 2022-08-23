@@ -56,13 +56,28 @@ export const enhancedFields = [
   USER_LOCK_LABEL,
   'noScaleCache',
   'strokeUniform',
+  '_order',
 ]
 
 export const keycodes = {
+  SHIFT_KEYCODE: 16,
+  ALT_KEYCODE: 18,
+  CTRL_KEYCODE: 17,
+  META_KEYCODE: 91,
   UP_KEYCODE: 38,
   DOWN_KEYCODE: 40,
   LEFT_KEYCODE: 37,
   RIGHT_KEYCODE: 39,
+  ONE_KEYCODE: 49,
+  TWO_KEYCODE: 50,
+  THREE_KEYCODE: 51,
+  FOUR_KEYCODE: 52,
+  FIVE_KEYCODE: 53,
+  SIX_KEYCODE: 54,
+  SEVEN_KEYCODE: 55,
+  EIGHT_KEYCODE: 56,
+  NINE_KEYCODE: 57,
+  ZERO_KEYCODE: 48,
   C_KEYCODE: 67,
   Z_KEYCODE: 90,
   X_KEYCODE: 88,
@@ -89,12 +104,12 @@ export const keycodes = {
   K_KEYCODE: 75,
   L_KEYCODE: 76,
   M_KEYCODE: 77,
+  PLUS_KEYCODE: 187,
+  MINUS_KEYCODE: 189,
   DEL_KEYCODE: 46,
   BACKSPACE_KEYCODE: 8,
   SPACE_KEYCODE: 32,
 }
-
-export const BROADCAST_MESSAGE_TYPE = 'draw-update'
 
 export const DEBOUNCE_DELAY = 300
 

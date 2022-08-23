@@ -20,7 +20,7 @@ export const fromCSSColor = (str) => {
       r: parseInt(r, 10),
       g: parseInt(g, 10),
       b: parseInt(b, 10),
-      a: parseFloat(a).toFixed(5),
+      a: parseFloat(parseFloat(a).toFixed(5)),
     }
   } if (str.startsWith('rgb(')) {
     const substr = str.match(/^rgb\((.*)\)/)[1]

@@ -41,6 +41,12 @@ export class TextGroup extends React.Component {
     })
   }
 
+  getOptions = () => {
+    const { fontSize, color } = this.state
+
+    return { fontSize, brushColor: { ...HEXtoRGB(color), a: 1 } }
+  }
+
   render () {
     const {
       opened,
@@ -80,10 +86,7 @@ export class TextGroup extends React.Component {
           active={tool === toolEnum.TEXT}
           title={intl.formatMessage({ id: intlID.TEXT })}
           group
-          onClick={() => handleOpen({
-            brushColor: { ...HEXtoRGB(color), a: 1 },
-            fontSize,
-          })}
+          onClick={() => handleOpen(this.getOptions())}
           innerRef={this.buttonRef}
         >
           <IconText />

@@ -1,51 +1,30 @@
+import { calcDistance } from '../util'
+
 import { Base } from './base'
 import { makeNotInteractive } from './object'
 import { WhiteboardArrowLine } from './_primitives'
 
 const MIN_DELTA = 0.2
-const POINT_DELTA = 5
+const POINT_DELTA = 2
 
 export class ArrowTool extends Base {
   constructor (canvas) {
     super(canvas)
 
-    this._draftLine = new WhiteboardArrowLine([], {
-      fill: 'red',
-      stroke: 'red',
-      strokeDashArray: [5, 5],
-      strokeWidth: 3,
-      hasControls: false,
-      hasBorders: false,
-      selectable: false,
-    })
-    this._draftLine.set('_draft', true)
+    this.__object = null
 
-    this._isDrawing = false
-    this._shiftPressed = false
-    this._startX = 0
-    this._startY = 0
+    this.__isDrawing = false
+    this.__isOnCanvas = false
+    this.__shiftPressed = false
+    this.__startPoint = null
 
-    this._canvas.forEachObject((_) => {
-      Object.assign(_, { evented: false, selectable: false })
-    })
-  }
-
-  __pointClick (x, y) {
-    return (Math.abs(this._startX - x) < POINT_DELTA)
-      && (Math.abs(this._startY - y) < POINT_DELTA)
+    this._canvas.forEachObject(_ => makeNotInteractive(_))
   }
 
   configure (props) {
-    this._color = props.lineColor
-    this._width = props.lineWidth
-    this._dash = props.dashArray
-
-    this._draftLine.set({
-      fill: this._color,
-      stroke: this._color,
-      strokeWidth: this._width,
-      strokeDashArray: this._dash,
-    })
+    this.__color = props.lineColor
+    this.__width = props.lineWidth
+    this.__dash = props.dashArray
 
     this._canvas.isDrawingMode = false
     this._canvas.selection = false
@@ -61,13 +40,13 @@ export class ArrowTool extends Base {
   handleKeyDownEvent (e) {
     if (!this._active) return
 
-    this._shiftPressed = e.shiftKey
+    this.__shiftPressed = e.shiftKey
   }
 
   handleKeyUpEvent (e) {
     if (!this._active) return
 
-    this._shiftPressed = e.shiftKey
+    this.__shiftPressed = e.shiftKey
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -78,90 +57,99 @@ export class ArrowTool extends Base {
   handleMouseDownEvent (opts) {
     if (!this._active) return
 
-    const { x, y } = this._canvas.getPointer(opts.e)
+    this.__startPoint = this._canvas.getPointer(opts.e)
 
-    this._startX = x
-    this._startY = y
-    this._draftLine.set({
-      'x1': x, 'y1': y, 'x2': x, 'y2': y,
+    this.__object = new WhiteboardArrowLine([], {
+      fill: this.__color,
+      stroke: this.__color,
+      strokeDashArray: this.__dash,
+      strokeWidth: this.__width,
+      hasControls: false,
+      hasBorders: false,
+      selectable: false,
+      _new: true,
     })
 
-    this._canvas.add(this._draftLine)
-    this._isDrawing = true
+    this.__object.set({
+      x1: this.__startPoint.x,
+      y1: this.__startPoint.y,
+      x2: this.__startPoint.x,
+      y2: this.__startPoint.y,
+    })
+    this.__isDrawing = true
   }
 
   handleMouseMoveEvent (opts) {
     if (!this._active) return
-    if (!this._isDrawing) return
+    if (!this.__isDrawing) return
 
     const { x, y } = this._canvas.getPointer(opts.e)
 
-    if (this._shiftPressed) {
-      const deltaX = Math.abs(this._startX - x)
-      const signX = Math.sign(this._startX - x)
-      const deltaY = Math.abs(this._startY - y)
-      const signY = Math.sign(this._startY - y)
-      const maxDelta = Math.max(deltaX, deltaY)
-      const minDelta = Math.min(deltaX, deltaY)
-      const delta = deltaX - deltaY
-
-      if (Math.abs(delta) < (maxDelta * MIN_DELTA)) {
-        this._draftLine.set({ 'x2': this._startX - signX * minDelta, 'y2': this._startY - signY * minDelta })
-      } else if (delta > 0) {
-        this._draftLine.set({ 'x2': x, 'y2': this._startY })
-      } else {
-        this._draftLine.set({ 'x2': this._startX, 'y2': y })
+    if (this.__isOnCanvas || calcDistance(this.__startPoint, { x, y }) > POINT_DELTA) {
+      let diff = {
+        x1: this.__startPoint.x,
+        y1: this.__startPoint.y,
       }
-    } else {
-      this._draftLine.set({ 'x2': x, 'y2': y })
-    }
 
-    this._canvas.requestRenderAll()
+      if (this.__shiftPressed) {
+        const deltaX = Math.abs(this.__startPoint.x - x)
+        const signX = Math.sign(this.__startPoint.x - x)
+        const deltaY = Math.abs(this.__startPoint.y - y)
+        const signY = Math.sign(this.__startPoint.y - y)
+        const maxDelta = Math.max(deltaX, deltaY)
+        const minDelta = Math.min(deltaX, deltaY)
+        const delta = deltaX - deltaY
+
+        if (Math.abs(delta) < (maxDelta * MIN_DELTA)) {
+          diff = {
+            ...diff, x2: this.__startPoint.x - signX * minDelta, y2: this.__startPoint.y - signY * minDelta,
+          }
+        } else if (delta > 0) {
+          diff = {
+            ...diff, x2: x, y2: this.__startPoint.y,
+          }
+        } else {
+          diff = {
+            ...diff, x2: this.__startPoint.x, y2: y,
+          }
+        }
+      } else {
+        diff = {
+          ...diff, x2: x, y2: y,
+        }
+      }
+
+      this.__object.set(diff)
+
+      this.__object._id && this._throttledSendMessage(this.__object._id, diff)
+      if (!this.__isOnCanvas) {
+        this.__isOnCanvas = true
+        this._canvas.add(this.__object)
+      }
+
+      this._canvas.requestRenderAll()
+    }
   }
 
-  handleMouseUpEvent (opts) {
+  handleMouseUpEvent () {
     if (!this._active) return
-    if (!this._isDrawing) return
+    if (!this.__isDrawing) return
 
-    const { x, y } = this._canvas.getPointer(opts.e)
-
-    // Skipping point click
-    if (this.__pointClick(x, y)) {
-      this._canvas.remove(this._draftLine)
-      this._isDrawing = false
-      this._canvas.renderAll()
-
-      return
+    if (this.__isOnCanvas) {
+      // Фиксируем изменения в эвенте
+      this._canvas.fire('object:modified', { target: this.__object })
     }
 
-    const line = new WhiteboardArrowLine([
-      this._draftLine.x1,
-      this._draftLine.y1,
-      this._draftLine.x2,
-      this._draftLine.y2,
-    ], {
-      fill: this._color,
-      stroke: this._color,
-      strokeWidth: this._width,
-      strokeDashArray: this._dash,
-    })
-
-    line.set({ '_new': true })
-
-    this._canvas.add(line)
-
-    this._canvas.remove(this._draftLine)
-    this._isDrawing = false
+    this.__isDrawing = false
+    this.__isOnCanvas = false
     this._canvas.renderAll()
   }
 
   reset () {
-    this._canvas.remove(this._draftLine)
     this._canvas.renderAll()
 
-    this._isDrawing = false
-    this._shiftPressed = false
-    this._startX = 0
-    this._startY = 0
+    this.__isDrawing = false
+    this.__isOnCanvas = false
+    this.__object = null
   }
 }

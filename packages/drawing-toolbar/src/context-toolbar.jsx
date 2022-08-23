@@ -16,8 +16,8 @@ import IconCopyPaste from './icons/copy-paste-tool-icon.svg'
 import IconDelete from './icons/delete-tool-icon.svg'
 import IconLockUnlocked from './icons/lock-tool-unlocked-icon.svg'
 import IconLockLocked from './icons/lock-tool-locked-icon.svg'
-// import IconBringFront from './icons/bring-front-tool-icon.svg'
-// import IconBringBack from './icons/bring-back-tool-icon.svg'
+import IconBringFront from './icons/bring-front-tool-icon.svg'
+import IconBringBack from './icons/bring-back-tool-icon.svg'
 
 import css from './context-toolbar.module.css'
 
@@ -138,7 +138,8 @@ export class ContextToolbar extends React.Component {
       type, fill, stroke, fontSize, strokeWidth, strokeDashArray,
     } = selectedObject
 
-    const { a: fillA } = fill ? fromCSSColor(fill) : {}
+    const { a: fillA } = fill ? fromCSSColor(fill) : { a: 0 }
+
     const dashed = !!strokeDashArray
     const showColorTool = ColorTypes.includes(type)
     const showFontTool = type === ObjectTypes.TEXT
@@ -181,8 +182,8 @@ export class ContextToolbar extends React.Component {
       onCopyPaste,
       onDelete,
       direction = 'top',
-      // onBringToFront,
-      // onSendToBack,
+      onBringToFront,
+      onSendToBack,
     } = this.props
     const {
       showColorTool,
@@ -305,18 +306,17 @@ export class ContextToolbar extends React.Component {
               <IconDelete />
 
             </ToolbarButton>
-            {/* ToDo: Пока не реализовано */}
-            {/* <Divider /> */}
-            {/* <ToolbarButton */}
-            {/*  onClick={() => this.handleAction(onBringToFront)} */}
-            {/* > */}
-            {/*  <IconBringFront /> */}
-            {/* </ToolbarButton> */}
-            {/* <ToolbarButton */}
-            {/*  onClick={() => this.handleAction(onSendToBack)} */}
-            {/* > */}
-            {/*  <IconBringBack /> */}
-            {/* </ToolbarButton> */}
+            <Divider />
+            <ToolbarButton
+              onClick={() => this.handleAction(onBringToFront)}
+            >
+              <IconBringFront />
+            </ToolbarButton>
+            <ToolbarButton
+              onClick={() => this.handleAction(onSendToBack)}
+            >
+              <IconBringBack />
+            </ToolbarButton>
           </>
         )}
       </div>

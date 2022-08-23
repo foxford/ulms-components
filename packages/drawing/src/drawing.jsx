@@ -5,7 +5,6 @@ import { queue as Queue } from 'd3-queue'
 import Hammer from 'hammerjs'
 
 import {
-  BROADCAST_MESSAGE_TYPE,
   enhancedFields,
   penToolModeEnum,
   lineToolModeEnum,
@@ -19,6 +18,7 @@ import { serializeObject } from './util/serialize-object'
 import { LockProvider } from './lock-provider'
 import { CopyPasteProvider } from './copy-paste-provider'
 import { CursorProvider } from './cursor-provider'
+import { BroadcastProvider } from './broadcast-provider'
 import { keyboardEvents, KeyboardListenerProvider } from './keyboard-listener-provider'
 import TokenProvider from './util/token-provider'
 
@@ -41,6 +41,8 @@ import {
   rectangleSolid,
   triangle,
   triangleSolid,
+  rightTriangle,
+  rightTriangleSolid,
 } from './tools/_shapes'
 import { makeNotInteractive } from './tools/object'
 
@@ -48,7 +50,7 @@ export const normalizeFields = (object, fields) => Object.assign(
   object,
   fields.reduce((a, field) => {
     // eslint-disable-next-line no-param-reassign
-    a[field] = object[field] || undefined
+    a[field] = (object[field] !== undefined) ? object[field] : undefined
 
     return a
   }, {})
@@ -91,7 +93,6 @@ export class Drawing extends React.Component {
     if (!tokenProvider) throw new TypeError('Absent tokenProvider')
 
     this.__lockModeTool = null
-    this.__broadcastProvider = null
   }
 
   componentDidMount () {
@@ -102,9 +103,9 @@ export class Drawing extends React.Component {
     TokenProvider.setProvider(tokenProvider)
 
     if (broadcastProvider) {
-      this.__broadcastProvider = broadcastProvider
+      BroadcastProvider.provider = broadcastProvider
 
-      this.__broadcastProvider.subscribe(BROADCAST_MESSAGE_TYPE, this._drawUpdateHandler)
+      BroadcastProvider.subscribe(this._drawUpdateHandler)
     }
 
     if (canDraw) {
@@ -263,7 +264,11 @@ export class Drawing extends React.Component {
   }
 
   _handleMouseDown = (opts) => {
+    const { onMouseDown } = this.props
+
     this.tool.handleMouseDownEvent(opts)
+
+    onMouseDown && onMouseDown({ ...opts, vptCoords: this.canvas.vptCoords })
   }
 
   _handleMouseMove = (opts) => {
@@ -275,7 +280,11 @@ export class Drawing extends React.Component {
   }
 
   _handleMouseUp = (opts) => {
+    const { onMouseUp } = this.props
+
     this.tool.handleMouseUpEvent(opts)
+
+    onMouseUp && onMouseUp({ ...opts, vptCoords: this.canvas.vptCoords })
   }
 
   _handleTextEditStartEvent = (opts) => {
@@ -368,6 +377,13 @@ export class Drawing extends React.Component {
 
         if (selectOnInit && isShapeObject(object)) return
 
+        if (this.canvas._objects.length > 1) {
+          const order = this.canvas._objects[this.canvas._objects.length - 2]._order || 0
+
+          object._order = order + 1
+        } else {
+          object._order = 0
+        }
         onDraw && onDraw(serializeObject(object))
       } else {
         delete object.remote
@@ -560,9 +576,6 @@ export class Drawing extends React.Component {
         this.tool.zoom = zoom
         this.tool.onSelection = onSelection
         this.tool.showContextMenu = showContextMenu
-        if (this.__broadcastProvider) {
-          this.tool.onBroadcast = data => this.__broadcastProvider.publish(BROADCAST_MESSAGE_TYPE, data)
-        }
 
         break
 
@@ -662,6 +675,38 @@ export class Drawing extends React.Component {
             this.tool = new ShapeTool(
               this.canvas,
               () => triangleSolid({
+                fill: toCSSColor(brushColor),
+                height: 97.2,
+                width: 97.2,
+              }),
+              {
+                adjustCenter: '0 -1',
+                selectOnInit,
+              }
+            )
+
+            break
+
+          case shapeToolModeEnum.RIGHT_TRIANGLE:
+            this.tool = new ShapeTool(
+              this.canvas,
+              () => rightTriangle({
+                width: 97.2,
+                height: 97.2,
+                stroke: toCSSColor(brushColor),
+              }),
+              {
+                adjustCenter: '0 -1',
+                selectOnInit,
+              }
+            )
+
+            break
+
+          case shapeToolModeEnum.RIGHT_TRIANGLE_SOLID:
+            this.tool = new ShapeTool(
+              this.canvas,
+              () => rightTriangleSolid({
                 fill: toCSSColor(brushColor),
                 height: 97.2,
                 width: 97.2,
@@ -854,6 +899,15 @@ export class Drawing extends React.Component {
     const activeObject = this.canvas.getActiveObject()
 
     if (activeObject) {
+      activeObject.set({ __local: true })
+      const objects = this.canvas.getObjects()
+      const order = objects[0]._order || 0
+
+      activeObject.set({
+        _order: order - 1,
+        __local: true,
+      })
+      this.canvas.fire('object:modified', { target: activeObject })
       this.canvas.sendToBack(activeObject)
     }
   }
@@ -862,6 +916,14 @@ export class Drawing extends React.Component {
     const activeObject = this.canvas.getActiveObject()
 
     if (activeObject) {
+      const objects = this.canvas.getObjects()
+      const order = objects[objects.length - 1]._order
+
+      activeObject.set({
+        _order: order + 1,
+        __local: true,
+      })
+      this.canvas.fire('object:modified', { target: activeObject })
       this.canvas.bringToFront(activeObject)
     }
   }
@@ -966,7 +1028,15 @@ export class Drawing extends React.Component {
             LockProvider.unlockUserObject(canvasObjects[objIndex])
           }
         } else {
-          canvasObjects[objIndex].set(nextObject)
+          const canvasObject = canvasObjects[objIndex]
+
+          // Поменялся order?
+          if (nextObject._order > canvasObject._order) {
+            this.canvas.bringToFront(canvasObject)
+          } else if (nextObject._order < canvasObject._order) {
+            this.canvas.sendToBack(canvasObject)
+          }
+          canvasObject.set(nextObject)
         }
 
         canvasObjects[objIndex].setCoords()
@@ -981,13 +1051,13 @@ export class Drawing extends React.Component {
   }
 
   _drawUpdateHandler = (data) => {
-    const objectId = data.id
+    const { id, diff } = data
 
     if (this.canvas) {
-      const object = this.canvas.getObjects().find(_ => _._id === objectId)
+      const object = this.canvas._objectsMap.get(id)
 
       if (object) {
-        object.set(data.diff)
+        object.set(diff)
 
         this.canvas.requestRenderAll()
       }
@@ -1114,11 +1184,7 @@ export class Drawing extends React.Component {
   }
 
   destroy () {
-    if (this.__broadcastProvider) {
-      this.__broadcastProvider.unsubscribe(BROADCAST_MESSAGE_TYPE)
-
-      this.__broadcastProvider = null
-    }
+    BroadcastProvider.destroy()
   }
 
   render () {

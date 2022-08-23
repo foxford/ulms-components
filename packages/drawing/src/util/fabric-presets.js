@@ -110,10 +110,12 @@ fabric.Object.prototype.transparentCorners = false
 fabric.Object.prototype.cornerSize = 8
 
 fabric.Object.prototype.controls.mtr = new fabric.Control({
-  x: +0.5,
-  y: +0.5,
+  x: 0.5,
+  y: 0.5,
   offsetY: 12,
   offsetX: 12,
+  sizeX: 18,
+  sizeY: 18,
   actionHandler: fabric.controlsUtils.rotationWithSnapping,
   cursorStyleHandler: fabric.controlsUtils.rotationStyleHandler,
   render: renderRotateIcon(),
@@ -123,10 +125,12 @@ fabric.Object.prototype.controls.mtr = new fabric.Control({
 })
 
 fabric.Textbox.prototype.controls.mtr = new fabric.Control({
-  x: -0.5,
-  y: +0.5,
+  x: 0.5,
+  y: 0.5,
   offsetY: 12,
-  offsetX: -12,
+  offsetX: 12,
+  sizeX: 18,
+  sizeY: 18,
   actionHandler: fabric.controlsUtils.rotationWithSnapping,
   cursorStyleHandler: fabric.controlsUtils.rotationStyleHandler,
   render: renderRotateIcon(),

@@ -31,7 +31,7 @@ export class StampGroup extends React.Component {
     this.buttonRef = React.createRef()
 
     this.state = {
-      toolMode: defaultToolSettings.stamp,
+      brushMode: defaultToolSettings.stamp,
     }
 
     this.iconsMap = {
@@ -109,14 +109,20 @@ export class StampGroup extends React.Component {
     this.stampToolRows = [this.iconsSet.slice(0, 5), this.iconsSet.slice(5, 9), this.iconsSet.slice(9)]
   }
 
-  handleClick = (toolMode) => {
+  handleClick = (brushMode) => {
     const { handleChange } = this.props
 
-    this.setState({ toolMode })
+    this.setState({ brushMode })
     handleChange({
       tool: toolEnum.STAMP,
-      brushMode: toolMode,
+      brushMode,
     })
+  }
+
+  getOptions = () => {
+    const { brushMode } = this.state
+
+    return { brushMode }
   }
 
   render () {
@@ -129,7 +135,7 @@ export class StampGroup extends React.Component {
       className,
     } = this.props
     const {
-      toolMode,
+      brushMode,
     } = this.state
 
     return (
@@ -145,7 +151,7 @@ export class StampGroup extends React.Component {
               <IconGroupSettings
                 iconsSet={iconsRow}
                 fillWidth
-                currentSelection={toolMode}
+                currentSelection={brushMode}
                 handleClick={this.handleClick}
                 key={i}
               />
@@ -157,7 +163,7 @@ export class StampGroup extends React.Component {
           active={tool === toolEnum.STAMP}
           group
           title={intl.formatMessage({ id: intlID.STAMP })}
-          onClick={() => handleOpen({ brushMode: toolMode })}
+          onClick={() => handleOpen(this.getOptions())}
           innerRef={this.buttonRef}
         >
           <IconStamp />

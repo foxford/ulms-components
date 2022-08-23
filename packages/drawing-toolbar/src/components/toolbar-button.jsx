@@ -14,6 +14,7 @@ export const ToolbarButton = ({
   group = false,
 }) => (
   <div className={css.wrapper}>
+    {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events */}
     <div
       ref={innerRef}
       className={cn(
