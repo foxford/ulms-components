@@ -17,16 +17,45 @@ function anchorWrapper (pointType) {
   return function anchorHandler (eventData, transform, x, y) {
     const fabricObject = transform.target
 
+    const linePoints = fabricObject.calcLinePoints()
+    const scaleX = fabricObject.scaleX || 1
+    const scaleY = fabricObject.scaleY || 1
+    const zoom = fabricObject.canvas.getZoom()
+    const canvasX = fabricObject.canvas.viewportTransform[4]
+    const canvasY = fabricObject.canvas.viewportTransform[5]
+    let x1; let x2; let y1; let
+      y2
+
+    if ((fabricObject.flipY && fabricObject.flipX) || (!fabricObject.flipY && !fabricObject.flipX)) {
+      x1 = canvasX + (fabricObject.left + linePoints.x1 * scaleX) * zoom
+      y1 = canvasY + (fabricObject.top + linePoints.y1 * scaleY) * zoom
+      x2 = canvasX + (fabricObject.left + linePoints.x2 * scaleX) * zoom
+      y2 = canvasY + (fabricObject.top + linePoints.y2 * scaleY) * zoom
+    } else {
+      x1 = canvasX + (fabricObject.left + linePoints.x1 * scaleX) * zoom
+      y1 = canvasY + (fabricObject.top + linePoints.y2 * scaleY) * zoom
+      x2 = canvasX + (fabricObject.left + linePoints.x2 * scaleX) * zoom
+      y2 = canvasY + (fabricObject.top + linePoints.y1 * scaleY) * zoom
+    }
+
     if (pointType === 'start') {
       if ((fabricObject.flipY && fabricObject.flipX) || (!fabricObject.flipY && !fabricObject.flipX)) {
-        fabricObject.set({ 'x1': x, 'y1': y })
+        fabricObject.set({
+          x1: x, y1: y, x2, y2,
+        })
       } else {
-        fabricObject.set({ 'x1': x, 'y2': y })
+        fabricObject.set({
+          x1: x, y2: y, x2, y1,
+        })
       }
     } else if ((fabricObject.flipY && fabricObject.flipX) || (!fabricObject.flipY && !fabricObject.flipX)) {
-      fabricObject.set({ 'x2': x, 'y2': y })
+      fabricObject.set({
+        x2: x, y2: y, x1, y1,
+      })
     } else {
-      fabricObject.set({ 'x2': x, 'y1': y })
+      fabricObject.set({
+        x2: x, y1: y, x1, y2,
+      })
     }
 
     return true
@@ -99,6 +128,8 @@ fabric.WhiteboardLine = fabric.WhiteboardLine || WhiteboardLine
 const WhiteboardArrowLine = fabric.util.createClass(fabric.WhiteboardLine, {
   type: 'WhiteboardArrowLine',
   initialize (points, options) {
+    options || (options = { })
+    options.objectCaching = false
     this.callSuper('initialize', points, options)
   },
   _render (ctx) {
