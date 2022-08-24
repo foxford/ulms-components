@@ -18,9 +18,15 @@ function anchorWrapper (pointType) {
     const fabricObject = transform.target
 
     if (pointType === 'start') {
-      fabricObject.set({ 'x1': x, 'y1': y })
-    } else {
+      if ((fabricObject.flipY && fabricObject.flipX) || (!fabricObject.flipY && !fabricObject.flipX)) {
+        fabricObject.set({ 'x1': x, 'y1': y })
+      } else {
+        fabricObject.set({ 'x1': x, 'y2': y })
+      }
+    } else if ((fabricObject.flipY && fabricObject.flipX) || (!fabricObject.flipY && !fabricObject.flipX)) {
       fabricObject.set({ 'x2': x, 'y2': y })
+    } else {
+      fabricObject.set({ 'x2': x, 'y1': y })
     }
 
     return true

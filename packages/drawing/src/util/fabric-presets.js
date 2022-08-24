@@ -38,27 +38,30 @@ fabric.Line.prototype.calcLineEndpointCoords = function calcLineEndpointCoords (
   const linePoints = this.calcLinePoints()
   const scaleX = this.scaleX || 1
   const scaleY = this.scaleY || 1
+  const zoom = this.canvas.getZoom()
+  const x = this.canvas.viewportTransform[4]
+  const y = this.canvas.viewportTransform[5]
 
   let startCoords
   let endCoords
 
   if ((this.flipY && this.flipX) || (!this.flipY && !this.flipX)) {
     startCoords = {
-      x: this.left + linePoints.x1 * scaleX,
-      y: this.top + linePoints.y1 * scaleY,
+      x: x + (this.left + linePoints.x1 * scaleX) * zoom,
+      y: y + (this.top + linePoints.y1 * scaleY) * zoom,
     }
     endCoords = {
-      x: this.left + linePoints.x2 * scaleX,
-      y: this.top + linePoints.y2 * scaleY,
+      x: x + (this.left + linePoints.x2 * scaleX) * zoom,
+      y: y + (this.top + linePoints.y2 * scaleY) * zoom,
     }
   } else {
     startCoords = {
-      x: this.left + linePoints.x1 * scaleX,
-      y: this.top + linePoints.y2 * scaleY,
+      x: x + (this.left + linePoints.x1 * scaleX) * zoom,
+      y: y + (this.top + linePoints.y2 * scaleY) * zoom,
     }
     endCoords = {
-      x: this.left + linePoints.x2 * scaleX,
-      y: this.top + linePoints.y1 * scaleY,
+      x: x + (this.left + linePoints.x2 * scaleX) * zoom,
+      y: y + (this.top + linePoints.y1 * scaleY) * zoom,
     }
   }
 
