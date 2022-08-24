@@ -89,6 +89,20 @@ export class ContextToolbar extends React.Component {
     actionFunc && actionFunc()
   }
 
+  flipX = () => {
+    const { selectedObject, onDrawUpdate } = this.props
+
+    selectedObject.set({ flipX: !selectedObject.flipX })
+    onDrawUpdate(selectedObject)
+  }
+
+  flipY = () => {
+    const { selectedObject, onDrawUpdate } = this.props
+
+    selectedObject.set({ flipY: !selectedObject.flipY })
+    onDrawUpdate(selectedObject)
+  }
+
   handleLineChanged = (newSize) => {
     const { selectedObject, onDrawUpdate } = this.props
     const { stroke } = selectedObject
