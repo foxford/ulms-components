@@ -104,27 +104,35 @@ export class ContextToolbar extends React.Component {
   }
 
   handleLineChanged = (newSize) => {
-    const { selectedObject, onDrawUpdate } = this.props
+    const {
+      selectedObject, onDrawUpdate, onSendEvent,
+    } = this.props
     const { stroke } = selectedObject
     const { a } = fromCSSColor(stroke)
     const isMarker = a < 0.9
 
     selectedObject.set({ strokeWidth: isMarker ? lineToMarkerMap[newSize] : newSize })
     onDrawUpdate(selectedObject)
+    onSendEvent && onSendEvent({ object: selectedObject, diff: { strokeWidth: selectedObject.strokeWidth } })
     this.setState({ currentSize: isMarker ? lineToMarkerMap[newSize] : newSize })
   }
 
   handleFontChanged = (newFontSize) => {
-    const { selectedObject, onDrawUpdate } = this.props
+    const {
+      selectedObject, onDrawUpdate, onSendEvent,
+    } = this.props
 
     selectedObject.set({ fontSize: newFontSize })
     onDrawUpdate(selectedObject)
+    onSendEvent && onSendEvent({ object: selectedObject, diff: { fontSize: selectedObject.fontSize } })
     this.setState({ currentFontSize: newFontSize })
   }
 
   handleColorChanged = (color) => {
     const newColor = HEXtoRGB(color)
-    const { selectedObject, onDrawUpdate } = this.props
+    const {
+      selectedObject, onDrawUpdate, onSendEvent,
+    } = this.props
     const {
       type, fill, stroke,
     } = selectedObject
@@ -136,14 +144,25 @@ export class ContextToolbar extends React.Component {
 
       selectedObject.set({ stroke: toCSSColor({ ...newColor, a }) })
     } else if (ShapeTypes.includes(type)) {
-      const { a } = fromCSSColor(fill)
+      if (fill) {
+        const { a } = fromCSSColor(fill)
 
-      selectedObject.set({
-        stroke: toCSSColor({ ...newColor, a: 1 }),
-        fill: a > 0.01 ? toCSSColor({ ...newColor, a: 1 }) : fill,
-      })
+        selectedObject.set({
+          stroke: toCSSColor({ ...newColor, a: 1 }),
+          fill: a > 0.01 ? toCSSColor({ ...newColor, a: 1 }) : fill,
+        })
+      } else {
+        const { a } = fromCSSColor(stroke)
+
+        selectedObject.set({
+          stroke: toCSSColor({ ...newColor, a }),
+        })
+      }
     }
     onDrawUpdate(selectedObject)
+    onSendEvent && onSendEvent({
+      object: selectedObject, diff: { fill: selectedObject.fill, stroke: selectedObject.stroke },
+    })
     this.setState({ currentColor: color })
   }
 

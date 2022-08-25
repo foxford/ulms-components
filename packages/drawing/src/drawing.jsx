@@ -739,7 +739,7 @@ export class Drawing extends React.Component {
 
     if (tool === toolEnum.PEN || tool === toolEnum.LINE) {
       const color = brushMode === penToolModeEnum.MARKER
-        ? { ...brushColor, a: 0.5 }
+        ? { ...brushColor, a: defaultToolSettings.markerAlpha }
         : brushColor
       const dashArray = (brushMode === penToolModeEnum.DASHED_PENCIL) || (brushMode === lineToolModeEnum.DASHED_LINE)
         ? [6, 6]

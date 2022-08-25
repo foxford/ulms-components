@@ -113,6 +113,7 @@ export const defaultToolSettings = {
   markerColor: '#FFCE03',
   size: 2,
   markerSize: 4,
+  markerAlpha: 0.4,
   fontSize: 48,
   shape: shapeToolModeEnum.RECT,
   line: lineToolModeEnum.LINE,

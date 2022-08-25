@@ -53,39 +53,41 @@ class _DrawingToolbarComponent extends React.Component {
     const { opened } = this.state
 
     if (tool !== prevProps.tool || brushMode !== prevProps.brushMode) {
-      let options = null
+      setTimeout(() => { // Чтобы успели примениться значения для getOptions
+        let options = null
 
-      if (tool === toolEnum.TEXT) options = this.textGroupRef.current.getOptions()
-      if (tool === toolEnum.STAMP) options = this.stampGroupRef.current.getOptions()
-      if (tool === toolEnum.SHAPE) options = this.shapeGroupRef.current.getOptions()
-      if (tool === toolEnum.PEN) options = this.penGroupRef.current.getOptions()
-      if (tool === toolEnum.LINE) options = this.lineGroupRef.current.getOptions()
-      if (tool === toolEnum.LIB) {
-        this.handleLibClick()
+        if (tool === toolEnum.TEXT) options = this.textGroupRef.current.getOptions()
+        if (tool === toolEnum.STAMP) options = this.stampGroupRef.current.getOptions()
+        if (tool === toolEnum.SHAPE) options = this.shapeGroupRef.current.getOptions()
+        if (tool === toolEnum.PEN) options = this.penGroupRef.current.getOptions()
+        if (tool === toolEnum.LINE) options = this.lineGroupRef.current.getOptions()
+        if (tool === toolEnum.LIB) {
+          this.handleLibClick()
 
-        return
-      }
-      if (tool === toolEnum.IMAGE) {
-        this.handleImageClick()
-
-        return
-      }
-
-      if (options) {
-        if (tool === toolEnum.STAMP) {
-          handleChange({
-            ...options, tool,
-          })
-        } else {
-          handleChange({
-            ...options, tool, brushMode,
-          })
+          return
         }
-      }
+        if (tool === toolEnum.IMAGE) {
+          this.handleImageClick()
 
-      if (tool !== opened) {
-        this.setState({ opened: '' })
-      }
+          return
+        }
+
+        if (options) {
+          if (tool === toolEnum.STAMP || tool === toolEnum.SHAPE) {
+            handleChange({
+              ...options, tool,
+            })
+          } else {
+            handleChange({
+              ...options, tool, brushMode,
+            })
+          }
+        }
+
+        if (tool !== opened) {
+          this.setState({ opened: '' })
+        }
+      }, 0)
     }
   }
 

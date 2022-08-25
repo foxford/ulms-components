@@ -65,6 +65,8 @@ export class LineGroup extends React.Component {
     }
   }
 
+  _getTitle = key => this.iconsSet.find(item => item.key === key).title
+
   handleClick = (name, value) => {
     const { handleChange } = this.props
     const {
@@ -141,6 +143,7 @@ export class LineGroup extends React.Component {
           group
           onClick={() => handleOpen(this.getOptions())}
           innerRef={this.buttonRef}
+          title={this._getTitle(brushMode)}
         >
           {this.iconsMap[brushMode]}
         </ToolbarButton>

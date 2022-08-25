@@ -1,6 +1,6 @@
 {
   "name": "@ulms/ui-drawing-toolbar",
-  "version": "1.4.3-dev.0-ULMS-1917",
+  "version": "1.4.3-dev.2-ULMS-1917",
   "description": "",
   "keywords": [
     "lerna"
@@ -25,7 +25,7 @@
     "build": "rm -rf ./es/* && BABEL_ENV=es rollup --config ./rollup.config.js index.js"
   },
   "dependencies": {
-    "@ulms/ui-drawing": "^2.5.3-dev.7-ULMS-1919",
+    "@ulms/ui-drawing": "^2.5.3-dev.3-ULMS-1917",
     "classnames-es": "^2.2.6",
     "prop-types": "^15.8.1",
     "react-floater": "^0.6.5"

@@ -11,7 +11,7 @@ import IconSolidCircle from '../icons/solid-circle-tool-icon.svg'
 import IconSolidTriangle from '../icons/solid-triangle-tool-icon.svg'
 import IconSolidRightTriangle from '../icons/solid-right-triangle-tool-icon.svg'
 
-// import { intlID } from '../../lang/constants'
+import { intlID } from '../../lang/constants'
 
 import { HEXtoRGB } from '../utils'
 
@@ -137,6 +137,7 @@ export class ShapeGroup extends React.Component {
       handleClose,
       handleOpen,
       className,
+      intl,
     } = this.props
     const {
       brushMode,
@@ -174,6 +175,7 @@ export class ShapeGroup extends React.Component {
         <ToolbarButton
           active={tool === toolEnum.SHAPE}
           group
+          title={intl.formatMessage({ id: intlID.SHAPE })}
           onClick={() => handleOpen(this.getOptions())}
           innerRef={this.buttonRef}
         >
