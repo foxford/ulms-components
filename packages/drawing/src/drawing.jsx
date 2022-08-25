@@ -5,7 +5,6 @@ import { queue as Queue } from 'd3-queue'
 import Hammer from 'hammerjs'
 
 import {
-  enhancedFields,
   penToolModeEnum,
   lineToolModeEnum,
   shapeToolModeEnum,
@@ -14,7 +13,7 @@ import {
 } from './constants'
 import './util/fabric-presets'
 import { HEXtoRGB, toCSSColor } from './util/to-css-color'
-import { serializeObject } from './util/serialize-object'
+import { serializeObject, normalizeFields } from './util/serialize-object'
 import { LockProvider } from './lock-provider'
 import { CopyPasteProvider } from './copy-paste-provider'
 import { CursorProvider } from './cursor-provider'
@@ -45,16 +44,6 @@ import {
   rightTriangleSolid,
 } from './tools/_shapes'
 import { makeNotInteractive } from './tools/object'
-
-export const normalizeFields = (object, fields) => Object.assign(
-  object,
-  fields.reduce((a, field) => {
-    // eslint-disable-next-line no-param-reassign
-    a[field] = (object[field] !== undefined) ? object[field] : undefined
-
-    return a
-  }, {})
-)
 
 function isShapeObject (object) {
   return object.type === shapeToolModeEnum.CIRCLE
@@ -1004,7 +993,7 @@ export class Drawing extends React.Component {
 
     objects.forEach((_) => {
       const objIndex = canvasObjectIds.indexOf(_._id)
-      const nextObject = normalizeFields(_, enhancedFields)
+      const nextObject = normalizeFields(_)
 
       if (objIndex === -1) {
         // add
@@ -1174,7 +1163,7 @@ export class Drawing extends React.Component {
   }
 
   currentSelection () {
-    return this.canvas.getActiveObject().toObject(enhancedFields)
+    return serializeObject(this.canvas.getActiveObject)
   }
 
   __cleanTools () {

@@ -1,5 +1,6 @@
 /* eslint-disable class-methods-use-this */
-import { toolEnum, USER_LOCK_LABEL } from './constants'
+import { toolEnum } from './constants'
+import { USER_LOCK_LABEL } from './util/serialize-object'
 import { makeInteractive, makeNotInteractive } from './tools/object'
 
 class CLockProvider {

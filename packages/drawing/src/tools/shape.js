@@ -81,6 +81,10 @@ export class ShapeTool extends PositionableObject {
       this.__object._id && this._throttledSendMessage(this.__object._id, diff)
       if (!this.__isOnCanvas) {
         this.__isOnCanvas = true
+        this.__object.set({
+          _noHistory: true, // Не сохраняем в undo/redo history
+          _drawByStretch: true, // Признак того, что объект создается растягиванием. Для аналитиков
+        })
         this._canvas.add(this.__object)
       }
       this._canvas.requestRenderAll()
@@ -101,6 +105,7 @@ export class ShapeTool extends PositionableObject {
       })
       this._canvas.add(this.__object)
     } else {
+      this.__object.set({ _noHistory: undefined })
       // Фиксируем изменения в эвенте
       this._canvas.fire('object:modified', { target: this.__object })
     }

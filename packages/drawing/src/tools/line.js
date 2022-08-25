@@ -66,6 +66,7 @@ export class LineTool extends Base {
       hasControls: false,
       hasBorders: false,
       selectable: false,
+      _noHistory: true, // Не сохраняем в undo/redo history
       _new: true,
     })
 
@@ -135,6 +136,7 @@ export class LineTool extends Base {
     if (!this.__isDrawing) return
 
     if (this.__isOnCanvas) {
+      this.__object.set({ _noHistory: undefined })
       // Фиксируем изменения в эвенте
       this._canvas.fire('object:modified', { target: this.__object })
     }

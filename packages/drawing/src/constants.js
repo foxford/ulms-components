@@ -49,16 +49,6 @@ export const stampToolModeEnum = {
   WELLDONE: 'welldone',
 }
 
-export const USER_LOCK_LABEL = '_lockedbyuser'
-
-export const enhancedFields = [
-  '_id',
-  USER_LOCK_LABEL,
-  'noScaleCache',
-  'strokeUniform',
-  '_order',
-]
-
 export const keycodes = {
   SHIFT_KEYCODE: 16,
   ALT_KEYCODE: 18,
@@ -120,7 +110,9 @@ export const COPY_PASTE_SHIFT = 30
 export const defaultToolSettings = {
   tool: toolEnum.PEN,
   color: '#000000',
+  markerColor: '#FFCE03',
   size: 2,
+  markerSize: 4,
   fontSize: 48,
   shape: shapeToolModeEnum.RECT,
   line: lineToolModeEnum.LINE,
