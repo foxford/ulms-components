@@ -112,7 +112,7 @@ export const defaultToolSettings = {
   color: '#000000',
   markerColor: '#FFCE03',
   size: 2,
-  markerSize: 4,
+  markerSize: 8,
   markerAlpha: 0.4,
   fontSize: 48,
   shape: shapeToolModeEnum.RECT,
