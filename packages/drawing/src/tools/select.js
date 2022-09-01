@@ -200,7 +200,11 @@ export default class SelectTool extends Base {
     if (this.__object && this.__object.__local) {
       this.__object.set('__local', undefined)
     }
-    this._triggerModified()
+    if (this.__object.text) {
+      this._triggerModified()
+    } else {
+      this._deleteObject()
+    }
   }
 
   handleMouseDownEvent (event) {

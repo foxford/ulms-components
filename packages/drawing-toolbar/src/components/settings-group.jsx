@@ -10,9 +10,9 @@ export const SettingsGroup = ({
     <Floater
       content={(
         <div className={css.floater}>
-          {content}
+          {isOpen && content}
         </div>
-)}
+      )}
       placement={direction}
       hideArrow
       styles={{

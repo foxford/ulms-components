@@ -21,6 +21,9 @@ export const triangle = (params = {}) => new fabric.Triangle({
   ...params,
   stroke: params.stroke,
   fill: params.fill || 'rgba(0,0,0,0.009)',
+  strokeLineCap: 'butt',
+  strokeLineJoin: 'miter',
+  strokeMiterLimit: 40,
 })
 
 export const triangleSolid = (params = {}) => {
@@ -33,6 +36,9 @@ export const triangleSolid = (params = {}) => {
     ...params,
     stroke: filler,
     fill: filler,
+    strokeLineCap: 'butt',
+    strokeLineJoin: 'miter',
+    strokeMiterLimit: 40,
   })
 }
 
@@ -46,6 +52,9 @@ export const rightTriangle = (params = {}) => new fabric.Path(trianglePath(param
   flipY: true,
   stroke: params.stroke,
   fill: params.fill || 'rgba(0,0,0,0.009)',
+  strokeLineCap: 'butt',
+  strokeLineJoin: 'miter',
+  strokeMiterLimit: 40,
 })
 
 export const rightTriangleSolid = (params = {}) => {
@@ -59,6 +68,9 @@ export const rightTriangleSolid = (params = {}) => {
     flipY: true,
     stroke: filler,
     fill: filler,
+    strokeLineCap: 'butt',
+    strokeLineJoin: 'miter',
+    strokeMiterLimit: 40,
   })
 }
 
