@@ -321,6 +321,7 @@ export class Drawing extends React.Component {
       disableMobileGestures,
       onLockSelection,
       onKeyDown,
+      isPresentation,
       onKeyUp,
     } = this.props
 
@@ -429,7 +430,7 @@ export class Drawing extends React.Component {
     this.canvas.on('after:render', () => this._handleAfterRender())
 
     if (!this._hammer && !disableMobileGestures) {
-      this.initHammer(this.canvas.upperCanvasEl)
+      this.initHammer(this.canvas.upperCanvasEl, isPresentation)
     }
 
     this.canvas._objectsMap = new Map()
@@ -761,7 +762,7 @@ export class Drawing extends React.Component {
     }
   }
 
-  initHammer (element) {
+  initHammer (element, isPresentation) {
     Hammer.defaults.touchAction = 'none'
 
     this._hammer = new Hammer(element)
@@ -793,8 +794,10 @@ export class Drawing extends React.Component {
 
         newZoom = parseFloat(newZoom.toPrecision(3))
 
-        this.canvas.viewportTransform[4] += event.center.x - this._hammerCenter.x
-        this.canvas.viewportTransform[5] += event.center.y - this._hammerCenter.y
+        if (!isPresentation) {
+          this.canvas.viewportTransform[4] += event.center.x - this._hammerCenter.x
+          this.canvas.viewportTransform[5] += event.center.y - this._hammerCenter.y
+        }
 
         if (newZoom !== zoom) {
           this.canvas.zoomToPoint(event.center, newZoom)

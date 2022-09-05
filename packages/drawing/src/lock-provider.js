@@ -92,6 +92,7 @@ class CLockProvider {
       lockScalingX: true,
       lockScalingY: true,
       lockUniScaling: true,
+      lockLine: true,
       editable: false,
 
       [USER_LOCK_LABEL]: true,
@@ -111,6 +112,7 @@ class CLockProvider {
       lockRotation: false,
       lockScalingX: false,
       lockScalingY: false,
+      lockLine: false,
       lockUniScaling: false,
       editable: true,
 

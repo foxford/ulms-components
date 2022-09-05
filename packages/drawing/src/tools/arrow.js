@@ -107,11 +107,11 @@ export class ArrowTool extends Base {
           }
         } else if (delta > 0) {
           diff = {
-            ...diff, x2: x, y2: this.__startPoint.y,
+            ...diff, x2: x, y2: this.__startPoint.y + 0.001,
           }
         } else {
           diff = {
-            ...diff, x2: this.__startPoint.x, y2: y,
+            ...diff, x2: this.__startPoint.x + 0.001, y2: y,
           }
         }
       } else {

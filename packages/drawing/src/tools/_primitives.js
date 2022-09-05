@@ -13,48 +13,37 @@ function linePositionHandler (dim, finalMatrix, fabricObject) {
   return endCoords
 }
 
+function lineStyleHandler (eventData, control, fabricObject) {
+  if (fabricObject.lockLine) {
+    return 'not-allowed'
+  }
+
+  return control.cursorStyle
+}
+
 function anchorWrapper (pointType) {
   return function anchorHandler (eventData, transform, x, y) {
     const fabricObject = transform.target
 
-    const linePoints = fabricObject.calcLinePoints()
-    const scaleX = fabricObject.scaleX || 1
-    const scaleY = fabricObject.scaleY || 1
-    const zoom = fabricObject.canvas.getZoom()
-    const canvasX = fabricObject.canvas.viewportTransform[4]
-    const canvasY = fabricObject.canvas.viewportTransform[5]
-    let x1; let x2; let y1; let
-      y2
-
-    if ((fabricObject.flipY && fabricObject.flipX) || (!fabricObject.flipY && !fabricObject.flipX)) {
-      x1 = canvasX + (fabricObject.left + linePoints.x1 * scaleX) * zoom
-      y1 = canvasY + (fabricObject.top + linePoints.y1 * scaleY) * zoom
-      x2 = canvasX + (fabricObject.left + linePoints.x2 * scaleX) * zoom
-      y2 = canvasY + (fabricObject.top + linePoints.y2 * scaleY) * zoom
-    } else {
-      x1 = canvasX + (fabricObject.left + linePoints.x1 * scaleX) * zoom
-      y1 = canvasY + (fabricObject.top + linePoints.y2 * scaleY) * zoom
-      x2 = canvasX + (fabricObject.left + linePoints.x2 * scaleX) * zoom
-      y2 = canvasY + (fabricObject.top + linePoints.y1 * scaleY) * zoom
-    }
+    if (fabricObject.lockLine) return false
 
     if (pointType === 'start') {
       if ((fabricObject.flipY && fabricObject.flipX) || (!fabricObject.flipY && !fabricObject.flipX)) {
         fabricObject.set({
-          x1: x, y1: y, x2, y2,
+          x1: x, y1: y,
         })
       } else {
         fabricObject.set({
-          x1: x, y2: y, x2, y1,
+          x1: x, y2: y,
         })
       }
     } else if ((fabricObject.flipY && fabricObject.flipX) || (!fabricObject.flipY && !fabricObject.flipX)) {
       fabricObject.set({
-        x2: x, y2: y, x1, y1,
+        x2: x, y2: y,
       })
     } else {
       fabricObject.set({
-        x2: x, y1: y, x1, y2,
+        x2: x, y1: y,
       })
     }
 
@@ -81,6 +70,7 @@ const WhiteboardLine = fabric.util.createClass(fabric.Line, {
       start: new fabric.Control({
         positionHandler: linePositionHandler,
         actionHandler: anchorWrapper('start'),
+        cursorStyleHandler: lineStyleHandler,
         actionName: 'modifyLine',
         pointType: 'start',
         withConnection: true,
@@ -88,6 +78,7 @@ const WhiteboardLine = fabric.util.createClass(fabric.Line, {
       end: new fabric.Control({
         positionHandler: linePositionHandler,
         actionHandler: anchorWrapper('end'),
+        cursorStyleHandler: lineStyleHandler,
         actionName: 'modifyLine',
         pointType: 'end',
         withConnection: true,

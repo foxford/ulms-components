@@ -25,7 +25,6 @@ export const ToolbarButton = ({
         group && css.group,
       )}
       onClick={onClick}
-      onKeyDown={onClick}
       role='button'
       tabIndex='0'
       title={title}
