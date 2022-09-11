@@ -769,7 +769,7 @@ export class Drawing extends React.Component {
 
     this._hammer.get('pan').set({ pointers: 2, threshold: 0 })
 
-    this._hammer.on('panstart panmove panend pancancel', (event) => {
+    !isPresentation && this._hammer.on('panstart panmove panend pancancel', (event) => {
       // eslint-disable-next-line max-len
       const distance = Math.round(Math.sqrt((event.pointers[1].x - event.pointers[0].x) ** 2 + (event.pointers[1].y - event.pointers[0].y) ** 2))
 
@@ -794,10 +794,8 @@ export class Drawing extends React.Component {
 
         newZoom = parseFloat(newZoom.toPrecision(3))
 
-        if (!isPresentation) {
-          this.canvas.viewportTransform[4] += event.center.x - this._hammerCenter.x
-          this.canvas.viewportTransform[5] += event.center.y - this._hammerCenter.y
-        }
+        this.canvas.viewportTransform[4] += event.center.x - this._hammerCenter.x
+        this.canvas.viewportTransform[5] += event.center.y - this._hammerCenter.y
 
         if (newZoom !== zoom) {
           this.canvas.zoomToPoint(event.center, newZoom)
