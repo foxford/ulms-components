@@ -115,6 +115,7 @@ class PresentationComponent extends React.Component {
       showActions,
       showPreviews,
       slotSlide,
+      innerRef,
     } = this.props
 
     return (
@@ -175,7 +176,7 @@ class PresentationComponent extends React.Component {
                   )
 
                 result = (
-                  <div className={cx(css.slide, { [css.fitToWidth]: fitToWidth })}>
+                  <div className={cx(css.slide, { [css.fitToWidth]: fitToWidth })} ref={innerRef}>
                     <img
                       alt='mainimage'
                       className={cx(css.mainImage, { [css.centered]: !fitToWidth })}
@@ -194,7 +195,7 @@ class PresentationComponent extends React.Component {
                 )
               } else {
                 result = (
-                  <div className={css.slide}>
+                  <div className={css.slide} ref={innerRef}>
                     <Spinner />
                   </div>
                 )
@@ -261,6 +262,7 @@ export class PresentationIntl extends React.PureComponent {
     const {
       defaultLocale = 'ru',
       locale = 'ru',
+      innerRef,
       ...props
     } = this.props
 
@@ -272,7 +274,7 @@ export class PresentationIntl extends React.PureComponent {
         messages={messagesIntl[locale]}
       >
         {/* eslint-disable-next-line react/jsx-props-no-spreading */}
-        <PresentationComponentIntl {...props} />
+        <PresentationComponentIntl {...props} innerRef={innerRef} />
       </IntlProvider>
     )
   }

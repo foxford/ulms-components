@@ -16,16 +16,16 @@ export class PDFPresentation extends React.Component {
 
   static CANVAS_PREVIEW_HEIGHT = 68
 
-  state = {
-    pagesCollection: [],
-  }
-
   constructor () {
     super()
 
     this.debouncedUpdateCollection = debounce(this.updateCollection, 100)
 
     this.mounted = false
+
+    this.state = {
+      pagesCollection: [],
+    }
   }
 
   componentDidMount () {
@@ -140,12 +140,15 @@ export class PDFPresentation extends React.Component {
 
   render () {
     const { pagesCollection } = this.state
-    const { url, ...otherProps } = this.props // eslint-disable-line no-unused-vars
+    const {
+      url, innerRef, ...otherProps
+    } = this.props // eslint-disable-line no-unused-vars
 
     // TODO: fix other props handling
     return (
       <Presentation
         {...otherProps}
+        innerRef={innerRef}
         collection={pagesCollection}
       />
     )
