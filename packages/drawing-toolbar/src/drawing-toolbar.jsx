@@ -48,7 +48,7 @@ class _DrawingToolbarComponent extends React.Component {
 
   componentDidUpdate (prevProps) {
     const {
-      tool, brushMode, handleChange,
+      tool, brushMode, handleChange, sendEvent,
     } = this.props
     const { opened } = this.state
 
@@ -77,11 +77,15 @@ class _DrawingToolbarComponent extends React.Component {
             handleChange({
               ...options, tool,
             })
+            sendEvent(tool, null, options)
           } else {
             handleChange({
               ...options, tool, brushMode,
             })
+            sendEvent(tool, brushMode, options)
           }
+        } else {
+          sendEvent(tool, null, {})
         }
 
         if (tool !== opened) {
@@ -162,6 +166,7 @@ class _DrawingToolbarComponent extends React.Component {
       brushColor,
       brushMode,
       handleChange,
+      sendEvent,
       intl,
       noSeparator,
       tool,
@@ -214,6 +219,7 @@ class _DrawingToolbarComponent extends React.Component {
               ref={this.penGroupRef}
               handleOpen={options => this.handleOpen(toolEnum.PEN, options)}
               handleChange={handleChange}
+              sendEvent={sendEvent}
             />
           )}
 
@@ -227,6 +233,7 @@ class _DrawingToolbarComponent extends React.Component {
               ref={this.shapeGroupRef}
               handleOpen={options => this.handleOpen(toolEnum.SHAPE, options)}
               handleChange={handleChange}
+              sendEvent={sendEvent}
             />
           )}
 
@@ -240,6 +247,7 @@ class _DrawingToolbarComponent extends React.Component {
               ref={this.lineGroupRef}
               handleOpen={options => this.handleOpen(toolEnum.LINE, options)}
               handleChange={handleChange}
+              sendEvent={sendEvent}
             />
           )}
 
@@ -252,6 +260,7 @@ class _DrawingToolbarComponent extends React.Component {
               ref={this.textGroupRef}
               handleOpen={options => this.handleOpen(toolEnum.TEXT, options)}
               handleChange={handleChange}
+              sendEvent={sendEvent}
             />
           )}
 

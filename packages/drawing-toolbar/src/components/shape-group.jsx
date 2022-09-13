@@ -105,7 +105,7 @@ export class ShapeGroup extends React.Component {
   }
 
   handleClick = (name, value) => {
-    const { handleChange } = this.props
+    const { handleChange, sendEvent } = this.props
     const {
       brushMode, color,
     } = { ...this.state, [name]: value }
@@ -116,6 +116,11 @@ export class ShapeGroup extends React.Component {
       brushMode,
       brushColor: { ...HEXtoRGB(color), a: 1 },
     })
+    if (name !== 'brushMode') {
+      sendEvent(toolEnum.SHAPE, brushMode, {
+        brushColor: { ...HEXtoRGB(color), a: 1 },
+      })
+    }
   }
 
   getOptions = () => {

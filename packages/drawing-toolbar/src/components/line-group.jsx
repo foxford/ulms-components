@@ -68,7 +68,7 @@ export class LineGroup extends React.Component {
   _getTitle = key => this.iconsSet.find(item => item.key === key).title
 
   handleClick = (name, value) => {
-    const { handleChange } = this.props
+    const { handleChange, sendEvent } = this.props
     const {
       brushMode, color, size,
     } = { ...this.state, [name]: value }
@@ -80,6 +80,13 @@ export class LineGroup extends React.Component {
       brushColor: { ...HEXtoRGB(color), a: 1 },
       brushWidth: size,
     })
+
+    if (name !== 'brushMode') {
+      sendEvent(toolEnum.LINE, brushMode, {
+        brushColor: { ...HEXtoRGB(color), a: 1 },
+        brushWidth: size,
+      })
+    }
   }
 
   getOptions = () => {

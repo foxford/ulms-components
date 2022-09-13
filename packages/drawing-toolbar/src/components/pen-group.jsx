@@ -77,12 +77,13 @@ export class PenGroup extends React.Component {
   _getTitle = key => this.iconsSet.find(item => item.key === key).title
 
   handleClick = (name, value) => {
-    const { handleChange } = this.props
+    const { handleChange, sendEvent } = this.props
     const {
       brushMode, penColor, penSize, markerColor, markerSize,
     } = { ...this.state, [name]: value }
 
     this.setState({ [name]: value })
+
     handleChange({
       tool: toolEnum.PEN,
       brushMode,
@@ -91,6 +92,14 @@ export class PenGroup extends React.Component {
         : { ...HEXtoRGB(penColor), a: 1 },
       brushWidth: (brushMode === penToolModeEnum.MARKER) ? lineToMarkerMap[markerSize] : penSize,
     })
+    if (name !== 'brushMode') {
+      sendEvent(toolEnum.PEN, brushMode, {
+        brushColor: (brushMode === penToolModeEnum.MARKER)
+          ? { ...HEXtoRGB(markerColor), a: defaultToolSettings.markerAlpha }
+          : { ...HEXtoRGB(penColor), a: 1 },
+        brushWidth: (brushMode === penToolModeEnum.MARKER) ? lineToMarkerMap[markerSize] : penSize,
+      })
+    }
   }
 
   getOptions = () => {

@@ -178,7 +178,7 @@ class PresentationComponent extends React.Component {
                 onPageResize && onPageResize(imageSize.width, imageSize.height)
 
                 result = (
-                  <div className={cx(css.slide, { [css.fitToWidth]: fitToWidth })} ref={innerRef}  data-id='presentation-slide'>
+                  <div className={cx(css.slide, { [css.fitToWidth]: fitToWidth })} ref={innerRef} data-id='presentation-slide'>
                     <img
                       alt='mainimage'
                       className={cx(css.mainImage, { [css.centered]: !fitToWidth })}

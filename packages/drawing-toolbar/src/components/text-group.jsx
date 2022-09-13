@@ -28,7 +28,7 @@ export class TextGroup extends React.Component {
   }
 
   handleClick = (name, value) => {
-    const { handleChange } = this.props
+    const { handleChange, sendEvent } = this.props
     const {
       color, fontSize,
     } = { ...this.state, [name]: value }
@@ -39,6 +39,12 @@ export class TextGroup extends React.Component {
       brushColor: { ...HEXtoRGB(color), a: 1 },
       fontSize,
     })
+    if (name !== 'brushMode') {
+      sendEvent(toolEnum.TEXT, null, {
+        brushColor: { ...HEXtoRGB(color), a: 1 },
+        fontSize,
+      })
+    }
   }
 
   getOptions = () => {
