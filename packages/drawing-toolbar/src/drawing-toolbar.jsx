@@ -63,6 +63,7 @@ class _DrawingToolbarComponent extends React.Component {
         if (tool === toolEnum.LINE) options = this.lineGroupRef.current.getOptions()
         if (tool === toolEnum.LIB) {
           this.handleLibClick()
+          sendEvent(tool, 'Open', {})
 
           return
         }
@@ -73,11 +74,11 @@ class _DrawingToolbarComponent extends React.Component {
         }
 
         if (options) {
-          if (tool === toolEnum.STAMP || tool === toolEnum.SHAPE) {
+          if (tool === toolEnum.STAMP || tool === toolEnum.SHAPE || tool === toolEnum.TEXT) {
             handleChange({
               ...options, tool,
             })
-            sendEvent(tool, null, options)
+            sendEvent(tool, options.brushMode ? options.brushMode : null, options)
           } else {
             handleChange({
               ...options, tool, brushMode,
