@@ -465,6 +465,8 @@ export class Drawing extends React.Component {
     this.canvas = new fabric.StaticCanvas('canvas')
     this.canvas._id = clientId
 
+    this.canvas._objectsMap = new Map()
+
     LockProvider.canvas = null
     CursorProvider.canvas = null
     CopyPasteProvider.canvas = null
@@ -1132,7 +1134,7 @@ export class Drawing extends React.Component {
             const objectToAdd = enlivenedObjects.get(object._id)
 
             this.canvas.add(objectToAdd)
-            this.canvas._objectsMap && this.canvas._objectsMap.set(objectToAdd._id, objectToAdd)
+            this.canvas._objectsMap.set(objectToAdd._id, objectToAdd)
             if (LockProvider.isLockedByUser(objectToAdd)) {
               LockProvider.lockUserObject(objectToAdd)
             }
