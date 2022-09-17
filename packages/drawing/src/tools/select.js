@@ -1,16 +1,17 @@
 /* eslint-disable no-param-reassign,default-case,no-fallthrough,import/no-extraneous-dependencies,class-methods-use-this */
 import debounce from 'lodash/debounce'
-import throttle from 'lodash/throttle'
 
 import { fromCSSColor, toCSSColor } from '../util/to-css-color'
+import { calcDistance } from '../util'
 
-import { keycodes, DEBOUNCE_DELAY, THROTTLE_DELAY } from '../constants'
-
+import { keycodes, DEBOUNCE_DELAY, toolEnum } from '../constants'
 import { LockProvider } from '../lock-provider'
 
 import { Base } from './base'
 
 const POSITION_INCREMENT = 10
+
+const DELTA = 3 // Максимальное расстояние при клике, при котором срабатывает выделение
 
 const directions = {
   left: 'left',
@@ -29,15 +30,29 @@ export default class SelectTool extends Base {
     this.__timer = null
     this.__shiftPressed = false
     this.__mouseDown = false
+    this.__mouseDownPoint = null
+    this.__isMoving = false
+    this.__zoom = 0
 
-    this._onBroadcast = null
+    this._onSelection = null
+    this._showContextMenuFunc = null
     this._debouncedTriggerModified = null
 
     this._initialConfigure()
   }
 
-  set onBroadcast (func) {
-    this._onBroadcast = func
+  set onSelection (func) {
+    this._onSelection = func
+  }
+
+  set showContextMenu (func) {
+    this._showContextMenuFunc = func
+  }
+
+  set zoom (zoom) {
+    this.__zoom = zoom
+
+    this._sendContextMenuEvent()
   }
 
   static removeFromSelection (canvas, object) {
@@ -67,10 +82,10 @@ export default class SelectTool extends Base {
     this._canvas.isDrawingMode = false
     this._canvas.selection = false
     this._canvas.perPixelTargetFind = true
+    this._canvas.targetFindTolerance = 15
     this._canvas.defaultCursor = 'default'
     this._canvas.setCursor('default')
     this._debouncedTriggerModified = debounce(this._triggerModified, DEBOUNCE_DELAY)
-    this._throttledTriggerUpdate = throttle((id, diff) => this._triggerUpdate(id, diff), THROTTLE_DELAY)
   }
 
   configure (opt) {
@@ -101,8 +116,19 @@ export default class SelectTool extends Base {
   destroy () {
     this._canvas.discardActiveObject()
 
-    this._onBroadcast = null
+    this._onSelection = null
+    this._showContextMenuFunc = null
     this._debouncedTriggerModified = null
+  }
+
+  _sendContextMenuEvent = (close = false) => {
+    if (this._showContextMenuFunc) {
+      if (close || !this.__object) {
+        this._showContextMenuFunc(false)
+      } else {
+        this._showContextMenuFunc(true, this._canvas.getAbsoluteCoords(this.__object))
+      }
+    }
   }
 
   _deleteObject = () => {
@@ -162,15 +188,6 @@ export default class SelectTool extends Base {
     }
   }
 
-  _triggerUpdate (id, diff) {
-    if (id && this._onBroadcast) {
-      this._onBroadcast({
-        id,
-        diff,
-      })
-    }
-  }
-
   handleTextEditStartEvent (opts) {
     if (opts.target && opts.target.hiddenTextarea) {
       opts.target.hiddenTextarea.style.width = '10px'
@@ -183,24 +200,96 @@ export default class SelectTool extends Base {
     if (this.__object && this.__object.__local) {
       this.__object.set('__local', undefined)
     }
-    this._triggerModified()
-  }
-
-  handleMouseDownEvent () {
-    this.__mouseDown = true
-  }
-
-  handleMouseMoveEvent (e) {
-    if (!this._active) return
-    if (this.__mouseDown && e.target) {
-      const { target } = e
-
-      this._throttledTriggerUpdate(target._id, { top: target.top, left: target.left })
+    if (this.__object.text) {
+      this._triggerModified()
+    } else {
+      this._deleteObject()
     }
   }
 
-  handleMouseUpEvent () {
+  handleMouseDownEvent (event) {
+    this.__mouseDown = true
+
+    this.__mouseDownPoint = event.pointer
+    if (event.target) {
+      this.__isMoving = false
+    }
+  }
+
+  handleMouseMoveEvent (event) {
+    if (!this._active) return
+    if (this.__mouseDown && event.target) {
+      const { target, transform } = event
+
+      if (!this.__isMoving) { // Отсылаем только один раз в начале движения
+        this.__isMoving = true
+        this._sendContextMenuEvent(true)
+      }
+
+      if (transform && transform.action) {
+        if (transform.action === 'modifyLine') {
+          this._throttledSendMessage(target._id, {
+            x1: target.x1,
+            y1: target.y1,
+            x2: target.x2,
+            y2: target.y2,
+          })
+        } else if (transform.action === 'drag') {
+          this._throttledSendMessage(target._id, {
+            top: target.top,
+            left: target.left,
+          })
+        } else {
+          this._throttledSendMessage(target._id, {
+            top: target.top,
+            left: target.left,
+            scaleX: target.scaleX,
+            scaleY: target.scaleY,
+            skewX: target.skewX,
+            skewY: target.skewY,
+            flipX: target.flipX,
+            flipY: target.flipY,
+            zoomX: target.zoomX,
+            zoomY: target.zoomY,
+            originX: target.originX,
+            originY: target.originY,
+            angle: target.angle,
+          })
+        }
+      }
+    }
+  }
+
+  handleMouseUpEvent (event) {
     this.__mouseDown = false
+
+    const mouseDistance = calcDistance(event.pointer, this.__mouseDownPoint)
+
+    if (event.target) {
+      // _selected - признак того, что на объекте уже есть выделение
+      if (mouseDistance < DELTA || event.target._selected) {
+        this._onSelection && this._onSelection(event.target)
+        this._sendContextMenuEvent()
+
+        if (LockProvider.isLockedByUser(event.target)) {
+          LockProvider.lockUserObject(event.target, {
+            _selected: true,
+            hasBorders: true,
+          })
+        } else if (event.target.type === 'WhiteboardLine' || event.target.type === 'WhiteboardArrowLine') {
+          event.target.set({
+            hasControls: true, _selected: true,
+          })
+        } else {
+          event.target.set({
+            hasBorders: true, hasControls: true, _selected: true,
+          })
+        }
+        this._canvas.requestRenderAll() // иначе не появится выделение до первой перерисовки
+      } else { // мы просто передвинули объект - снимаем выделение
+        this._canvas.discardActiveObject()
+      }
+    }
   }
 
   handleKeyDownEvent (e) {
@@ -257,25 +346,48 @@ export default class SelectTool extends Base {
     })
   }
 
-  handleSelectionUpdatedEvent = (opts) => {
+  handleSelectionUpdatedEvent = (event) => {
     if (!this._active) return
-    this.__object = opts.target
+
+    this.__object = event.target
   }
 
-  handleSelectionCreatedEvent = (opts) => {
+  handleSelectionCreatedEvent = (event) => {
     if (!this._active) return
-    this.__object = opts.target
+
+    this.__object = event.target
+
+    if (event.target._selected) { // обрабатываем случай копипасты
+      this._onSelection && this._onSelection(event.target)
+      this._sendContextMenuEvent()
+    }
   }
 
-  handleSelectionClearedEvent = () => {
+  handleSelectionClearedEvent = (event) => {
     if (!this._active) return
+
+    let sendSelectionEvent = false
+
+    event.deselected && event.deselected.forEach((object) => {
+      sendSelectionEvent = sendSelectionEvent || object._selected
+      object.set({
+        hasBorders: false, hasControls: false, _selected: false,
+      })
+      if (object.type === toolEnum.TEXT && object.text === '') {
+        this._canvas.remove(object)
+      }
+    })
+    this._sendContextMenuEvent(true)
+    if (this._onSelection && sendSelectionEvent) {
+      this._onSelection(null)
+    }
     this.__object = null
   }
 
   handleTextChangedEvent = (e) => {
     const { target } = e
 
-    this._throttledTriggerUpdate(target._id, { text: target.text })
+    this._throttledSendMessage(target._id, { text: target.text })
   }
 
   reset () {

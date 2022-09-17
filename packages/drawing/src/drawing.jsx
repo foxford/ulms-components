@@ -4,27 +4,34 @@ import { fabric } from 'fabric/dist/fabric.min'
 import { queue as Queue } from 'd3-queue'
 import Hammer from 'hammerjs'
 
-import { BROADCAST_MESSAGE_TYPE, enhancedFields, penToolModeEnum, shapeToolModeEnum, stampToolModeEnum, toolEnum } from './constants'
-import { toCSSColor } from './util/to-css-color'
+import {
+  penToolModeEnum,
+  lineToolModeEnum,
+  shapeToolModeEnum,
+  toolEnum,
+  defaultToolSettings,
+} from './constants'
+import './util/fabric-presets'
+import { HEXtoRGB, toCSSColor } from './util/to-css-color'
+import { serializeObject, normalizeFields } from './util/serialize-object'
 import { LockProvider } from './lock-provider'
 import { CopyPasteProvider } from './copy-paste-provider'
 import { CursorProvider } from './cursor-provider'
+import { BroadcastProvider } from './broadcast-provider'
 import { keyboardEvents, KeyboardListenerProvider } from './keyboard-listener-provider'
+import TokenProvider from './util/token-provider'
 
 import DynamicPattern from './tools/dynamic-pattern'
-// FIXME: fix cycle dep
-// eslint-disable-next-line import/no-cycle
 import EraserTool from './tools/eraser'
 import './tools/optimized-pencil-brush'
 import PanTool from './tools/pan'
 import PenTool from './tools/pen'
 import SelectTool from './tools/select'
 import { LineTool } from './tools/line'
+import { ArrowTool } from './tools/arrow'
 import { ShapeTool } from './tools/shape'
 import { StampTool } from './tools/stamp'
 import { TextboxTool } from './tools/textbox'
-// FIXME: fix cycle dep
-// eslint-disable-next-line import/no-cycle
 import { LockTool } from './tools/lock'
 import {
   circle,
@@ -33,100 +40,10 @@ import {
   rectangleSolid,
   triangle,
   triangleSolid,
+  rightTriangle,
+  rightTriangleSolid,
 } from './tools/_shapes'
 import { makeNotInteractive } from './tools/object'
-
-export const normalizeFields = (object, fields) => Object.assign(
-  object,
-  fields.reduce((a, field) => {
-    // eslint-disable-next-line no-param-reassign
-    a[field] = object[field] || undefined
-
-    return a
-  }, {})
-)
-
-// TODO: use common token provider
-class TokenProvider {
-  constructor () {
-    this._provider = null
-    this._rq = []
-  }
-
-  setProvider (provider) {
-    this._provider = provider
-
-    if (this._provider !== null) {
-      this._provider()
-        .then((token) => {
-          this._rq.forEach((p) => {
-            p.resolve(token)
-          })
-
-          this._rq = []
-
-          return null
-        })
-        .catch(error => console.log(error)) // eslint-disable-line no-console
-    }
-  }
-
-  getToken () {
-    let p
-
-    if (this._provider === null) {
-      p = new Promise((resolve, reject) => {
-        this._rq.push({ resolve, reject })
-      })
-    } else {
-      p = this._provider()
-    }
-
-    return p
-  }
-}
-
-const tp = new TokenProvider()
-
-function matchesStorageURIScheme (url) {
-  const re = /^.*\/api\/(.*)\/sets\/(.*)\/objects\/(.*)$/
-
-  return url.match(re)
-}
-
-fabric.disableStyleCopyPaste = true
-const originalFabricLoadImageFn = fabric.util.loadImage
-
-fabric.util.loadImage = function loadImage (url, callback, context, crossOrigin) {
-  if (matchesStorageURIScheme(url)) {
-    tp.getToken()
-      .then((token) => {
-        if (url.indexOf('access_token') !== -1) {
-          originalFabricLoadImageFn(
-            url.replace(/\?access_token=(.*)$/i, `?access_token=${token}`),
-            callback,
-            context,
-            crossOrigin
-          )
-        } else {
-          originalFabricLoadImageFn(`${url}?access_token=${token}`, callback, context, crossOrigin)
-        }
-
-        return null
-      })
-      .catch(error => console.log(error)) // eslint-disable-line no-console
-  } else {
-    originalFabricLoadImageFn(url, callback, context, crossOrigin)
-  }
-}
-
-function maybeRemoveToken (object) {
-  if (object.type === 'image' && object.src.indexOf('?access_token=') !== -1) {
-    object.src = object.src.split('?')[0] // eslint-disable-line
-  }
-
-  return object
-}
 
 function isShapeObject (object) {
   return object.type === shapeToolModeEnum.CIRCLE
@@ -165,7 +82,6 @@ export class Drawing extends React.Component {
     if (!tokenProvider) throw new TypeError('Absent tokenProvider')
 
     this.__lockModeTool = null
-    this.__broadcastProvider = null
   }
 
   componentDidMount () {
@@ -173,12 +89,12 @@ export class Drawing extends React.Component {
       canDraw, tool, objects, pattern, tokenProvider, broadcastProvider,
     } = this.props
 
-    tp.setProvider(tokenProvider)
+    TokenProvider.setProvider(tokenProvider)
 
     if (broadcastProvider) {
-      this.__broadcastProvider = broadcastProvider
+      BroadcastProvider.provider = broadcastProvider
 
-      this.__broadcastProvider.subscribe(BROADCAST_MESSAGE_TYPE, this._drawUpdateHandler)
+      BroadcastProvider.subscribe(this._drawUpdateHandler)
     }
 
     if (canDraw) {
@@ -212,8 +128,6 @@ export class Drawing extends React.Component {
       height,
       objects,
       pattern,
-      shapeMode,
-      stampMode,
       tool,
       width,
       x,
@@ -272,6 +186,11 @@ export class Drawing extends React.Component {
       }
     }
 
+    // Обновляем значение зум в Селектк, чтобы пересчитать координаты и размеры объекта для контекстного меню
+    if (prevProps.zoom !== zoom && tool === toolEnum.SELECT) {
+      this.tool.zoom = zoom
+    }
+
     if (prevProps.objects && objects && prevProps.objects !== objects) {
       this.updateCanvasObjects(objects)
     }
@@ -281,11 +200,9 @@ export class Drawing extends React.Component {
       && (
         prevProps.tool !== tool
         || prevProps.brushColor !== brushColor
-        || prevProps.shapeMode !== shapeMode
-        || prevProps.stampMode !== stampMode
         || prevProps.brushMode !== brushMode
         // need to update the tool if it's a pen
-        || (tool === toolEnum.PEN && brushMode !== penToolModeEnum.LINE)
+        || tool === toolEnum.PEN
       )
     ) {
       if (prevProps.tool !== tool || tool !== toolEnum.SELECT) {
@@ -300,8 +217,6 @@ export class Drawing extends React.Component {
         || prevProps.brushMode !== brushMode
         || prevProps.brushWidth !== brushWidth
         || prevProps.eraserWidth !== eraserWidth
-        || prevProps.shapeMode !== shapeMode
-        || prevProps.stampMode !== stampMode
       )
     ) {
       this.configureTool()
@@ -309,7 +224,7 @@ export class Drawing extends React.Component {
   }
 
   componentWillUnmount () {
-    tp.setProvider(null)
+    TokenProvider.setProvider(null)
 
     this.destroyQueues()
 
@@ -338,7 +253,11 @@ export class Drawing extends React.Component {
   }
 
   _handleMouseDown = (opts) => {
+    const { onMouseDown } = this.props
+
     this.tool.handleMouseDownEvent(opts)
+
+    onMouseDown && onMouseDown({ ...opts, vptCoords: this.canvas.vptCoords })
   }
 
   _handleMouseMove = (opts) => {
@@ -350,7 +269,11 @@ export class Drawing extends React.Component {
   }
 
   _handleMouseUp = (opts) => {
+    const { onMouseUp } = this.props
+
     this.tool.handleMouseUpEvent(opts)
+
+    onMouseUp && onMouseUp({ ...opts, vptCoords: this.canvas.vptCoords })
   }
 
   _handleTextEditStartEvent = (opts) => {
@@ -397,21 +320,22 @@ export class Drawing extends React.Component {
       uniqId,
       disableMobileGestures,
       onLockSelection,
-      onSelection,
       onKeyDown,
+      isPresentation,
       onKeyUp,
     } = this.props
 
     this.canvas = new fabric.Canvas('canvas', {
       enablePointerEvents: 'PointerEvent' in window,
       allowTouchScrolling: !disableMobileGestures,
+      preserveObjectStacking: true, // Чтобы выделенный объект не выходил на верхний слой
     })
     this.canvas._id = clientId
     this.canvas.freeDrawingBrush = new fabric.OptimizedPencilBrush(this.canvas)
 
     KeyboardListenerProvider.init(this.canvasRef.current.ownerDocument)
 
-    this.__lockModeTool = new LockTool(this.canvas, onLockSelection, onSelection)
+    this.__lockModeTool = new LockTool(this.canvas, onLockSelection)
 
     this.canvas.on('mouse:down', opt => this._handleMouseDown(opt))
     this.canvas.on('mouse:move', opt => this._handleMouseMove(opt))
@@ -434,18 +358,23 @@ export class Drawing extends React.Component {
     this.canvas.on('object:added', (event) => {
       const { onDraw } = this.props
       const object = event.target
-      let serializedObj
 
       // Skipping draft objects
       if (object._draft) return
 
       if (!object.remote) {
         object._id = uniqId()
-        serializedObj = object.toObject(enhancedFields)
 
         if (selectOnInit && isShapeObject(object)) return
 
-        onDraw && onDraw(maybeRemoveToken(serializedObj))
+        if (this.canvas._objects.length > 1) {
+          const order = this.canvas._objects[this.canvas._objects.length - 2]._order || 0
+
+          object._order = order + 1
+        } else {
+          object._order = 0
+        }
+        onDraw && onDraw(serializeObject(object))
       } else {
         delete object.remote
       }
@@ -459,10 +388,8 @@ export class Drawing extends React.Component {
       const [object] = deselected
 
       if (isShapeObject(object)) {
-        const serializedObj = object.toObject(enhancedFields)
-
         if (object._new) {
-          onDraw && onDraw(maybeRemoveToken(serializedObj))
+          onDraw && onDraw(serializeObject(object))
           object.set('_new', undefined)
         }
       }
@@ -475,18 +402,16 @@ export class Drawing extends React.Component {
       // Skipping draft objects
       if (object._draft) return
 
-      const serializedObj = object.toObject(enhancedFields)
-
       if (isTextObject(object) && object._textBeforeEdit === '') {
-        onDraw && onDraw(maybeRemoveToken(serializedObj))
+        onDraw && onDraw(serializeObject(object))
       } else if (isShapeObject(object)) {
         object._new
-          ? onDraw && onDraw(maybeRemoveToken(serializedObj))
-          : onDrawUpdate && onDrawUpdate(maybeRemoveToken(serializedObj))
+          ? onDraw && onDraw(serializeObject(object))
+          : onDrawUpdate && onDrawUpdate(serializeObject(object))
 
         object.set('_new', undefined)
       } else {
-        onDrawUpdate && onDrawUpdate(maybeRemoveToken(serializedObj))
+        onDrawUpdate && onDrawUpdate(serializeObject(object))
       }
     })
 
@@ -499,14 +424,16 @@ export class Drawing extends React.Component {
       // Skipping draft objects
       if (object._draft) return
 
-      onObjectRemove && onObjectRemove(maybeRemoveToken(object.toObject(enhancedFields)))
+      onObjectRemove && onObjectRemove(serializeObject(object))
     })
 
     this.canvas.on('after:render', () => this._handleAfterRender())
 
     if (!this._hammer && !disableMobileGestures) {
-      this.initHammer(this.canvas.upperCanvasEl)
+      this.initHammer(this.canvas.upperCanvasEl, isPresentation)
     }
+
+    this.canvas._objectsMap = new Map()
 
     CursorProvider.canvas = this.canvas
     LockProvider.canvas = this.canvas
@@ -538,6 +465,8 @@ export class Drawing extends React.Component {
     this.canvas = new fabric.StaticCanvas('canvas')
     this.canvas._id = clientId
 
+    this.canvas._objectsMap = new Map()
+
     LockProvider.canvas = null
     CursorProvider.canvas = null
     CopyPasteProvider.canvas = null
@@ -563,6 +492,7 @@ export class Drawing extends React.Component {
 
       KeyboardListenerProvider.destroy()
 
+      this.canvas._objectsMap = null
       this.canvas = null
       this.ignoreObjectRemovedEvent = false
     }
@@ -597,8 +527,10 @@ export class Drawing extends React.Component {
       brushMode,
       isPresentation,
       selectOnInit,
-      shapeMode,
-      stampMode,
+      fontSize,
+      onSelection,
+      showContextMenu,
+      zoom,
       publicStorageProvider,
     } = this.props
 
@@ -618,10 +550,14 @@ export class Drawing extends React.Component {
         break
 
       case toolEnum.PEN:
-        if (brushMode === penToolModeEnum.LINE) {
+        this.tool = new PenTool(this.canvas)
+        break
+
+      case toolEnum.LINE:
+        if (brushMode === lineToolModeEnum.LINE || brushMode === lineToolModeEnum.DASHED_LINE) {
           this.tool = new LineTool(this.canvas)
         } else {
-          this.tool = new PenTool(this.canvas)
+          this.tool = new ArrowTool(this.canvas)
         }
         break
 
@@ -629,15 +565,16 @@ export class Drawing extends React.Component {
         this.tool = new SelectTool(this.canvas, { isPresentation })
         LockTool.updateAllLock(this.canvas)
 
-        if (this.__broadcastProvider) {
-          this.tool.onBroadcast = data => this.__broadcastProvider.publish(BROADCAST_MESSAGE_TYPE, data)
-        }
+        this.tool.zoom = zoom
+        this.tool.onSelection = onSelection
+        this.tool.showContextMenu = showContextMenu
 
         break
 
       case toolEnum.TEXT:
         this.tool = new TextboxTool(this.canvas, undefined, {
           fill: toCSSColor(brushColor),
+          fontSize,
           fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif',
         })
 
@@ -646,14 +583,14 @@ export class Drawing extends React.Component {
       case toolEnum.STAMP:
         this.tool = new StampTool(
           this.canvas,
-          stampMode,
+          brushMode,
           publicStorageProvider,
         )
 
         break
 
       case toolEnum.SHAPE:
-        switch (shapeMode) {
+        switch (brushMode) {
           case shapeToolModeEnum.CIRCLE:
             this.tool = new ShapeTool(
               this.canvas,
@@ -742,6 +679,38 @@ export class Drawing extends React.Component {
 
             break
 
+          case shapeToolModeEnum.RIGHT_TRIANGLE:
+            this.tool = new ShapeTool(
+              this.canvas,
+              () => rightTriangle({
+                width: 97.2,
+                height: 97.2,
+                stroke: toCSSColor(brushColor),
+              }),
+              {
+                adjustCenter: '0 -1',
+                selectOnInit,
+              }
+            )
+
+            break
+
+          case shapeToolModeEnum.RIGHT_TRIANGLE_SOLID:
+            this.tool = new ShapeTool(
+              this.canvas,
+              () => rightTriangleSolid({
+                fill: toCSSColor(brushColor),
+                height: 97.2,
+                width: 97.2,
+              }),
+              {
+                adjustCenter: '0 -1',
+                selectOnInit,
+              }
+            )
+
+            break
+
           default:
             this.tool = new ShapeTool(
               this.canvas,
@@ -771,14 +740,18 @@ export class Drawing extends React.Component {
       brushColor, brushMode, brushWidth, eraserWidth, eraserPrecision, tool,
     } = this.props
 
-    if (tool === toolEnum.PEN) {
+    if (tool === toolEnum.PEN || tool === toolEnum.LINE) {
       const color = brushMode === penToolModeEnum.MARKER
-        ? { ...brushColor, a: 0.5 }
+        ? { ...brushColor, a: defaultToolSettings.markerAlpha }
         : brushColor
+      const dashArray = (brushMode === penToolModeEnum.DASHED_PENCIL) || (brushMode === lineToolModeEnum.DASHED_LINE)
+        ? [6, 6]
+        : undefined
 
       this.tool.configure({
         lineColor: toCSSColor(color),
         lineWidth: brushWidth,
+        dashArray,
       })
     } else {
       this.tool.configure({
@@ -791,14 +764,14 @@ export class Drawing extends React.Component {
     }
   }
 
-  initHammer (element) {
+  initHammer (element, isPresentation) {
     Hammer.defaults.touchAction = 'none'
 
     this._hammer = new Hammer(element)
 
     this._hammer.get('pan').set({ pointers: 2, threshold: 0 })
 
-    this._hammer.on('panstart panmove panend pancancel', (event) => {
+    !isPresentation && this._hammer.on('panstart panmove panend pancancel', (event) => {
       // eslint-disable-next-line max-len
       const distance = Math.round(Math.sqrt((event.pointers[1].x - event.pointers[0].x) ** 2 + (event.pointers[1].y - event.pointers[0].y) ** 2))
 
@@ -863,12 +836,14 @@ export class Drawing extends React.Component {
   }
 
   addImage (url, options) {
+    this.canvas.discardActiveObject()
     fabric.Image.fromURL(url, (image) => {
       const { tl, br } = this.canvas.calcViewportBoundaries()
 
       image.set({
         left: br.x - (br.x - tl.x) / 2 - image.width / 2,
         top: br.y - (br.y - tl.y) / 2 - image.height / 2,
+        _selected: true, // Чтобы сработало выделение на новом объекте
       })
 
       this.canvas.add(image)
@@ -886,6 +861,7 @@ export class Drawing extends React.Component {
     const { tl, br } = this.canvas.calcViewportBoundaries()
     let offset = 0
 
+    this.canvas.discardActiveObject()
     imageSet.forEach((src) => {
       fabric.Image.fromURL(publicStorageProvider.getUrl(publicStorageProvider.types.LIB, src), (image) => {
         image.set({
@@ -900,6 +876,48 @@ export class Drawing extends React.Component {
         this.canvas.add(image)
       }, { crossOrigin: 'anonymous' })
     })
+  }
+
+  deleteSelection () {
+    const activeObject = this.canvas.getActiveObject()
+
+    if (activeObject) {
+      activeObject.set({ '_toDelete': true })
+      this.canvas.remove(activeObject)
+    }
+  }
+
+  sendSelectionToBack () {
+    const activeObject = this.canvas.getActiveObject()
+
+    if (activeObject) {
+      activeObject.set({ __local: true })
+      const objects = this.canvas.getObjects()
+      const order = objects[0]._order || 0
+
+      activeObject.set({
+        _order: order - 1,
+        __local: true,
+      })
+      this.canvas.fire('object:modified', { target: activeObject })
+      this.canvas.sendToBack(activeObject)
+    }
+  }
+
+  bringSelectionToFront () {
+    const activeObject = this.canvas.getActiveObject()
+
+    if (activeObject) {
+      const objects = this.canvas.getObjects()
+      const order = objects[objects.length - 1]._order
+
+      activeObject.set({
+        _order: order + 1,
+        __local: true,
+      })
+      this.canvas.fire('object:modified', { target: activeObject })
+      this.canvas.bringToFront(activeObject)
+    }
   }
 
   updateCanvasParameters (forced = false) {
@@ -978,7 +996,7 @@ export class Drawing extends React.Component {
 
     objects.forEach((_) => {
       const objIndex = canvasObjectIds.indexOf(_._id)
-      const nextObject = normalizeFields(_, enhancedFields)
+      const nextObject = normalizeFields(_)
 
       if (objIndex === -1) {
         // add
@@ -1002,7 +1020,15 @@ export class Drawing extends React.Component {
             LockProvider.unlockUserObject(canvasObjects[objIndex])
           }
         } else {
-          canvasObjects[objIndex].set(nextObject)
+          const canvasObject = canvasObjects[objIndex]
+
+          // Поменялся order?
+          if (nextObject._order > canvasObject._order) {
+            this.canvas.bringToFront(canvasObject)
+          } else if (nextObject._order < canvasObject._order) {
+            this.canvas.sendToBack(canvasObject)
+          }
+          canvasObject.set(nextObject)
         }
 
         canvasObjects[objIndex].setCoords()
@@ -1017,13 +1043,13 @@ export class Drawing extends React.Component {
   }
 
   _drawUpdateHandler = (data) => {
-    const objectId = data.id
+    const { id, diff } = data
 
     if (this.canvas) {
-      const object = this.canvas.getObjects().find(_ => _._id === objectId)
+      const object = this.canvas._objectsMap.get(id)
 
       if (object) {
-        object.set(data.diff)
+        object.set(diff)
 
         this.canvas.requestRenderAll()
       }
@@ -1042,6 +1068,9 @@ export class Drawing extends React.Component {
     if (objectsToRemove.length) {
       this.ignoreObjectRemovedEvent = true
       this.canvas.remove(...objectsToRemove)
+      objectsToRemove.forEach((object) => {
+        this.canvas._objectsMap.delete(object._id)
+      })
       this.ignoreObjectRemovedEvent = false
     }
 
@@ -1105,6 +1134,7 @@ export class Drawing extends React.Component {
             const objectToAdd = enlivenedObjects.get(object._id)
 
             this.canvas.add(objectToAdd)
+            this.canvas._objectsMap.set(objectToAdd._id, objectToAdd)
             if (LockProvider.isLockedByUser(objectToAdd)) {
               LockProvider.lockUserObject(objectToAdd)
             }
@@ -1136,7 +1166,7 @@ export class Drawing extends React.Component {
   }
 
   currentSelection () {
-    return this.canvas.getActiveObject().toObject(enhancedFields)
+    return serializeObject(this.canvas.getActiveObject)
   }
 
   __cleanTools () {
@@ -1146,11 +1176,7 @@ export class Drawing extends React.Component {
   }
 
   destroy () {
-    if (this.__broadcastProvider) {
-      this.__broadcastProvider.unsubscribe(BROADCAST_MESSAGE_TYPE)
-
-      this.__broadcastProvider = null
-    }
+    BroadcastProvider.destroy()
   }
 
   render () {
@@ -1171,13 +1197,9 @@ export class Drawing extends React.Component {
 }
 
 Drawing.defaultProps = {
-  brushColor: {
-    r: 255, g: 255, b: 255, a: 1,
-  },
-  brushWidth: 12,
-  shapeMode: shapeToolModeEnum.RECT,
-  stampMode: stampToolModeEnum.PLEASED,
-  tool: toolEnum.PEN,
+  brushColor: { ...HEXtoRGB(defaultToolSettings.color), a: 1 },
+  brushWidth: defaultToolSettings.size,
+  tool: defaultToolSettings.tool,
   x: 0,
   y: 0,
   zoom: 1,

@@ -1,12 +1,16 @@
 import { Base } from './base'
 
-export const makeNotInteractive = _ => Object.assign(_, {
-  selectable: false, evented: false, hoverCursor: 'crosshair',
-})
+export const makeNotInteractive = (_) => {
+  _.set({
+    selectable: false, evented: false, hoverCursor: 'crosshair',
+  })
+}
 
-export const makeInteractive = _ => Object.assign(_, {
-  selectable: true, evented: true, hoverCursor: 'move',
-})
+export const makeInteractive = (_) => {
+  _.set({
+    selectable: true, evented: true, hoverCursor: 'move',
+  })
+}
 
 export const adjustPosition = (object, pointer, adjust) => {
   const { width, height } = object.getBoundingRect()

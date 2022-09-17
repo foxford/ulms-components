@@ -2,21 +2,26 @@ export const toolEnum = {
   ERASER: 'eraser',
   PAN: 'pan',
   PEN: 'pen',
+  LINE: 'line',
   SELECT: 'select',
   SHAPE: 'shape',
   TEXT: 'textbox',
-  COLOR: 'color',
   GRID: 'grid',
   IMAGE: 'image',
-  LOCK: 'lock',
   STAMP: 'stamp',
   LIB: 'lib',
 }
 
 export const penToolModeEnum = {
   PENCIL: 'pencil',
+  DASHED_PENCIL: 'dashed-pencil',
   MARKER: 'marker',
+}
+
+export const lineToolModeEnum = {
   LINE: 'line',
+  DASHED_LINE: 'dashed-line',
+  ARROW: 'arrow',
 }
 
 export const shapeToolModeEnum = {
@@ -26,6 +31,8 @@ export const shapeToolModeEnum = {
   RECT_SOLID: 'rect-solid',
   TRIANGLE: 'triangle',
   TRIANGLE_SOLID: 'triangle-solid',
+  RIGHT_TRIANGLE: 'right-triangle',
+  RIGHT_TRIANGLE_SOLID: 'right-triangle-solid',
 }
 
 export const stampToolModeEnum = {
@@ -42,20 +49,25 @@ export const stampToolModeEnum = {
   WELLDONE: 'welldone',
 }
 
-export const USER_LOCK_LABEL = '_lockedbyuser'
-
-export const enhancedFields = [
-  '_id',
-  USER_LOCK_LABEL,
-  'noScaleCache',
-  'strokeUniform',
-]
-
 export const keycodes = {
+  SHIFT_KEYCODE: 16,
+  ALT_KEYCODE: 18,
+  CTRL_KEYCODE: 17,
+  META_KEYCODE: 91,
   UP_KEYCODE: 38,
   DOWN_KEYCODE: 40,
   LEFT_KEYCODE: 37,
   RIGHT_KEYCODE: 39,
+  ONE_KEYCODE: 49,
+  TWO_KEYCODE: 50,
+  THREE_KEYCODE: 51,
+  FOUR_KEYCODE: 52,
+  FIVE_KEYCODE: 53,
+  SIX_KEYCODE: 54,
+  SEVEN_KEYCODE: 55,
+  EIGHT_KEYCODE: 56,
+  NINE_KEYCODE: 57,
+  ZERO_KEYCODE: 48,
   C_KEYCODE: 67,
   Z_KEYCODE: 90,
   X_KEYCODE: 88,
@@ -82,14 +94,28 @@ export const keycodes = {
   K_KEYCODE: 75,
   L_KEYCODE: 76,
   M_KEYCODE: 77,
+  PLUS_KEYCODE: 187,
+  MINUS_KEYCODE: 189,
   DEL_KEYCODE: 46,
   BACKSPACE_KEYCODE: 8,
+  SPACE_KEYCODE: 32,
 }
-
-export const BROADCAST_MESSAGE_TYPE = 'draw-update'
 
 export const DEBOUNCE_DELAY = 300
 
 export const THROTTLE_DELAY = 500
 
 export const COPY_PASTE_SHIFT = 30
+
+export const defaultToolSettings = {
+  tool: toolEnum.PEN,
+  color: '#000000',
+  markerColor: '#FFCE03',
+  size: 2,
+  markerSize: 8,
+  markerAlpha: 0.4,
+  fontSize: 48,
+  shape: shapeToolModeEnum.RECT,
+  line: lineToolModeEnum.LINE,
+  stamp: stampToolModeEnum.PLEASED,
+}

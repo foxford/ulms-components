@@ -22,3 +22,19 @@ export const fromCSSColor = (str) => {
     a: parseFloat(a).toFixed(5),
   }
 }
+
+export function HEXtoRGB (str) {
+  const regex = new RegExp('#([\\da-fA-F]{2})([\\da-fA-F]{2})([\\da-fA-F]{2})')
+  const [
+    dummy,
+    rHex,
+    gHex,
+    bHex,
+  ] = regex.exec(str)
+
+  return {
+    r: parseInt(rHex, 16),
+    g: parseInt(gHex, 16),
+    b: parseInt(bHex, 16),
+  }
+}

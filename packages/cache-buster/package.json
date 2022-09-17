@@ -24,9 +24,6 @@
   "scripts": {
     "build": "rm -rf ./es/* && BABEL_ENV=es rollup --config ./rollup.config.js index.js"
   },
-  "dependencies": {
-    "react": "^16.14.0"
-  },
   "peerDependencies": {
     "react": "^15.6 || ^16.x || ^17.x"
   }

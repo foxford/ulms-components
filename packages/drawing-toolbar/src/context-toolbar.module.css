@@ -1,0 +1,10 @@
+.contextMenuWrapper {
+  width: min-content;
+  background: #fff;
+  padding: 3px 8px;
+  margin: 0;
+  display: flex;
+  flex-flow: row nowrap;
+  border-radius: 5px;
+  border: 1px solid #E9E9E9;
+}

@@ -15,6 +15,10 @@ class CCopyPasteProvider {
     return !this.__clipboard
   }
 
+  clear = () => {
+    this.__clipboard = null
+  }
+
   copy = () => {
     if (this.__canvas && this.__canvas.getActiveObject()) {
       this.__canvas.getActiveObject().clone((cloned) => {
@@ -32,6 +36,7 @@ class CCopyPasteProvider {
         clonedObj.set({
           left: clonedObj.left + COPY_PASTE_SHIFT,
           top: clonedObj.top + COPY_PASTE_SHIFT,
+          _selected: true, // Чтобы сработало выделение на новом объекте
           evented: true,
           __local: true,
         })
