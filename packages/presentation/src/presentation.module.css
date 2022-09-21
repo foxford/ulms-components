@@ -94,6 +94,12 @@
   position: relative;
 }
 
+.root .slideWrapper .slide_centerContent {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .root .slideWrapper .slide .mainImage {
   position: absolute;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
@@ -103,9 +109,20 @@
   position: absolute;
 }
 
-.centered {
+.centeredX {
   left: 50%;
   transform: translateX(-50%);
+}
+
+.centeredY {
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.centeredXY {
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 
 .fitToWidth {
