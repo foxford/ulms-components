@@ -74,7 +74,6 @@ export class TextboxTool extends PositionableObject {
       top: y,
       fontSize: this.__fontSize,
       __local: true,
-      _selected: true, // Чтобы сработало выделение на новом объекте
     })
 
     this._canvas.add(this.__object)

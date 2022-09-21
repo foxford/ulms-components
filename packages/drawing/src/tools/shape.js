@@ -29,7 +29,6 @@ export class ShapeTool extends PositionableObject {
       hasControls: false,
       hasBorders: false,
       selectable: false,
-      _new: true,
     })
 
     this.__isDrawing = true
@@ -101,7 +100,6 @@ export class ShapeTool extends PositionableObject {
       this.__object.set({
         left: x,
         top: y,
-        _new: true,
       })
       this._canvas.add(this.__object)
     } else {

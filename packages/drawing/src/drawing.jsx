@@ -380,39 +380,16 @@ export class Drawing extends React.Component {
       }
     })
 
-    this.canvas.on('selection:cleared', (event) => {
-      const { deselected } = event
-      if (!deselected || deselected.length !== 1) return
-
-      const { onDraw } = this.props
-      const [object] = deselected
-
-      if (isShapeObject(object)) {
-        if (object._new) {
-          onDraw && onDraw(serializeObject(object))
-          object.set('_new', undefined)
-        }
-      }
-    })
+    this.canvas.on('selection:cleared', () => {})
 
     this.canvas.on('object:modified', (event) => {
-      const { onDraw, onDrawUpdate } = this.props
+      const { onDrawUpdate } = this.props
       const object = event.target
 
       // Skipping draft objects
       if (object._draft) return
 
-      if (isTextObject(object) && object._textBeforeEdit === '') {
-        onDraw && onDraw(serializeObject(object))
-      } else if (isShapeObject(object)) {
-        object._new
-          ? onDraw && onDraw(serializeObject(object))
-          : onDrawUpdate && onDrawUpdate(serializeObject(object))
-
-        object.set('_new', undefined)
-      } else {
-        onDrawUpdate && onDrawUpdate(serializeObject(object))
-      }
+      onDrawUpdate && onDrawUpdate(serializeObject(object))
     })
 
     this.canvas.on('object:removed', (event) => {

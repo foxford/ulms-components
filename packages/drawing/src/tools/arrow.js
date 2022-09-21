@@ -68,7 +68,6 @@ export class ArrowTool extends Base {
       hasBorders: false,
       selectable: false,
       _noHistory: true, // Не сохраняем в undo/redo history
-      _new: true,
     })
 
     this.__object.set({
