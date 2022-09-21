@@ -106,17 +106,18 @@ class PresentationComponent extends React.Component {
 
   render () {
     const {
-      index,
-      intl,
+      centered = 'x', // x, y, xy
       collection,
       fitToWidth,
-      onPageResize,
+      index,
+      innerRef,
+      intl,
       onChange,
-      showPagesCount,
+      onPageResize,
       showActions,
+      showPagesCount,
       showPreviews,
       slotSlide,
-      innerRef,
     } = this.props
 
     return (
@@ -181,14 +182,14 @@ class PresentationComponent extends React.Component {
                   <div className={cx(css.slide, { [css.fitToWidth]: fitToWidth })} ref={innerRef} data-id='presentation-slide'>
                     <img
                       alt='mainimage'
-                      className={cx(css.mainImage, { [css.centered]: !fitToWidth })}
+                      className={cx(css.mainImage, { [css[`centered${centered.toUpperCase()}`]]: !fitToWidth })}
                       src={collection[index].image}
                       width={imageSize.width}
                       height={imageSize.height}
                     />
                     {
                       slotSlide && (
-                        <div className={cx(css.slotSlide, { [css.centered]: !fitToWidth })}>
+                        <div className={cx(css.slotSlide, { [css[`centered${centered.toUpperCase()}`]]: !fitToWidth })}>
                           {slotSlide(imageSize.width, imageSize.height)}
                         </div>
                       )
@@ -197,7 +198,7 @@ class PresentationComponent extends React.Component {
                 )
               } else {
                 result = (
-                  <div className={cx(css.slide, { [css.fitToWidth]: fitToWidth })} data-id='presentation-slide' ref={innerRef}>
+                  <div className={cx(css.slide, { [css.fitToWidth]: fitToWidth }, css.slide_centerContent,)} data-id='presentation-slide' ref={innerRef}>
                     <Spinner />
                   </div>
                 )
