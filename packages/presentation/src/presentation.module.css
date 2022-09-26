@@ -109,17 +109,17 @@
   position: absolute;
 }
 
-.centeredX {
+.centeredHorizontal {
   left: 50%;
   transform: translateX(-50%);
 }
 
-.centeredY {
+.centeredVertical {
   top: 50%;
   transform: translateY(-50%);
 }
 
-.centeredXY {
+.centeredBoth {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);

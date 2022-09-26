@@ -1,6 +1,6 @@
 {
   "name": "@ulms/ui-presentation",
-  "version": "1.4.2-dev.0-ulms-1998",
+  "version": "1.4.2-dev.1-ulms-1998",
   "description": "",
   "keywords": [
     "lerna"
@@ -30,6 +30,7 @@
     "classnames-es": "^2.2.6",
     "lodash": "^4.17.20",
     "pdfjs-dist": "^2.0.943",
+    "prop-types": "^15.8.1",
     "react-intl": "^5.21.0",
     "react-sizeme": "^2.6.7",
     "react-visibility-sensor": "^5.0.2",
