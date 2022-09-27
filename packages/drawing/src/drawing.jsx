@@ -187,7 +187,7 @@ export class Drawing extends React.Component {
     }
 
     // Обновляем значение зум в Селектк, чтобы пересчитать координаты и размеры объекта для контекстного меню
-    if (prevProps.zoom !== zoom && tool === toolEnum.SELECT) {
+    if (canDraw && prevProps.zoom !== zoom && tool === toolEnum.SELECT) {
       this.tool.zoom = zoom
     }
 
