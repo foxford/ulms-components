@@ -1,6 +1,8 @@
 /* eslint-disable no-param-reassign */
 import { fabric } from 'fabric/dist/fabric.min'
 
+import { defaultToolSettings } from '../constants'
+
 // define a function that can locate the controls.
 // this function will be used both for drawing and for interaction.
 function linePositionHandler (dim, finalMatrix, fabricObject) {
@@ -173,7 +175,7 @@ const WhiteboardCircle = fabric.util.createClass(fabric.Circle, {
     this.callSuper('_render', ctx)
 
     // для кругов с обводкой рисуем дополнительный кружочек по центру
-    if (this.fill === 'rgba(0,0,0,0.009)') {
+    if (this.fill === defaultToolSettings.transparentColor) {
       ctx.save()
       ctx.beginPath()
       ctx.arc(
@@ -197,4 +199,24 @@ WhiteboardCircle.fromObject = function fromObject (object, callback) {
 
 fabric.WhiteboardCircle = fabric.WhiteboardCircle || WhiteboardCircle
 
-export { WhiteboardLine, WhiteboardArrowLine, WhiteboardCircle }
+const WhiteboardRightTriangle = fabric.util.createClass(fabric.Path, {
+  type: 'WhiteboardRightTriangle',
+})
+
+WhiteboardRightTriangle.fromObject = function fromObject (object, callback) {
+  callback && callback(new fabric.WhiteboardRightTriangle(object.path, object, callback))
+}
+
+fabric.WhiteboardRightTriangle = fabric.WhiteboardRightTriangle || WhiteboardRightTriangle
+
+const WhiteboardStar = fabric.util.createClass(fabric.Polygon, {
+  type: 'WhiteboardStar',
+})
+
+WhiteboardStar.fromObject = function fromObject (object, callback) {
+  callback && callback(new fabric.WhiteboardStar(object.points, object, callback))
+}
+
+fabric.WhiteboardStar = fabric.WhiteboardStar || WhiteboardStar
+
+export { WhiteboardLine, WhiteboardArrowLine, WhiteboardCircle, WhiteboardRightTriangle, WhiteboardStar }

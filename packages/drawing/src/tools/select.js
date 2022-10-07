@@ -4,7 +4,7 @@ import debounce from 'lodash/debounce'
 import { fromCSSColor, toCSSColor } from '../util/to-css-color'
 import { calcDistance } from '../util'
 
-import { keycodes, DEBOUNCE_DELAY, toolEnum } from '../constants'
+import { keycodes, DEBOUNCE_DELAY, toolEnum, defaultToolSettings } from '../constants'
 import { LockProvider } from '../lock-provider'
 
 import { Base } from './base'
@@ -104,7 +104,7 @@ export default class SelectTool extends Base {
       }
 
       // ToDo: вынести в константу!
-      if (this.__object.fill && (this.__object.fill !== 'rgba(0,0,0,0.009)')) {
+      if (this.__object.fill && (this.__object.fill !== defaultToolSettings.transparentColor)) {
         newOpt.fill = opt.lineColor
       }
 

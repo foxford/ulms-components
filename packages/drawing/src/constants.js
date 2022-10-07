@@ -31,8 +31,10 @@ export const shapeToolModeEnum = {
   RECT_SOLID: 'rect-solid',
   TRIANGLE: 'triangle',
   TRIANGLE_SOLID: 'triangle-solid',
-  RIGHT_TRIANGLE: 'right-triangle',
-  RIGHT_TRIANGLE_SOLID: 'right-triangle-solid',
+  RIGHT_TRIANGLE: 'rightTriangle',
+  RIGHT_TRIANGLE_SOLID: 'rightTriangle-solid',
+  STAR: 'star',
+  STAR_SOLID: 'star-solid',
 }
 
 export const stampToolModeEnum = {
@@ -111,10 +113,12 @@ export const defaultToolSettings = {
   tool: toolEnum.PEN,
   color: '#000000',
   markerColor: '#FFCE03',
+  transparentColor: 'rgba(0,0,0,0.009)',
   size: 2,
   markerSize: 8,
   markerAlpha: 0.4,
   fontSize: 48,
+  childrenFontSize: 64,
   shape: shapeToolModeEnum.RECT,
   line: lineToolModeEnum.LINE,
   stamp: stampToolModeEnum.PLEASED,

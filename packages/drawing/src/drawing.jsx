@@ -42,6 +42,8 @@ import {
   triangleSolid,
   rightTriangle,
   rightTriangleSolid,
+  star,
+  starSolid,
 } from './tools/_shapes'
 import { makeNotInteractive } from './tools/object'
 
@@ -49,10 +51,6 @@ function isShapeObject (object) {
   return object.type === shapeToolModeEnum.CIRCLE
     || object.type === shapeToolModeEnum.RECT
     || object.type === shapeToolModeEnum.TRIANGLE
-}
-
-function isTextObject (object) {
-  return object.type === toolEnum.TEXT
 }
 
 export class Drawing extends React.Component {
@@ -122,6 +120,7 @@ export class Drawing extends React.Component {
     const {
       brushColor,
       brushMode,
+      fontSize,
       brushWidth,
       canDraw,
       eraserWidth,
@@ -215,6 +214,7 @@ export class Drawing extends React.Component {
       && (
         prevProps.brushColor !== brushColor
         || prevProps.brushMode !== brushMode
+        || prevProps.fontSize !== fontSize
         || prevProps.brushWidth !== brushWidth
         || prevProps.eraserWidth !== eraserWidth
       )
@@ -688,6 +688,38 @@ export class Drawing extends React.Component {
 
             break
 
+          case shapeToolModeEnum.STAR:
+            this.tool = new ShapeTool(
+              this.canvas,
+              () => star({
+                width: 97.2,
+                height: 97.2,
+                stroke: toCSSColor(brushColor),
+              }),
+              {
+                adjustCenter: '-0.5 -0.5',
+                selectOnInit,
+              }
+            )
+
+            break
+
+          case shapeToolModeEnum.STAR_SOLID:
+            this.tool = new ShapeTool(
+              this.canvas,
+              () => starSolid({
+                fill: toCSSColor(brushColor),
+                height: 97.2,
+                width: 97.2,
+              }),
+              {
+                adjustCenter: '-0.5 -0.5',
+                selectOnInit,
+              }
+            )
+
+            break
+
           default:
             this.tool = new ShapeTool(
               this.canvas,
@@ -714,7 +746,7 @@ export class Drawing extends React.Component {
 
   configureTool (initial = false) {
     const {
-      brushColor, brushMode, brushWidth, eraserWidth, eraserPrecision, tool,
+      brushColor, brushMode, brushWidth, eraserWidth, eraserPrecision, tool, fontSize,
     } = this.props
 
     if (tool === toolEnum.PEN || tool === toolEnum.LINE) {
@@ -736,6 +768,7 @@ export class Drawing extends React.Component {
         lineWidth: brushWidth,
         precision: eraserPrecision,
         eraserWidth,
+        fontSize,
         initial,
       })
     }

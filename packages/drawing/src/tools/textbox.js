@@ -15,7 +15,7 @@ export class TextboxTool extends PositionableObject {
     this.__lastAdded = undefined
 
     this.__objectFn = objectFn || (() => new fabric.Textbox('', {
-      backgroundColor: 'rgba(0,0,0,0.009)', // FIXME: should be removed on select & eraser update
+      backgroundColor: defaultToolSettings.transparentColor, // FIXME: should be removed on select & eraser update
       borderScaleFactor: 1,
       fill: 'rgba(0,0,0,1)',
       padding: 7,
@@ -26,6 +26,10 @@ export class TextboxTool extends PositionableObject {
       width: 600,
       ...restOptions,
     }))
+  }
+
+  configure (props) {
+    this.__fontSize = props.fontSize
   }
 
   handleTextEditEndEvent () {
