@@ -27,6 +27,11 @@
   height: 16px;
 }
 
+.colorCircle.colorCircle_extended {
+  width: 28px;
+  height: 28px;
+}
+
 .fontItem {
   width: 100%;
   text-align: center;

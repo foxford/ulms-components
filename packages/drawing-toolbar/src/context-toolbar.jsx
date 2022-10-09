@@ -215,6 +215,7 @@ export class ContextToolbar extends React.Component {
       onCopyPaste,
       onDelete,
       direction = 'top',
+      shortMode = false,
       onBringToFront,
       onSendToBack,
     } = this.props
@@ -234,7 +235,7 @@ export class ContextToolbar extends React.Component {
 
     return (
       <div className={css.contextMenuWrapper}>
-        {!isLocked && (
+        {!isLocked && !shortMode && (
           <>
             {showLineTool && (
             <SettingsGroup

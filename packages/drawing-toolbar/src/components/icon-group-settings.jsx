@@ -5,7 +5,12 @@ import { ToolbarButton } from './toolbar-button'
 import css from './settings.module.css'
 
 export const IconGroupSettings = ({
-  iconsSet, currentSelection, handleClick, fillWidth,
+  iconsSet,
+  currentSelection,
+  handleClick,
+  fillWidth,
+  extended = false,
+  childrenStyle = false,
 }) => (
   <div className={css.wrapper}>
     <div className={css.row}>
@@ -18,6 +23,8 @@ export const IconGroupSettings = ({
           title={title}
           fillWidth={fillWidth}
           key={key}
+          extended={extended}
+          childrenStyle={childrenStyle}
         >
           {icon}
         </ToolbarButton>

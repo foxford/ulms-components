@@ -8,3 +8,8 @@
   border-left: 1px solid #E9E9E9;
   margin: 5px 6px;
 }
+
+.verticalDivider.noBorder,
+.horizontalDivider.noBorder {
+  border: none;
+}

@@ -2,6 +2,10 @@
   padding: 5px 4px;
 }
 
+.wrapper.round {
+  padding: 0;
+}
+
 .button {
   width: 36px;
   height: 36px;
@@ -13,23 +17,66 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
+
+  --button-color: transparent;
+  --button-hover-color: #E9E9E999;
+  --button-active-color: #E9E9E9;
+}
+
+.button.children {
+  --button-color: #f5f7fb;
+  --button-hover-color: #ece1ff;
+  --button-active-color: #caafff;
+}
+
+.button.button_extended {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+}
+
+.button.round {
+  border-radius: 50%;
+  padding: 2px;
 }
 
 .button.button_fillWidth {
   width: auto;
 }
 
+.button {
+  background-color: var(--button-color)
+}
+
 .button.button_active:hover,
 .button.button_active {
-  background-color: #E9E9E9;
+  background-color: var(--button-active-color);
+}
+
+.button:hover {
+  background-color: var(--button-hover-color);
+}
+
+.button.round {
+  background-color: transparent;
+  border-color: transparent;
+  border-width: 2px;
+  border-style: solid;
+}
+
+.button.round.button_active:hover,
+.button.round.button_active {
+  background-color: transparent;
+  border-color: var(--button-active-color);
+}
+
+.button.round:hover {
+  background-color: transparent;
+  border-color: var(--button-hover-color);
 }
 
 .button.button_padded {
   margin-bottom: 8px;
-}
-
-.button:hover {
-  background-color: #E9E9E999;
 }
 
 .group {

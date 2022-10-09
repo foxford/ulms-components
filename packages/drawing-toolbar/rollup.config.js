@@ -4,6 +4,7 @@ const babel = require('rollup-plugin-babel')
 const cjs = require('rollup-plugin-commonjs')
 const cssdupl = require('postcss-discard-duplicates')
 const cssnano = require('cssnano')
+const cssnext = require('postcss-cssnext')
 const cssurl = require('postcss-url')
 const Debug = require('debug')
 const env = require('postcss-preset-env')
@@ -55,6 +56,7 @@ const rollupPlugins = [ // order matters
     plugins: [
       cssurl({ url: 'inline' }),
       env(),
+      cssnext(),
       cssdupl()
     ].concat(shouldMinifyCss()),
     loaders: [

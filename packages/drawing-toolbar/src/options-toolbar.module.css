@@ -1,0 +1,8 @@
+.optionsWrapper {
+  width: min-content;
+  padding: 3px 8px;
+  margin: 0;
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+}

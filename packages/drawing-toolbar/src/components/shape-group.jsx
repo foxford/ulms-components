@@ -26,7 +26,7 @@ import css from './settings.module.css'
 export class ShapeGroup extends React.Component {
   constructor (props) {
     super(props)
-    // const { intl } = props
+    const { intl } = props
 
     this.buttonRef = React.createRef()
 
@@ -53,22 +53,22 @@ export class ShapeGroup extends React.Component {
       {
         key: shapeToolModeEnum.RECT,
         icon: this.iconsMap[shapeToolModeEnum.RECT],
-        // title: intl.formatMessage({ id: intlID.RECT }),
+        title: intl.formatMessage({ id: intlID.RECT }),
       },
       {
         key: shapeToolModeEnum.CIRCLE,
         icon: this.iconsMap[shapeToolModeEnum.CIRCLE],
-        // title: intl.formatMessage({ id: intlID.CIRCLE }),
+        title: intl.formatMessage({ id: intlID.CIRCLE }),
       },
       {
         key: shapeToolModeEnum.TRIANGLE,
         icon: this.iconsMap[shapeToolModeEnum.TRIANGLE],
-        // title: intl.formatMessage({ id: intlID.TRIANGLE }),
+        title: intl.formatMessage({ id: intlID.TRIANGLE }),
       },
       {
         key: shapeToolModeEnum.RIGHT_TRIANGLE,
         icon: this.iconsMap[shapeToolModeEnum.RIGHT_TRIANGLE],
-        // title: intl.formatMessage({ id: intlID.RIGHT_TRIANGLE }),
+        title: intl.formatMessage({ id: intlID.RIGHT_TRIANGLE }),
       },
     ]
 
@@ -76,22 +76,22 @@ export class ShapeGroup extends React.Component {
       {
         key: shapeToolModeEnum.RECT_SOLID,
         icon: this.iconsSolidMap[shapeToolModeEnum.RECT_SOLID],
-        // title: intl.formatMessage({ id: intlID.RECT_SOLID }),
+        title: intl.formatMessage({ id: intlID.RECT_SOLID }),
       },
       {
         key: shapeToolModeEnum.CIRCLE_SOLID,
         icon: this.iconsSolidMap[shapeToolModeEnum.CIRCLE_SOLID],
-        // title: intl.formatMessage({ id: intlID.CIRCLE_SOLID }),
+        title: intl.formatMessage({ id: intlID.CIRCLE_SOLID }),
       },
       {
         key: shapeToolModeEnum.TRIANGLE_SOLID,
         icon: this.iconsSolidMap[shapeToolModeEnum.TRIANGLE_SOLID],
-        // title: intl.formatMessage({ id: intlID.TRIANGLE_SOLID }),
+        title: intl.formatMessage({ id: intlID.TRIANGLE_SOLID }),
       },
       {
         key: shapeToolModeEnum.RIGHT_TRIANGLE_SOLID,
         icon: this.iconsSolidMap[shapeToolModeEnum.RIGHT_TRIANGLE_SOLID],
-        // title: intl.formatMessage({ id: intlID.RIGHT_TRIANGLE_SOLID }),
+        title: intl.formatMessage({ id: intlID.RIGHT_TRIANGLE_SOLID }),
       },
     ]
   }

@@ -11,6 +11,8 @@ export const ObjectTypes = {
   CIRCLE: 'circle',
   NEW_CIRCLE: 'WhiteboardCircle',
   TRIANGLE: 'triangle',
+  RIGHT_TRIANGLE: 'WhiteboardRightTriangle',
+  STAR: 'WhiteboardStar',
   TEXT: 'textbox',
   PATH: 'path',
   LINE: 'WhiteboardLine',
@@ -23,6 +25,8 @@ export const ShapeTypes = [
   ObjectTypes.NEW_CIRCLE,
   ObjectTypes.TRIANGLE,
   ObjectTypes.PATH,
+  ObjectTypes.STAR,
+  ObjectTypes.RIGHT_TRIANGLE,
 ]
 
 export const LineTypes = [ObjectTypes.LINE, ObjectTypes.ARROW]
