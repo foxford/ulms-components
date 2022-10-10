@@ -30,6 +30,21 @@
   transform: translateY(0)
 }
 
+.floaterMenu {
+  position: absolute;
+  right: 0;
+  background-color: #F1F3F6;
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+  top: 20px;
+  transition: all 0.5s;
+  padding: 8px 12px 16px;
+}
+
+.floaterMenu.floaterMenu_opened {
+  transform: translateY(-100%);
+}
+
 .root {
   user-select: none;
 
@@ -47,6 +62,8 @@
 
 .root.root_horizontal {
   padding: 10px 5px 6px 5px;
+  background-color: #fff;
+  z-index: 10;
 }
 
 .button {

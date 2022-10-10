@@ -213,26 +213,6 @@ export class OptionsToolbar extends React.Component {
       }
     }
 
-    // if (tool === toolEnum.TEXT) {
-    //   const { color, param } = this.toolOptionsSet[tool]
-    //
-    //   return { brushColor: { ...HEXtoRGB(color), a: 1 }, fontSize: param }
-    // } if (tool === toolEnum.SHAPE) {
-    //   const { color, param } = this.toolOptionsSet[tool][brushMode.split('-')[0]]
-    //
-    //   return { brushColor: { ...HEXtoRGB(color), a: 1 }, brushMode: param ? `${brushMode.split('-')[0]}-solid` : brushMode.split('-')[0] }
-    // } if (tool === toolEnum.LINE || tool === toolEnum.PEN) {
-    //   const { color, param } = this.toolOptionsSet[tool][brushMode]
-    //
-    //   return {
-    //     brushWidth: brushMode === penToolModeEnum.MARKER ? lineToMarkerMap[param] : param,
-    //     brushColor: {
-    //       ...HEXtoRGB(color),
-    //       a: (tool === toolEnum.PEN && brushMode === penToolModeEnum.MARKER) ? defaultToolSettings.markerAlpha : 1,
-    //     },
-    //   }
-    // }
-
     return null
   }
 
@@ -253,17 +233,6 @@ export class OptionsToolbar extends React.Component {
         this.toolOptions.lineWidth = param
         handleChange({ brushWidth: brushMode === penToolModeEnum.MARKER ? lineToMarkerMap[param] : param })
       }
-      // this.setState({ param })
-      // if (tool === toolEnum.TEXT) {
-      //   this.toolOptionsSet[tool].param = param
-      //   handleChange({ fontSize: param })
-      // } else if (tool === toolEnum.SHAPE) {
-      //   this.toolOptionsSet[tool][brushMode.split('-')[0]].param = param
-      //   handleChange({ brushMode: param ? `${brushMode.split('-')[0]}-solid` : brushMode.split('-')[0] })
-      // } else if (tool === toolEnum.LINE || tool === toolEnum.PEN) {
-      //   this.toolOptionsSet[tool][brushMode].param = param
-      //   handleChange({ brushWidth: brushMode === penToolModeEnum.MARKER ? lineToMarkerMap[param] : param })
-      // }
     } else {
       const {
         type, fill, stroke,
@@ -304,13 +273,6 @@ export class OptionsToolbar extends React.Component {
         },
       })
       this.toolOptions.color = color
-      // if (tool === toolEnum.TEXT) {
-      //   this.toolOptionsSet[tool].color = color
-      // } else if (tool === toolEnum.SHAPE) {
-      //   this.toolOptionsSet[tool][brushMode.split('-')[0]].color = color
-      // } else if (tool === toolEnum.LINE || tool === toolEnum.PEN) {
-      //   this.toolOptionsSet[tool][brushMode].color = color
-      // }
     } else {
       const {
         type, fill, stroke,
@@ -364,13 +326,6 @@ export class OptionsToolbar extends React.Component {
         iconsSet: lineIconsSet, color, param: lineWidth,
       })
     }
-    // if (tool === toolEnum.TEXT) {
-    //   this.setState({ iconsSet: textIconsSet, ...this.toolOptionsSet[tool] })
-    // } else if (tool === toolEnum.SHAPE) {
-    //   this.setState({ iconsSet: shapeIconsSet[brushMode], ...this.toolOptionsSet[tool][brushMode.split('-')[0]] })
-    // } else if (tool === toolEnum.LINE || tool === toolEnum.PEN) {
-    //   this.setState({ iconsSet: lineIconsSet, ...this.toolOptionsSet[tool][brushMode] })
-    // }
   }
 
   processSelectedObject (selectedObject) {

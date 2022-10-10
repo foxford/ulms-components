@@ -1,7 +1,7 @@
 /* eslint-disable react/jsx-props-no-spreading,max-classes-per-file */
 import React from 'react'
 import { injectIntl, IntlProvider } from 'react-intl'
-import { toolEnum } from '@ulms/ui-drawing'
+import { defaultToolSettings, toolEnum } from '@ulms/ui-drawing'
 import cn from 'classnames-es'
 
 import { messagesIntl } from '../lang'
@@ -11,6 +11,7 @@ import { AdultDrawingToolbar } from './adult-drawing-toolbar'
 import { groupTypes } from './constants'
 import css from './drawing-toolbar.module.css'
 import { OptionsToolbar } from './options-toolbar'
+import { StampSettings } from './components/stamp-settings'
 
 function supportPointerEvent () {
   return 'PointerEvent' in window
@@ -31,7 +32,12 @@ export class CDrawingToolbarComponent extends React.Component {
 
     this.toolbarRef = React.createRef()
 
-    this.state = { opened: '' }
+    this.state = {
+      opened: '',
+      stampOpened: false,
+      showMoreOpened: false,
+      currentStamp: defaultToolSettings.stamp,
+    }
   }
 
   componentDidMount () {
@@ -43,6 +49,10 @@ export class CDrawingToolbarComponent extends React.Component {
       tool, brushMode, handleChange, sendEvent,
     } = this.props
     const { opened } = this.state
+
+    if (tool !== prevProps.tool && tool !== toolEnum.STAMP) {
+      this.setState({ stampOpened: false, showMoreOpened: false })
+    }
 
     if (tool !== prevProps.tool || brushMode !== prevProps.brushMode) {
       setTimeout(() => { // Чтобы успели примениться значения для getOptions
@@ -129,17 +139,39 @@ export class CDrawingToolbarComponent extends React.Component {
     this.toggleOpened(groupTypes.GROUP_STAMP)
   }
 
-  handleDocumentClickEvent = (event) => {
-    const { opened } = this.state
+  handleChildrenStampOpen = () => {
+    const { handleChange, tool } = this.props
+    const { currentStamp } = this.state
 
-    if (opened === '') return
+    if (tool !== toolEnum.STAMP) {
+      handleChange({ tool: toolEnum.STAMP, brushMode: currentStamp })
+    }
+    this.setState({ stampOpened: true })
+  }
+
+  handleChildrenStampClick = (param) => {
+    const { handleChange } = this.props
+
+    handleChange({ tool: toolEnum.STAMP, brushMode: param })
+    this.setState({ currentStamp: param })
+  }
+
+  handleDocumentClickEvent = (event) => {
+    const {
+      opened, stampOpened, showMoreOpened,
+    } = this.state
+
+    if (opened === '' && !stampOpened && !showMoreOpened) return
 
     // TODO: remove implicit functional based on classnames
     const closestToolbarElement = event.target.closest(`.${css.root}`)
     const closestFloaterElement = event.target.closest(`.${css.floater}`)
+    const closestFloaterMenuElement = event.target.closest(`.${css.floaterMenu}`)
 
-    if (closestToolbarElement === null && closestFloaterElement === null) {
-      this.setState({ opened: '' })
+    if (closestToolbarElement === null && closestFloaterElement === null && closestFloaterMenuElement === null) {
+      this.setState({
+        opened: '', stampOpened: false, showMoreOpened: false,
+      })
     }
   }
 
@@ -163,7 +195,9 @@ export class CDrawingToolbarComponent extends React.Component {
       selectedObject,
       onDrawUpdate,
     } = this.props
-    const { opened } = this.state
+    const {
+      opened, stampOpened, showMoreOpened,
+    } = this.state
 
     const props = {
       brushColor,
@@ -197,7 +231,15 @@ export class CDrawingToolbarComponent extends React.Component {
           />
         </div>
         <div className={css.toolbarWrapper}>
-          <ChildrenDrawingToolbar {...props} />
+          <div className={cn(css.floaterMenu, stampOpened && css.floaterMenu_opened)}>
+            <StampSettings
+              handleClick={this.handleChildrenStampClick}
+              brushMode={brushMode}
+              intl={intl}
+              extended
+            />
+          </div>
+          <ChildrenDrawingToolbar {...props} handleStampOpen={this.handleChildrenStampOpen} />
         </div>
       </div>
     ) : (

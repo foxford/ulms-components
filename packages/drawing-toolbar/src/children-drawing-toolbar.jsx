@@ -19,7 +19,9 @@ import IconTriangle from './icons/children-triangle-toolbar-icon.svg'
 import IconArrow from './icons/children-arrow-toolbar-icon.svg'
 import IconLine from './icons/children-line-toolbar-icon.svg'
 import IconImage from './icons/children-image-toolbar-icon.svg'
-// import IconLib from './icons/lib-tool-icon.svg'
+import IconStamp from './icons/children-stamp-toolbar-icon.svg'
+import IconShowMore from './icons/children-showmore-toolbar-icon.svg'
+
 import { toCSSColor } from './utils'
 
 // eslint-disable-next-line react/prefer-stateless-function
@@ -34,7 +36,9 @@ export class ChildrenDrawingToolbar extends React.Component {
       tools,
       handleOpen,
       handleImageClick,
-      handleLibClick,
+      handleShowMoreOpen,
+      handleStampOpen,
+      showMoreOpened,
       css,
     } = this.props
 
@@ -48,6 +52,8 @@ export class ChildrenDrawingToolbar extends React.Component {
     const isTextEnabled = tools && tools.includes(toolEnum.TEXT)
     const isStampEnabled = tools && tools.includes(toolEnum.STAMP)
     const isLibEnabled = tools && tools.includes(toolEnum.LIB)
+    const isAnimationEnabled = tools && tools.includes(toolEnum.ANIMATION)
+    const isShowMoreEnabled = isLibEnabled || isAnimationEnabled
     const showSeparator = !noSeparator && (isImageEnabled || isStampEnabled || isLibEnabled)
 
     return (
@@ -207,27 +213,31 @@ export class ChildrenDrawingToolbar extends React.Component {
             </ToolbarButton>
           )}
 
-          {/* { isStampEnabled && ( */}
-          {/*  <StampGroup */}
-          {/*    opened={opened === toolEnum.STAMP} */}
-          {/*    className={css.floater} */}
-          {/*    intl={intl} */}
-          {/*    tool={tool} */}
-          {/*    ref={this.stampGroupRef} */}
-          {/*    handleOpen={options => handleOpen(toolEnum.STAMP, options)} */}
-          {/*    handleChange={handleChange} */}
-          {/*  /> */}
-          {/* )} */}
+          {isStampEnabled && (
+          <ToolbarButton
+            active={tool === toolEnum.STAMP}
+            onClick={handleStampOpen}
+            title={intl.formatMessage({ id: 'STAMP' })}
+            extended
+            childrenStyle
+          >
+            <IconStamp />
+          </ToolbarButton>
+          )}
 
-          {/* { isLibEnabled && ( */}
-          {/*  <ToolbarButton */}
-          {/*    active={tool === toolEnum.LIB} */}
-          {/*    group */}
-          {/*    onClick={handleLibClick} */}
-          {/*    title={intl.formatMessage({ id: 'LIB' })} */}
-          {/*  > */}
-          {/*    <IconLib /> */}
-          {/*  </ToolbarButton> */}
+          {/* Заглушки для анимации - в другой задаче будет реализовано */}
+          {/* { showSeparator && <Divider noBorder /> } */}
+
+          {/* { isShowMoreEnabled && ( */}
+          {/* <ToolbarButton */}
+          {/*  active={showMoreOpened} */}
+          {/*  onClick={handleShowMoreOpen} */}
+          {/*  title={intl.formatMessage({ id: 'SHOW_MORE' })} */}
+          {/*  extended */}
+          {/*  childrenStyle */}
+          {/* > */}
+          {/*  <IconShowMore /> */}
+          {/* </ToolbarButton> */}
           {/* )} */}
         </div>
       </div>
