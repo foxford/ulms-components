@@ -10,6 +10,7 @@ export const toolEnum = {
   IMAGE: 'image',
   STAMP: 'stamp',
   LIB: 'lib',
+  ANIMATION: 'animation',
 }
 
 export const penToolModeEnum = {
