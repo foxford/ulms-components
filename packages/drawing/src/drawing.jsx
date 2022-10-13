@@ -51,10 +51,6 @@ function isShapeObject (object) {
     || object.type === shapeToolModeEnum.TRIANGLE
 }
 
-function isTextObject (object) {
-  return object.type === toolEnum.TEXT
-}
-
 export class Drawing extends React.Component {
   constructor (props) {
     super(props)
@@ -1110,7 +1106,16 @@ export class Drawing extends React.Component {
 
             const objectToAdd = enlivenedObjects.get(object._id)
 
-            this.canvas.add(objectToAdd)
+            // eslint-disable-next-line max-len
+            if (this.canvas._objects.length && objectToAdd._order < this.canvas._objects[this.canvas._objects.length - 1]._order) {
+              const index = this.canvas._objects.findIndex(item => item._order > objectToAdd._order)
+
+              // eslint-disable-next-line max-len
+              this.canvas._objects = [...this.canvas._objects.slice(0, index - 1), objectToAdd, ...this.canvas._objects.slice(index)]
+            } else {
+              this.canvas.add(objectToAdd)
+            }
+
             this.canvas._objectsMap.set(objectToAdd._id, objectToAdd)
             if (LockProvider.isLockedByUser(objectToAdd)) {
               LockProvider.lockUserObject(objectToAdd)
