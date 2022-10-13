@@ -41,7 +41,7 @@ const colorsHorizontal = [
 ]
 
 export const ColorItem = ({
-  color, active = false, handleClick, innerRef, extended = false, horizontal = false,
+  color, active = false, handleClick, innerRef, size = 'md', horizontal = false,
 }) => (
   <ToolbarButton
     active={active}
@@ -52,14 +52,14 @@ export const ColorItem = ({
     round={horizontal}
   >
     <div
-      className={cn(css.colorCircle, extended && css.colorCircle_extended)}
+      className={cn(css.colorCircle, size === 'lg' && css.colorCircle_extended)}
       style={{ backgroundColor: color, border: color.toLowerCase() === '#ffffff' ? '1px solid #B8B8B8' : 'none' }}
     />
   </ToolbarButton>
 )
 
 export const ColorSettings = ({
-  currentColor, handleClick, horizontal = false, extended = false,
+  currentColor, handleClick, horizontal = false, size = 'md',
 }) => (
   <div className={css.wrapper}>
     {horizontal
@@ -71,7 +71,7 @@ export const ColorSettings = ({
               color={color}
               handleClick={handleClick}
               key={color}
-              extended={extended}
+              size={size}
               horizontal={horizontal}
             />
           ))}
@@ -85,7 +85,7 @@ export const ColorSettings = ({
               color={color}
               handleClick={handleClick}
               key={color}
-              extended={extended}
+              size={size}
             />
           ))}
         </div>

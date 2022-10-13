@@ -64,7 +64,7 @@ export class ChildrenDrawingToolbar extends React.Component {
               active={tool === toolEnum.SELECT}
               onClick={() => handleOpen(toolEnum.SELECT)}
               title={intl.formatMessage({ id: 'SELECT' })}
-              extended
+              size='lg'
               childrenStyle
             >
               <IconSelect />
@@ -76,7 +76,7 @@ export class ChildrenDrawingToolbar extends React.Component {
               active={tool === toolEnum.PAN}
               onClick={() => handleOpen(toolEnum.PAN)}
               title={intl.formatMessage({ id: 'HAND' })}
-              extended
+              size='lg'
               childrenStyle
             >
               <IconPan />
@@ -91,7 +91,7 @@ export class ChildrenDrawingToolbar extends React.Component {
                 active={tool === toolEnum.PEN && brushMode === penToolModeEnum.PENCIL}
                 onClick={() => handleOpen(toolEnum.PEN, { brushMode: penToolModeEnum.PENCIL })}
                 title={intl.formatMessage({ id: 'PENCIL' })}
-                extended
+                size='lg'
                 childrenStyle
               >
                 <IconPen />
@@ -101,7 +101,7 @@ export class ChildrenDrawingToolbar extends React.Component {
                 active={tool === toolEnum.PEN && brushMode === penToolModeEnum.MARKER}
                 onClick={() => handleOpen(toolEnum.PEN, { brushMode: penToolModeEnum.MARKER })}
                 title={intl.formatMessage({ id: 'HIGHLIGHTER' })}
-                extended
+                size='lg'
                 childrenStyle
               >
                 <IconMarker />
@@ -114,7 +114,7 @@ export class ChildrenDrawingToolbar extends React.Component {
               active={tool === toolEnum.ERASER}
               onClick={() => handleOpen(toolEnum.ERASER)}
               title={intl.formatMessage({ id: 'ERASER' })}
-              extended
+              size='lg'
               childrenStyle
             >
               <IconEraser />
@@ -126,7 +126,7 @@ export class ChildrenDrawingToolbar extends React.Component {
               active={tool === toolEnum.TEXT}
               onClick={() => handleOpen(toolEnum.TEXT)}
               title={intl.formatMessage({ id: 'TEXT' })}
-              extended
+              size='lg'
               childrenStyle
             >
               <IconText />
@@ -141,7 +141,7 @@ export class ChildrenDrawingToolbar extends React.Component {
                 active={tool === toolEnum.SHAPE && brushMode === shapeToolModeEnum.RECT}
                 onClick={() => handleOpen(toolEnum.SHAPE, { brushMode: shapeToolModeEnum.RECT })}
                 title={intl.formatMessage({ id: 'RECT' })}
-                extended
+                size='lg'
                 childrenStyle
               >
                 <IconRect />
@@ -151,7 +151,7 @@ export class ChildrenDrawingToolbar extends React.Component {
                 active={tool === toolEnum.SHAPE && brushMode === shapeToolModeEnum.CIRCLE}
                 onClick={() => handleOpen(toolEnum.SHAPE, { brushMode: shapeToolModeEnum.CIRCLE })}
                 title={intl.formatMessage({ id: 'CIRCLE' })}
-                extended
+                size='lg'
                 childrenStyle
               >
                 <IconCircle />
@@ -160,7 +160,7 @@ export class ChildrenDrawingToolbar extends React.Component {
                 active={tool === toolEnum.SHAPE && brushMode === shapeToolModeEnum.STAR}
                 onClick={() => handleOpen(toolEnum.SHAPE, { brushMode: shapeToolModeEnum.STAR })}
                 title={intl.formatMessage({ id: 'STAR' })}
-                extended
+                size='lg'
                 childrenStyle
               >
                 <IconStar />
@@ -169,7 +169,7 @@ export class ChildrenDrawingToolbar extends React.Component {
                 active={tool === toolEnum.SHAPE && brushMode === shapeToolModeEnum.TRIANGLE}
                 onClick={() => handleOpen(toolEnum.SHAPE, { brushMode: shapeToolModeEnum.TRIANGLE })}
                 title={intl.formatMessage({ id: 'TRIANGLE' })}
-                extended
+                size='lg'
                 childrenStyle
               >
                 <IconTriangle />
@@ -183,7 +183,7 @@ export class ChildrenDrawingToolbar extends React.Component {
                 active={tool === toolEnum.LINE && brushMode === lineToolModeEnum.ARROW}
                 onClick={() => handleOpen(toolEnum.LINE, { brushMode: lineToolModeEnum.ARROW })}
                 title={intl.formatMessage({ id: 'ARROW' })}
-                extended
+                size='lg'
                 childrenStyle
               >
                 <IconArrow />
@@ -193,7 +193,7 @@ export class ChildrenDrawingToolbar extends React.Component {
                 active={tool === toolEnum.LINE && brushMode === lineToolModeEnum.LINE}
                 onClick={() => handleOpen(toolEnum.LINE, { brushMode: lineToolModeEnum.LINE })}
                 title={intl.formatMessage({ id: 'LINE' })}
-                extended
+                size='lg'
                 childrenStyle
               >
                 <IconLine />
@@ -206,7 +206,7 @@ export class ChildrenDrawingToolbar extends React.Component {
               active={tool === toolEnum.IMAGE}
               onClick={handleImageClick}
               title={intl.formatMessage({ id: 'UPLOAD_IMAGE' })}
-              extended
+              size='lg'
               childrenStyle
             >
               <IconImage />
@@ -218,7 +218,7 @@ export class ChildrenDrawingToolbar extends React.Component {
             active={tool === toolEnum.STAMP}
             onClick={handleStampOpen}
             title={intl.formatMessage({ id: 'STAMP' })}
-            extended
+            size='lg'
             childrenStyle
           >
             <IconStamp />
@@ -226,19 +226,19 @@ export class ChildrenDrawingToolbar extends React.Component {
           )}
 
           {/* Заглушки для анимации - в другой задаче будет реализовано */}
-          {/* { showSeparator && <Divider noBorder /> } */}
+          { showSeparator && <Divider noBorder /> }
 
-          {/* { isShowMoreEnabled && ( */}
-          {/* <ToolbarButton */}
-          {/*  active={showMoreOpened} */}
-          {/*  onClick={handleShowMoreOpen} */}
-          {/*  title={intl.formatMessage({ id: 'SHOW_MORE' })} */}
-          {/*  extended */}
-          {/*  childrenStyle */}
-          {/* > */}
-          {/*  <IconShowMore /> */}
-          {/* </ToolbarButton> */}
-          {/* )} */}
+          { isShowMoreEnabled && (
+          <ToolbarButton
+            active={showMoreOpened}
+            onClick={handleShowMoreOpen}
+            title={intl.formatMessage({ id: 'SHOW_MORE' })}
+            size='lg'
+            childrenStyle
+          >
+            <IconShowMore />
+          </ToolbarButton>
+          )}
         </div>
       </div>
     )

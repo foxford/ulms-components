@@ -59,48 +59,48 @@ const textIconsSet = [
   },
 ]
 
-const shapeIconsSet = {
-  [shapeToolModeEnum.RECT]: [
-    {
-      key: false,
-      icon: (<IconRect />),
-    },
-    {
-      key: true,
-      icon: (<IconRectSolid />),
-    },
-  ],
-  [shapeToolModeEnum.CIRCLE]: [
-    {
-      key: false,
-      icon: (<IconCircle />),
-    },
-    {
-      key: true,
-      icon: (<IconCircleSolid />),
-    },
-  ],
-  [shapeToolModeEnum.STAR]: [
-    {
-      key: false,
-      icon: (<IconStar />),
-    },
-    {
-      key: true,
-      icon: (<IconStarSolid />),
-    },
-  ],
-  [shapeToolModeEnum.TRIANGLE]: [
-    {
-      key: false,
-      icon: (<IconTriangle />),
-    },
-    {
-      key: true,
-      icon: (<IconTriangleSolid />),
-    },
-  ],
-}
+const rectIconSet = [
+  {
+    key: false,
+    icon: (<IconRect />),
+  },
+  {
+    key: true,
+    icon: (<IconRectSolid />),
+  },
+]
+
+const circleIconSet = [
+  {
+    key: false,
+    icon: (<IconCircle />),
+  },
+  {
+    key: true,
+    icon: (<IconCircleSolid />),
+  },
+]
+
+const starIconSet = [
+  {
+    key: false,
+    icon: (<IconStar />),
+  },
+  {
+    key: true,
+    icon: (<IconStarSolid />),
+  },
+]
+const triangleIconSet = [
+  {
+    key: false,
+    icon: (<IconTriangle />),
+  },
+  {
+    key: true,
+    icon: (<IconTriangleSolid />),
+  },
+]
 
 export class OptionsToolbar extends React.Component {
   constructor (props) {
@@ -116,52 +116,6 @@ export class OptionsToolbar extends React.Component {
       fontSize: defaultToolSettings.childrenFontSize,
       solidShape: false,
     }
-
-    // Пусть пока тут полежит
-    // this.toolOptionsSet = {
-    //   [toolEnum.LINE]: {
-    //     [lineToolModeEnum.LINE]: {
-    //       color: defaultToolSettings.color,
-    //       param: defaultToolSettings.size,
-    //     },
-    //     [lineToolModeEnum.ARROW]: {
-    //       color: defaultToolSettings.color,
-    //       param: defaultToolSettings.size,
-    //     },
-    //   },
-    //   [toolEnum.PEN]: {
-    //     [penToolModeEnum.PENCIL]: {
-    //       color: defaultToolSettings.color,
-    //       param: defaultToolSettings.size,
-    //     },
-    //     [penToolModeEnum.MARKER]: {
-    //       color: defaultToolSettings.markerColor,
-    //       param: markerToLineMap[defaultToolSettings.markerSize],
-    //     },
-    //   },
-    //   [toolEnum.TEXT]: {
-    //     color: defaultToolSettings.color,
-    //     param: defaultToolSettings.size,
-    //   },
-    //   [toolEnum.SHAPE]: {
-    //     [shapeToolModeEnum.RECT]: {
-    //       color: defaultToolSettings.color,
-    //       param: false,
-    //     },
-    //     [shapeToolModeEnum.CIRCLE]: {
-    //       color: defaultToolSettings.color,
-    //       param: false,
-    //     },
-    //     [shapeToolModeEnum.STAR]: {
-    //       color: defaultToolSettings.color,
-    //       param: false,
-    //     },
-    //     [shapeToolModeEnum.TRIANGLE]: {
-    //       color: defaultToolSettings.color,
-    //       param: false,
-    //     },
-    //   },
-    // }
 
     this.state = {
       color: this.toolOptions.color,
@@ -318,8 +272,34 @@ export class OptionsToolbar extends React.Component {
         iconsSet: textIconsSet, color, param: fontSize,
       })
     } else if (tool === toolEnum.SHAPE) {
+      let iconsSet
+
+      switch (brushMode.split('-')[0]) {
+        case shapeToolModeEnum.RECT:
+          iconsSet = rectIconSet
+          break
+
+        case shapeToolModeEnum.CIRCLE:
+
+        case ObjectTypes.NEW_CIRCLE:
+          iconsSet = circleIconSet
+          break
+
+        case shapeToolModeEnum.STAR:
+          iconsSet = starIconSet
+          break
+
+        case shapeToolModeEnum.TRIANGLE:
+
+        case shapeToolModeEnum.RIGHT_TRIANGLE:
+          iconsSet = triangleIconSet
+          break
+        default:
+
+          iconsSet = null
+      }
       this.setState({
-        iconsSet: shapeIconsSet[brushMode.split('-')[0]], color, param: solidShape,
+        iconsSet, color, param: solidShape,
       })
     } else if (tool === toolEnum.LINE || tool === toolEnum.PEN) {
       this.setState({
@@ -355,25 +335,25 @@ export class OptionsToolbar extends React.Component {
 
       switch (type) {
         case ObjectTypes.RECT:
-          iconsSet = shapeIconsSet[shapeToolModeEnum.RECT]
+          iconsSet = rectIconSet
           break
 
         case ObjectTypes.CIRCLE:
 
         case ObjectTypes.NEW_CIRCLE:
-          iconsSet = shapeIconsSet[shapeToolModeEnum.CIRCLE]
+          iconsSet = circleIconSet
 
           break
 
         case ObjectTypes.STAR:
-          iconsSet = shapeIconsSet[shapeToolModeEnum.STAR]
+          iconsSet = starIconSet
 
           break
 
         case ObjectTypes.TRIANGLE:
 
         case ObjectTypes.RIGHT_TRIANGLE:
-          iconsSet = shapeIconsSet[shapeToolModeEnum.TRIANGLE]
+          iconsSet = triangleIconSet
 
           break
         default:
@@ -408,7 +388,7 @@ export class OptionsToolbar extends React.Component {
           currentColor={color}
           handleClick={this.handleColorChanged}
           horizontal
-          extended
+          size='lg'
         />
 
       </div>

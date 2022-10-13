@@ -9,7 +9,7 @@ export const IconGroupSettings = ({
   currentSelection,
   handleClick,
   fillWidth,
-  extended = false,
+  size = 'md',
   childrenStyle = false,
 }) => (
   <div className={css.wrapper}>
@@ -23,7 +23,7 @@ export const IconGroupSettings = ({
           title={title}
           fillWidth={fillWidth}
           key={key}
-          extended={extended}
+          size={size}
           childrenStyle={childrenStyle}
         >
           {icon}

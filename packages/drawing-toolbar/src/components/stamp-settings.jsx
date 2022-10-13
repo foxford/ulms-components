@@ -13,6 +13,17 @@ import IconSmart from '../icons/stamps/_app_stamp__smart.svg'
 import IconStar from '../icons/stamps/_app_stamp__star.svg'
 import IconTryMore from '../icons/stamps/_app_stamp__trymore.svg'
 import IconWellDone from '../icons/stamps/_app_stamp__welldone.svg'
+import IconChildrenDislike from '../icons/stamps/_children_app_stamp__dislike.svg'
+import IconChildrenHeart from '../icons/stamps/_children_app_stamp__heart.svg'
+import IconChildrenLike from '../icons/stamps/_children_app_stamp__like.svg'
+import IconChildrenLove from '../icons/stamps/_children_app_stamp__love.svg'
+import IconChildrenPleased from '../icons/stamps/_children_app_stamp__pleased.svg'
+import IconChildrenQuestion from '../icons/stamps/_children_app_stamp__question.svg'
+import IconChildrenSad from '../icons/stamps/_children_app_stamp__sad.svg'
+import IconChildrenSmart from '../icons/stamps/_children_app_stamp__smart.svg'
+import IconChildrenStar from '../icons/stamps/_children_app_stamp__star.svg'
+import IconChildrenTryMore from '../icons/stamps/_children_app_stamp__trymore.svg'
+import IconChildrenWellDone from '../icons/stamps/_children_app_stamp__welldone.svg'
 
 // import { intlID } from '../../lang/constants'
 
@@ -24,6 +35,7 @@ export class StampSettings extends React.Component {
   constructor (props) {
     super(props)
     // const { intl } = props
+    const { childrenStyle } = props
 
     this.iconsMap = {
       [stampToolModeEnum.PLEASED]: (<IconPleased />),
@@ -39,60 +51,76 @@ export class StampSettings extends React.Component {
       [stampToolModeEnum.TRYMORE]: (<IconTryMore />),
     }
 
+    this.childrenIconsMap = {
+      [stampToolModeEnum.PLEASED]: (<IconChildrenPleased />),
+      [stampToolModeEnum.SAD]: (<IconChildrenSad />),
+      [stampToolModeEnum.LOVE]: (<IconChildrenLove />),
+      [stampToolModeEnum.STAR]: (<IconChildrenStar />),
+      [stampToolModeEnum.HEART]: (<IconChildrenHeart />),
+      [stampToolModeEnum.LIKE]: (<IconChildrenLike />),
+      [stampToolModeEnum.DISLIKE]: (<IconChildrenDislike />),
+      [stampToolModeEnum.QUESTION]: (<IconChildrenQuestion />),
+      [stampToolModeEnum.WELLDONE]: (<IconChildrenWellDone />),
+      [stampToolModeEnum.SMART]: (<IconChildrenSmart />),
+      [stampToolModeEnum.TRYMORE]: (<IconChildrenTryMore />),
+    }
+
+    const iconsMap = childrenStyle ? this.childrenIconsMap : this.iconsMap
+
     this.iconsSet = [
       {
         key: stampToolModeEnum.PLEASED,
-        icon: this.iconsMap[stampToolModeEnum.PLEASED],
+        icon: iconsMap[stampToolModeEnum.PLEASED],
         // title: intl.formatMessage({ id: intlID.STAMP_PLEASED }),
       },
       {
         key: stampToolModeEnum.SAD,
-        icon: this.iconsMap[stampToolModeEnum.SAD],
+        icon: iconsMap[stampToolModeEnum.SAD],
         // title: intl.formatMessage({ id: intlID.STAMP_SAD }),
       },
       {
         key: stampToolModeEnum.LOVE,
-        icon: this.iconsMap[stampToolModeEnum.LOVE],
+        icon: iconsMap[stampToolModeEnum.LOVE],
         // title: intl.formatMessage({ id: intlID.STAMP_LOVE }),
       },
       {
         key: stampToolModeEnum.STAR,
-        icon: this.iconsMap[stampToolModeEnum.STAR],
+        icon: iconsMap[stampToolModeEnum.STAR],
         // title: intl.formatMessage({ id: intlID.STAMP_STAR }),
       },
       {
         key: stampToolModeEnum.HEART,
-        icon: this.iconsMap[stampToolModeEnum.HEART],
+        icon: iconsMap[stampToolModeEnum.HEART],
         // title: intl.formatMessage({ id: intlID.STAMP_HEART }),
       },
       {
         key: stampToolModeEnum.LIKE,
-        icon: this.iconsMap[stampToolModeEnum.LIKE],
+        icon: iconsMap[stampToolModeEnum.LIKE],
         // title: intl.formatMessage({ id: intlID.STAMP_LIKE }),
       },
       {
         key: stampToolModeEnum.DISLIKE,
-        icon: this.iconsMap[stampToolModeEnum.DISLIKE],
+        icon: iconsMap[stampToolModeEnum.DISLIKE],
         // title: intl.formatMessage({ id: intlID.STAMP_DISLIKE }),
       },
       {
         key: stampToolModeEnum.QUESTION,
-        icon: this.iconsMap[stampToolModeEnum.QUESTION],
+        icon: iconsMap[stampToolModeEnum.QUESTION],
         // title: intl.formatMessage({ id: intlID.STAMP_QUESTION }),
       },
       {
         key: stampToolModeEnum.WELLDONE,
-        icon: this.iconsMap[stampToolModeEnum.WELLDONE],
+        icon: iconsMap[stampToolModeEnum.WELLDONE],
         // title: intl.formatMessage({ id: intlID.STAMP_WELLDONE }),
       },
       {
         key: stampToolModeEnum.SMART,
-        icon: this.iconsMap[stampToolModeEnum.SMART],
+        icon: iconsMap[stampToolModeEnum.SMART],
         // title: intl.formatMessage({ id: intlID.STAMP_SMART }),
       },
       {
         key: stampToolModeEnum.TRYMORE,
-        icon: this.iconsMap[stampToolModeEnum.TRYMORE],
+        icon: iconsMap[stampToolModeEnum.TRYMORE],
         // title: intl.formatMessage({ id: intlID.STAMP_TRYMORE }),
       },
     ]
@@ -105,7 +133,7 @@ export class StampSettings extends React.Component {
       brushMode,
       handleClick,
       className,
-      extended,
+      childrenStyle,
     } = this.props
 
     return (
@@ -114,7 +142,7 @@ export class StampSettings extends React.Component {
           <IconGroupSettings
             iconsSet={iconsRow}
             fillWidth
-            extended={extended}
+            size={childrenStyle ? 'xl' : 'md'}
             currentSelection={brushMode}
             handleClick={handleClick}
             key={i}

@@ -1,4 +1,4 @@
-/* eslint-disable react/jsx-props-no-spreading,max-classes-per-file */
+/* eslint-disable react/jsx-props-no-spreading,max-classes-per-file,jsx-a11y/no-static-element-interactions,jsx-a11y/click-events-have-key-events */
 import React from 'react'
 import { injectIntl, IntlProvider } from 'react-intl'
 import { defaultToolSettings, toolEnum } from '@ulms/ui-drawing'
@@ -12,6 +12,9 @@ import { groupTypes } from './constants'
 import css from './drawing-toolbar.module.css'
 import { OptionsToolbar } from './options-toolbar'
 import { StampSettings } from './components/stamp-settings'
+
+import IconLib from './icons/children-lib-tool-icon.svg'
+import IconAnimation from './icons/children-animation-tool-icon.svg'
 
 function supportPointerEvent () {
   return 'PointerEvent' in window
@@ -130,6 +133,15 @@ export class CDrawingToolbarComponent extends React.Component {
     onLib()
   }
 
+  handleAnimationClick = () => {
+    const { handleChange, onAnimation } = this.props
+
+    this.setState({ opened: toolEnum.ANIMATION })
+
+    handleChange({ tool: toolEnum.ANIMATION })
+    onAnimation()
+  }
+
   handleStampClick = () => {
     const { handleChange, tool } = this.props
 
@@ -146,7 +158,13 @@ export class CDrawingToolbarComponent extends React.Component {
     if (tool !== toolEnum.STAMP) {
       handleChange({ tool: toolEnum.STAMP, brushMode: currentStamp })
     }
-    this.setState({ stampOpened: true })
+    this.setState({ stampOpened: true, showMoreOpened: false })
+  }
+
+  handleShowMoreOpen = () => {
+    const { showMoreOpened } = this.state
+
+    this.setState({ stampOpened: false, showMoreOpened: !showMoreOpened })
   }
 
   handleChildrenStampClick = (param) => {
@@ -218,7 +236,7 @@ export class CDrawingToolbarComponent extends React.Component {
     return horizontal ? (
       <div className={css.wrapper}>
         <div className={cn(css.optionsWrapper, {
-          [css.optionsWrapper_opened]: selectedObject || toolsWithOptions.includes(tool),
+          [css.optionsWrapper_opened]: (selectedObject || toolsWithOptions.includes(tool)) && !showMoreOpened,
         })}
         >
           <OptionsToolbar
@@ -236,10 +254,33 @@ export class CDrawingToolbarComponent extends React.Component {
               handleClick={this.handleChildrenStampClick}
               brushMode={brushMode}
               intl={intl}
-              extended
+              childrenStyle
             />
           </div>
-          <ChildrenDrawingToolbar {...props} handleStampOpen={this.handleChildrenStampOpen} />
+          <div className={cn(css.floaterMenu, showMoreOpened && css.floaterMenu_opened)}>
+            <div className={css.floaterMenu__wrapper}>
+              <div
+                className={cn(css.floaterMenu__item, tool === toolEnum.LIB && css.floaterMenu__item_active)}
+                onClick={this.handleLibClick}
+              >
+                <span className={css.floaterMenu__icon}><IconLib /></span>
+                {intl.formatMessage({ id: 'LIB_MENU' })}
+              </div>
+              <div
+                className={cn(css.floaterMenu__item, tool === toolEnum.ANIMATION && css.floaterMenu__item_active)}
+                onClick={this.handleAnimationClick}
+              >
+                <span className={css.floaterMenu__icon}><IconAnimation /></span>
+                {intl.formatMessage({ id: 'ANIMATION' })}
+              </div>
+            </div>
+          </div>
+          <ChildrenDrawingToolbar
+            {...props}
+            handleStampOpen={this.handleChildrenStampOpen}
+            handleShowMoreOpen={this.handleShowMoreOpen}
+            showMoreOpened={showMoreOpened}
+          />
         </div>
       </div>
     ) : (

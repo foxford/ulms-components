@@ -14,8 +14,9 @@ export const ToolbarButton = ({
   group = false,
   childrenStyle = false,
   round = false,
-  extended = false,
+  size = 'md',
   noSpacing = false,
+  rightText = '',
 }) => (
   <div className={!noSpacing ? css.wrapper : ''}>
     {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events */}
@@ -23,8 +24,8 @@ export const ToolbarButton = ({
       ref={innerRef}
       className={cn(
         css.button,
-        extended && css.button_extended,
-        fillWidth && css.button_fillWidth,
+        css[`button__size_${size}`],
+        (fillWidth || rightText) && css.button_fillWidth,
         active && css.button_active,
         padded && css.button_padded,
         childrenStyle && css.children,
@@ -36,7 +37,8 @@ export const ToolbarButton = ({
       tabIndex='0'
       title={title}
     >
-      {children}
+      <span>{children}</span>
+      {rightText && (<span>{rightText}</span>)}
     </div>
   </div>
 )
