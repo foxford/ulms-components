@@ -1106,12 +1106,13 @@ export class Drawing extends React.Component {
 
             const objectToAdd = enlivenedObjects.get(object._id)
 
-            // eslint-disable-next-line max-len
-            if (this.canvas._objects.length && objectToAdd._order < this.canvas._objects[this.canvas._objects.length - 1]._order) {
+            if (
+              this.canvas._objects.length
+              && objectToAdd._order < this.canvas._objects[this.canvas._objects.length - 1]._order
+            ) {
               const index = this.canvas._objects.findIndex(item => item._order > objectToAdd._order)
 
-              // eslint-disable-next-line max-len
-              this.canvas._objects = [...this.canvas._objects.slice(0, index - 1), objectToAdd, ...this.canvas._objects.slice(index)]
+              this.canvas.insertAt(objectToAdd, index)
             } else {
               this.canvas.add(objectToAdd)
             }
