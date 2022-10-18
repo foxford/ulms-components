@@ -111,6 +111,7 @@ export const defaultToolSettings = {
   tool: toolEnum.PEN,
   color: '#000000',
   markerColor: '#FFCE03',
+  transparentColor: 'rgba(0,0,0,0.009)',
   size: 2,
   markerSize: 8,
   markerAlpha: 0.4,
