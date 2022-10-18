@@ -93,51 +93,6 @@ class CCopyPasteProvider {
       })
     }
   }
-  //
-  // copyToClipboard = (event) => {
-  //   console.log(888888888, 111, this.__canvas, this.__canvas && this.__canvas.getActiveObject())
-  //   if (this.__canvas && this.__canvas.getActiveObject()) {
-  //     this.__canvas.getActiveObject().clone(async (clonedObj) => {
-  //       const serializedObj = serializeObject(clonedObj)
-  //       const svgObject = clonedObj.toSVG()
-  //       const SVG = `<svg width="${clonedObj.width}" height="${clonedObj.height}" viewBox="0 0 ${clonedObj.width} ${clonedObj.height}" fill="none" xmlns="http://www.w3.org/2000/svg">`
-  //         + `${svgObject}`
-  //         + '</svg>'
-  //
-  //       serializedObj.isUlms = true // признак, что это наш объект
-  //
-  //       try {
-  //         // Custom type не поддерживает chrome
-  //         const type = 'whiteboard/object'
-  //         const blob = new Blob([JSON.stringify(serializedObj)], { type })
-  //         const svgBlob = new Blob([SVG], { type: 'image/svg+xml' })
-  //         // eslint-disable-next-line no-undef
-  //         const data = [new ClipboardItem({ [type]: blob })]
-  //
-  //         console.log(888888888, 222, svgBlob, SVG)
-  //         // event.clipboardData.setData('text/plain', 'Foxford whiteboard object')
-  //         // event.clipboardData.files = [new File([svgBlob], 'whiteboard.svg')]
-  //         // event.clipboardData.setData('Files', new File([svgBlob], 'whiteboard.svg'))
-  //         const file = new File([svgBlob], 'whiteboard.svg', { type: 'image/svg+xml' })
-  //
-  //         // event.clipboardData.items.add(file)
-  //         // event.clipboardData.setData('image/svg+xml', [new ClipboardItem({ [svgBlob.type]: svgBlob })])
-  //         // event.clipboardData.setData(type, data)
-  //         // // записываем через navigator.clipboard.write, так как через clipboardData не получается записать данные картинок
-  //         // await navigator.clipboard.write(data)
-  //         const item = new ClipboardItem({ 'image/svg+xml': svgBlob })
-  //
-  //         await navigator.clipboard.write([item])
-  //
-  //         // this.setState({ copyPasteIncrement: 1 })
-  //         event.preventDefault()
-  //       } catch (error) {
-  //         // eslint-disable-next-line no-console
-  //         console.warn('Error copy to clipboard: ', error)
-  //       }
-  //     })
-  //   }
-  // }
 
   _copyObjectToClipboard = async (event, object) => {
     const serializedObj = serializeObject(object)
