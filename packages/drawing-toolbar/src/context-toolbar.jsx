@@ -210,6 +210,7 @@ export class ContextToolbar extends React.Component {
 
   render () {
     const {
+      colorSettingsRows,
       isLocked,
       onLock,
       onCopyPaste,
@@ -301,6 +302,7 @@ export class ContextToolbar extends React.Component {
                 <ColorSettings
                   currentColor={currentColor}
                   handleClick={this.handleColorChanged}
+                  rows={colorSettingsRows}
                 />
               )}
             >

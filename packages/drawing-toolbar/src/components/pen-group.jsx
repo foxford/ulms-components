@@ -127,6 +127,9 @@ export class PenGroup extends React.Component {
       handleClose,
       handleOpen,
       className,
+      containerStyles = { marginTop: '-12px', marginLeft: '4px' },
+      direction = 'right-start',
+      orientation = 'vertical',
     } = this.props
     const {
       brushMode,
@@ -138,32 +141,35 @@ export class PenGroup extends React.Component {
 
     return (
       <SettingsGroup
-        direction='right-start'
-        containerStyles={{ marginTop: '-12px', marginLeft: '4px' }}
+        direction={direction}
+        containerStyles={containerStyles}
         isOpen={opened}
         handleClose={handleClose}
         target={this.buttonRef.current}
         content={(
-          <div className={cn(css.column, className)}>
-            <IconGroupSettings
-              iconsSet={this.iconsSet}
-              currentSelection={brushMode}
-              handleClick={value => this.handleClick('brushMode', value)}
-            />
-            <Divider horizontal />
-            <LineSettings
-              currentSize={brushMode === penToolModeEnum.MARKER ? markerSize : penSize}
-              dashed={brushMode === penToolModeEnum.DASHED_PENCIL}
-              handleClick={value => (brushMode === penToolModeEnum.MARKER)
-                ? this.handleClick('markerSize', value)
-                : this.handleClick('penSize', value)}
-            />
+          <div className={cn(css.column, css[orientation], className)}>
+            <div className={css.column__group}>
+              <IconGroupSettings
+                iconsSet={this.iconsSet}
+                currentSelection={brushMode}
+                handleClick={value => this.handleClick('brushMode', value)}
+              />
+              <Divider horizontal={orientation === 'vertical'} />
+              <LineSettings
+                currentSize={brushMode === penToolModeEnum.MARKER ? markerSize : penSize}
+                dashed={brushMode === penToolModeEnum.DASHED_PENCIL}
+                handleClick={value => (brushMode === penToolModeEnum.MARKER)
+                  ? this.handleClick('markerSize', value)
+                  : this.handleClick('penSize', value)}
+              />
+            </div>
             <Divider horizontal />
             <ColorSettings
               currentColor={brushMode === penToolModeEnum.MARKER ? markerColor : penColor}
               handleClick={value => (brushMode === penToolModeEnum.MARKER)
                 ? this.handleClick('markerColor', value)
                 : this.handleClick('penColor', value)}
+              rows={orientation === 'horizontal' ? 1 : 3}
             />
           </div>
         )}

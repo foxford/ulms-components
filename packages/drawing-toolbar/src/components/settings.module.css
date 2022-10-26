@@ -13,12 +13,34 @@
   align-items: center;
 }
 
+.horizontal .colorRow {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 36px);
+  grid-gap: 0 4px;
+}
+
+.horizontal .colorRow > div {
+  padding: 2px 4px;
+}
+
 .column {
   padding: 0;
   margin: 0;
   display: flex;
   flex-flow: column nowrap;
   align-items: flex-start;
+}
+
+.column__group {
+  display: flex;
+}
+
+.vertical .column__group {
+  flex-direction: column;
+}
+
+.horizontal .column__group {
+  flex-direction: row;
 }
 
 .colorCircle {

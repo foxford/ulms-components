@@ -170,6 +170,9 @@ class _DrawingToolbarComponent extends React.Component {
       sendEvent,
       intl,
       noSeparator,
+      penGroupContainerStyles,
+      penGroupDirection,
+      penGroupOrientation,
       tool,
       tools,
     } = this.props
@@ -220,6 +223,9 @@ class _DrawingToolbarComponent extends React.Component {
               ref={this.penGroupRef}
               handleOpen={options => this.handleOpen(toolEnum.PEN, options)}
               handleChange={handleChange}
+              containerStyles={penGroupContainerStyles}
+              direction={penGroupDirection}
+              orientation={penGroupOrientation}
               sendEvent={sendEvent}
             />
           )}
