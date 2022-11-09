@@ -1150,7 +1150,7 @@ export class Drawing extends React.Component {
 
   currentSelection () {
     if (this.canvas) {
-      return serializeObject(this.canvas.getActiveObject)
+      return serializeObject(this.canvas.getActiveObject())
     }
 
     return null
