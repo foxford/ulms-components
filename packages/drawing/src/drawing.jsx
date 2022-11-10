@@ -1145,11 +1145,15 @@ export class Drawing extends React.Component {
   }
 
   cleanSelection () {
-    if (this.canvas.getActiveObject()) this.canvas.discardActiveObject()
+    if (this.canvas && this.canvas.getActiveObject()) this.canvas.discardActiveObject()
   }
 
   currentSelection () {
-    return serializeObject(this.canvas.getActiveObject)
+    if (this.canvas) {
+      return serializeObject(this.canvas.getActiveObject())
+    }
+
+    return null
   }
 
   __cleanTools () {
