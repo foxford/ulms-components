@@ -181,6 +181,7 @@ class CCopyPasteProvider {
           borderScaleFactor: 1,
           fill: toCSSColor(HEXtoRGB(defaultToolSettings.color)),
           fontSize: defaultToolSettings.fontSize,
+          fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif',
           padding: 7,
           perPixelTargetFind: false,
           scaleX: 0.5,
