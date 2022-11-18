@@ -46,6 +46,18 @@ class CCursorProvider {
     }
   }
 
+  hide () {
+    if (this.__canvas && this.__cursor) {
+      this.__canvas.remove(this.__cursor)
+    }
+  }
+
+  show () {
+    if (this.__canvas && this.__cursor) {
+      this.__canvas.add(this.__cursor)
+    }
+  }
+
   destroy () {
     if (this.__canvas) {
       this._clearCursor()

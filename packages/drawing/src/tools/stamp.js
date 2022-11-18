@@ -100,7 +100,11 @@ export class StampTool extends PositionableObject {
         this.__object.set({ left: x, top: y })
       }
 
+      CursorProvider.hide() // Временно убираем курсор с доски, чтобы не сбивать логику выставления order
+
       this._canvas.add(this.__object)
+
+      CursorProvider.show() // Теперь можно снова показать курсор
 
       makeNotInteractive(this.__object)
     }
