@@ -1,0 +1,15 @@
+{
+  "FVS__CONTACT_YOU": "Свяжемся с вами в Slack\n в течение двух минут",
+  "FVS__DESCRIBE_PROBLEM": "Опишите проблему -\n мы поможем",
+  "FVS__DESCRIBE_PROBLEM_MORE": "Опишите точнее, если нужно",
+  "FVS__DETAILS": "Подробности",
+  "FVS__PROBLEM": "Проблема",
+  "FVS__RECEIVED_REQUEST": "Получили ваш запрос",
+  "FVS__REFRESH": "Обновить",
+  "FVS__SERVICE_IS_UNAVAILABLE": "Сервис недоступен",
+  "FVS__SOMETHING_WRONG": "Что-то не работает",
+  "FVS__SUBMIT": "Отправить",
+  "FVS__SUBMIT_ANOTHER_REQUEST": "Отправить ещё один запрос",
+  "FVS__SUPPORT": "Техподдержка",
+  "FVS__TRY_AGAIN": "Пожалуйста, повторите попытку"
+}
