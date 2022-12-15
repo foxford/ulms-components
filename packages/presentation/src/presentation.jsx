@@ -1,9 +1,10 @@
 /* eslint-disable max-len, react/prop-types, jsx-a11y/no-static-element-interactions, react/jsx-one-expression-per-line,max-classes-per-file */
 import React from 'react'
 import { injectIntl, IntlProvider } from 'react-intl'
-import cx from 'classnames-es'
-import scrollIntoView from 'scroll-into-view-if-needed'
 import VisibilitySensor from 'react-visibility-sensor'
+import cx from 'classnames-es'
+import PropTypes from 'prop-types'
+import scrollIntoView from 'scroll-into-view-if-needed'
 import { Icons } from '@ulms/ui-icons'
 import { SizeMe } from 'react-sizeme'
 import { Spinner } from '@ulms/ui-spinner'
@@ -106,17 +107,18 @@ class PresentationComponent extends React.Component {
 
   render () {
     const {
-      index,
-      intl,
+      centered = 'Horizontal',
       collection,
       fitToWidth,
-      onPageResize,
+      index,
+      innerRef,
+      intl,
       onChange,
-      showPagesCount,
+      onPageResize,
       showActions,
+      showPagesCount,
       showPreviews,
       slotSlide,
-      innerRef,
     } = this.props
 
     return (
@@ -181,14 +183,14 @@ class PresentationComponent extends React.Component {
                   <div className={cx(css.slide, { [css.fitToWidth]: fitToWidth })} ref={innerRef} data-id='presentation-slide'>
                     <img
                       alt='mainimage'
-                      className={cx(css.mainImage, { [css.centered]: !fitToWidth })}
+                      className={cx(css.mainImage, { [css[`centered${centered}`]]: !fitToWidth })}
                       src={collection[index].image}
                       width={imageSize.width}
                       height={imageSize.height}
                     />
                     {
                       slotSlide && (
-                        <div className={cx(css.slotSlide, { [css.centered]: !fitToWidth })}>
+                        <div className={cx(css.slotSlide, { [css[`centered${centered}`]]: !fitToWidth })}>
                           {slotSlide(imageSize.width, imageSize.height)}
                         </div>
                       )
@@ -197,7 +199,7 @@ class PresentationComponent extends React.Component {
                 )
               } else {
                 result = (
-                  <div className={cx(css.slide, { [css.fitToWidth]: fitToWidth })} data-id='presentation-slide' ref={innerRef}>
+                  <div className={cx(css.slide, { [css.fitToWidth]: fitToWidth }, css.slide_centerContent,)} data-id='presentation-slide' ref={innerRef}>
                     <Spinner />
                   </div>
                 )
@@ -255,6 +257,10 @@ class PresentationComponent extends React.Component {
       </div>
     )
   }
+}
+
+PresentationComponent.propTypes = {
+  centered: PropTypes.oneOf(['Both', 'Horizontal', 'Vertical']),
 }
 
 const PresentationComponentIntl = injectIntl(PresentationComponent)

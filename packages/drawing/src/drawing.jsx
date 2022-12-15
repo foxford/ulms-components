@@ -1117,7 +1117,17 @@ export class Drawing extends React.Component {
 
             const objectToAdd = enlivenedObjects.get(object._id)
 
-            this.canvas.add(objectToAdd)
+            if (
+              this.canvas._objects.length
+              && objectToAdd._order < this.canvas._objects[this.canvas._objects.length - 1]._order
+            ) {
+              const index = this.canvas._objects.findIndex(item => item._order > objectToAdd._order)
+
+              this.canvas.insertAt(objectToAdd, index)
+            } else {
+              this.canvas.add(objectToAdd)
+            }
+
             this.canvas._objectsMap.set(objectToAdd._id, objectToAdd)
             if (LockProvider.isLockedByUser(objectToAdd)) {
               LockProvider.lockUserObject(objectToAdd)
@@ -1146,11 +1156,15 @@ export class Drawing extends React.Component {
   }
 
   cleanSelection () {
-    if (this.canvas.getActiveObject()) this.canvas.discardActiveObject()
+    if (this.canvas && this.canvas.getActiveObject && this.canvas.getActiveObject()) this.canvas.discardActiveObject()
   }
 
   currentSelection () {
-    return serializeObject(this.canvas.getActiveObject)
+    if (this.canvas && this.canvas.getActiveObject) {
+      return serializeObject(this.canvas.getActiveObject())
+    }
+
+    return null
   }
 
   __cleanTools () {

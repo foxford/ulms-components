@@ -16,7 +16,7 @@ export const SettingsGroup = ({
       placement={direction}
       hideArrow
       styles={{
-        floater: { filter: 'none' },
+        floater: { filter: 'none', maxWidth: 'auto' },
         container: {
           padding: 0,
           backgroundColor: '#fff',
