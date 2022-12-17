@@ -1,3 +1,5 @@
+import { CopyPasteProvider } from './copy-paste-provider'
+
 export const keyboardEvents = {
   keyDown: 'keydown',
   keyUp: 'keyup',
@@ -22,15 +24,21 @@ class CKeyboardListenerProvider {
       && this.__element.removeEventListener(keyboardEvents.keyDown, this._handleKeyDownEvent)
       this.__element.removeEventListener
       && this.__element.removeEventListener(keyboardEvents.keyUp, this._handleKeyUpEvent)
+      this.__element.removeEventListener('copy', this.handleCopyEvent)
     }
 
     if (el) {
       this.__element = el
-
       this.__element.addEventListener
       && this.__element.addEventListener(keyboardEvents.keyDown, this._handleKeyDownEvent)
       this.__element.addEventListener
       && this.__element.addEventListener(keyboardEvents.keyUp, this._handleKeyUpEvent)
+      this.__element.addEventListener
+      && this.__element.addEventListener('copy', this.handleCopyEvent)
+      this.__element.addEventListener
+      && this.__element.addEventListener('cut', this.handleCutEvent)
+      this.__element.addEventListener
+      && this.__element.addEventListener('paste', this.handlePasteEvent)
     }
   }
 
@@ -43,6 +51,12 @@ class CKeyboardListenerProvider {
       && this.__element.removeEventListener(keyboardEvents.keyDown, this._handleKeyDownEvent)
       this.__element.removeEventListener
       && this.__element.removeEventListener(keyboardEvents.keyUp, this._handleKeyUpEvent)
+      this.__element.removeEventListener
+      && this.__element.removeEventListener('copy', this.handleCopyEvent)
+      this.__element.removeEventListener
+      && this.__element.removeEventListener('cut', this.handleCutEvent)
+      this.__element.removeEventListener
+      && this.__element.removeEventListener('paste', this.handlePasteEvent)
     }
     this.__keyDownListeners = []
     this.__keyUpListeners = []
@@ -50,20 +64,44 @@ class CKeyboardListenerProvider {
     this.__element = null
   }
 
-  _canHandleEvent (e) {
+  handleCopyEvent = (e) => {
+    if (this.canHandleCopyEvent(e)) {
+      CopyPasteProvider.copyToClipboard(e)
+    }
+  }
+
+  handleCutEvent = (e) => {
+    if (this.canHandleCopyEvent(e)) {
+      CopyPasteProvider.cutToClipboard(e)
+    }
+  }
+
+  handlePasteEvent = (e) => {
+    if (this.canHandleEvent(e)) {
+      CopyPasteProvider.pasteFromClipboard(e)
+    }
+  }
+
+  canHandleEvent (e) {
     const { tagName } = (e.target || e.srcElement)
 
-    return !(tagName.isContentEditable || tagName === 'INPUT' || tagName === 'SELECT' || tagName === 'TEXTAREA' || tagName === 'ULMS-IM')
+    return !(tagName.isContentEditable || tagName === 'INPUT' || tagName === 'SELECT' || tagName === 'TEXTAREA')
+  }
+
+  canHandleCopyEvent (e) {
+    const { tagName } = (e.target || e.srcElement)
+
+    return tagName === 'BODY'
   }
 
   _handleKeyDownEvent = (e) => {
-    if (this._canHandleEvent(e)) {
+    if (this.canHandleEvent(e)) {
       this.__keyDownListeners.forEach((handler) => { handler(e) })
     }
   }
 
   _handleKeyUpEvent = (e) => {
-    if (this._canHandleEvent(e)) {
+    if (this.canHandleEvent(e)) {
       this.__keyUpListeners.forEach((handler) => { handler(e) })
     }
   }

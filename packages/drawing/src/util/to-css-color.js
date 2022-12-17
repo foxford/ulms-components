@@ -1,6 +1,6 @@
 export const toCSSColor = (rgbaColor) => {
   const {
-    r, g, b, a,
+    r, g, b, a = 1,
   } = rgbaColor
 
   return `rgba(${r},${g},${b},${a})`

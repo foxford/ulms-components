@@ -51,6 +51,15 @@ function isShapeObject (object) {
     || object.type === shapeToolModeEnum.TRIANGLE
 }
 
+function clearExternalSelection () {
+  // Сбрасываем выделение на других областях
+  if (window.getSelection) {
+    window.getSelection().removeAllRanges()
+  } else if (document.selection) {
+    document.selection.empty()
+  }
+}
+
 export class Drawing extends React.Component {
   constructor (props) {
     super(props)
@@ -285,10 +294,12 @@ export class Drawing extends React.Component {
   }
 
   _handleSelectionUpdatedEvent = (opts) => {
+    clearExternalSelection()
     this.tool.handleSelectionUpdatedEvent(opts)
   }
 
   _handleSelectionCreatedEvent = (opts) => {
+    clearExternalSelection()
     this.tool.handleSelectionCreatedEvent(opts)
   }
 
