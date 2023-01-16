@@ -3,12 +3,16 @@ import { CopyPasteProvider } from './copy-paste-provider'
 export const keyboardEvents = {
   keyDown: 'keydown',
   keyUp: 'keyup',
+  keyDownCapture: 'keydowcapture',
+  keyUpCapture: 'keyupcapture',
 }
 
 class CKeyboardListenerProvider {
   constructor () {
     this.__keyDownListeners = []
     this.__keyUpListeners = []
+    this.__keyDownCaptureListeners = []
+    this.__keyUpCaptureListeners = []
 
     this.__element = null
   }
@@ -19,26 +23,25 @@ class CKeyboardListenerProvider {
    * @param {HTMLElement, HTMLDocument} el Dom element
    */
   init (el) {
-    if (this.__element) {
-      this.__element.removeEventListener
-      && this.__element.removeEventListener(keyboardEvents.keyDown, this._handleKeyDownEvent)
-      this.__element.removeEventListener
-      && this.__element.removeEventListener(keyboardEvents.keyUp, this._handleKeyUpEvent)
+    if (this.__element && this.__element.removeEventListener) {
+      this.__element.removeEventListener(keyboardEvents.keyDown, this._handleKeyDownEvent)
+      this.__element.removeEventListener(keyboardEvents.keyUp, this._handleKeyUpEvent)
+      this.__element.removeEventListener(keyboardEvents.keyDown, this._handleKeyDownCaptureEvent, true)
+      this.__element.removeEventListener(keyboardEvents.keyUp, this._handleKeyUpCaptureEvent, true)
       this.__element.removeEventListener('copy', this.handleCopyEvent)
+      this.__element.removeEventListener('cut', this.handleCopyEvent)
+      this.__element.removeEventListener('paste', this.handleCopyEvent)
     }
 
-    if (el) {
+    if (el && el.addEventListener) {
       this.__element = el
-      this.__element.addEventListener
-      && this.__element.addEventListener(keyboardEvents.keyDown, this._handleKeyDownEvent)
-      this.__element.addEventListener
-      && this.__element.addEventListener(keyboardEvents.keyUp, this._handleKeyUpEvent)
-      this.__element.addEventListener
-      && this.__element.addEventListener('copy', this.handleCopyEvent)
-      this.__element.addEventListener
-      && this.__element.addEventListener('cut', this.handleCutEvent)
-      this.__element.addEventListener
-      && this.__element.addEventListener('paste', this.handlePasteEvent)
+      this.__element.addEventListener(keyboardEvents.keyDown, this._handleKeyDownEvent)
+      this.__element.addEventListener(keyboardEvents.keyUp, this._handleKeyUpEvent)
+      this.__element.addEventListener(keyboardEvents.keyDown, this._handleKeyDownCaptureEvent, true)
+      this.__element.addEventListener(keyboardEvents.keyUp, this._handleKeyUpCaptureEvent, true)
+      this.__element.addEventListener('copy', this.handleCopyEvent)
+      this.__element.addEventListener('cut', this.handleCutEvent)
+      this.__element.addEventListener('paste', this.handlePasteEvent)
     }
   }
 
@@ -46,17 +49,14 @@ class CKeyboardListenerProvider {
    * Removes all listeners
    */
   destroy () {
-    if (this.__element) {
-      this.__element.removeEventListener
-      && this.__element.removeEventListener(keyboardEvents.keyDown, this._handleKeyDownEvent)
-      this.__element.removeEventListener
-      && this.__element.removeEventListener(keyboardEvents.keyUp, this._handleKeyUpEvent)
-      this.__element.removeEventListener
-      && this.__element.removeEventListener('copy', this.handleCopyEvent)
-      this.__element.removeEventListener
-      && this.__element.removeEventListener('cut', this.handleCutEvent)
-      this.__element.removeEventListener
-      && this.__element.removeEventListener('paste', this.handlePasteEvent)
+    if (this.__element && this.__element.removeEventListener) {
+      this.__element.removeEventListener(keyboardEvents.keyDown, this._handleKeyDownEvent)
+      this.__element.removeEventListener(keyboardEvents.keyUp, this._handleKeyUpEvent)
+      this.__element.removeEventListener(keyboardEvents.keyDown, this._handleKeyDownCaptureEvent, true)
+      this.__element.removeEventListener(keyboardEvents.keyUp, this._handleKeyUpCaptureEvent, true)
+      this.__element.removeEventListener('copy', this.handleCopyEvent)
+      this.__element.removeEventListener('cut', this.handleCutEvent)
+      this.__element.removeEventListener('paste', this.handlePasteEvent)
     }
     this.__keyDownListeners = []
     this.__keyUpListeners = []
@@ -106,6 +106,18 @@ class CKeyboardListenerProvider {
     }
   }
 
+  _handleKeyDownCaptureEvent = (e) => {
+    if (this.canHandleEvent(e)) {
+      this.__keyDownCaptureListeners.forEach((handler) => { handler(e) })
+    }
+  }
+
+  _handleKeyUpCaptureEvent = (e) => {
+    if (this.canHandleEvent(e)) {
+      this.__keyUpCaptureListeners.forEach((handler) => { handler(e) })
+    }
+  }
+
   /**
    * Add event listener
    *
@@ -124,6 +136,14 @@ class CKeyboardListenerProvider {
 
       case keyboardEvents.keyUp:
         this.__keyUpListeners.push(handler)
+        break
+
+      case keyboardEvents.keyDownCapture:
+        this.__keyDownCaptureListeners.push(handler)
+        break
+
+      case keyboardEvents.keyUpCapture:
+        this.__keyUpCaptureListeners.push(handler)
         break
 
       default:
@@ -152,6 +172,20 @@ class CKeyboardListenerProvider {
         index = this.__keyUpListeners.findIndex(item => item === handler)
         if (index !== -1) {
           this.__keyUpListeners.splice(index, 1)
+        }
+        break
+
+      case keyboardEvents.keyDownCapture:
+        index = this.__keyDownCaptureListeners.findIndex(item => item === handler)
+        if (index !== -1) {
+          this.__keyDownCaptureListeners.splice(index, 1)
+        }
+        break
+
+      case keyboardEvents.keyUpCapture:
+        index = this.__keyUpCaptureListeners.findIndex(item => item === handler)
+        if (index !== -1) {
+          this.__keyUpCaptureListeners.splice(index, 1)
         }
         break
 
