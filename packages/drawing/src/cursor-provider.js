@@ -14,12 +14,19 @@ class CCursorProvider {
 
   setCursor (cursorObject, adjustPoint = '-0.5 -0.5') {
     this._clearCursor()
-    this.__cursor = cursorObject || null
-    if (this.__cursor) {
-      this.__adjustPoint = adjustPoint
+    if (cursorObject) {
+      cursorObject.clone((object) => {
+        this.__cursor = object || null
+        if (this.__cursor) {
+          this.__adjustPoint = adjustPoint
 
-      makeNotInteractive(this.__cursor)
-      this.__cursor.set('_draft', true)
+          makeNotInteractive(this.__cursor)
+          this.__cursor.set('_draft', true)
+          this.__cursor.set('opacity', 0.5)
+        }
+      })
+    } else {
+      this.__cursor = null
     }
   }
 

@@ -36,17 +36,8 @@ export const shapeToolModeEnum = {
 }
 
 export const stampToolModeEnum = {
-  DISLIKE: 'dislike',
-  HEART: 'heart',
-  LIKE: 'like',
-  LOVE: 'love',
-  PLEASED: 'pleased',
-  QUESTION: 'question',
-  SAD: 'sad',
-  SMART: 'smart',
-  STAR: 'star',
-  TRYMORE: 'trymore',
-  WELLDONE: 'welldone',
+  STAMP: 'stamp',
+  STICKER: 'sticker',
 }
 
 export const keycodes = {
@@ -118,5 +109,5 @@ export const defaultToolSettings = {
   fontSize: 48,
   shape: shapeToolModeEnum.RECT,
   line: lineToolModeEnum.LINE,
-  stamp: stampToolModeEnum.PLEASED,
+  stamp: stampToolModeEnum.STAMP,
 }
