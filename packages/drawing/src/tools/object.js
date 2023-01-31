@@ -12,7 +12,7 @@ export const makeInteractive = (_) => {
   })
 }
 
-export const adjustPosition = (object, pointer, adjust) => {
+export const adjustPosition = (object, pointer, adjust, zoom = 1) => {
   const { width, height } = object.getBoundingRect()
 
   let [dx, dy] = (adjust || '0 0').split(' ')
@@ -20,7 +20,7 @@ export const adjustPosition = (object, pointer, adjust) => {
   dx = Number(dx) || 0
   dy = Number(dy) || 0
 
-  return [pointer.x + width * dx, pointer.y + height * dy]
+  return [pointer.x + width * dx * zoom, pointer.y + height * dy * zoom]
 }
 
 export class PositionableObject extends Base {

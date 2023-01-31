@@ -72,11 +72,11 @@ export class StampTool extends PositionableObject {
   handleMouseDownEvent (event) {
     if (this.#image) {
       this.#image.clone((clonedObj) => {
-        const [x, y] = adjustPosition(clonedObj, event.absolutePointer, '-1 0')
+        const [x, y] = adjustPosition(clonedObj, event.absolutePointer, '-1 0', this._canvas.getZoom())
 
         clonedObj.set({
           left: x, top: y, __local: true,
-        })
+        }).setCoords()
 
         CursorProvider.hide() // Временно убираем курсор с доски, чтобы не сбивать логику выставления order
 
@@ -94,8 +94,8 @@ export class StampTool extends PositionableObject {
             hasControls: true,
           })
           this._canvas.setActiveObject(clonedObj)
-          this._canvas.requestRenderAll()
         }
+        this._canvas.requestRenderAll()
       })
     }
   }
