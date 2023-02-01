@@ -8,12 +8,9 @@ import { messagesIntl } from '../lang/index'
 import { PenGroup } from './components/pen-group'
 import { LineGroup } from './components/line-group'
 import { TextGroup } from './components/text-group'
-import { StampGroup } from './components/stamp-group'
 import { ShapeGroup } from './components/shape-group'
 import { Divider } from './components/divider'
 import { ToolbarButton } from './components/toolbar-button'
-
-import { groupTypes } from './constants'
 
 import css from './drawing-toolbar.module.css'
 import IconEraser from './icons/eraser-tool-icon.svg'
@@ -21,6 +18,7 @@ import IconImage from './icons/image-tool-icon.svg'
 import IconPan from './icons/pan-toolbar-icon.svg'
 import IconSelect from './icons/select-tool-icon.svg'
 import IconLib from './icons/lib-tool-icon.svg'
+import IconStamp from './icons/stamp-tool-icon.svg'
 import { toCSSColor } from './utils'
 
 function supportPointerEvent () {
@@ -57,10 +55,10 @@ class _DrawingToolbarComponent extends React.Component {
         let options = null
 
         if (tool === toolEnum.TEXT) options = this.textGroupRef.current.getOptions()
-        if (tool === toolEnum.STAMP) options = this.stampGroupRef.current.getOptions()
         if (tool === toolEnum.SHAPE) options = this.shapeGroupRef.current.getOptions()
         if (tool === toolEnum.PEN) options = this.penGroupRef.current.getOptions()
         if (tool === toolEnum.LINE) options = this.lineGroupRef.current.getOptions()
+        if (tool === toolEnum.STAMP) return
         if (tool === toolEnum.LIB) {
           this.handleLibClick()
           sendEvent('Lib', 'Open', {})
@@ -134,12 +132,12 @@ class _DrawingToolbarComponent extends React.Component {
   }
 
   handleStampClick = () => {
-    const { handleChange, tool } = this.props
+    const { handleChange, onStamp } = this.props
 
-    if (tool !== toolEnum.STAMP) {
-      handleChange({ tool: toolEnum.STAMP })
-    }
-    this.toggleOpened(groupTypes.GROUP_STAMP)
+    this.setState({ opened: toolEnum.STAMP })
+
+    handleChange({ tool: toolEnum.STAMP, stampSrc: '' })
+    onStamp()
   }
 
   handleDocumentClickEvent = (event) => {
@@ -294,15 +292,14 @@ class _DrawingToolbarComponent extends React.Component {
           )}
 
           { isStampEnabled && (
-            <StampGroup
-              opened={opened === toolEnum.STAMP}
-              className={css.floater}
-              intl={intl}
-              tool={tool}
-              ref={this.stampGroupRef}
-              handleOpen={options => this.handleOpen(toolEnum.STAMP, options)}
-              handleChange={handleChange}
-            />
+            <ToolbarButton
+              active={tool === toolEnum.STAMP}
+              group
+              onClick={this.handleStampClick}
+              title={intl.formatMessage({ id: 'STAMP' })}
+            >
+              <IconStamp />
+            </ToolbarButton>
           )}
 
           { isLibEnabled && (
