@@ -1,6 +1,6 @@
 {
   "name": "@ulms/ui-drawing",
-  "version": "3.1.0",
+  "version": "3.2.0-dev.0",
   "description": "",
   "keywords": [
     "lerna"
@@ -26,7 +26,6 @@
   },
   "dependencies": {
     "classnames-es": "^2.2.6",
-    "d3-queue": "~3.0.7",
     "fabric": "4.6.0",
     "hammerjs": "~2.0.8",
     "lodash": "~4.17.21"

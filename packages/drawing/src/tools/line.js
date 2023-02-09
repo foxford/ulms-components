@@ -136,6 +136,8 @@ export class LineTool extends Base {
 
     if (this.__isOnCanvas) {
       this.__object.set({ _noHistory: undefined })
+      // Чтобы объект можно было выделить!
+      this.__object.setCoords()
       // Фиксируем изменения в эвенте
       this._canvas.fire('object:modified', { target: this.__object })
     }
@@ -146,7 +148,6 @@ export class LineTool extends Base {
   }
 
   reset () {
-    this._canvas.remove(this.__draftLine)
     this._canvas.renderAll()
 
     this.__isDrawing = false

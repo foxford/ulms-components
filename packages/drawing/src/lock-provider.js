@@ -2,6 +2,8 @@
 import { toolEnum } from './constants'
 import { USER_LOCK_LABEL } from './util/serialize-object'
 import { makeInteractive, makeNotInteractive } from './tools/object'
+// eslint-disable-next-line import/no-cycle
+import SelectTool from './tools/select'
 
 class CLockProvider {
   constructor () {
@@ -54,7 +56,10 @@ class CLockProvider {
 
         addedIds.forEach((id) => {
           if (this.__canvas._objectsMap.has(id)) {
-            makeNotInteractive(this.__canvas._objectsMap.get(id))
+            const object = this.__canvas._objectsMap.get(id)
+
+            makeNotInteractive(object)
+            SelectTool.removeFromSelection(this.__canvas, object)
           }
         })
 
