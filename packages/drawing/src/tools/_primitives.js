@@ -158,10 +158,10 @@ const WhiteboardArrowLine = fabric.util.createClass(fabric.WhiteboardLine, {
 WhiteboardArrowLine.fromObject = function fromObject (object, callback) {
   // Correct the coordinates relative to top/left
   callback && callback(new fabric.WhiteboardArrowLine([
-    object.x1 + object.left,
-    object.y1 + object.top,
-    object.x2 + object.left,
-    object.y2 + object.top,
+    object.x1,
+    object.y1,
+    object.x2,
+    object.y2,
   ], object))
 }
 
