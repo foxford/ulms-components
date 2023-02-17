@@ -1002,8 +1002,6 @@ export class Drawing extends React.Component {
     this.clearCanvasObjects()
 
     if (pageObjects.length) {
-      let t = performance.now()
-
       const normalizedObjects = pageObjects.map(_ => normalizeFields({ ..._, remote: true }))
 
       fabric.util.enlivenObjects(normalizedObjects, (enlivenedObjects) => {
@@ -1024,9 +1022,6 @@ export class Drawing extends React.Component {
 
         this.canvas.renderOnAddRemove = true
         this.canvas.requestRenderAll()
-
-        t = performance.now() - t
-        console.log(99999999, 'Время выполнения "createCanvasObjects" = ', t)
       })
     }
   }
@@ -1075,8 +1070,6 @@ export class Drawing extends React.Component {
   }
 
   updateCanvasObjects (objects) {
-    let t = performance.now()
-
     const {
       objectsToAdd,
       objectsToRemove,
@@ -1121,9 +1114,6 @@ export class Drawing extends React.Component {
       })
     }
     this.canvas.requestRenderAll()
-
-    t = performance.now() - t
-    console.log(99999999, 'Время выполнения "updateCanvasObjects" = ', t)
   }
 
   cleanSelection () {
