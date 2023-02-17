@@ -1,7 +1,6 @@
 /* eslint-disable react/prop-types, max-classes-per-file */
 import React from 'react'
 import { fabric } from 'fabric/dist/fabric.min'
-import { queue as Queue } from 'd3-queue'
 import Hammer from 'hammerjs'
 
 import {
@@ -91,7 +90,7 @@ export class Drawing extends React.Component {
 
   componentDidMount () {
     const {
-      canDraw, tool, objects, pattern, tokenProvider, broadcastProvider,
+      canDraw, tool, pattern, tokenProvider, broadcastProvider, pageObjects,
     } = this.props
 
     TokenProvider.setProvider(tokenProvider)
@@ -120,11 +119,13 @@ export class Drawing extends React.Component {
     }
 
     this.updateCanvasParameters(true)
-    this.updateCanvasObjects(objects)
+    this.createCanvasObjects(pageObjects)
   }
 
   componentDidUpdate (prevProps) {
     const {
+      pageObjects,
+      updatedObjects,
       brushColor,
       brushMode,
       brushWidth,
@@ -132,7 +133,6 @@ export class Drawing extends React.Component {
       canDraw,
       eraserWidth,
       height,
-      objects,
       pattern,
       tool,
       width,
@@ -155,7 +155,7 @@ export class Drawing extends React.Component {
       }
 
       this.updateCanvasParameters(true)
-      this.updateCanvasObjects(objects)
+      this.createCanvasObjects(pageObjects)
     }
 
     if (prevProps.pattern !== pattern) {
@@ -197,8 +197,12 @@ export class Drawing extends React.Component {
       this.tool.zoom = zoom
     }
 
-    if (prevProps.objects && objects && prevProps.objects !== objects) {
-      this.updateCanvasObjects(objects)
+    if (prevProps.pageObjects !== pageObjects) {
+      this.createCanvasObjects(pageObjects)
+    }
+
+    if (updatedObjects?.length && prevProps.updatedObjects !== updatedObjects) {
+      this.updateCanvasObjects(updatedObjects)
     }
 
     if (
@@ -384,6 +388,7 @@ export class Drawing extends React.Component {
           object._order = 0
         }
         onDraw && onDraw(serializeObject(object))
+        this.canvas._objectsMap.set(object._id, object)
       } else {
         delete object.remote
       }
@@ -398,6 +403,16 @@ export class Drawing extends React.Component {
       // Skipping draft objects
       if (object._draft) return
 
+      if (object._order === undefined) {
+        if (this.canvas._objects.length > 1) {
+          const order = this.canvas._objects[this.canvas._objects.length - 2]._order || 0
+
+          object._order = order + 1
+        } else {
+          object._order = 0
+        }
+      }
+
       onDrawUpdate && onDrawUpdate(serializeObject(object))
     })
 
@@ -411,6 +426,7 @@ export class Drawing extends React.Component {
       if (object._draft) return
 
       onObjectRemove && onObjectRemove(serializeObject(object))
+      this.canvas._objectsMap.delete(object._id)
     })
 
     this.canvas.on('after:render', () => this._handleAfterRender())
@@ -554,6 +570,8 @@ export class Drawing extends React.Component {
         this.tool.zoom = zoom
         this.tool.onSelection = onSelection
         this.tool.showContextMenu = showContextMenu
+
+        this.canvas.requestRenderAll()
 
         break
 
@@ -958,77 +976,6 @@ export class Drawing extends React.Component {
     }
   }
 
-  _updateCanvasObjects (canvasObjects, objects) {
-    const canvasObjectIds = canvasObjects.map(_ => _._id)
-    const newObjectIds = new Set(objects.map(_ => _._id))
-    const objectsToAdd = []
-    const objectsToRemove = []
-
-    this.destroyQueues()
-
-    this.q = new Queue(50)
-    this.rq = new Queue(50)
-
-    this.canvas.renderOnAddRemove = false
-
-    canvasObjects.forEach((_) => {
-      if (!newObjectIds.has(_._id)) {
-        if (!_.__local && !_._draft) {
-          objectsToRemove.push(_)
-        }
-      } else if (_.__local) {
-        _.set('__local', undefined)
-      }
-    })
-
-    objects.forEach((_) => {
-      const objIndex = canvasObjectIds.indexOf(_._id)
-      const nextObject = normalizeFields(_)
-
-      if (objIndex === -1) {
-        // add
-        objectsToAdd.push(nextObject)
-      } else {
-        // update (only if revision has been changed)
-        if (_._rev === canvasObjects[objIndex]._rev) {
-          return
-        }
-
-        if (_._restored) {
-          // если объект "восстановленный" - тоже сбрасываем выделение
-          SelectTool.removeFromSelection(this.canvas, canvasObjects[objIndex])
-        }
-
-        if (LockProvider.isLockedByUser(_) !== LockProvider.isLockedByUser(canvasObjects[objIndex])) {
-          canvasObjects[objIndex].set(nextObject)
-          if (LockProvider.isLockedByUser(_)) {
-            LockProvider.lockUserObject(canvasObjects[objIndex])
-          } else {
-            LockProvider.unlockUserObject(canvasObjects[objIndex])
-          }
-        } else {
-          const canvasObject = canvasObjects[objIndex]
-
-          // Поменялся order?
-          if (nextObject._order > canvasObject._order) {
-            this.canvas.bringToFront(canvasObject)
-          } else if (nextObject._order < canvasObject._order) {
-            this.canvas.sendToBack(canvasObject)
-          }
-          canvasObject.set(nextObject)
-        }
-
-        canvasObjects[objIndex].setCoords()
-      }
-    })
-
-    return {
-      objects,
-      objectsToAdd,
-      objectsToRemove,
-    }
-  }
-
   _drawUpdateHandler = (data) => {
     const { id, diff } = data
 
@@ -1043,14 +990,90 @@ export class Drawing extends React.Component {
     }
   }
 
-  updateCanvasObjects (_objects) {
-    const canvasObjects = this.canvas.getObjects()
-    const enlivenedObjects = new Map()
+  clearCanvasObjects ({ silent } = { silent: true }) {
+    if (this.canvas.getObjects().length) {
+      if (silent) this.ignoreObjectRemovedEvent = true
+      this.canvas.clear()
+      if (silent) this.ignoreObjectRemovedEvent = false
+    }
+  }
+
+  createCanvasObjects = (pageObjects) => {
+    this.clearCanvasObjects()
+
+    if (pageObjects.length) {
+      const normalizedObjects = pageObjects.map(_ => normalizeFields({ ..._, remote: true }))
+
+      fabric.util.enlivenObjects(normalizedObjects, (enlivenedObjects) => {
+        this.canvas.renderOnAddRemove = false
+
+        this.canvas.add(...enlivenedObjects)
+
+        enlivenedObjects.forEach((object) => {
+          this.canvas._objectsMap.set(object._id, object)
+
+          if (LockProvider.isLockedByUser(object)) {
+            LockProvider.lockUserObject(object)
+          }
+          if (LockProvider.isLockedBySelection(object)) {
+            makeNotInteractive(object)
+          }
+        })
+
+        this.canvas.renderOnAddRemove = true
+        this.canvas.requestRenderAll()
+      })
+    }
+  }
+
+  _prepareCanvasObjects (objects) {
+    const objectsToAdd = []
+    const objectsToRemove = []
+
+    objects.forEach((_) => {
+      if (_._removed && this.canvas._objectsMap.has(_._id)) objectsToRemove.push(this.canvas._objectsMap.get(_._id))
+
+      if (this.canvas._objectsMap.has(_._id)) {
+        const nextObject = normalizeFields(_)
+        const canvasObject = this.canvas._objectsMap.get(_._id)
+
+        if (_._restored) {
+          // если объект "восстановленный" - тоже сбрасываем выделение
+          SelectTool.removeFromSelection(this.canvas, canvasObject)
+        }
+
+        if (LockProvider.isLockedByUser(_) !== LockProvider.isLockedByUser(canvasObject)) {
+          canvasObject.set(nextObject)
+          if (LockProvider.isLockedByUser(_)) {
+            LockProvider.lockUserObject(canvasObject)
+          } else {
+            LockProvider.unlockUserObject(canvasObject)
+          }
+        } else {
+          // Поменялся order?
+          if (nextObject._order > canvasObject._order) {
+            this.canvas.bringToFront(canvasObject)
+          } else if (nextObject._order < canvasObject._order) {
+            this.canvas.sendToBack(canvasObject)
+          }
+          canvasObject.set(nextObject)
+        }
+
+        canvasObject.setCoords()
+      } else if (!_._removed) objectsToAdd.push(_)
+    })
+
+    return {
+      objectsToRemove,
+      objectsToAdd,
+    }
+  }
+
+  updateCanvasObjects (objects) {
     const {
-      objects,
       objectsToAdd,
       objectsToRemove,
-    } = this._updateCanvasObjects(canvasObjects, _objects)
+    } = this._prepareCanvasObjects(objects)
 
     if (objectsToRemove.length) {
       this.ignoreObjectRemovedEvent = true
@@ -1062,100 +1085,35 @@ export class Drawing extends React.Component {
     }
 
     if (objectsToAdd.length) {
-      objectsToAdd
-        .map(_ => ({ ..._, remote: true }))
-        .forEach((_) => {
-          this.q.defer((done) => {
-            if (!document.hidden) {
-              window.requestAnimationFrame(() => {
-                fabric.util.enlivenObjects([_], ([fObject]) => {
-                  if (fObject) {
-                    enlivenedObjects.set(fObject._id, fObject)
-                  }
+      const normalizedObjects = objectsToAdd.map(_ => normalizeFields({ ..._, remote: true }))
 
-                  done(null)
-                })
-              })
-            } else {
-              fabric.util.enlivenObjects([_], ([fObject]) => {
-                if (fObject) {
-                  enlivenedObjects.set(fObject._id, fObject)
-                }
-
-                done(null)
-              })
-            }
-          })
-        })
-
-      this.q.awaitAll((error) => {
-        if (error) {
-          return
-        }
-
+      fabric.util.enlivenObjects(normalizedObjects, (enlivenedObjects) => {
         this.canvas.renderOnAddRemove = false
 
-        const { objects: _o } = this.props
-        const newObjectIdsAgain = new Set(_o.map(_ => _._id))
+        enlivenedObjects.forEach((object) => {
+          if (
+            this.canvas._objects.length
+            && object._order < this.canvas._objects[this.canvas._objects.length - 1]._order
+          ) {
+            const index = this.canvas._objects.findIndex(item => item._order > object._order)
 
-        objects.forEach((object) => {
-          if (!enlivenedObjects.has(object._id)) {
-            return
+            this.canvas.insertAt(object, index)
+          } else {
+            this.canvas.add(object)
           }
 
-          this.rq.defer((done) => {
-            // With requestAnimationFrame objects may be duplicated on canvas
-            if (this.canvas === null) {
-              done()
-
-              return
-            }
-
-            // Bypass objects which should be invalidated
-            if (!newObjectIdsAgain.has(object._id) && !object._invalidate) {
-              done()
-
-              return
-            }
-
-            const objectToAdd = enlivenedObjects.get(object._id)
-
-            if (
-              this.canvas._objects.length
-              && objectToAdd._order < this.canvas._objects[this.canvas._objects.length - 1]._order
-            ) {
-              const index = this.canvas._objects.findIndex(item => item._order > objectToAdd._order)
-
-              this.canvas.insertAt(objectToAdd, index)
-            } else {
-              this.canvas.add(objectToAdd)
-            }
-
-            this.canvas._objectsMap.set(objectToAdd._id, objectToAdd)
-            if (LockProvider.isLockedByUser(objectToAdd)) {
-              LockProvider.lockUserObject(objectToAdd)
-            }
-            if (LockProvider.isLockedBySelection(objectToAdd)) {
-              makeNotInteractive(objectToAdd)
-            }
-
-            done(null)
-          })
-        })
-
-        this.rq.awaitAll((rqError) => {
-          if (rqError) {
-            return
+          this.canvas._objectsMap.set(object._id, object)
+          if (LockProvider.isLockedByUser(object)) {
+            LockProvider.lockUserObject(object)
           }
-
-          this.canvas.renderOnAddRemove = true
-          this.canvas.requestRenderAll()
+          if (LockProvider.isLockedBySelection(object)) {
+            makeNotInteractive(object)
+          }
         })
+        this.canvas.renderOnAddRemove = true
       })
-    } else {
-      this.canvas.renderOnAddRemove = true
-      this.canvas.requestRenderAll()
     }
+    this.canvas.requestRenderAll()
   }
 
   cleanSelection () {

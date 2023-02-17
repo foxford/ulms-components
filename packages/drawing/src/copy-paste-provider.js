@@ -51,6 +51,8 @@ class CCopyPasteProvider {
         clonedObj.set({
           left: clonedObj.left + COPY_PASTE_SHIFT,
           top: clonedObj.top + COPY_PASTE_SHIFT,
+          hasBorders: true,
+          hasControls: true,
           _selected: true, // Чтобы сработало выделение на новом объекте
           evented: true,
           __local: true,
