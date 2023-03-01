@@ -1103,7 +1103,6 @@ export class Drawing extends React.Component {
           }
         })
         this.canvas.renderOnAddRemove = true
-        this.canvas.requestRenderAll()
       })
     }
     this.canvas.requestRenderAll()
