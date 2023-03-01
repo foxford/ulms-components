@@ -4,8 +4,9 @@ import debounce from 'lodash/debounce'
 import { fromCSSColor, toCSSColor } from '../util/to-css-color'
 import { calcDistance } from '../util'
 
-import { keycodes, DEBOUNCE_DELAY, toolEnum } from '../constants'
-import { LockProvider } from '../lock-provider'
+import { keycodes, DEBOUNCE_DELAY, toolEnum, defaultToolSettings } from '../constants'
+// eslint-disable-next-line import/no-cycle
+import { LockProvider } from '../lock-provider' // ToDo: Убрать циклическую зависимость
 
 import { Base } from './base'
 
@@ -104,7 +105,7 @@ export default class SelectTool extends Base {
       }
 
       // ToDo: вынести в константу!
-      if (this.__object.fill && (this.__object.fill !== 'rgba(0,0,0,0.009)')) {
+      if (this.__object.fill && (this.__object.fill !== defaultToolSettings.transparentColor)) {
         newOpt.fill = opt.lineColor
       }
 
@@ -197,10 +198,7 @@ export default class SelectTool extends Base {
   }
 
   handleTextEditEndEvent () {
-    if (this.__object && this.__object.__local) {
-      this.__object.set('__local', undefined)
-    }
-    if (this.__object.text) {
+    if (this.__object?.text) {
       this._triggerModified()
     } else {
       this._deleteObject()

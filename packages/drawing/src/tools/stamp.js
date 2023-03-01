@@ -74,9 +74,7 @@ export class StampTool extends PositionableObject {
       this.#image.clone((clonedObj) => {
         const [x, y] = adjustPosition(clonedObj, event.absolutePointer, '-1 0', this._canvas.getZoom())
 
-        clonedObj.set({
-          left: x, top: y, __local: true,
-        }).setCoords()
+        clonedObj.set({ left: x, top: y }).setCoords()
 
         CursorProvider.hide() // Временно убираем курсор с доски, чтобы не сбивать логику выставления order
 

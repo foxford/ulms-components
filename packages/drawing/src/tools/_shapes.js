@@ -1,5 +1,7 @@
 import { fabric } from 'fabric/dist/fabric.min'
 
+import { defaultToolSettings } from '../constants'
+
 const commonDefaults = {
   noScaleCache: false,
 }
@@ -20,7 +22,7 @@ export const triangle = (params = {}) => new fabric.Triangle({
   ...strokeDefaults,
   ...params,
   stroke: params.stroke,
-  fill: params.fill || 'rgba(0,0,0,0.009)',
+  fill: params.fill || defaultToolSettings.transparentColor,
   strokeLineCap: 'butt',
   strokeLineJoin: 'miter',
   strokeMiterLimit: 40,
@@ -51,7 +53,7 @@ export const rightTriangle = (params = {}) => new fabric.Path(trianglePath(param
   ...params,
   flipY: true,
   stroke: params.stroke,
-  fill: params.fill || 'rgba(0,0,0,0.009)',
+  fill: params.fill || defaultToolSettings.transparentColor,
   strokeLineCap: 'butt',
   strokeLineJoin: 'miter',
   strokeMiterLimit: 40,
@@ -80,7 +82,7 @@ export const circle = (params = {}) => new fabric.WhiteboardCircle({
   ...strokeDefaults,
   ...params,
   stroke: params.stroke,
-  fill: params.fill || 'rgba(0,0,0,0.009)',
+  fill: params.fill || defaultToolSettings.transparentColor,
 })
 
 export const circleSolid = (params = {}) => {
@@ -102,7 +104,7 @@ export const rectangle = (params = {}) => new fabric.Rect({
   ...strokeDefaults,
   ...params,
   stroke: params.stroke,
-  fill: params.fill || 'rgba(0,0,0,0.009)',
+  fill: params.fill || defaultToolSettings.transparentColor,
 })
 
 export const rectangleSolid = (params = {}) => {

@@ -15,7 +15,7 @@ export class TextboxTool extends PositionableObject {
     this.__lastAdded = undefined
 
     this.__objectFn = objectFn || (() => new fabric.Textbox('', {
-      backgroundColor: 'rgba(0,0,0,0.009)', // FIXME: should be removed on select & eraser update
+      backgroundColor: defaultToolSettings.transparentColor, // FIXME: should be removed on select & eraser update
       borderScaleFactor: 1,
       fill: 'rgba(0,0,0,1)',
       padding: 7,
@@ -29,9 +29,6 @@ export class TextboxTool extends PositionableObject {
   }
 
   handleTextEditEndEvent () {
-    if (this.__object && this.__object.__local) {
-      this.__object.set('__local', undefined)
-    }
   }
 
   handleObjectAddedEvent (opts) {
@@ -73,7 +70,6 @@ export class TextboxTool extends PositionableObject {
       left: x,
       top: y,
       fontSize: this.__fontSize,
-      __local: true,
     })
 
     this._canvas.add(this.__object)
