@@ -28,9 +28,6 @@ export class TextboxTool extends PositionableObject {
     }))
   }
 
-  handleTextEditEndEvent () {
-  }
-
   handleObjectAddedEvent (opts) {
     this.__lastAdded = opts.target
     // memoize object was created last
