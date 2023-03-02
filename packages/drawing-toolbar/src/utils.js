@@ -48,6 +48,7 @@ export function RGBtoHEX ({
 export function HEXtoRGB (str) {
   const regex = new RegExp('#([\\da-fA-F]{2})([\\da-fA-F]{2})([\\da-fA-F]{2})')
   const [
+    // eslint-disable-next-line no-unused-vars
     dummy,
     rHex,
     gHex,

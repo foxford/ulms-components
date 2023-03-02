@@ -5,6 +5,7 @@ import { fromCSSColor, toCSSColor } from '../util/to-css-color'
 import { calcDistance } from '../util'
 
 import { keycodes, DEBOUNCE_DELAY, toolEnum } from '../constants'
+// eslint-disable-next-line import/no-cycle
 import { LockProvider } from '../lock-provider'
 
 import { Base } from './base'
@@ -84,7 +85,7 @@ export default class SelectTool extends Base {
     this._canvas.perPixelTargetFind = true
     this._canvas.targetFindTolerance = 15
     this._canvas.defaultCursor = 'default'
-    this._canvas.setCursor('default')
+    this._canvas.setCursor && this._canvas.setCursor('default')
     this._debouncedTriggerModified = debounce(this._triggerModified, DEBOUNCE_DELAY)
   }
 
