@@ -1,5 +1,4 @@
 /* eslint-disable */
-const alias = require('rollup-plugin-alias')
 const babel = require('rollup-plugin-babel')
 const cjs = require('rollup-plugin-commonjs')
 const cssdupl = require('postcss-discard-duplicates')
@@ -8,11 +7,10 @@ const cssnext = require('postcss-cssnext')
 const cssurl = require('postcss-url')
 const Debug = require('debug')
 const env = require('postcss-preset-env')
-const fs = require('fs')
 const json = require('rollup-plugin-json')
 const npm = require('rollup-plugin-node-resolve')
 const postcss = require('rollup-plugin-postcss')
-const svgr = require('@svgr/rollup').default
+const svgr = require('@svgr/rollup')
 const uglify = require('rollup-plugin-uglify')
 
 const { name, peerDependencies } = require('./package.json')
