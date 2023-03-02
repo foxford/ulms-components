@@ -873,7 +873,6 @@ export class Drawing extends React.Component {
           left: br.x - (br.x - tl.x) / 2 - image.width / 2 + offset,
           top: br.y - (br.y - tl.y) / 2 - image.height / 2 + offset,
           evented: true,
-          __local: true,
         })
 
         offset += offsetInc
@@ -896,14 +895,10 @@ export class Drawing extends React.Component {
     const activeObject = this.canvas.getActiveObject()
 
     if (activeObject) {
-      activeObject.set({ __local: true })
       const objects = this.canvas.getObjects()
       const order = objects[0]._order || 0
 
-      activeObject.set({
-        _order: order - 1,
-        __local: true,
-      })
+      activeObject.set({ _order: order - 1 })
       this.canvas.fire('object:modified', { target: activeObject })
       this.canvas.sendToBack(activeObject)
     }
@@ -916,10 +911,7 @@ export class Drawing extends React.Component {
       const objects = this.canvas.getObjects()
       const order = objects[objects.length - 1]._order
 
-      activeObject.set({
-        _order: order + 1,
-        __local: true,
-      })
+      activeObject.set({ _order: order + 1 })
       this.canvas.fire('object:modified', { target: activeObject })
       this.canvas.bringToFront(activeObject)
     }
@@ -1111,6 +1103,7 @@ export class Drawing extends React.Component {
           }
         })
         this.canvas.renderOnAddRemove = true
+        this.canvas.requestRenderAll()
       })
     }
     this.canvas.requestRenderAll()

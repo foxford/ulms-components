@@ -55,7 +55,6 @@ class CCopyPasteProvider {
           hasControls: true,
           _selected: true, // Чтобы сработало выделение на новом объекте
           evented: true,
-          __local: true,
         })
         if (clonedObj.type === 'activeSelection') {
           // active selection needs a reference to the canvas.
@@ -137,7 +136,6 @@ class CCopyPasteProvider {
             hasControls: true,
             _selected: true, // Чтобы сработало выделение на новом объекте
             evented: true,
-            __local: true,
           })
 
           this.__canvas.add(fObject)
@@ -208,7 +206,6 @@ class CCopyPasteProvider {
           top: br.y - (br.y - tl.y) / 2 - (text.height * text.scaleY) / 2,
           hasBorders: true,
           hasControls: true,
-          __local: true,
           _selected: true, // Чтобы сработало выделение на новом объекте
         })
 
