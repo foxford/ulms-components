@@ -1134,6 +1134,7 @@ export class Drawing extends React.Component {
     this.__lockModeTool = undefined
   }
 
+  // eslint-disable-next-line class-methods-use-this
   destroy () {
     BroadcastProvider.destroy()
   }

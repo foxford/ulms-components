@@ -5,14 +5,14 @@ import { FetchVersionResolver, VersionChecker } from './utils'
 const refresh = () => globalThis.location.reload()
 
 class CacheBuster extends React.Component {
-  state = {
-    error: null,
-    loading: true,
-    versionMismatch: true,
-  }
-
   constructor (props) {
     super(props)
+
+    this.state = {
+      error: null,
+      loading: true,
+      versionMismatch: true,
+    }
 
     this.intervalId = null
     this._versionChecker = null

@@ -23,22 +23,22 @@ describe('`updateAllSelection` on onlineIds change is ok', () => {
   afterEach(() => {})
 
   it('changing onlineIds on an empty list', () => {
-    const lockProvider = new LockProvider()
+    const lockProvider = LockProvider
 
-    lockProvider.labels([])
+    lockProvider.lockedIds = []
 
     const wrap = shallow((
       <Drawing
         _lockProvider={lockProvider}
         tokenProvider={tokenProvider}
-        objects={[]}
+        pageObjects={[]}
         tool={toolEnum.SELECT}
       />
     ))
 
     const instance = wrap.instance()
 
-    lockProvider.labels(['uuidv4_lock_id_2'])
+    lockProvider.lockedIds = ['uuidv4_lock_id_2']
 
     expect(instance.canvas._objects).toEqual([])
   })
@@ -47,7 +47,7 @@ describe('`updateAllSelection` on onlineIds change is ok', () => {
     const wrap = shallow((
       <Drawing
         tokenProvider={tokenProvider}
-        objects={[]}
+        pageObjects={[]}
         tool={toolEnum.SELECT}
       />
     ))

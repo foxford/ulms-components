@@ -141,8 +141,9 @@ export class PDFPresentation extends React.Component {
   render () {
     const { pagesCollection } = this.state
     const {
+      // eslint-disable-next-line no-unused-vars
       url, innerRef, ...otherProps
-    } = this.props // eslint-disable-line no-unused-vars
+    } = this.props
 
     // TODO: fix other props handling
     return (

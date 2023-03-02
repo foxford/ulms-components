@@ -82,12 +82,14 @@ class CKeyboardListenerProvider {
     }
   }
 
+  // eslint-disable-next-line class-methods-use-this
   canHandleEvent (e) {
     const { tagName } = (e.target || e.srcElement)
 
     return !(tagName.isContentEditable || tagName === 'INPUT' || tagName === 'SELECT' || tagName === 'TEXTAREA')
   }
 
+  // eslint-disable-next-line class-methods-use-this
   canHandleCopyEvent (e) {
     const { tagName } = (e.target || e.srcElement)
 

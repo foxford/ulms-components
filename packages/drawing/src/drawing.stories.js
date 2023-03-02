@@ -10,7 +10,12 @@ const handler = {
 }
 
 class Updater extends React.Component {
-  state = { objects: [] } // eslint-disable-line react/no-unused-state
+  constructor () {
+    super()
+
+    // eslint-disable-next-line react/no-unused-state
+    this.state = { objects: [] }
+  }
 
   render () {
     // eslint-disable-next-line react/prop-types
