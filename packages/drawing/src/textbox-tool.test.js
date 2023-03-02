@@ -26,7 +26,7 @@ describe('TextboxTool tool', () => {
     const wrap = shallow((
       <Drawing
         tokenProvider={tokenProvider}
-        objects={[]}
+        pageObjects={[]}
         tool={toolEnum.TEXT}
       />
     ))

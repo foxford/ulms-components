@@ -85,7 +85,7 @@ export default class SelectTool extends Base {
     this._canvas.perPixelTargetFind = true
     this._canvas.targetFindTolerance = 15
     this._canvas.defaultCursor = 'default'
-    this._canvas.setCursor('default')
+    this._canvas.setCursor && this._canvas.setCursor('default')
     this._debouncedTriggerModified = debounce(this._triggerModified, DEBOUNCE_DELAY)
   }
 
