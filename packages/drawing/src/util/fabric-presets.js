@@ -35,6 +35,13 @@ fabric.util.loadImage = function loadImage (url, callback, context, crossOrigin)
 }
 
 fabric.Line.prototype.calcLineEndpointCoords = function calcLineEndpointCoords () {
+  if (!this.canvas) {
+    return {
+      startCoords: { x: 0, y: 0 },
+      endCoords: { x: 0, y: 0 },
+    }
+  }
+
   const linePoints = this.calcLinePoints()
   const scaleX = this.scaleX || 1
   const scaleY = this.scaleY || 1

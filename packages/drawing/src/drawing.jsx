@@ -1026,32 +1026,7 @@ export class Drawing extends React.Component {
       if (_._removed && this.canvas._objectsMap.has(_._id)) objectsToRemove.push(this.canvas._objectsMap.get(_._id))
 
       if (this.canvas._objectsMap.has(_._id)) {
-        const nextObject = normalizeFields(_)
-        const canvasObject = this.canvas._objectsMap.get(_._id)
-
-        if (_._restored) {
-          // если объект "восстановленный" - тоже сбрасываем выделение
-          SelectTool.removeFromSelection(this.canvas, canvasObject)
-        }
-
-        if (LockProvider.isLockedByUser(_) !== LockProvider.isLockedByUser(canvasObject)) {
-          canvasObject.set(nextObject)
-          if (LockProvider.isLockedByUser(_)) {
-            LockProvider.lockUserObject(canvasObject)
-          } else {
-            LockProvider.unlockUserObject(canvasObject)
-          }
-        } else {
-          // Поменялся order?
-          if (nextObject._order > canvasObject._order) {
-            this.canvas.bringToFront(canvasObject)
-          } else if (nextObject._order < canvasObject._order) {
-            this.canvas.sendToBack(canvasObject)
-          }
-          canvasObject.set(nextObject)
-        }
-
-        canvasObject.setCoords()
+        this._updateExistingObject(normalizeFields(_))
       } else if (!_._removed) objectsToAdd.push(_)
     })
 
@@ -1059,6 +1034,34 @@ export class Drawing extends React.Component {
       objectsToRemove,
       objectsToAdd,
     }
+  }
+
+  _updateExistingObject (object) {
+    const canvasObject = this.canvas._objectsMap.get(object._id)
+
+    if (object._restored) {
+      // если объект "восстановленный" - тоже сбрасываем выделение
+      SelectTool.removeFromSelection(this.canvas, canvasObject)
+    }
+
+    if (LockProvider.isLockedByUser(object) !== LockProvider.isLockedByUser(canvasObject)) {
+      canvasObject.set(object)
+      if (LockProvider.isLockedByUser(object)) {
+        LockProvider.lockUserObject(canvasObject)
+      } else {
+        LockProvider.unlockUserObject(canvasObject)
+      }
+    } else {
+      // Поменялся order?
+      if (object._order > canvasObject._order) {
+        this.canvas.bringToFront(canvasObject)
+      } else if (object._order < canvasObject._order) {
+        this.canvas.sendToBack(canvasObject)
+      }
+      canvasObject.set(object)
+    }
+
+    canvasObject.setCoords()
   }
 
   updateCanvasObjects (objects) {
@@ -1083,23 +1086,27 @@ export class Drawing extends React.Component {
         this.canvas.renderOnAddRemove = false
 
         enlivenedObjects.forEach((object) => {
-          if (
-            this.canvas._objects.length
-            && object._order < this.canvas._objects[this.canvas._objects.length - 1]._order
-          ) {
-            const index = this.canvas._objects.findIndex(item => item._order > object._order)
-
-            this.canvas.insertAt(object, index)
+          if (this.canvas._objectsMap.has(object._id)) { // Обрабатываем случай, когда к моменту "оживления" объекта такой объект уже появился на доске
+            this._updateExistingObject(object)
           } else {
-            this.canvas.add(object)
-          }
+            if (
+              this.canvas._objects.length
+              && object._order < this.canvas._objects[this.canvas._objects.length - 1]._order
+            ) {
+              const index = this.canvas._objects.findIndex(item => item._order > object._order)
 
-          this.canvas._objectsMap.set(object._id, object)
-          if (LockProvider.isLockedByUser(object)) {
-            LockProvider.lockUserObject(object)
-          }
-          if (LockProvider.isLockedBySelection(object)) {
-            makeNotInteractive(object)
+              this.canvas.insertAt(object, index)
+            } else {
+              this.canvas.add(object)
+            }
+
+            this.canvas._objectsMap.set(object._id, object)
+            if (LockProvider.isLockedByUser(object)) {
+              LockProvider.lockUserObject(object)
+            }
+            if (LockProvider.isLockedBySelection(object)) {
+              makeNotInteractive(object)
+            }
           }
         })
         this.canvas.renderOnAddRemove = true

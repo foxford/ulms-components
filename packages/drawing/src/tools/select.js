@@ -104,7 +104,6 @@ export default class SelectTool extends Base {
         })
       }
 
-      // ToDo: вынести в константу!
       if (this.__object.fill && (this.__object.fill !== defaultToolSettings.transparentColor)) {
         newOpt.fill = opt.lineColor
       }
@@ -347,16 +346,18 @@ export default class SelectTool extends Base {
   handleSelectionUpdatedEvent = (event) => {
     if (!this._active) return
 
-    this.__object = event.target
+    // eslint-disable-next-line prefer-destructuring
+    this.__object = event.selected[0]
   }
 
   handleSelectionCreatedEvent = (event) => {
     if (!this._active) return
 
-    this.__object = event.target
+    // eslint-disable-next-line prefer-destructuring
+    this.__object = event.selected[0]
 
-    if (event.target._selected) { // обрабатываем случай копипасты
-      this._onSelection && this._onSelection(event.target)
+    if (this.__object._selected) { // обрабатываем случай копипасты
+      this._onSelection && this._onSelection(this.__object)
       this._sendContextMenuEvent()
     }
   }
