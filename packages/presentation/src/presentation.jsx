@@ -124,7 +124,7 @@ class PresentationComponent extends React.Component {
       centered = 'Horizontal',
       collection,
       fitToWidth,
-      hasError,
+      error,
       index,
       innerRef,
       intl,
@@ -214,9 +214,7 @@ class PresentationComponent extends React.Component {
               } else {
                 result = (
                   <div className={cx(css.slide, { [css.fitToWidth]: fitToWidth }, css.slide_centerContent,)} data-id='presentation-slide' ref={innerRef}>
-                    {hasError
-                      ? <span>Произошла ошибка при загрузке презентации</span>
-                      : <Spinner />}
+                    {error ? <p>{error}</p> : <Spinner />}
                   </div>
                 )
               }
