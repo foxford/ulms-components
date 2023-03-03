@@ -3,9 +3,19 @@ import React from 'react'
 import debounce from 'lodash/debounce'
 
 import { Presentation } from './presentation'
-import { getDocument, getImage, keyFn, renderPage } from './utils/pdf-rendering'
+import { getImage, keyFn, renderPage, service } from './utils/pdf-rendering'
 
 const reportError = error => console.error(error) // eslint-disable-line no-console
+
+const documentCache = {}
+
+function getDocument (url, { httpHeaders }) {
+  if (!documentCache[url]) {
+    documentCache[url] = service.getDocument({ url, httpHeaders })
+  }
+
+  return documentCache[url]
+}
 
 export class PDFPresentation extends React.Component {
   static CANVAS_WIDTH = 2048
@@ -24,6 +34,7 @@ export class PDFPresentation extends React.Component {
     this.mounted = false
 
     this.state = {
+      hasError: false,
       pagesCollection: [],
     }
   }
@@ -135,11 +146,15 @@ export class PDFPresentation extends React.Component {
 
         return null
       })
-      .catch(reportError)
+      .catch((error) => {
+        this.setState({ hasError: true })
+        delete documentCache[url]
+        reportError(error)
+      })
   }
 
   render () {
-    const { pagesCollection } = this.state
+    const { hasError, pagesCollection } = this.state
     const {
       // eslint-disable-next-line no-unused-vars
       url, innerRef, ...otherProps
@@ -149,6 +164,7 @@ export class PDFPresentation extends React.Component {
     return (
       <Presentation
         {...otherProps}
+        hasError={hasError}
         innerRef={innerRef}
         collection={pagesCollection}
       />

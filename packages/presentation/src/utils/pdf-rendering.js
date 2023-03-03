@@ -1,7 +1,5 @@
-const service = window.pdfjsLib
+export const service = window.pdfjsLib
 
-// TODO: do not use cache at module
-const documentCache = {}
 const imageCache = {}
 const tasks = {}
 
@@ -10,11 +8,7 @@ export function keyFn (documentUrl, pageNumber, width, height) {
 }
 
 export function getDocument (url, { httpHeaders }) {
-  if (!documentCache[url]) {
-    documentCache[url] = service.getDocument({ url, httpHeaders })
-  }
-
-  return documentCache[url]
+  return service.getDocument({ url, httpHeaders })
 }
 
 export function getImage (key) {
