@@ -32,6 +32,10 @@ function calculateFitSize (containerWidth, containerHeight, imageWidth, imageHei
 }
 
 class PresentationComponent extends React.Component {
+  prevImageWidth
+
+  prevImageHeight
+
   componentDidMount () {
     this.maybeScrollToActive()
   }
@@ -85,6 +89,16 @@ class PresentationComponent extends React.Component {
     }
   }
 
+  handlePageResize = (width, height) => {
+    const { onPageResize } = this.props
+
+    if (onPageResize && this.prevImageWidth !== width && this.prevImageHeight !== height) {
+      this.prevImageWidth = width
+      this.prevImageHeight = height
+      onPageResize && onPageResize(width, height)
+    }
+  }
+
   maybeScrollToActive = () => {
     const { showPreviews } = this.props
 
@@ -115,7 +129,6 @@ class PresentationComponent extends React.Component {
       innerRef,
       intl,
       onChange,
-      onPageResize,
       showActions,
       showPagesCount,
       showPreviews,
@@ -178,7 +191,7 @@ class PresentationComponent extends React.Component {
                     collection[index].imageHeight
                   )
 
-                onPageResize && onPageResize(imageSize.width, imageSize.height)
+                this.handlePageResize(imageSize.width, imageSize.height)
 
                 result = (
                   <div className={cx(css.slide, { [css.fitToWidth]: fitToWidth })} ref={innerRef} data-id='presentation-slide'>
