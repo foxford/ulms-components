@@ -1,18 +1,18 @@
 /* eslint-disable */
-const babel = require('@rollup/plugin-babel')
-const cjs = require('@rollup/plugin-commonjs')
 const cssdupl = require('postcss-discard-duplicates')
 const cssnano = require('cssnano')
 const cssnext = require('postcss-cssnext')
 const cssurl = require('postcss-url')
 const Debug = require('debug')
 const env = require('postcss-preset-env')
-const json = require('@rollup/plugin-json')
-const npm = require('@rollup/plugin-node-resolve')
 const postcss = require('rollup-plugin-postcss')
-const sourcemaps = require('rollup-plugin-sourcemaps')
 const svgr = require('@svgr/rollup')
-const uglify = require('rollup-plugin-uglify')
+import strip from '@rollup/plugin-strip';
+import terser from '@rollup/plugin-terser';
+import json from '@rollup/plugin-json';
+import { nodeResolve as npm } from '@rollup/plugin-node-resolve';
+import { babel } from '@rollup/plugin-babel';
+import commonjs from '@rollup/plugin-commonjs';
 
 const { name, peerDependencies } = require('./package.json')
 const { postcssLoader } = require('./rollup/loaders')
@@ -26,18 +26,11 @@ console.warn = (...argv) => process.env.LOG_WARN && Debug(`${name}:console.warn`
 
 // const globalDebug = Debug(`${name}:rollup.config.js`)
 
-const uglifyOptions = {
-  compress: {
-    drop_console: true,
-    pure_getters: true,
-    unsafe_comps: true,
-    warnings: false,
-  },
-}
-
 const shouldMinifyCss = options => process.env.NODE_ENV === 'production' ? cssnano(options) : []
 
-const shouldUglify = (options = uglifyOptions, minifier) => process.env.NODE_ENV === 'production' ? uglify(options, minifier) : []
+const shouldUglify = (options) => process.env.NODE_ENV === 'production' ? [terser(options), strip({
+  functions: ['console.log', 'assert.*'], // Убираем только console.log, warn и error оставляем!
+})] : []
 
 const processAsCssModule = function(){
   this.options = {
@@ -81,10 +74,11 @@ const rollupPlugins = [ // order matters
     browser: true,
     extensions: ['.js', '.jsx']
   }),
-  cjs({
+  commonjs({
     include: 'node_modules/**',
     namedExports: {
-      'react-sizeme': ['SizeMe']
+      'react-sizeme': ['SizeMe'],
+      'fabric': ['fabric']
     }
   }),
   babel({
@@ -95,7 +89,6 @@ const rollupPlugins = [ // order matters
       ...babel_rc.plugins
     ]
   }),
-  sourcemaps()
 ].concat(shouldUglify())
 
 const dist = (entry = 'index.js', frm = './', out = './es') => {
@@ -109,16 +102,16 @@ const dist = (entry = 'index.js', frm = './', out = './es') => {
     file: `${out}/${entry}`, // that's important duplicate
     external: Object.keys(peerDependencies),
     plugins: rollupPlugins,
-    onwarn: function(warning, warn){
+    onwarn: function(warning){
       if(!warning.code) return //globalDebug(warning.message)
 
       //const debug = Debug(`${name}:${warning.code}`)
 
-      if(process.env.LOG_DEBUG) debug(warning)
+      // if(process.env.LOG_DEBUG) debug(warning)
 
       if(warning.code === 'UNKNOWN_OPTION'){
         //if(process.env.LOG_DEBUG) debug(warning.message)
-        return
+        // return
       } else if(warning.code) {
         //return debug(warning.message)
       }
@@ -131,5 +124,3 @@ const dist = (entry = 'index.js', frm = './', out = './es') => {
 }
 
 module.exports = dist()
-
-// exports.dist = dist
