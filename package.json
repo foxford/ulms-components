@@ -68,6 +68,10 @@
     "@babel/preset-env": "^7.2.3",
     "@babel/preset-react": "^7.12.13",
     "@babel/register": "^7.0.0",
+    "@rollup/plugin-babel": "^6.0.3",
+    "@rollup/plugin-commonjs": "^24.0.1",
+    "@rollup/plugin-json": "^6.0.0",
+    "@rollup/plugin-node-resolve": "^15.0.1",
     "@storybook/addon-actions": "^6.1.17",
     "@storybook/addon-essentials": "^6.1.17",
     "@storybook/addon-links": "^6.1.17",
@@ -107,19 +111,16 @@
     "lerna": "5.5.2",
     "mkdirp": "^0.5.1",
     "ncp": "^2.0.0",
-    "postcss": "8.4.21",
+    "postcss": "^8.4.21",
     "postcss-cssnext": "^3.1.0",
     "postcss-discard-duplicates": "^4.0.2",
-    "postcss-loader": "^3.0.0",
+    "postcss-load-config": "^4.0.1",
+    "postcss-loader": "^4.3.0",
     "postcss-preset-env": "^5.3.0",
     "postcss-url": "^8.0.0",
     "reserved-words": "^0.1.2",
-    "rollup": "1.20.3",
+    "rollup": "^2.79.1",
     "rollup-plugin-alias": "^1.5.2",
-    "rollup-plugin-babel": "^4.4.0",
-    "rollup-plugin-commonjs": "^9.3.4",
-    "rollup-plugin-json": "^3.1.0",
-    "rollup-plugin-node-resolve": "^3.4.0",
     "rollup-plugin-postcss": "^4.0.2",
     "rollup-plugin-sourcemaps": "^0.6.3",
     "rollup-plugin-uglify": "^3.0.0",
@@ -141,6 +142,7 @@
     "react-router-dom": "^4.3.1"
   },
   "engines": {
-    "node": ">=10.14"
+    "node": ">=16.15",
+    "npm": "8.3"
   }
 }

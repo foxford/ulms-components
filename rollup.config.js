@@ -1,14 +1,14 @@
 /* eslint-disable */
-const babel = require('rollup-plugin-babel')
-const cjs = require('rollup-plugin-commonjs')
+const babel = require('@rollup/plugin-babel')
+const cjs = require('@rollup/plugin-commonjs')
 const cssdupl = require('postcss-discard-duplicates')
-const cssnano = require('cssnano')
+import csso from 'postcss-csso';
 const cssnext = require('postcss-cssnext')
 const cssurl = require('postcss-url')
 const Debug = require('debug')
 const env = require('postcss-preset-env')
-const json = require('rollup-plugin-json')
-const npm = require('rollup-plugin-node-resolve')
+const json = require('@rollup/plugin-json')
+const npm = require('@rollup/plugin-node-resolve')
 const postcss = require('rollup-plugin-postcss')
 const svgr = require('@svgr/rollup')
 const uglify = require('rollup-plugin-uglify')
@@ -17,11 +17,11 @@ const { name, peerDependencies } = require('./package.json')
 const { postcssLoader } = require('./rollup/loaders')
 const babelrc = require('./.babelrc.json')
 
-const warn = console.warn
+// const warn = console.warn
 console.warn = (...argv) => process.env.LOG_WARN && Debug(`${name}:console.warn`)(...argv)
 // monkeypatch warn method to disable annoying postcss warning
 
-const globalDebug = Debug(`${name}:rollup.config.js`)
+// const globalDebug = Debug(`${name}:rollup.config.js`)
 
 const uglifyOptions = {
   compress: {
@@ -32,7 +32,7 @@ const uglifyOptions = {
   },
 }
 
-const shouldMinifyCss = options => process.env.NODE_ENV === 'production' ? cssnano(options) : []
+const shouldMinifyCss = options => process.env.NODE_ENV === 'production' ? csso(options) : []
 
 const shouldUglify = (options = uglifyOptions, minifier) => process.env.NODE_ENV === 'production' ? uglify(options, minifier) : []
 
@@ -47,6 +47,7 @@ const rollupPlugins = [ // order matters
   svgr(),
   postcss({
     extract: true,
+    parser: 'sugarss',
     plugins: [
       cssurl({ url: 'inline' }),
       env(),
