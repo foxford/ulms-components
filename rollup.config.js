@@ -1,11 +1,9 @@
 /* eslint-disable */
 const cssdupl = require('postcss-discard-duplicates')
-const cssnano = require('cssnano')
 const cssnext = require('postcss-cssnext')
 const cssurl = require('postcss-url')
 const Debug = require('debug')
 const env = require('postcss-preset-env')
-const postcss = require('rollup-plugin-postcss')
 const svgr = require('@svgr/rollup')
 import strip from '@rollup/plugin-strip';
 import terser from '@rollup/plugin-terser';
@@ -13,6 +11,8 @@ import json from '@rollup/plugin-json';
 import { nodeResolve as npm } from '@rollup/plugin-node-resolve';
 import { babel } from '@rollup/plugin-babel';
 import commonjs from '@rollup/plugin-commonjs';
+import postcss from 'rollup-plugin-postcss';
+import cssnano from 'cssnano';
 
 const { name, peerDependencies } = require('./package.json')
 const { postcssLoader } = require('./rollup/loaders')
@@ -28,7 +28,7 @@ console.warn = (...argv) => process.env.LOG_WARN && Debug(`${name}:console.warn`
 
 const shouldMinifyCss = options => process.env.NODE_ENV === 'production' ? cssnano(options) : []
 
-const shouldUglify = (options) => process.env.NODE_ENV === 'production' ? [terser(options), strip({
+const shouldUglify = options => process.env.NODE_ENV === 'production' ? [terser(options), strip({
   functions: ['console.log', 'assert.*'], // Убираем только console.log, warn и error оставляем!
 })] : []
 
@@ -107,7 +107,7 @@ const dist = (entry = 'index.js', frm = './', out = './es') => {
 
       //const debug = Debug(`${name}:${warning.code}`)
 
-      if(process.env.LOG_DEBUG) debug(warning)
+      // if(process.env.LOG_DEBUG) debug(warning)
 
       if(warning.code === 'UNKNOWN_OPTION'){
         //if(process.env.LOG_DEBUG) debug(warning.message)
@@ -123,4 +123,4 @@ const dist = (entry = 'index.js', frm = './', out = './es') => {
   return opts
 }
 
-exports.dist = dist
+module.exports = dist()
