@@ -16,7 +16,7 @@ blocks:
             - nvm install $(cat .nvmrc)
             - nvm use
             - cache restore node-modules-$SEMAPHORE_GIT_BRANCH-$(checksum package-lock.json),node-modules-$SEMAPHORE_GIT_BRANCH
-            - npm i
+            - npm ci
             - cache store node-modules-$SEMAPHORE_GIT_BRANCH-$(checksum package-lock.json) node_modules
   - name: Commit
     task:
