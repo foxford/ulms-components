@@ -343,7 +343,7 @@ export class Drawing extends React.Component {
     this.canvas._id = clientId
     this.canvas.freeDrawingBrush = new fabric.OptimizedPencilBrush(this.canvas)
 
-    KeyboardListenerProvider.init(this.canvasRef.current.ownerDocument)
+    KeyboardListenerProvider.init(this.canvasRef.current?.ownerDocument)
 
     this.__lockModeTool = new LockTool(this.canvas, onLockSelection)
 
