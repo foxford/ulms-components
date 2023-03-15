@@ -124,7 +124,6 @@
     "source-map-explorer": "^2.5.2",
     "storybook": "^6.1.17",
     "storybook-css-modules-preset": "^1.0.6",
-    "tap": "^12.1.1",
     "webpack": "^4.26.1"
   },
   "peerDependencies": {
