@@ -114,7 +114,9 @@ export default class SelectTool extends Base {
   }
 
   destroy () {
+    this._sendContextMenuEvent(true)
     this._canvas.discardActiveObject()
+    this._canvas.requestRenderAll()
 
     this._onSelection = null
     this._showContextMenuFunc = null
