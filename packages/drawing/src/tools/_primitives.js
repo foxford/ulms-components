@@ -6,13 +6,6 @@ import { defaultToolSettings } from '../constants'
 // define a function that can locate the controls.
 // this function will be used both for drawing and for interaction.
 function linePositionHandler (dim, finalMatrix, fabricObject) {
-  if (!this.canvas) {
-    return {
-      startCoords: { x: 0, y: 0 },
-      endCoords: { x: 0, y: 0 },
-    }
-  }
-
   const { startCoords, endCoords } = fabricObject.calcLineEndpointCoords()
 
   if (this.pointType === 'start') {
