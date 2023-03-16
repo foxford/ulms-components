@@ -425,20 +425,23 @@ export class Drawing extends React.Component {
 
   _handleMouseWheel = (event) => {
     const { onZoom } = this.props
-    const delta = event.e.deltaY
-    let zoom = this.canvas.getZoom()
-
-    zoom += delta / 200
+    const delta = (event.e.deltaY > 0) ? 0.05 : -0.05
+    let zoom = this.canvas.getZoom() + delta
 
     if (zoom > 2) zoom = 2
-    if (zoom < 0.5) zoom = 0.5
+    if (zoom < 0.2) zoom = 0.2
 
     this.canvas.zoomToPoint({ x: event.e.offsetX, y: event.e.offsetY }, zoom)
+
+    const { tl } = this.canvas.calcViewportBoundaries()
+    const { x, y } = tl
 
     event.e.preventDefault()
     event.e.stopPropagation()
 
-    onZoom && onZoom(zoom)
+    onZoom && onZoom({
+      x, y, zoom,
+    })
   }
 
   initCanvasListeners () {
