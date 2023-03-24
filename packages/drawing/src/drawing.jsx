@@ -42,7 +42,7 @@ import {
   rightTriangle,
   rightTriangleSolid,
 } from './tools/_shapes'
-import { makeNotInteractive } from './tools/object'
+import {makeInteractive, makeNotInteractive} from './tools/object'
 
 function isShapeObject (object) {
   return object.type === shapeToolModeEnum.CIRCLE
@@ -425,7 +425,8 @@ export class Drawing extends React.Component {
 
   _handleMouseWheel = (event) => {
     const { onZoom } = this.props
-    const delta = (event.e.deltaY > 0) ? 0.05 : -0.05
+    let delta = (event.e.deltaY > 0) ? 0.05 : -0.05
+    if (event.e.ctrlKey) delta = -delta // Это тачпад, а не мышь - инвертируем
     let zoom = this.canvas.getZoom() + delta
 
     if (zoom > 2) zoom = 2
@@ -1042,6 +1043,8 @@ export class Drawing extends React.Component {
   }
 
   createCanvasObjects = (pageObjects) => {
+    const { tool } = this.props
+
     this.clearCanvasObjects()
 
     if (pageObjects.length) {
@@ -1053,6 +1056,15 @@ export class Drawing extends React.Component {
         this.canvas.add(...enlivenedObjects)
 
         enlivenedObjects.forEach((object) => {
+          if (tool !== toolEnum.SELECT) {
+            if (tool === toolEnum.PAN) {
+              object.set({ selectable: false, evented: false }) // Если PAN - не меняем курсор!
+            } else {
+              makeNotInteractive(object)
+            }
+          } else {
+            makeInteractive(object)
+          }
           this.canvas._objectsMap.set(object._id, object)
 
           if (LockProvider.isLockedByUser(object)) {

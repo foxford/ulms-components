@@ -60,7 +60,7 @@ export default class PanTool extends Base {
   }
 
   handleObjectAddedEvent (opts) {
-    Object.assign(opts.target, { selectable: false, evented: false })
+    opts.target.set({ selectable: false, evented: false })
   }
 
   reset () {
