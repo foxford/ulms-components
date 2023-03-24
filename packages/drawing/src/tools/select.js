@@ -1,12 +1,16 @@
 /* eslint-disable no-param-reassign,default-case,no-fallthrough,import/no-extraneous-dependencies,class-methods-use-this */
 import debounce from 'lodash/debounce'
 
+import floatingThrottle from '../util/floating-throttle'
+
 import { fromCSSColor, toCSSColor } from '../util/to-css-color'
 import { calcDistance } from '../util'
 
-import { keycodes, DEBOUNCE_DELAY, toolEnum, defaultToolSettings } from '../constants'
+import { keycodes, DEBOUNCE_DELAY, toolEnum, defaultToolSettings, MAX_TEXT_LENGTH, THROTTLE_DELAY } from '../constants'
 // eslint-disable-next-line import/no-cycle
 import { LockProvider } from '../lock-provider' // ToDo: Убрать циклическую зависимость
+
+import { BroadcastProvider } from '../broadcast-provider'
 
 import { Base } from './base'
 
@@ -27,6 +31,7 @@ export default class SelectTool extends Base {
 
     this.__object = null
     this.__options = options
+    this.__delayMultipler = 1
 
     this.__timer = null
     this.__shiftPressed = false
@@ -38,6 +43,7 @@ export default class SelectTool extends Base {
     this._onSelection = null
     this._showContextMenuFunc = null
     this._debouncedTriggerModified = null
+    this._floatingThrottledSendMessage = null
 
     this._initialConfigure()
   }
@@ -87,6 +93,8 @@ export default class SelectTool extends Base {
     this._canvas.defaultCursor = 'default'
     this._canvas.setCursor && this._canvas.setCursor('default')
     this._debouncedTriggerModified = debounce(this._triggerModified, DEBOUNCE_DELAY)
+    this._floatingThrottledSendMessage =
+      floatingThrottle((id, diff) => BroadcastProvider.sendMessage({ id, diff }), this._floatingDelay)
   }
 
   configure (opt) {
@@ -121,7 +129,10 @@ export default class SelectTool extends Base {
     this._onSelection = null
     this._showContextMenuFunc = null
     this._debouncedTriggerModified = null
+    this._floatingThrottledSendMessage = null
   }
+
+  _floatingDelay = () => this.__delayMultipler * THROTTLE_DELAY
 
   _sendContextMenuEvent = (close = false) => {
     if (this._showContextMenuFunc) {
@@ -388,7 +399,14 @@ export default class SelectTool extends Base {
   handleTextChangedEvent = (e) => {
     const { target } = e
 
-    this._throttledSendMessage(target._id, { text: target.text })
+    if (target.text.length <= MAX_TEXT_LENGTH / 4) {
+      this.__delayMultipler = 1
+    } else if (target.text.length > (MAX_TEXT_LENGTH / 4) && target.text.length < (MAX_TEXT_LENGTH / 2)) {
+      this.__delayMultipler = 2
+    } else {
+      this.__delayMultipler = 6
+    }
+    this._floatingThrottledSendMessage(target._id, { text: target.text })
   }
 
   reset () {
