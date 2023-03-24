@@ -42,7 +42,7 @@ import {
   rightTriangle,
   rightTriangleSolid,
 } from './tools/_shapes'
-import {makeInteractive, makeNotInteractive} from './tools/object'
+import { makeInteractive, makeNotInteractive } from './tools/object'
 
 function isShapeObject (object) {
   return object.type === shapeToolModeEnum.CIRCLE
