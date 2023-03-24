@@ -108,6 +108,8 @@ export class Drawing extends React.Component {
       }
     }
 
+    KeyboardListenerProvider.enabled = canDraw
+
     if (pattern) {
       this.initCanvasPattern()
 
@@ -159,12 +161,14 @@ export class Drawing extends React.Component {
           this.initCanvasListeners()
         }
       }
+      KeyboardListenerProvider.enabled = canDraw
 
       this.updateCanvasParameters(true)
       this.createCanvasObjects(pageObjects)
     }
 
     if (canDraw !== prevProps.canDraw) {
+      KeyboardListenerProvider.enabled = canDraw
       this.destroyCanvasListeners()
       if (canDraw) {
         this.initCanvasListeners()
