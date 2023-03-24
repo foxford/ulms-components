@@ -1,42 +1,36 @@
 /* eslint-disable */
-const alias = require('rollup-plugin-alias')
-const babel = require('rollup-plugin-babel')
-const cjs = require('rollup-plugin-commonjs')
 const cssdupl = require('postcss-discard-duplicates')
-const cssnano = require('cssnano')
 const cssnext = require('postcss-cssnext')
 const cssurl = require('postcss-url')
 const Debug = require('debug')
 const env = require('postcss-preset-env')
-const fs = require('fs')
-const json = require('rollup-plugin-json')
-const npm = require('rollup-plugin-node-resolve')
-const postcss = require('rollup-plugin-postcss')
-const svgr = require('@svgr/rollup').default
-const uglify = require('rollup-plugin-uglify')
+const svgr = require('@svgr/rollup')
+import strip from '@rollup/plugin-strip';
+import terser from '@rollup/plugin-terser';
+import json from '@rollup/plugin-json';
+import { nodeResolve as npm } from '@rollup/plugin-node-resolve';
+import { babel } from '@rollup/plugin-babel';
+import commonjs from '@rollup/plugin-commonjs';
+import postcss from 'rollup-plugin-postcss';
+import cssnano from 'cssnano';
 
 const { name, peerDependencies } = require('./package.json')
 const { postcssLoader } = require('./rollup/loaders')
 const babelrc = require('./.babelrc.json')
 
-const warn = console.warn
+const babel_rc = babelrc.env[process.env.BABEL_ENV || 'es']
+
+// const warn = console.warn
 console.warn = (...argv) => process.env.LOG_WARN && Debug(`${name}:console.warn`)(...argv)
 // monkeypatch warn method to disable annoying postcss warning
 
-const globalDebug = Debug(`${name}:rollup.config.js`)
-
-const uglifyOptions = {
-  compress: {
-    drop_console: true,
-    pure_getters: true,
-    unsafe_comps: true,
-    warnings: false,
-  },
-}
+// const globalDebug = Debug(`${name}:rollup.config.js`)
 
 const shouldMinifyCss = options => process.env.NODE_ENV === 'production' ? cssnano(options) : []
 
-const shouldUglify = (options = uglifyOptions, minifier) => process.env.NODE_ENV === 'production' ? uglify(options, minifier) : []
+const shouldUglify = options => process.env.NODE_ENV === 'production' ? [terser(options), strip({
+  functions: ['console.log', 'assert.*'], // Убираем только console.log, warn и error оставляем!
+})] : []
 
 const processAsCssModule = function(){
   this.options = {
@@ -80,7 +74,7 @@ const rollupPlugins = [ // order matters
     browser: true,
     extensions: ['.js', '.jsx']
   }),
-  cjs({
+  commonjs({
     include: 'node_modules/**',
     namedExports: {
       'react-sizeme': ['SizeMe'],
@@ -89,43 +83,44 @@ const rollupPlugins = [ // order matters
   }),
   babel({
     babelrc: false,
-    presets: babelrc.env.packages.presets,
+    presets: babel_rc.presets,
     plugins: [
       ...babelrc.plugins,
-      ...babelrc.env.packages.plugins
+      ...babel_rc.plugins
     ]
-  })
+  }),
 ].concat(shouldUglify())
 
-const dist = (entry, frm = 'src/packages', out = 'packages') => {
+const dist = (entry = 'index.js', frm = './', out = './es') => {
   const opts = ({
     input: `${frm}/${entry}`,
     output: {
       file: `${out}/${entry}`,
-      format: 'cjs',
+      format: 'es',
+      sourcemap: true,
     },
     file: `${out}/${entry}`, // that's important duplicate
     external: Object.keys(peerDependencies),
     plugins: rollupPlugins,
-    onwarn: function(warning, warn){
-      if(!warning.code) return globalDebug(warning.message)
+    onwarn: function(warning){
+      if(!warning.code) return //globalDebug(warning.message)
 
-      const debug = Debug(`${name}:${warning.code}`)
+      //const debug = Debug(`${name}:${warning.code}`)
 
-      if(process.env.LOG_DEBUG) debug(warning)
+      // if(process.env.LOG_DEBUG) debug(warning)
 
       if(warning.code === 'UNKNOWN_OPTION'){
-        if(process.env.LOG_DEBUG) debug(warning.message)
-        return
+        //if(process.env.LOG_DEBUG) debug(warning.message)
+        // return
       } else if(warning.code) {
-        return debug(warning.message)
+        //return debug(warning.message)
       }
 
-      globalDebug(warning.message)
+      //globalDebug(warning.message)
     }
   })
 
   return opts
 }
 
-exports.dist = dist
+module.exports = dist()

@@ -42,7 +42,7 @@ import {
   rightTriangle,
   rightTriangleSolid,
 } from './tools/_shapes'
-import { makeNotInteractive } from './tools/object'
+import { makeInteractive, makeNotInteractive } from './tools/object'
 
 function isShapeObject (object) {
   return object.type === shapeToolModeEnum.CIRCLE
@@ -69,8 +69,6 @@ export class Drawing extends React.Component {
     this.canvasPatternRef = React.createRef()
     this.dynamicPattern = null
     this.ignoreObjectRemovedEvent = false
-    this.q = null
-    this.rq = null
     this.tool = null
 
     this._hammer = null
@@ -90,7 +88,7 @@ export class Drawing extends React.Component {
 
   componentDidMount () {
     const {
-      canDraw, tool, pattern, tokenProvider, broadcastProvider, pageObjects,
+      canDraw, tool, pattern, tokenProvider, broadcastProvider, pageObjects, staticCanvas,
     } = this.props
 
     TokenProvider.setProvider(tokenProvider)
@@ -101,11 +99,13 @@ export class Drawing extends React.Component {
       BroadcastProvider.subscribe(this._drawUpdateHandler)
     }
 
-    if (canDraw) {
-      this.initCanvas()
-      this.initTool(tool)
-    } else {
+    if (staticCanvas) {
       this.initStaticCanvas()
+    } else {
+      this.initCanvas()
+      if (canDraw) {
+        this.initCanvasListeners()
+      }
     }
 
     if (pattern) {
@@ -120,6 +120,10 @@ export class Drawing extends React.Component {
 
     this.updateCanvasParameters(true)
     this.createCanvasObjects(pageObjects)
+
+    if (!staticCanvas) {
+      this.initTool(tool)
+    }
   }
 
   componentDidUpdate (prevProps) {
@@ -139,23 +143,32 @@ export class Drawing extends React.Component {
       x,
       y,
       zoom,
+      staticCanvas,
     } = this.props
 
-    if (prevProps.canDraw !== canDraw) {
-      this.destroyQueues()
+    if (prevProps.staticCanvas !== staticCanvas) {
       this.destroyCanvas()
 
       this.canvasRef.current.style.position = 'relative'
 
-      if (canDraw) {
-        this.initCanvas()
-        this.initTool(tool)
-      } else {
+      if (staticCanvas) {
         this.initStaticCanvas()
+      } else {
+        this.initCanvas()
+        if (canDraw) {
+          this.initCanvasListeners()
+        }
       }
 
       this.updateCanvasParameters(true)
       this.createCanvasObjects(pageObjects)
+    }
+
+    if (canDraw !== prevProps.canDraw) {
+      this.destroyCanvasListeners()
+      if (canDraw) {
+        this.initCanvasListeners()
+      }
     }
 
     if (prevProps.pattern !== pattern) {
@@ -206,14 +219,11 @@ export class Drawing extends React.Component {
     }
 
     if (
-      canDraw
-      && (
-        prevProps.tool !== tool
+      prevProps.tool !== tool
         || prevProps.brushColor !== brushColor
         || prevProps.brushMode !== brushMode
         // need to update the tool if it's a pen
         || tool === toolEnum.PEN
-      )
     ) {
       if (prevProps.tool !== tool || tool !== toolEnum.SELECT) {
         this.initTool(tool)
@@ -237,8 +247,6 @@ export class Drawing extends React.Component {
   componentWillUnmount () {
     TokenProvider.setProvider(null)
 
-    this.destroyQueues()
-
     this.destroyHammer()
 
     if (this.dynamicPattern) {
@@ -256,17 +264,17 @@ export class Drawing extends React.Component {
   }
 
   _handleKeyDown = (opts) => {
-    this.tool.handleKeyDownEvent(opts)
+    this.tool && this.tool.handleKeyDownEvent(opts)
   }
 
   _handleKeyUp = (opts) => {
-    this.tool.handleKeyUpEvent(opts)
+    this.tool && this.tool.handleKeyUpEvent(opts)
   }
 
   _handleMouseDown = (opts) => {
     const { onMouseDown } = this.props
 
-    this.tool.handleMouseDownEvent(opts)
+    this.tool && this.tool.handleMouseDownEvent(opts)
 
     onMouseDown && onMouseDown({ ...opts, vptCoords: this.canvas.vptCoords })
   }
@@ -275,46 +283,42 @@ export class Drawing extends React.Component {
     const { onMouseMove } = this.props
 
     CursorProvider.onMouseMove(opts)
-    this.tool.handleMouseMoveEvent(opts)
+    this.tool && this.tool.handleMouseMoveEvent(opts)
     onMouseMove && onMouseMove({ ...opts, vptCoords: this.canvas.vptCoords })
   }
 
   _handleMouseUp = (opts) => {
     const { onMouseUp } = this.props
 
-    this.tool.handleMouseUpEvent(opts)
+    this.tool && this.tool.handleMouseUpEvent(opts)
 
     onMouseUp && onMouseUp({ ...opts, vptCoords: this.canvas.vptCoords })
   }
 
   _handleTextEditStartEvent = (opts) => {
-    this.tool.handleTextEditStartEvent(opts)
+    this.tool && this.tool.handleTextEditStartEvent(opts)
   }
 
   _handleTextEditEndEvent = (opts) => {
-    this.tool.handleTextEditEndEvent(opts)
+    this.tool && this.tool.handleTextEditEndEvent(opts)
   }
 
   _handleTextChangedEvent = (opts) => {
-    this.tool.handleTextChangedEvent(opts)
+    this.tool && this.tool.handleTextChangedEvent(opts)
   }
 
   _handleSelectionUpdatedEvent = (opts) => {
     clearExternalSelection()
-    this.tool.handleSelectionUpdatedEvent(opts)
+    this.tool && this.tool.handleSelectionUpdatedEvent(opts)
   }
 
   _handleSelectionCreatedEvent = (opts) => {
     clearExternalSelection()
-    this.tool.handleSelectionCreatedEvent(opts)
+    this.tool && this.tool.handleSelectionCreatedEvent(opts)
   }
 
   _handleSelectionClearedEvent = (opts) => {
-    this.tool.handleSelectionClearedEvent(opts)
-  }
-
-  _handleObjectAdded = (opts) => {
-    this.tool.handleObjectAddedEvent(opts)
+    this.tool && this.tool.handleSelectionClearedEvent(opts)
   }
 
   _handleAfterRender = () => {
@@ -328,38 +332,138 @@ export class Drawing extends React.Component {
   // eslint-disable-next-line react/sort-comp
   initCanvas () {
     const {
-      selectOnInit,
       clientId,
-      uniqId,
-      disableMobileGestures,
       onLockSelection,
-      onKeyDown,
-      isPresentation,
-      onKeyUp,
     } = this.props
 
     this.canvas = new fabric.Canvas('canvas', {
       enablePointerEvents: 'PointerEvent' in window,
-      allowTouchScrolling: !disableMobileGestures,
       preserveObjectStacking: true, // Чтобы выделенный объект не выходил на верхний слой
     })
     this.canvas._id = clientId
     this.canvas.freeDrawingBrush = new fabric.OptimizedPencilBrush(this.canvas)
 
-    KeyboardListenerProvider.init(this.canvasRef.current.ownerDocument)
+    KeyboardListenerProvider.init(this.canvasRef.current?.ownerDocument)
 
     this.__lockModeTool = new LockTool(this.canvas, onLockSelection)
 
-    this.canvas.on('mouse:down', opt => this._handleMouseDown(opt))
-    this.canvas.on('mouse:move', opt => this._handleMouseMove(opt))
-    this.canvas.on('mouse:up', opt => this._handleMouseUp(opt))
-    this.canvas.on('object:added', opt => this._handleObjectAdded(opt))
-    this.canvas.on('text:editing:entered', opt => this._handleTextEditStartEvent(opt))
-    this.canvas.on('text:editing:exited', opt => this._handleTextEditEndEvent(opt))
-    this.canvas.on('text:changed', opt => this._handleTextChangedEvent(opt))
-    this.canvas.on('selection:updated', opt => this._handleSelectionUpdatedEvent(opt))
-    this.canvas.on('selection:created', opt => this._handleSelectionCreatedEvent(opt))
-    this.canvas.on('selection:cleared', opt => this._handleSelectionClearedEvent(opt))
+    this.canvas._objectsMap = new Map()
+
+    CursorProvider.canvas = this.canvas
+    LockProvider.canvas = this.canvas
+    CopyPasteProvider.canvas = this.canvas
+
+    this.canvas.on('after:render', () => this._handleAfterRender())
+  }
+
+  _handleObjectAdded = (event) => {
+    this.tool && this.tool.handleObjectAddedEvent(event)
+
+    if (!this.canvas.renderOnAddRemove) return
+
+    const {
+      onDraw, uniqId, selectOnInit,
+    } = this.props
+    const object = event.target
+
+    // Skipping draft objects
+    if (object._draft) return
+
+    if (!object.remote) {
+      object._id = uniqId()
+
+      if (selectOnInit && isShapeObject(object)) return
+
+      if (this.canvas._objects.length > 1) {
+        const order = this.canvas._objects[this.canvas._objects.length - 2]._order || 0
+
+        object._order = order + 1
+      } else {
+        object._order = 0
+      }
+      onDraw && onDraw(serializeObject(object))
+      this.canvas._objectsMap.set(object._id, object)
+    } else {
+      delete object.remote
+    }
+  }
+
+  _handleObjectModified = (event) => {
+    const { onDrawUpdate } = this.props
+    const object = event.target
+
+    // Skipping draft objects
+    if (object._draft) return
+
+    if (object._order === undefined) {
+      if (this.canvas._objects.length > 1) {
+        const order = this.canvas._objects[this.canvas._objects.length - 2]._order || 0
+
+        object._order = order + 1
+      } else {
+        object._order = 0
+      }
+    }
+
+    onDrawUpdate && onDrawUpdate(serializeObject(object))
+  }
+
+  _handleObjectRemoved = (event) => {
+    if (!this.canvas.renderOnAddRemove) return
+
+    if (this.ignoreObjectRemovedEvent) return
+
+    const { onObjectRemove } = this.props
+    const object = event.target
+
+    // Skipping draft objects
+    if (object._draft) return
+
+    onObjectRemove && onObjectRemove(serializeObject(object))
+    this.canvas._objectsMap.delete(object._id)
+  }
+
+  _handleMouseWheel = (event) => {
+    const { onZoom } = this.props
+    let delta = (event.e.deltaY > 0) ? 0.05 : -0.05
+    if (event.e.ctrlKey) delta = -delta // Это тачпад, а не мышь - инвертируем
+    let zoom = this.canvas.getZoom() + delta
+
+    if (zoom > 2) zoom = 2
+    if (zoom < 0.2) zoom = 0.2
+
+    this.canvas.zoomToPoint({ x: event.e.offsetX, y: event.e.offsetY }, zoom)
+
+    const { tl } = this.canvas.calcViewportBoundaries()
+    const { x, y } = tl
+
+    event.e.preventDefault()
+    event.e.stopPropagation()
+
+    onZoom && onZoom({
+      x, y, zoom,
+    })
+  }
+
+  initCanvasListeners () {
+    const {
+      onKeyDown,
+      isPresentation,
+      onKeyUp,
+      onZoom,
+    } = this.props
+
+    this.canvas.allowTouchScrolling = true
+
+    this.canvas.on('mouse:down', this._handleMouseDown)
+    this.canvas.on('mouse:move', this._handleMouseMove)
+    this.canvas.on('mouse:up', this._handleMouseUp)
+    this.canvas.on('text:editing:entered', this._handleTextEditStartEvent)
+    this.canvas.on('text:editing:exited', this._handleTextEditEndEvent)
+    this.canvas.on('text:changed', this._handleTextChangedEvent)
+    this.canvas.on('selection:updated', this._handleSelectionUpdatedEvent)
+    this.canvas.on('selection:created', this._handleSelectionCreatedEvent)
+    this.canvas.on('selection:cleared', this._handleSelectionClearedEvent)
 
     KeyboardListenerProvider.on(keyboardEvents.keyDown, this.__lockModeTool.handleKeyDownEvent)
     KeyboardListenerProvider.on(keyboardEvents.keyUp, this.__lockModeTool.handleKeyUpEvent)
@@ -368,93 +472,54 @@ export class Drawing extends React.Component {
     onKeyDown && KeyboardListenerProvider.on(keyboardEvents.keyDown, onKeyDown)
     onKeyUp && KeyboardListenerProvider.on(keyboardEvents.keyUp, onKeyUp)
 
-    this.canvas.on('object:added', (event) => {
-      const { onDraw } = this.props
-      const object = event.target
+    this.canvas.on('object:added', this._handleObjectAdded)
 
-      // Skipping draft objects
-      if (object._draft) return
+    this.canvas.on('object:modified', this._handleObjectModified)
 
-      if (!object.remote) {
-        object._id = uniqId()
+    this.canvas.on('object:removed', this._handleObjectRemoved)
 
-        if (selectOnInit && isShapeObject(object)) return
-
-        if (this.canvas._objects.length > 1) {
-          const order = this.canvas._objects[this.canvas._objects.length - 2]._order || 0
-
-          object._order = order + 1
-        } else {
-          object._order = 0
-        }
-        onDraw && onDraw(serializeObject(object))
-        this.canvas._objectsMap.set(object._id, object)
-      } else {
-        delete object.remote
-      }
-    })
-
-    this.canvas.on('selection:cleared', () => {})
-
-    this.canvas.on('object:modified', (event) => {
-      const { onDrawUpdate } = this.props
-      const object = event.target
-
-      // Skipping draft objects
-      if (object._draft) return
-
-      if (object._order === undefined) {
-        if (this.canvas._objects.length > 1) {
-          const order = this.canvas._objects[this.canvas._objects.length - 2]._order || 0
-
-          object._order = order + 1
-        } else {
-          object._order = 0
-        }
-      }
-
-      onDrawUpdate && onDrawUpdate(serializeObject(object))
-    })
-
-    this.canvas.on('object:removed', (event) => {
-      if (this.ignoreObjectRemovedEvent) return
-
-      const { onObjectRemove } = this.props
-      const object = event.target
-
-      // Skipping draft objects
-      if (object._draft) return
-
-      onObjectRemove && onObjectRemove(serializeObject(object))
-      this.canvas._objectsMap.delete(object._id)
-    })
-
-    this.canvas.on('after:render', () => this._handleAfterRender())
-
-    if (!this._hammer && !disableMobileGestures) {
+    if (!this._hammer) {
       this.initHammer(this.canvas.upperCanvasEl, isPresentation)
     }
 
-    this.canvas._objectsMap = new Map()
+    onZoom && this.canvas.on('mouse:wheel', this._handleMouseWheel)
+  }
 
-    CursorProvider.canvas = this.canvas
-    LockProvider.canvas = this.canvas
-    CopyPasteProvider.canvas = this.canvas
+  destroyCanvasListeners () {
+    const {
+      onKeyDown,
+      onKeyUp,
+      onZoom,
+    } = this.props
 
-    // this.canvas.on('mouse:wheel', (opt) => {
-    //   const delta = opt.e.deltaY
-    //   let zoom = this.canvas.getZoom()
-    //
-    //   zoom += delta / 200
-    //
-    //   if (zoom > 2) zoom = 2
-    //   if (zoom < 0.5) zoom = 0.5
-    //
-    //   this.canvas.zoomToPoint({ x: opt.e.offsetX, y: opt.e.offsetY }, zoom)
-    //
-    //   opt.e.preventDefault()
-    //   opt.e.stopPropagation()
-    // })
+    this.canvas.allowTouchScrolling = false
+
+    this.canvas.off('mouse:down', this._handleMouseDown)
+    this.canvas.off('mouse:move', this._handleMouseMove)
+    this.canvas.off('mouse:up', this._handleMouseUp)
+    this.canvas.off('text:editing:entered', this._handleTextEditStartEvent)
+    this.canvas.off('text:editing:exited', this._handleTextEditEndEvent)
+    this.canvas.off('text:changed', this._handleTextChangedEvent)
+    this.canvas.off('selection:updated', this._handleSelectionUpdatedEvent)
+    this.canvas.off('selection:created', this._handleSelectionCreatedEvent)
+    this.canvas.off('selection:cleared', this._handleSelectionClearedEvent)
+
+    KeyboardListenerProvider.off(keyboardEvents.keyDown, this.__lockModeTool.handleKeyDownEvent)
+    KeyboardListenerProvider.off(keyboardEvents.keyUp, this.__lockModeTool.handleKeyUpEvent)
+    KeyboardListenerProvider.off(keyboardEvents.keyDown, this._handleKeyDown)
+    KeyboardListenerProvider.off(keyboardEvents.keyUp, this._handleKeyUp)
+    onKeyDown && KeyboardListenerProvider.off(keyboardEvents.keyDown, onKeyDown)
+    onKeyUp && KeyboardListenerProvider.off(keyboardEvents.keyUp, onKeyUp)
+
+    this.canvas.off('object:added', this._handleObjectAdded)
+
+    this.canvas.off('object:modified', this._handleObjectModified)
+
+    this.canvas.off('object:removed', this._handleObjectRemoved)
+
+    onZoom && this.canvas.off('mouse:wheel', this._handleMouseWheel)
+
+    this.destroyHammer()
   }
 
   initCanvasPattern () {
@@ -490,6 +555,7 @@ export class Drawing extends React.Component {
       this.canvas.clear()
       this.canvas.dispose()
 
+      this.destroyCanvasListeners()
       this.__cleanTools()
 
       KeyboardListenerProvider.destroy()
@@ -506,20 +572,6 @@ export class Drawing extends React.Component {
       this.canvasPattern.dispose()
 
       this.canvasPattern = null
-    }
-  }
-
-  destroyQueues () {
-    if (this.q !== null) {
-      this.q.abort()
-
-      this.q = null
-    }
-
-    if (this.rq !== null) {
-      this.rq.abort()
-
-      this.rq = null
     }
   }
 
@@ -991,6 +1043,8 @@ export class Drawing extends React.Component {
   }
 
   createCanvasObjects = (pageObjects) => {
+    const { tool } = this.props
+
     this.clearCanvasObjects()
 
     if (pageObjects.length) {
@@ -1002,6 +1056,15 @@ export class Drawing extends React.Component {
         this.canvas.add(...enlivenedObjects)
 
         enlivenedObjects.forEach((object) => {
+          if (tool !== toolEnum.SELECT) {
+            if (tool === toolEnum.PAN) {
+              object.set({ selectable: false, evented: false }) // Если PAN - не меняем курсор!
+            } else {
+              makeNotInteractive(object)
+            }
+          } else {
+            makeInteractive(object)
+          }
           this.canvas._objectsMap.set(object._id, object)
 
           if (LockProvider.isLockedByUser(object)) {
@@ -1026,32 +1089,7 @@ export class Drawing extends React.Component {
       if (_._removed && this.canvas._objectsMap.has(_._id)) objectsToRemove.push(this.canvas._objectsMap.get(_._id))
 
       if (this.canvas._objectsMap.has(_._id)) {
-        const nextObject = normalizeFields(_)
-        const canvasObject = this.canvas._objectsMap.get(_._id)
-
-        if (_._restored) {
-          // если объект "восстановленный" - тоже сбрасываем выделение
-          SelectTool.removeFromSelection(this.canvas, canvasObject)
-        }
-
-        if (LockProvider.isLockedByUser(_) !== LockProvider.isLockedByUser(canvasObject)) {
-          canvasObject.set(nextObject)
-          if (LockProvider.isLockedByUser(_)) {
-            LockProvider.lockUserObject(canvasObject)
-          } else {
-            LockProvider.unlockUserObject(canvasObject)
-          }
-        } else {
-          // Поменялся order?
-          if (nextObject._order > canvasObject._order) {
-            this.canvas.bringToFront(canvasObject)
-          } else if (nextObject._order < canvasObject._order) {
-            this.canvas.sendToBack(canvasObject)
-          }
-          canvasObject.set(nextObject)
-        }
-
-        canvasObject.setCoords()
+        this._updateExistingObject(normalizeFields(_))
       } else if (!_._removed) objectsToAdd.push(_)
     })
 
@@ -1059,6 +1097,34 @@ export class Drawing extends React.Component {
       objectsToRemove,
       objectsToAdd,
     }
+  }
+
+  _updateExistingObject (object) {
+    const canvasObject = this.canvas._objectsMap.get(object._id)
+
+    if (object._restored) {
+      // если объект "восстановленный" - тоже сбрасываем выделение
+      SelectTool.removeFromSelection(this.canvas, canvasObject)
+    }
+
+    if (LockProvider.isLockedByUser(object) !== LockProvider.isLockedByUser(canvasObject)) {
+      canvasObject.set(object)
+      if (LockProvider.isLockedByUser(object)) {
+        LockProvider.lockUserObject(canvasObject)
+      } else {
+        LockProvider.unlockUserObject(canvasObject)
+      }
+    } else {
+      // Поменялся order?
+      if (object._order > canvasObject._order) {
+        this.canvas.bringToFront(canvasObject)
+      } else if (object._order < canvasObject._order) {
+        this.canvas.sendToBack(canvasObject)
+      }
+      canvasObject.set(object)
+    }
+
+    canvasObject.setCoords()
   }
 
   updateCanvasObjects (objects) {
@@ -1083,23 +1149,27 @@ export class Drawing extends React.Component {
         this.canvas.renderOnAddRemove = false
 
         enlivenedObjects.forEach((object) => {
-          if (
-            this.canvas._objects.length
-            && object._order < this.canvas._objects[this.canvas._objects.length - 1]._order
-          ) {
-            const index = this.canvas._objects.findIndex(item => item._order > object._order)
-
-            this.canvas.insertAt(object, index)
+          if (this.canvas._objectsMap.has(object._id)) { // Обрабатываем случай, когда к моменту "оживления" объекта такой объект уже появился на доске
+            this._updateExistingObject(object)
           } else {
-            this.canvas.add(object)
-          }
+            if (
+              this.canvas._objects.length
+              && object._order < this.canvas._objects[this.canvas._objects.length - 1]._order
+            ) {
+              const index = this.canvas._objects.findIndex(item => item._order > object._order)
 
-          this.canvas._objectsMap.set(object._id, object)
-          if (LockProvider.isLockedByUser(object)) {
-            LockProvider.lockUserObject(object)
-          }
-          if (LockProvider.isLockedBySelection(object)) {
-            makeNotInteractive(object)
+              this.canvas.insertAt(object, index)
+            } else {
+              this.canvas.add(object)
+            }
+
+            this.canvas._objectsMap.set(object._id, object)
+            if (LockProvider.isLockedByUser(object)) {
+              LockProvider.lockUserObject(object)
+            }
+            if (LockProvider.isLockedBySelection(object)) {
+              makeNotInteractive(object)
+            }
           }
         })
         this.canvas.renderOnAddRemove = true

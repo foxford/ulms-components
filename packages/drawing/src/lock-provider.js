@@ -143,6 +143,8 @@ class CLockProvider {
 
     this.isLockedByUser(object) ? this.unlockUserObject(object) : this.lockUserObject(object)
 
+    this.__canvas.requestRenderAll()
+
     this.__canvas && this.__canvas.fire('object:modified', { target: object })
   }
 }

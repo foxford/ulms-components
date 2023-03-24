@@ -20,6 +20,7 @@ export default class PanTool extends Base {
     this._canvas.selection = false
     this._canvas.defaultCursor = 'grab'
     this._canvas.setCursor('grab')
+    this._canvas.forEachObject(_ => makeNotInteractive(_))
   }
 
   handleMouseDownEvent (opts) {
@@ -59,7 +60,7 @@ export default class PanTool extends Base {
   }
 
   handleObjectAddedEvent (opts) {
-    Object.assign(opts.target, { selectable: false, evented: false })
+    opts.target.set({ selectable: false, evented: false })
   }
 
   reset () {

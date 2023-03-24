@@ -35,6 +35,13 @@ fabric.util.loadImage = function loadImage (url, callback, context, crossOrigin)
 }
 
 fabric.Line.prototype.calcLineEndpointCoords = function calcLineEndpointCoords () {
+  if (!this.canvas) {
+    return {
+      startCoords: { x: 0, y: 0 },
+      endCoords: { x: 0, y: 0 },
+    }
+  }
+
   const linePoints = this.calcLinePoints()
   const scaleX = this.scaleX || 1
   const scaleY = this.scaleY || 1
@@ -79,10 +86,12 @@ fabric.Canvas.prototype.getAbsoluteCoords = function getAbsoluteCoords (object) 
   } = object.getBoundingRect(true)
 
   return {
-    left: x + this._offset.left + left * canvasZoom, // this._offset - смещение канвас относительно окна
-    top: y + this._offset.top + top * canvasZoom,
+    left: x + left * canvasZoom,
+    top: y + top * canvasZoom,
     width: width * canvasZoom,
     height: height * canvasZoom,
+    offsetTop: this._offset.top, // Для корректировки размещения попапа
+    offsetLeft: this._offset.left, // this._offset - смещение канвас относительно окна
   }
 }
 
