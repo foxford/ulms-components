@@ -1,6 +1,6 @@
 {
   "name": "@ulms/ui-presentation",
-  "version": "1.4.3",
+  "version": "1.5.1",
   "description": "",
   "keywords": [
     "lerna"
@@ -35,6 +35,10 @@
     "react-sizeme": "^2.6.7",
     "react-visibility-sensor": "^5.0.2",
     "scroll-into-view-if-needed": "^2.2.20"
+  },
+  "devDependencies": {
+    "react": "^16.14.0",
+    "react-dom": "^16.14.0"
   },
   "peerDependencies": {
     "react": "^15.6 || ^16.x || ^17.x || ^18.x",
