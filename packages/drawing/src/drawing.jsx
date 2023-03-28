@@ -1132,6 +1132,7 @@ export class Drawing extends React.Component {
   }
 
   updateCanvasObjects (objects) {
+    const { tool } = this.props
     const {
       objectsToAdd,
       objectsToRemove,
@@ -1165,6 +1166,16 @@ export class Drawing extends React.Component {
               this.canvas.insertAt(object, index)
             } else {
               this.canvas.add(object)
+            }
+
+            if (tool !== toolEnum.SELECT) {
+              if (tool === toolEnum.PAN) {
+                object.set({ selectable: false, evented: false }) // Если PAN - не меняем курсор!
+              } else {
+                makeNotInteractive(object)
+              }
+            } else {
+              makeInteractive(object)
             }
 
             this.canvas._objectsMap.set(object._id, object)

@@ -36,8 +36,8 @@ class CKeyboardListenerProvider {
       this.#element.removeEventListener(keyboardEvents.keyDown, this.#handleKeyDownCaptureEvent, true)
       this.#element.removeEventListener(keyboardEvents.keyUp, this.#handleKeyUpCaptureEvent, true)
       this.#element.removeEventListener('copy', this.handleCopyEvent)
-      this.#element.removeEventListener('cut', this.handleCopyEvent)
-      this.#element.removeEventListener('paste', this.handleCopyEvent)
+      this.#element.removeEventListener('cut', this.handleCutEvent)
+      this.#element.removeEventListener('paste', this.handlePasteEvent)
     }
 
     if (el && el.addEventListener) {
