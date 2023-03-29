@@ -1039,6 +1039,7 @@ export class Drawing extends React.Component {
   }
 
   clearCanvasObjects ({ silent } = { silent: true }) {
+    this.canvas._objectsMap = new Map()
     if (this.canvas.getObjects().length) {
       if (silent) this.ignoreObjectRemovedEvent = true
       this.canvas.clear()
