@@ -65,6 +65,7 @@ export class Drawing extends React.Component {
     super(props)
 
     this.canvas = null
+    this.eventsEndabled = false
     this.canvasPattern = null
     this.canvasRef = React.createRef()
     this.canvasPatternRef = React.createRef()
@@ -104,9 +105,9 @@ export class Drawing extends React.Component {
       this.initStaticCanvas()
     } else {
       this.initCanvas()
-      if (canDraw) {
-        this.initCanvasListeners()
-      }
+      this.initCanvasListeners()
+      this.eventsEndabled = canDraw
+      KeyboardListenerProvider.enabled = canDraw
     }
 
     KeyboardListenerProvider.enabled = canDraw
@@ -158,9 +159,9 @@ export class Drawing extends React.Component {
         this.initStaticCanvas()
       } else {
         this.initCanvas()
-        if (canDraw) {
-          this.initCanvasListeners()
-        }
+        this.initCanvasListeners()
+        this.eventsEndabled = canDraw
+        KeyboardListenerProvider.enabled = canDraw
       }
       KeyboardListenerProvider.enabled = canDraw
 
@@ -170,10 +171,7 @@ export class Drawing extends React.Component {
 
     if (canDraw !== prevProps.canDraw) {
       KeyboardListenerProvider.enabled = canDraw
-      this.destroyCanvasListeners()
-      if (canDraw) {
-        this.initCanvasListeners()
-      }
+      this.eventsEndabled = canDraw
     }
 
     if (prevProps.pattern !== pattern) {
@@ -269,33 +267,42 @@ export class Drawing extends React.Component {
   }
 
   _handleKeyDown = (opts) => {
-    this.tool && this.tool.handleKeyDownEvent(opts)
+    this.eventsEndabled && this.tool && this.tool.handleKeyDownEvent(opts)
   }
 
   _handleKeyUp = (opts) => {
-    this.tool && this.tool.handleKeyUpEvent(opts)
+    this.eventsEndabled && this.tool && this.tool.handleKeyUpEvent(opts)
   }
 
   _handleMouseDown = (opts) => {
-    const { onMouseDown } = this.props
+    const {
+      onMouseDown, tool, isPresentation,
+    } = this.props
 
-    this.tool && this.tool.handleMouseDownEvent(opts)
+    this.tool && (this.eventsEndabled || (tool === toolEnum.PAN && !isPresentation))
+    && this.tool.handleMouseDownEvent(opts)
 
     onMouseDown && onMouseDown({ ...opts, vptCoords: this.canvas.vptCoords })
   }
 
   _handleMouseMove = (opts) => {
-    const { onMouseMove } = this.props
+    const {
+      onMouseMove, tool, isPresentation,
+    } = this.props
 
     CursorProvider.onMouseMove(opts)
-    this.tool && this.tool.handleMouseMoveEvent(opts)
+    this.tool && (this.eventsEndabled || (tool === toolEnum.PAN && !isPresentation))
+    && this.tool.handleMouseMoveEvent(opts)
     onMouseMove && onMouseMove({ ...opts, vptCoords: this.canvas.vptCoords })
   }
 
   _handleMouseUp = (opts) => {
-    const { onMouseUp } = this.props
+    const {
+      onMouseUp, tool, isPresentation,
+    } = this.props
 
-    this.tool && this.tool.handleMouseUpEvent(opts)
+    this.tool && (this.eventsEndabled || (tool === toolEnum.PAN && !isPresentation))
+    && this.tool.handleMouseUpEvent(opts)
 
     onMouseUp && onMouseUp({ ...opts, vptCoords: this.canvas.vptCoords })
   }
@@ -306,29 +313,29 @@ export class Drawing extends React.Component {
       // eslint-disable-next-line no-param-reassign
       opts.target.hiddenTextarea.maxLength = MAX_TEXT_LENGTH
     }
-    this.tool && this.tool.handleTextEditStartEvent(opts)
+    this.eventsEndabled && this.tool && this.tool.handleTextEditStartEvent(opts)
   }
 
   _handleTextEditEndEvent = (opts) => {
-    this.tool && this.tool.handleTextEditEndEvent(opts)
+    this.eventsEndabled && this.tool && this.tool.handleTextEditEndEvent(opts)
   }
 
   _handleTextChangedEvent = (opts) => {
-    this.tool && this.tool.handleTextChangedEvent(opts)
+    this.eventsEndabled && this.tool && this.tool.handleTextChangedEvent(opts)
   }
 
   _handleSelectionUpdatedEvent = (opts) => {
     clearExternalSelection()
-    this.tool && this.tool.handleSelectionUpdatedEvent(opts)
+    this.eventsEndabled && this.tool && this.tool.handleSelectionUpdatedEvent(opts)
   }
 
   _handleSelectionCreatedEvent = (opts) => {
     clearExternalSelection()
-    this.tool && this.tool.handleSelectionCreatedEvent(opts)
+    this.eventsEndabled && this.tool && this.tool.handleSelectionCreatedEvent(opts)
   }
 
   _handleSelectionClearedEvent = (opts) => {
-    this.tool && this.tool.handleSelectionClearedEvent(opts)
+    this.eventsEndabled && this.tool && this.tool.handleSelectionClearedEvent(opts)
   }
 
   _handleAfterRender = () => {
@@ -461,9 +468,10 @@ export class Drawing extends React.Component {
       isPresentation,
       onKeyUp,
       onZoom,
+      disableMobileGestures,
     } = this.props
 
-    this.canvas.allowTouchScrolling = true
+    this.canvas.allowTouchScrolling = !disableMobileGestures
 
     this.canvas.on('mouse:down', this._handleMouseDown)
     this.canvas.on('mouse:move', this._handleMouseMove)

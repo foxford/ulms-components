@@ -104,25 +104,25 @@ class CKeyboardListenerProvider {
   }
 
   #handleKeyDownEvent = (e) => {
-    if (this.#enabled && this.canHandleEvent(e)) {
+    if (this.canHandleEvent(e)) {
       this.#keyDownListeners.forEach((handler) => { handler(e) })
     }
   }
 
   #handleKeyUpEvent = (e) => {
-    if (this.#enabled && this.canHandleEvent(e)) {
+    if (this.canHandleEvent(e)) {
       this.#keyUpListeners.forEach((handler) => { handler(e) })
     }
   }
 
   #handleKeyDownCaptureEvent = (e) => {
-    if (this.#enabled && this.canHandleEvent(e)) {
+    if (this.canHandleEvent(e)) {
       this.#keyDownCaptureListeners.forEach((handler) => { handler(e) })
     }
   }
 
   #handleKeyUpCaptureEvent = (e) => {
-    if (this.#enabled && this.canHandleEvent(e)) {
+    if (this.canHandleEvent(e)) {
       this.#keyUpCaptureListeners.forEach((handler) => { handler(e) })
     }
   }
