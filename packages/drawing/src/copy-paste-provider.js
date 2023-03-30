@@ -1,7 +1,7 @@
 /* eslint-disable no-param-reassign,no-undef */
 import { fabric } from 'fabric/dist/fabric.min'
 
-import { COPY_PASTE_SHIFT, defaultToolSettings } from './constants'
+import { COPY_PASTE_SHIFT, defaultToolSettings, MAX_TEXT_LENGTH } from './constants'
 import { serializeObject } from './util/serialize-object'
 import { toCSSColor, HEXtoRGB } from './util/to-css-color'
 
@@ -190,7 +190,9 @@ class CCopyPasteProvider {
           width: 600,
         })
 
-        text.set('text', clipboardData.getData('text/plain'))
+        const clipboardText = clipboardData.getData('text/plain')
+
+        text.set('text', clipboardText.substring(0, MAX_TEXT_LENGTH))
 
         if (text._unwrappedTextLines.length === 1 && text._textLines.length === 1) {
           const w = text.measureLine(0).width
