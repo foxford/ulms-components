@@ -109,6 +109,8 @@ export class Drawing extends React.Component {
       KeyboardListenerProvider.enabled = canDraw
     }
 
+    KeyboardListenerProvider.enabled = canDraw
+
     if (pattern) {
       this.initCanvasPattern()
 
@@ -160,6 +162,7 @@ export class Drawing extends React.Component {
         this.eventsEndabled = canDraw
         KeyboardListenerProvider.enabled = canDraw
       }
+      KeyboardListenerProvider.enabled = canDraw
 
       this.updateCanvasParameters(true)
       this.createCanvasObjects(pageObjects)
@@ -1044,6 +1047,7 @@ export class Drawing extends React.Component {
   }
 
   clearCanvasObjects ({ silent } = { silent: true }) {
+    this.canvas._objectsMap = new Map()
     if (this.canvas.getObjects().length) {
       if (silent) this.ignoreObjectRemovedEvent = true
       this.canvas.clear()

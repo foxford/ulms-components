@@ -3,9 +3,97 @@ import React from 'react'
 import debounce from 'lodash/debounce'
 
 import { Presentation } from './presentation'
-import { getDocument, getImage, keyFn, renderPage } from './utils/pdf-rendering'
 
+const service = window.pdfjsLib
+
+function keyFn (documentUrl, pageNumber, width, height) {
+  return `${documentUrl}_${pageNumber}_${width}_${height}`
+}
 const reportError = error => console.error(error) // eslint-disable-line no-console
+
+const documentCache = {}
+const imageCache = {}
+const tasks = {}
+
+function getDocument (url, { httpHeaders }) {
+  if (!documentCache[url]) {
+    documentCache[url] = service.getDocument({ url, httpHeaders })
+  }
+
+  return documentCache[url]
+}
+
+export function getImage (key) {
+  return imageCache[key]
+}
+
+export function renderPage (documentUrl, pageNumber, width, height, { httpHeaders }) {
+  const key = keyFn(documentUrl, pageNumber, width, height)
+  let canvas
+  let context
+  let renderViewport
+
+  if (!tasks[key]) {
+    tasks[key] = new Promise((resolve, reject) => {
+      getDocument(documentUrl, { httpHeaders })
+        .then(document => document.getPage(pageNumber))
+        .then((page) => {
+          const initialViewport = page.getViewport(1)
+          const scale = Math.min(width / initialViewport.width, height / initialViewport.height)
+
+          renderViewport = page.getViewport(scale)
+
+          canvas = window.document.createElement('canvas')
+          context = canvas.getContext('2d')
+
+          canvas.width = renderViewport.width
+          canvas.height = renderViewport.height
+
+          context.clearRect(0, 0, canvas.width, canvas.height)
+
+          const renderContext = {
+            canvasContext: context,
+            viewport: renderViewport,
+          }
+
+          return page.render(renderContext)
+        })
+        .then(() => {
+          canvas.toBlob((blob) => {
+            if (blob) {
+              const url = window.URL.createObjectURL(blob)
+              const imageData = {
+                url,
+                width: renderViewport.width,
+                height: renderViewport.height,
+              }
+
+              context.clearRect(0, 0, canvas.width, canvas.height)
+              canvas.width = 0
+              canvas.height = 0
+              canvas = null
+              context = null
+              renderViewport = null
+
+              imageCache[`${documentUrl}_${pageNumber}_${width}_${height}`] = imageData
+
+              resolve(imageData)
+            }
+
+            resolve({})
+          })
+
+          return null
+        })
+        .catch(error => reject(error))
+    })
+  }
+
+  return tasks[key]
+}
+
+const MAX_NUMBER_ATTEMPTS_TO_REPEAT_REQUEST = 2
+const REPEATED_REQUEST_TIMER_VALUE = 5
 
 export class PDFPresentation extends React.Component {
   static CANVAS_WIDTH = 2048
@@ -23,8 +111,13 @@ export class PDFPresentation extends React.Component {
 
     this.mounted = false
 
+    this.attemptNumber = 0
+    this.timerToRepeatedRequestId = null
+
     this.state = {
+      hasError: false,
       pagesCollection: [],
+      repeatedRequestTimer: REPEATED_REQUEST_TIMER_VALUE,
     }
   }
 
@@ -50,6 +143,10 @@ export class PDFPresentation extends React.Component {
 
   componentWillUnmount () {
     this.mounted = false
+
+    if (this.timerToRepeatedRequestId) {
+      clearInterval(this.timerToRepeatedRequestId)
+    }
   }
 
   createCollection = (count) => {
@@ -135,22 +232,67 @@ export class PDFPresentation extends React.Component {
 
         return null
       })
-      .catch(reportError)
+      .catch((error) => {
+        this.setState({ hasError: true })
+        delete documentCache[url]
+        reportError(error)
+        this.startTimerToRepeatedRequest()
+      })
+  }
+
+  startTimerToRepeatedRequest = () => {
+    if (this.timerToRepeatedRequestId) return
+
+    if (this.attemptNumber >= MAX_NUMBER_ATTEMPTS_TO_REPEAT_REQUEST) return
+
+    this.timerToRepeatedRequestId = setInterval(() => {
+      this.setState(
+        prevState => ({
+          repeatedRequestTimer: prevState.repeatedRequestTimer - 1,
+        }),
+        () => {
+          const { repeatedRequestTimer } = this.state
+
+          if (repeatedRequestTimer === 0) {
+            clearInterval(this.timerToRepeatedRequestId)
+            this.timerToRepeatedRequestId = null
+
+            this.setState(({
+              hasError: false,
+              repeatedRequestTimer: REPEATED_REQUEST_TIMER_VALUE,
+            }))
+
+            this.updateCollection()
+            ++this.attemptNumber
+          }
+        }
+      )
+    }, 1000)
   }
 
   render () {
-    const { pagesCollection } = this.state
+    const {
+      hasError, pagesCollection, repeatedRequestTimer,
+    } = this.state
     const {
       // eslint-disable-next-line no-unused-vars
       url, innerRef, ...otherProps
     } = this.props
 
+    const errorText = hasError
+      ? `Произошла ошибка при загрузке презентации. ${this.attemptNumber === MAX_NUMBER_ATTEMPTS_TO_REPEAT_REQUEST
+        ? 'Попробуйте перезагрузить страницу'
+        : `Повторная попытка через ${repeatedRequestTimer}`}`
+      : undefined
+
     // TODO: fix other props handling
     return (
       <Presentation
         {...otherProps}
+        error={errorText}
         innerRef={innerRef}
         collection={pagesCollection}
+        repeatRequest={this.repeatRequest}
       />
     )
   }
