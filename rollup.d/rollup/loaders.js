@@ -145,7 +145,7 @@ var postcssLoader = {
                   // But skip this when namedExports is a function
                   // Since a user like you can manually log that if you want
                   if (name !== newName && typeof options.namedExports !== 'function') {
-                    console.warn(`Exported "${name}" as "${newName}" in ${humanlizePath(this.id)}`);
+                    console.warn(`Exported "${name}" as "${newName}" in ${this.id}`);
                   }
 
                   if (!json[newName]) {
