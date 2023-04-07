@@ -59,6 +59,8 @@ const rollupPlugins = [ // order matters
             // do nothing as we going to import file as is
           } else if(/node_modules\/.*\.css$/.exec(this.id)){
             // do nothing as we going to import file as is
+          } else if(/dist\/.*.css$/.exec(this.id)){
+            // do nothing as we going to import file as is
           } else {
             processAsCssModule.call(this)
             // process css as css-modules
@@ -75,7 +77,7 @@ const rollupPlugins = [ // order matters
     extensions: ['.js', '.jsx']
   }),
   commonjs({
-    include: 'node_modules/**',
+    include: ['node_modules/**', 'src/dist/**'],
     namedExports: {
       'react-sizeme': ['SizeMe'],
       'fabric': ['fabric']
