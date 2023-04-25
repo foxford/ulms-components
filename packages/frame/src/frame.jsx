@@ -45,6 +45,7 @@ export class Frame extends React.PureComponent {
     let _data = {
       page,
       title,
+      // eslint-disable-next-line node/no-unsupported-features/node-builtins
       url: new URL(`${Frame.type}/${id}`).href,
     }
 

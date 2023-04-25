@@ -1,6 +1,6 @@
 {
   "name": "@ulms/ui-icons",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "",
   "keywords": [
     "lerna"
@@ -28,6 +28,6 @@
     "classnames-es": "^2.2.6"
   },
   "peerDependencies": {
-    "react": "^15.6 || ^16.x || ^17.x"
+    "react": "^16.14"
   }
 }
