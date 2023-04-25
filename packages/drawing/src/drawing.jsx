@@ -9,6 +9,7 @@ import {
   shapeToolModeEnum,
   toolEnum,
   defaultToolSettings,
+  MAX_TEXT_LENGTH,
 } from './constants'
 import './util/fabric-presets'
 import { HEXtoRGB, toCSSColor } from './util/to-css-color'
@@ -307,6 +308,11 @@ export class Drawing extends React.Component {
   }
 
   _handleTextEditStartEvent = (opts) => {
+    if (opts.target.hiddenTextarea) {
+      // limit textarea length
+      // eslint-disable-next-line no-param-reassign
+      opts.target.hiddenTextarea.maxLength = MAX_TEXT_LENGTH
+    }
     this.eventsEndabled && this.tool && this.tool.handleTextEditStartEvent(opts)
   }
 
@@ -509,8 +515,8 @@ export class Drawing extends React.Component {
     this.canvas.off('mouse:down', this._handleMouseDown)
     this.canvas.off('mouse:move', this._handleMouseMove)
     this.canvas.off('mouse:up', this._handleMouseUp)
-    this.canvas.off('text:editing:entered', this._handleTextEditStartEvent)
-    this.canvas.off('text:editing:exited', this._handleTextEditEndEvent)
+    this.canvas.off('editing:entered', this._handleTextEditStartEvent)
+    this.canvas.off('editing:exited', this._handleTextEditEndEvent)
     this.canvas.off('text:changed', this._handleTextChangedEvent)
     this.canvas.off('selection:updated', this._handleSelectionUpdatedEvent)
     this.canvas.off('selection:created', this._handleSelectionCreatedEvent)

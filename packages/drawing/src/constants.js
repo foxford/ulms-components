@@ -98,6 +98,8 @@ export const THROTTLE_DELAY = 500
 
 export const COPY_PASTE_SHIFT = 30
 
+export const MAX_TEXT_LENGTH = 2000
+
 export const defaultToolSettings = {
   tool: toolEnum.PEN,
   color: '#000000',
