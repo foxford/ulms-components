@@ -1,6 +1,6 @@
 {
   "name": "@ulms/ui-grid",
-  "version": "1.1.0-dev.3",
+  "version": "1.1.1",
   "description": "Allows to use back-to-back columns for application layout. Not intended to wrap SplitPane-like elements.",
   "keywords": [
     "lerna"
@@ -28,6 +28,6 @@
     "classnames-es": "^2.2.6"
   },
   "peerDependencies": {
-    "react": "^15.6 || ^16.x || ^17.x"
+    "react": "^16.14"
   }
 }

@@ -6,7 +6,7 @@ const mkdirp = require('mkdirp') // eslint-disable-line import/no-extraneous-dep
 const ncp = require('ncp') // eslint-disable-line import/no-extraneous-dependencies
 const path = require('path')
 
-const { dist } = require('./rollup.config')
+const dist = require('./rollup.config')
 const { name } = require('./package.json')
 
 const debug = Debug(`${name}:rollup.js`)
