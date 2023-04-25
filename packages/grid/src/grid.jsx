@@ -1,8 +1,9 @@
 /* eslint-disable react/prop-types, react/jsx-props-no-spreading */
 import React from 'react'
 import cx from 'classnames-es'
-import { Grid as G } from '@foxford/ui/packages/Grid/Grid'
-import '@foxford/ui/packages/Grid/Grid.css'
+
+import { Grid as G } from './dist'
+import './dist/index.css'
 
 import css from './grid.module.css'
 

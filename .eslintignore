@@ -1,3 +1,4 @@
 /packages-v0
 /packages/*/es
+/packages/*/src/dist
 node_modules

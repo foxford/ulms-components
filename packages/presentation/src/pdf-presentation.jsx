@@ -61,6 +61,7 @@ export function renderPage (documentUrl, pageNumber, width, height, { httpHeader
         .then(() => {
           canvas.toBlob((blob) => {
             if (blob) {
+              // eslint-disable-next-line node/no-unsupported-features/node-builtins
               const url = window.URL.createObjectURL(blob)
               const imageData = {
                 url,

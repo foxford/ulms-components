@@ -1,6 +1,6 @@
 {
   "name": "@ulms/ui-location-viewport",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "",
   "keywords": [
     "lerna"
@@ -28,12 +28,10 @@
     "@ulms/ui-icons": "^1.0.0",
     "@ungap/event-target": "0.1.0",
     "classnames-es": "^2.2.6",
-    "popper.js": "^1.16.0",
-    "react": "^16.14.0",
-    "react-dom": "^16.14.0"
+    "popper.js": "^1.16.0"
   },
   "peerDependencies": {
-    "react": "^15.6 || ^16.x || ^17.x",
-    "react-dom": "^15.6 || ^16.x || ^17.x"
+    "react": "^16.14",
+    "react-dom": "^16.14"
   }
 }

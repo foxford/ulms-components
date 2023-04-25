@@ -1,6 +1,6 @@
 {
   "name": "@ulms/ui-frame",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "",
   "keywords": [
     "lerna"
@@ -25,9 +25,6 @@
     "build": "rm -rf ./es/* && BABEL_ENV=es rollup --config ./rollup.config.js index.js"
   },
   "peerDependencies": {
-    "react": "^15.6 || ^16.x || ^17.x"
-  },
-  "engines": {
-    "node": ">=10.14"
+    "react": "^16.14"
   }
 }
