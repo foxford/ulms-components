@@ -1067,7 +1067,7 @@ export class Drawing extends React.Component {
     this.clearCanvasObjects()
 
     if (pageObjects.length) {
-      const normalizedObjects = pageObjects.map(_ => normalizeFields({ ..._, remote: true }))
+      const normalizedObjects = pageObjects.map(_ => normalizeFields({ ..._, remote: true })).filter(_ => !_._removed)
 
       fabric.util.enlivenObjects(normalizedObjects, (enlivenedObjects) => {
         this.canvas.renderOnAddRemove = false
