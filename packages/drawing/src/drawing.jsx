@@ -1079,11 +1079,17 @@ export class Drawing extends React.Component {
       const normalizedObjects = pageObjects.map(_ => normalizeFields({ ..._, remote: true })).filter(_ => !_._removed)
 
       fabric.util.enlivenObjects(normalizedObjects, (enlivenedObjects) => {
+        // Есть ситуации, когда во время выполнения enlivenObjects this.canvas уже нет
+        if (!this.canvas) return
+
         this.canvas.renderOnAddRemove = false
 
         this.canvas.add(...enlivenedObjects)
 
         enlivenedObjects.forEach((object) => {
+          // Есть ситуации, когда во время выполнения enlivenObjects this.canvas уже нет
+          if (!this.canvas) return
+
           if (tool !== toolEnum.SELECT) {
             if (tool === toolEnum.PAN) {
               object.set({ selectable: false, evented: false }) // Если PAN - не меняем курсор!
@@ -1175,9 +1181,15 @@ export class Drawing extends React.Component {
       const normalizedObjects = objectsToAdd.map(_ => normalizeFields({ ..._, remote: true }))
 
       fabric.util.enlivenObjects(normalizedObjects, (enlivenedObjects) => {
+        // Есть ситуации, когда во время выполнения enlivenObjects this.canvas уже нет
+        if (!this.canvas) return
+
         this.canvas.renderOnAddRemove = false
 
         enlivenedObjects.forEach((object) => {
+          // Есть ситуации, когда во время выполнения enlivenObjects this.canvas уже нет
+          if (!this.canvas) return
+
           if (this.canvas._objectsMap.has(object._id)) { // Обрабатываем случай, когда к моменту "оживления" объекта такой объект уже появился на доске
             this._updateExistingObject(object)
           } else {
