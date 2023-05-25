@@ -172,6 +172,15 @@ export class Drawing extends React.Component {
     if (canDraw !== prevProps.canDraw) {
       KeyboardListenerProvider.enabled = canDraw
       this.eventsEndabled = canDraw
+
+      if (tool === toolEnum.SELECT) {
+        if (canDraw) {
+          LockTool.updateAllLock(this.canvas)
+        } else {
+          this.canvas.forEachObject(_ => makeNotInteractive(_))
+        }
+        this.canvas.requestRenderAll()
+      }
     }
 
     if (prevProps.pattern !== pattern) {
