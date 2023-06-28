@@ -1,0 +1,138 @@
+.container {
+  --toastify-toast-min-height: auto;
+  --toastify-color-light: 'red';
+  --container-position: 16px;
+
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0;
+  max-width: calc(100% - var(--container-position) * 2);
+  width: fit-content;
+}
+
+.container.isCompact {
+  --container-position: 12px;
+}
+
+:global(.Toastify__toast-container--top-center) {
+  top: var(--container-position);
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+ :global(.Toastify__toast-container--bottom-left) {
+  bottom: var(--container-position);
+  left: var(--container-position);
+   align-items: flex-start;
+}
+
+@media screen and (max-width: 576px) {
+  :global(.Toastify__toast-container--bottom-left) {
+    left: 50%;
+    transform: translateX(-50%);
+  }
+}
+
+@media screen and (max-width: 375px) {
+  .container.isCompact {
+    margin-right: 8px;
+    margin-left: 8px;
+  }
+}
+
+.toast {
+  margin-bottom: 8px;
+  padding: 0;
+  min-height: var(--toastify-toast-min-height);
+  max-width: 100%;
+  width: fit-content;
+  background-color: transparent;
+  box-shadow: none;
+  font-family: 'Circe', sans-serif;
+  overflow: initial;
+}
+
+.toast:last-child {
+  margin-bottom: 0;
+}
+
+.body {
+  margin: 0;
+  padding: 0;
+  min-height: var(--toastify-toast-min-height);
+  max-width: 100%;
+}
+
+.body > div:last-child {
+  max-width: 100%;
+}
+
+.animate__animated {
+  animation-duration: 0.6s;
+  animation-fill-mode: both;
+  animation-timing-function: ease-out;
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translate3d(0, -100%, 0);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.fadeInDown {
+  animation-name: fadeInDown;
+}
+
+.fadeOutUp {
+  animation-name: fadeOutUp;
+}
+
+@keyframes fadeOutUp {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+    transform: translate3d(0, -100%, 0);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 100%, 0);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.fadeInUp {
+  animation-name: fadeInUp;
+}
+
+@keyframes fadeOutDown {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+    transform: translate3d(0, 100%, 0);
+  }
+}
+
+.fadeOutDown {
+  animation-name: fadeOutDown;
+}
