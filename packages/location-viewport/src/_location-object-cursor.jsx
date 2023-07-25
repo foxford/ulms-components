@@ -1,10 +1,11 @@
 /* eslint-disable react/prop-types */
 import React from 'react'
 import cx from 'classnames-es'
-import Popper from 'popper.js'
-import { Icons } from '@ulms/ui-icons'
 
 import { fCalcIntermediateCoords, rangeBound, rotation } from './_utils'
+
+import CursorIcon from './cursor.svg'
+
 import css from './location-viewport.module.css'
 
 const getPosition = a => typeof a === 'number' ? `${a}px` : a
@@ -18,26 +19,14 @@ export class LocationObjectCursor extends React.Component {
   constructor (props) {
     super(props)
 
-    this.__descEl = undefined
-    this.__referenceEl = undefined
-    this.__popper = undefined
+    this.ref = React.createRef()
+    this.cursorSize = 20
   }
 
   componentDidMount () {
-    const { viewport: boundariesElement } = this.props
+    const style = getComputedStyle(this.ref.current)
 
-    this.__popper = new Popper(
-      this.__referenceEl,
-      this.__descEl,
-      {
-        placement: 'right',
-        modifiers: {
-          preventOverflow: {
-            boundariesElement,
-          },
-        },
-      }
-    )
+    this.cursorSize = parseInt(style.getPropertyValue('--location-viewport-object-size'))
   }
 
   shouldComponentUpdate (nextProps) {
@@ -46,17 +35,6 @@ export class LocationObjectCursor extends React.Component {
     if (nextProps.left !== left || nextProps.top !== top) return 1
 
     return 0
-  }
-
-  set _element (element) {
-    const { onAccessElement, id } = this.props
-
-    this.__descEl = element
-    onAccessElement && onAccessElement([id, element])
-  }
-
-  get _element () {
-    return this.__descEl
   }
 
   render () {
@@ -94,14 +72,27 @@ export class LocationObjectCursor extends React.Component {
 
     let rot = 0
     let transform
+    let textPosition = 'auto auto -12px 12px'
 
-    if (isOutOfRange(left, xUp, xLo) || isOutOfRange(top, yUp, yLo)) {
+    if (isOutOfRange(left, Math.max(xUp - this.cursorSize, 0), xLo)
+      || isOutOfRange(top, Math.max(yUp - this.cursorSize, 0), yLo)
+    ) {
       rot = rotation([xi, yi], [xC, yC], {
         defRotation: defaultCursorRotation,
         invert: !opts.inverted ? 1 : -1,
       })
 
       transform = `rotate(${Math.round(rot)}deg)`
+
+      if (text) {
+        if (rot > 225) {
+          textPosition = '-30px auto auto 12px'
+        } else if (rot > 135) {
+          textPosition = '-26px 40px auto auto'
+        } else if (rot > 46) {
+          textPosition = 'auto 30px -12px auto'
+        }
+      }
     }
 
     const styles = {
@@ -112,28 +103,27 @@ export class LocationObjectCursor extends React.Component {
 
     return (
       <div
-        className={cx({
-          [className]: className,
-          [css.cursor]: true,
-        })}
+        className={cx(css.cursor, className)}
         style={{
+          ...style,
           transform: `translate(${getPosition(styles.left)}, ${getPosition(styles.top)})`,
         }}
-        ref={(el) => { this.__referenceEl = el }}
+        ref={this.ref}
       >
-        <span
+        <div
           className={css.cursorItem}
-          style={{ transform, color: style.background || '#000' }}
+          style={{ transform }}
         >
-          <Icons size='xs' name='cursor-pointer' />
-        </span>
-        <span
-          ref={(el) => { this._element = el }}
-          className={css.cursorText}
-          style={style}
-        >
-          {text}
-        </span>
+          <CursorIcon />
+        </div>
+        {text && (
+          <div
+            className={css.cursorText}
+            style={{ inset: textPosition }}
+          >
+            {text}
+          </div>
+        )}
       </div>
     )
   }
