@@ -1,45 +1,58 @@
 .root {
-  --location-viewport-object-size: 20px
+  --location-viewport-cursor-fill: #e1d4f7;
+  --location-viewport-cursor-stroke: #fff;
+  --location-viewport-object-size: 20px;
+  --location-viewport-text-padding: 2px 8px;
+  --location-viewport-text-line-height: 18px;
+  --location-viewport-text-border-radius: 12px;
+  --location-viewport-text-font-size: 14px;
+  --location-viewport-text-color: #25262c;
 }
 
-.root .outer {
+.outer {
   position: relative;
   height: 100%;
   overflow: hidden;
 }
 
-.root .object { }
-
-.root .cursor {
+.cursor {
   position: absolute;
-  transition: transform .25s linear;
+  transition: transform 0.3s linear;
+  z-index: 1;
 }
 
-.root .cursorItem
-,.root .cursorText
-{
+.cursorItem,
+.cursorText {
   user-select: none;
 }
 
-.root .cursorItem {
+.cursorItem {
+  position: relative;
   display: block;
   transform-origin: top left;
-  transition: transform .3s linear;
 }
 
-.root .cursorText {
-  display: inline-block;
-  margin: 0 12px;
-  padding: 2px 3px;
+.cursorText {
+  position: absolute;
+  display: flex;
+  padding: var(--location-viewport-text-padding);
+  border-radius: var(--location-viewport-text-border-radius);
+  background-color: var(--location-viewport-cursor-fill);
+  line-height: var(--location-viewport-text-line-height);
+  color: var(--location-viewport-text-color);
+  white-space: nowrap;
 }
 
-.root .cursorItem > * {
+.cursorItem > * {
   --icons-size-xs: var(--location-viewport-object-size);
   display: block;
 }
 
-.root .cursorItem svg path {
-  width: inherit;
-  height: inherit;
-  fill: currentColor;
+@media screen and (max-width: 1899px) {
+  .root {
+    --location-viewport-text-padding: 2px 6px;
+    --location-viewport-text-font-size: 12px;
+    --location-viewport-text-line-height: 14px;
+  }
 }
+
