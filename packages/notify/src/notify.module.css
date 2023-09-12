@@ -9,7 +9,7 @@
   align-items: center;
   padding: 0;
   max-width: calc(100% - var(--container-position) * 2);
-  width: fit-content;
+  width: max-content;
 }
 
 .container.isCompact {
