@@ -75,6 +75,104 @@ fabric.Line.prototype.calcLineEndpointCoords = function calcLineEndpointCoords (
   return { startCoords, endCoords }
 }
 
+// Эта подмена нужна, чтобы поправить баг с неправильным определением места курсора при печати длинного текста
+fabric.Textbox.prototype.onInput = function (e) {
+  const { fromPaste } = this
+
+  this.fromPaste = false
+  e && e.stopPropagation()
+  if (!this.isEditing) {
+    return
+  }
+  // decisions about style changes.
+  const nextText = this._splitTextIntoLines(this.hiddenTextarea.value).graphemeText
+  const charCount = this._text.length
+  const nextCharCount = nextText.length
+  let removedText
+  let insertedText
+  let charDiff = nextCharCount - charCount
+  const { selectionStart } = this
+  const { selectionEnd } = this
+  const selection = selectionStart !== selectionEnd
+  let copiedStyle
+  let removeFrom
+  let removeTo
+
+  if (this.hiddenTextarea.value === '') {
+    this.styles = { }
+    this.updateFromTextArea()
+    this.fire('changed')
+    if (this.canvas) {
+      this.canvas.fire('text:changed', { target: this })
+      this.canvas.requestRenderAll()
+    }
+
+    return
+  }
+
+  const textareaSelection = this.fromStringToGraphemeSelection(
+    this.hiddenTextarea.selectionStart,
+    this.hiddenTextarea.selectionEnd,
+    this.hiddenTextarea.value
+  )
+  const backDelete = selectionStart > textareaSelection.selectionStart
+
+  if (selection) {
+    removedText = this._text.slice(selectionStart, selectionEnd)
+    charDiff += selectionEnd - selectionStart
+  } else if (nextCharCount < charCount) {
+    if (backDelete) {
+      removedText = this._text.slice(selectionEnd + charDiff, selectionEnd)
+    } else {
+      removedText = this._text.slice(selectionStart, selectionStart - charDiff)
+    }
+  }
+  insertedText = nextText.slice(textareaSelection.selectionEnd - charDiff, textareaSelection.selectionEnd)
+  if (removedText && removedText.length) {
+    if (insertedText.length) {
+      // let's copy some style before deleting.
+      // we want to copy the style before the cursor OR the style at the cursor if selection
+      // is bigger than 0.
+      copiedStyle = this.getSelectionStyles(selectionStart, selectionStart + 1, false)
+      // now duplicate the style one for each inserted text.
+      copiedStyle = insertedText.map(() =>
+        // this return an array of references, but that is fine since we are
+        // copying the style later.
+        copiedStyle[0])
+    }
+    if (selection) {
+      removeFrom = selectionStart
+      removeTo = selectionEnd
+    } else if (backDelete) {
+      // detect differences between forwardDelete and backDelete
+      removeFrom = selectionEnd - removedText.length
+      removeTo = selectionEnd
+    } else {
+      removeFrom = selectionEnd
+      removeTo = selectionEnd + removedText.length
+    }
+    this.removeStyleFromTo(removeFrom, removeTo)
+  }
+  if (insertedText.length) {
+    if (fromPaste && insertedText.join('') === fabric.copiedText && !fabric.disableStyleCopyPaste) {
+      copiedStyle = fabric.copiedTextStyle
+    }
+    this.insertNewStyleBlock(insertedText, selectionStart, copiedStyle)
+  }
+  this.updateFromTextArea()
+  this.fire('changed')
+  if (this.canvas) {
+    this.canvas.fire('text:changed', { target: this })
+
+    // Эти три строчки - новые в onInput
+    fabric.charWidthsCache[this.value] = {}
+    this.canvas.getActiveObject().initDimensions()
+    this.canvas.getActiveObject().setCoords()
+    // До этого момента
+    this.canvas.requestRenderAll()
+  }
+}
+
 // Вычисляет абсолютные координаты объекта во вьюпорте документа
 fabric.Canvas.prototype.getAbsoluteCoords = function getAbsoluteCoords (object) {
   const canvasZoom = this.getZoom()
