@@ -76,6 +76,7 @@ fabric.Line.prototype.calcLineEndpointCoords = function calcLineEndpointCoords (
 }
 
 // Эта подмена нужна, чтобы поправить баг с неправильным определением места курсора при печати длинного текста
+// Это копипаста из Фабрика
 fabric.Textbox.prototype.onInput = function (e) {
   const { fromPaste } = this
 
