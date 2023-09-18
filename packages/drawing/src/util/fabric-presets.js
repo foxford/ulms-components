@@ -89,7 +89,6 @@ fabric.Textbox.prototype.onInput = function (e) {
   const charCount = this._text.length
   const nextCharCount = nextText.length
   let removedText
-  let insertedText
   let charDiff = nextCharCount - charCount
   const { selectionStart } = this
   const { selectionEnd } = this
@@ -127,7 +126,8 @@ fabric.Textbox.prototype.onInput = function (e) {
       removedText = this._text.slice(selectionStart, selectionStart - charDiff)
     }
   }
-  insertedText = nextText.slice(textareaSelection.selectionEnd - charDiff, textareaSelection.selectionEnd)
+  const insertedText = nextText.slice(textareaSelection.selectionEnd - charDiff, textareaSelection.selectionEnd)
+
   if (removedText && removedText.length) {
     if (insertedText.length) {
       // let's copy some style before deleting.
@@ -135,10 +135,9 @@ fabric.Textbox.prototype.onInput = function (e) {
       // is bigger than 0.
       copiedStyle = this.getSelectionStyles(selectionStart, selectionStart + 1, false)
       // now duplicate the style one for each inserted text.
-      copiedStyle = insertedText.map(() =>
-        // this return an array of references, but that is fine since we are
-        // copying the style later.
-        copiedStyle[0])
+      // this return an array of references, but that is fine since we are
+      // copying the style later.
+      copiedStyle = insertedText.map(() => copiedStyle[0])
     }
     if (selection) {
       removeFrom = selectionStart
