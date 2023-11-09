@@ -360,7 +360,10 @@ export class Drawing extends React.Component {
     const {
       clientId,
       onLockSelection,
+      mobile,
     } = this.props
+
+    fabric.Object.prototype.objectCaching = !mobile
 
     this.canvas = new fabric.Canvas('canvas', {
       enablePointerEvents: 'PointerEvent' in window,
