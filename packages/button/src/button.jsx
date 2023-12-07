@@ -6,12 +6,13 @@ import css from './button.module.css'
 
 function Button (props) {
   const {
-    active, children, className, disabled, onClick, title,
+    active, children, className, dataTestId, disabled, onClick, title,
   } = props
 
   return (
     <button
       className={cx(css.root, className, { [css.active]: active })}
+      data-testid={dataTestId}
       disabled={disabled}
       onClick={onClick}
       title={title}

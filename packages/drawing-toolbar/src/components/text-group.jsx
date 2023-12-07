@@ -90,6 +90,7 @@ export class TextGroup extends React.Component {
       >
         <ToolbarButton
           active={tool === toolEnum.TEXT}
+          dataTestId='board-panel-text-button'
           title={intl.formatMessage({ id: intlID.TEXT })}
           group
           onClick={() => handleOpen(this.getOptions())}

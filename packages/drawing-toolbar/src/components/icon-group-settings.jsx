@@ -10,10 +10,11 @@ export const IconGroupSettings = ({
   <div className={css.wrapper}>
     <div className={css.row}>
       {iconsSet.map(({
-        key, icon, title = '',
+        dataTestId, key, icon, title = '',
       }) => (
         <ToolbarButton
           active={currentSelection === key}
+          dataTestId={dataTestId}
           onClick={() => handleClick(key)}
           title={title}
           fillWidth={fillWidth}

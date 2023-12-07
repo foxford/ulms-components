@@ -194,6 +194,7 @@ class _DrawingToolbarComponent extends React.Component {
           { isSelectEnabled && (
             <ToolbarButton
               active={tool === toolEnum.SELECT}
+              dataTestId='board-panel-choose-button'
               onClick={() => this.handleOpen(toolEnum.SELECT)}
               title={intl.formatMessage({ id: 'SELECT' })}
             >
@@ -204,6 +205,7 @@ class _DrawingToolbarComponent extends React.Component {
           { isPanEnabled && (
             <ToolbarButton
               active={tool === toolEnum.PAN}
+              dataTestId='board-panel-move-button'
               onClick={() => this.handleOpen(toolEnum.PAN)}
               title={intl.formatMessage({ id: 'HAND' })}
             >
@@ -230,6 +232,7 @@ class _DrawingToolbarComponent extends React.Component {
 
           { isShapeEnabled && (
             <ShapeGroup
+              dataTestId='board-panel-group-shape-button'
               opened={opened === toolEnum.SHAPE}
               className={css.floater}
               intl={intl}
@@ -272,6 +275,7 @@ class _DrawingToolbarComponent extends React.Component {
           { isEraserEnabled && (
             <ToolbarButton
               active={tool === toolEnum.ERASER}
+              dataTestId='board-panel-eraser-button'
               onClick={() => this.handleOpen(toolEnum.ERASER)}
               title={intl.formatMessage({ id: 'ERASER' })}
             >
@@ -284,6 +288,7 @@ class _DrawingToolbarComponent extends React.Component {
           { isImageEnabled && (
             <ToolbarButton
               active={tool === toolEnum.IMAGE}
+              dataTestId='board-panel-image-button'
               onClick={this.handleImageClick}
               title={intl.formatMessage({ id: 'UPLOAD_IMAGE' })}
             >
@@ -294,6 +299,7 @@ class _DrawingToolbarComponent extends React.Component {
           { isStampEnabled && (
             <ToolbarButton
               active={tool === toolEnum.STAMP}
+              dataTestId='board-panel-stamps-button'
               group
               onClick={this.handleStampClick}
               title={intl.formatMessage({ id: 'STAMP' })}
@@ -305,6 +311,7 @@ class _DrawingToolbarComponent extends React.Component {
           { isLibEnabled && (
             <ToolbarButton
               active={tool === toolEnum.LIB}
+              dataTestId='board-panel-library-button'
               group
               onClick={this.handleLibClick}
               title={intl.formatMessage({ id: 'LIB' })}
