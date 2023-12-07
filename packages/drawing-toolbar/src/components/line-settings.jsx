@@ -37,18 +37,22 @@ export const LineSettings = ({
 
   const iconsSet = [
     {
+      dataTestId: 'board-panel-popup-thickness1-button',
       key: lineSizes.ONE,
       icon: iconsMap[lineSizes.ONE],
     },
     {
+      dataTestId: 'board-panel-popup-thickness2-button',
       key: lineSizes.TWO,
       icon: iconsMap[lineSizes.TWO],
     },
     {
+      dataTestId: 'board-panel-popup-thickness3-button',
       key: lineSizes.FOUR,
       icon: iconsMap[lineSizes.FOUR],
     },
     {
+      dataTestId: 'board-panel-popup-thickness4-button',
       key: lineSizes.EIGHT,
       icon: iconsMap[lineSizes.EIGHT],
     },
@@ -56,18 +60,22 @@ export const LineSettings = ({
 
   const dashedIconsSet = [
     {
+      dataTestId: 'board-panel-popup-thickness1-button',
       key: lineSizes.ONE,
       icon: dashedIconsMap[lineSizes.ONE],
     },
     {
+      dataTestId: 'board-panel-popup-thickness2-button',
       key: lineSizes.TWO,
       icon: dashedIconsMap[lineSizes.TWO],
     },
     {
+      dataTestId: 'board-panel-popup-thickness3-button',
       key: lineSizes.FOUR,
       icon: dashedIconsMap[lineSizes.FOUR],
     },
     {
+      dataTestId: 'board-panel-popup-thickness4-button',
       key: lineSizes.EIGHT,
       icon: dashedIconsMap[lineSizes.EIGHT],
     },

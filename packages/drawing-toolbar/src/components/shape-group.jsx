@@ -51,21 +51,25 @@ export class ShapeGroup extends React.Component {
 
     this.iconsSet = [
       {
+        dataTestId: 'board-panel-popup-empty-square',
         key: shapeToolModeEnum.RECT,
         icon: this.iconsMap[shapeToolModeEnum.RECT],
         // title: intl.formatMessage({ id: intlID.RECT }),
       },
       {
+        dataTestId: 'board-panel-popup-empty-circle',
         key: shapeToolModeEnum.CIRCLE,
         icon: this.iconsMap[shapeToolModeEnum.CIRCLE],
         // title: intl.formatMessage({ id: intlID.CIRCLE }),
       },
       {
+        dataTestId: 'board-panel-popup-empty-triangle',
         key: shapeToolModeEnum.TRIANGLE,
         icon: this.iconsMap[shapeToolModeEnum.TRIANGLE],
         // title: intl.formatMessage({ id: intlID.TRIANGLE }),
       },
       {
+        dataTestId: 'board-panel-popup-empty-right-triangle',
         key: shapeToolModeEnum.RIGHT_TRIANGLE,
         icon: this.iconsMap[shapeToolModeEnum.RIGHT_TRIANGLE],
         // title: intl.formatMessage({ id: intlID.RIGHT_TRIANGLE }),
@@ -74,21 +78,25 @@ export class ShapeGroup extends React.Component {
 
     this.solidIconsSet = [
       {
+        dataTestId: 'board-panel-popup-square',
         key: shapeToolModeEnum.RECT_SOLID,
         icon: this.iconsSolidMap[shapeToolModeEnum.RECT_SOLID],
         // title: intl.formatMessage({ id: intlID.RECT_SOLID }),
       },
       {
+        dataTestId: 'board-panel-popup-circle',
         key: shapeToolModeEnum.CIRCLE_SOLID,
         icon: this.iconsSolidMap[shapeToolModeEnum.CIRCLE_SOLID],
         // title: intl.formatMessage({ id: intlID.CIRCLE_SOLID }),
       },
       {
+        dataTestId: 'board-panel-popup-triangle',
         key: shapeToolModeEnum.TRIANGLE_SOLID,
         icon: this.iconsSolidMap[shapeToolModeEnum.TRIANGLE_SOLID],
         // title: intl.formatMessage({ id: intlID.TRIANGLE_SOLID }),
       },
       {
+        dataTestId: 'board-panel-popup-right-triangle',
         key: shapeToolModeEnum.RIGHT_TRIANGLE_SOLID,
         icon: this.iconsSolidMap[shapeToolModeEnum.RIGHT_TRIANGLE_SOLID],
         // title: intl.formatMessage({ id: intlID.RIGHT_TRIANGLE_SOLID }),
@@ -179,6 +187,7 @@ export class ShapeGroup extends React.Component {
       >
         <ToolbarButton
           active={tool === toolEnum.SHAPE}
+          dataTestId='board-panel-group-shape-button'
           group
           title={intl.formatMessage({ id: intlID.SHAPE })}
           onClick={() => handleOpen(this.getOptions())}

@@ -40,16 +40,19 @@ export class LineGroup extends React.Component {
 
     this.iconsSet = [
       {
+        dataTestId: 'board-panel-line-button',
         key: lineToolModeEnum.LINE,
         icon: this.iconsMap[lineToolModeEnum.LINE],
         title: intl.formatMessage({ id: intlID.LINE }),
       },
       {
+        dataTestId: 'board-panel-dotted-line-button',
         key: lineToolModeEnum.DASHED_LINE,
         icon: this.iconsMap[lineToolModeEnum.DASHED_LINE],
         title: intl.formatMessage({ id: intlID.DASHED_LINE }),
       },
       {
+        dataTestId: 'board-panel-arrow-button',
         key: lineToolModeEnum.ARROW,
         icon: this.iconsMap[lineToolModeEnum.ARROW],
         title: intl.formatMessage({ id: intlID.ARROW }),
@@ -147,6 +150,7 @@ export class LineGroup extends React.Component {
       >
         <ToolbarButton
           active={tool === toolEnum.LINE}
+          dataTestId='board-panel-group-line-button'
           group
           onClick={() => handleOpen(this.getOptions())}
           innerRef={this.buttonRef}

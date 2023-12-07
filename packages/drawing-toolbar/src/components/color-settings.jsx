@@ -6,25 +6,30 @@ import { ToolbarButton } from './toolbar-button'
 import css from './settings.module.css'
 
 const colors = [
-  '#000000',
-  '#ABB8C3',
-  '#FFFFFF',
-  '#A45C3D',
-  '#FFCE03',
-  '#F94B28',
-  '#7FC92E',
-  '#1A96F6',
-  '#FF9900',
-  '#FFADDA',
-  '#A30BF8',
-  '#9DF1F7',
+  { dataTestId: 'board-panel-popup-color-black-button', value: '#000000' },
+  { dataTestId: 'board-panel-popup-color-gray-button', value: '#ABB8C3' },
+  { dataTestId: 'board-panel-popup-color-white-button', value: '#FFFFFF' },
+  { dataTestId: 'board-panel-popup-color-brown-button', value: '#A45C3D' },
+  { dataTestId: 'board-panel-popup-color-yellow-button', value: '#FFCE03' },
+  { dataTestId: 'board-panel-popup-color-red-button', value: '#F94B28' },
+  { dataTestId: 'board-panel-popup-color-green-button', value: '#7FC92E' },
+  { dataTestId: 'board-panel-popup-color-blue-button', value: '#1A96F6' },
+  { dataTestId: 'board-panel-popup-color-orange-button', value: '#FF9900' },
+  { dataTestId: 'board-panel-popup-color-pink-button', value: '#FFADDA' },
+  { dataTestId: 'board-panel-popup-color-violet-button', value: '#A30BF8' },
+  { dataTestId: 'board-panel-popup-color-aquamarine-button', value: '#9DF1F7' },
 ]
 
 export const ColorItem = ({
-  color, active = false, handleClick, innerRef,
+  active = false,
+  color,
+  dataTestId,
+  handleClick,
+  innerRef,
 }) => (
   <ToolbarButton
     active={active}
+    dataTestId={dataTestId}
     innerRef={innerRef}
     onClick={() => handleClick(color)}
   >
@@ -55,10 +60,11 @@ export const ColorSettings = ({
         <div className={cn(css.row, css.colorRow)} key={i}>
           {colorsRow.map(color => (
             <ColorItem
-              active={currentColor.toLowerCase() === color.toLowerCase()}
-              color={color}
+              active={currentColor.toLowerCase() === color.value.toLowerCase()}
+              color={color.value}
+              dataTestId={color.dataTestId}
               handleClick={handleClick}
-              key={color}
+              key={color.value}
             />
           ))}
         </div>
