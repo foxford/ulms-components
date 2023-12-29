@@ -17,7 +17,7 @@ const tasks = {}
 
 function getDocument (url, { httpHeaders }) {
   if (!documentCache[url]) {
-    documentCache[url] = service.getDocument({ url, httpHeaders })
+    documentCache[url] = service.getDocument({ url, httpHeaders }).promise
   }
 
   return documentCache[url]
@@ -38,10 +38,10 @@ export function renderPage (documentUrl, pageNumber, width, height, { httpHeader
       getDocument(documentUrl, { httpHeaders })
         .then(document => document.getPage(pageNumber))
         .then((page) => {
-          const initialViewport = page.getViewport(1)
+          const initialViewport = page.getViewport({ scale: 1 })
           const scale = Math.min(width / initialViewport.width, height / initialViewport.height)
 
-          renderViewport = page.getViewport(scale)
+          renderViewport = page.getViewport({ scale })
 
           canvas = window.document.createElement('canvas')
           context = canvas.getContext('2d')
@@ -56,7 +56,7 @@ export function renderPage (documentUrl, pageNumber, width, height, { httpHeader
             viewport: renderViewport,
           }
 
-          return page.render(renderContext)
+          return page.render(renderContext).promise
         })
         .then(() => {
           canvas.toBlob((blob) => {
