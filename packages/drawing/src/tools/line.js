@@ -1,4 +1,4 @@
-import { calcDistance } from '../util'
+import { calcDistance, snapCoord } from '../util'
 
 import { Base } from './base'
 import { makeNotInteractive } from './object'
@@ -16,9 +16,25 @@ export class LineTool extends Base {
     this.__isDrawing = false
     this.__isOnCanvas = false
     this.__shiftPressed = false
+    this.__cmdPressed = false
+    this.__ctrlPressed = false
     this.__startPoint = null
+    this.__currentPoint = null
 
     this._canvas.forEachObject(_ => makeNotInteractive(_))
+  }
+
+  _createObject () {
+    this.__object = new WhiteboardLine([], {
+      fill: this.__color,
+      stroke: this.__color,
+      strokeDashArray: this.__dash,
+      strokeWidth: this.__width,
+      hasControls: false,
+      hasBorders: false,
+      selectable: false,
+      _noHistory: true, // Не сохраняем в undo/redo history
+    })
   }
 
   configure (props) {
@@ -37,16 +53,39 @@ export class LineTool extends Base {
     }
   }
 
-  handleKeyDownEvent (e) {
+  #handleKeyEvent (e) {
     if (!this._active) return
 
+    const changed =
+      this.__shiftPressed !== e.shiftKey
+      || this.__cmdPressed !== e.metaKey
+      || this.__ctrlPressed !== e.ctrlKey
+
     this.__shiftPressed = e.shiftKey
+    this.__cmdPressed = e.metaKey
+    this.__ctrlPressed = e.ctrlKey
+
+    changed && this._reshape()
+  }
+
+  handleKeyDownEvent (e) {
+    this.#handleKeyEvent(e)
   }
 
   handleKeyUpEvent (e) {
-    if (!this._active) return
+    this.#handleKeyEvent(e)
+  }
 
-    this.__shiftPressed = e.shiftKey
+  #preparePoint (e) {
+    const point = this._canvas.getPointer(e)
+
+    if (!(this.__cmdPressed || this.__ctrlPressed)) {
+      return point
+    }
+    point.x = snapCoord(point.x)
+    point.y = snapCoord(point.y)
+
+    return point
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -57,17 +96,9 @@ export class LineTool extends Base {
   handleMouseDownEvent (opts) {
     if (!this._active) return
 
-    this.__startPoint = this._canvas.getPointer(opts.e)
-    this.__object = new WhiteboardLine([], {
-      fill: this.__color,
-      stroke: this.__color,
-      strokeDashArray: this.__dash,
-      strokeWidth: this.__width,
-      hasControls: false,
-      hasBorders: false,
-      selectable: false,
-      _noHistory: true, // Не сохраняем в undo/redo history
-    })
+    this.__startPoint = this.#preparePoint(opts.e)
+
+    this._createObject()
 
     this.__object.set({
       x1: this.__startPoint.x,
@@ -82,7 +113,14 @@ export class LineTool extends Base {
     if (!this._active) return
     if (!this.__isDrawing) return
 
-    const { x, y } = this._canvas.getPointer(opts.e)
+    this.__currentPoint = this.#preparePoint(opts.e)
+    this._reshape()
+  }
+
+  _reshape () {
+    if (!this.__isDrawing) return
+
+    const { x, y } = this.__currentPoint
 
     if (this.__isOnCanvas || calcDistance(this.__startPoint, { x, y }) > POINT_DELTA) {
       let diff = {
@@ -105,11 +143,11 @@ export class LineTool extends Base {
           }
         } else if (delta > 0) {
           diff = {
-            ...diff, x2: x, y2: this.__startPoint.y,
+            ...diff, x2: x, y2: this.__startPoint.y + 0.001,
           }
         } else {
           diff = {
-            ...diff, x2: this.__startPoint.x, y2: y,
+            ...diff, x2: this.__startPoint.x + 0.001, y2: y,
           }
         }
       } else {
@@ -153,5 +191,6 @@ export class LineTool extends Base {
     this.__isDrawing = false
     this.__isOnCanvas = false
     this.__startPoint = null
+    this.__currentPoint = null
   }
 }

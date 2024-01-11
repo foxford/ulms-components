@@ -11,3 +11,7 @@ export const calcDistance = (point1, point2) => {
 
   return 0
 }
+
+export function snapCoord (coord) {
+  return Math.round(coord / 10) * 10
+}
