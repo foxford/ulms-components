@@ -144,7 +144,7 @@ class PresentationComponent extends React.Component {
         data-presentation-root
       >
         <div className={cx(css.listWrapper, showPreviews && css.isShown)}>
-          <div className={css.list}>
+          <div className={css.list} data-testid='presentation-preview-panel'>
             {
               collection.map((item, idx) => (
                 <div
