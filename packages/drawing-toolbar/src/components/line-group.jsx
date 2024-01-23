@@ -123,7 +123,7 @@ export class LineGroup extends React.Component {
     return (
       <SettingsGroup
         direction='right-start'
-        containerStyles={{ marginTop: '-12px', marginLeft: '4px' }}
+        containerStyles={{ marginTop: '-16px', marginLeft: '-2px' }}
         isOpen={opened}
         handleClose={handleClose}
         target={this.buttonRef.current}
@@ -152,6 +152,7 @@ export class LineGroup extends React.Component {
           active={tool === toolEnum.LINE}
           dataTestId='board-panel-group-line-button'
           group
+          groupColor={color}
           onClick={() => handleOpen(this.getOptions())}
           innerRef={this.buttonRef}
           title={this._getTitle(brushMode)}

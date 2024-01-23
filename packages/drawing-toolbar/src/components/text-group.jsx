@@ -70,7 +70,7 @@ export class TextGroup extends React.Component {
     return (
       <SettingsGroup
         direction='right-start'
-        containerStyles={{ marginTop: '-12px', marginLeft: '4px' }}
+        containerStyles={{ marginTop: '-16px', marginLeft: '-2px' }}
         isOpen={opened}
         handleClose={handleClose}
         target={this.buttonRef.current}
@@ -93,6 +93,7 @@ export class TextGroup extends React.Component {
           dataTestId='board-panel-text-button'
           title={intl.formatMessage({ id: intlID.TEXT })}
           group
+          groupColor={color}
           onClick={() => handleOpen(this.getOptions())}
           innerRef={this.buttonRef}
         >

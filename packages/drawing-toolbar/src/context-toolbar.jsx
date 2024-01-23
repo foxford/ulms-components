@@ -12,6 +12,7 @@ import { RGBtoHEX, fromCSSColor, toCSSColor, HEXtoRGB } from './utils'
 import { ObjectTypes, ShapeTypes, LineTypes, ColorTypes } from './constants'
 
 import IconLineSettingsTool from './icons/line-settings-tool-icon.svg'
+import IconTextSettingsTool from './icons/text-tool-alt-icon.svg'
 import IconCopyPaste from './icons/copy-paste-tool-icon.svg'
 import IconDelete from './icons/delete-tool-icon.svg'
 import IconLockUnlocked from './icons/lock-tool-unlocked-icon.svg'
@@ -240,7 +241,9 @@ export class ContextToolbar extends React.Component {
             {showLineTool && (
             <SettingsGroup
               direction={`${direction}-start`}
-              containerStyles={{ marginLeft: '-12px' }}
+              containerStyles={{
+                left: '-12px', padding: '8px 12px', top: direction === 'top' ? '2px' : '-2px',
+              }}
               isOpen={lineSettingsOpened}
               handleClose={() => this.setState({ lineSettingsOpened: false })}
               target={this.lineSettingsRef.current}
@@ -268,7 +271,9 @@ export class ContextToolbar extends React.Component {
             {showFontTool && (
             <SettingsGroup
               direction={`${direction}-start`}
-              containerStyles={{ marginLeft: '-12px' }}
+              containerStyles={{
+                left: '-12px', padding: '8px 12px', top: direction === 'top' ? '2px' : '-2px',
+              }}
               isOpen={fontSettingsOpened}
               handleClose={() => this.setState({ fontSettingsOpened: false })}
               target={this.fontSettingsRef.current}
@@ -279,22 +284,28 @@ export class ContextToolbar extends React.Component {
                 />
               )}
             >
-              <FontItem
-                fontSize={48}
-                innerRef={this.fontSettingsRef}
+              <ToolbarButton
                 active={fontSettingsOpened}
-                handleClick={() => this.setState({
-                  fontSettingsOpened: !fontSettingsOpened,
-                  lineSettingsOpened: false,
-                  colorSettingsOpened: false,
-                })}
-              />
+                onClick={() => {
+                  this.setState({
+                    fontSettingsOpened: !fontSettingsOpened,
+                    lineSettingsOpened: false,
+                    colorSettingsOpened: false,
+                  })
+                }}
+                innerRef={this.fontSettingsRef}
+              >
+                <IconTextSettingsTool />
+              </ToolbarButton>
+
             </SettingsGroup>
             )}
             {showColorTool && (
             <SettingsGroup
               direction={`${direction}-start`}
-              containerStyles={{ marginLeft: '-12px' }}
+              containerStyles={{
+                left: '-12px', padding: '12px', top: direction === 'top' ? '2px' : '-2px',
+              }}
               isOpen={colorSettingsOpened}
               handleClose={() => this.setState({ colorSettingsOpened: false })}
               target={this.colorSettingsRef.current}

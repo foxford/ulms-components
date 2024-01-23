@@ -9,29 +9,40 @@ export const ToolbarButton = ({
   dataTestId,
   fillWidth = false,
   group = false,
+  groupColor = '#fff',
   innerRef,
   onClick,
   padded = false,
   title = '',
+  style = {},
 }) => (
-  <div className={css.wrapper}>
-    {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events */}
-    <div
-      ref={innerRef}
-      className={cn(
-        css.button,
-        fillWidth && css.button_fillWidth,
-        active && css.button_active,
-        padded && css.button_padded,
-        group && css.group,
-      )}
-      data-testid={dataTestId}
-      onClick={onClick}
-      role='button'
-      tabIndex='0'
-      title={title}
-    >
-      {children}
-    </div>
+  // eslint-disable-next-line jsx-a11y/click-events-have-key-events
+  <div
+    ref={innerRef}
+    className={cn(
+      css.button,
+      fillWidth && css.button_fillWidth,
+      active && css.button_active,
+      padded && css.button_padded,
+    )}
+    data-testid={dataTestId}
+    onClick={onClick}
+    role='button'
+    tabIndex='0'
+    title={title}
+    style={style}
+  >
+    {group && (
+      <div className={css.colorIndicatorWrapper}>
+        <div
+          className={css.colorIndicator}
+          style={{
+            backgroundColor: groupColor,
+            borderColor: groupColor === '#FFFFFF' ? 'rgba(37, 38, 44, 0.55)' : groupColor,
+          }}
+        />
+      </div>
+    )}
+    {children}
   </div>
 )
