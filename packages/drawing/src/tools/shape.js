@@ -168,7 +168,6 @@ export class ShapeTool extends PositionableObject {
 
     this.__resolveObject(opts)
     this.__startPoint = this.#preparePoint(opts.e)
-    console.log(2222222, this.__cmdPressed, this.__startPoint)
     this.__object.set({
       left: this.__startPoint.x,
       top: this.__startPoint.y,
