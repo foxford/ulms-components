@@ -16,9 +16,9 @@ const styles = {
     filter: 'drop-shadow(rgba(0, 0, 0, 0.1) 0px 6px 20px)',
   },
   container: {
-    padding: '12px 16px',
+    padding: '8px 12px',
     minWidth: 'auto',
-    borderRadius: '8px',
+    borderRadius: '4px',
     backgroundColor: '#fff',
   },
   content: {
@@ -30,6 +30,9 @@ const styles = {
     spread: 16,
     length: 8,
     color: '#fff',
+  },
+  options: {
+    zIndex: 10000,
   },
 }
 

@@ -1,10 +1,17 @@
+const CRY = 'cry'
+const EXPLOSION = 'explosion'
+const HANDS = 'hands'
+const LIKE = 'like'
+const LOVE = 'love'
+const TRY_AGAIN = 'try_again'
+
 export const ANIMATION_IDS = {
-  cry: 'cry',
-  explosion: 'explosion',
-  hands: 'hands',
-  like: 'like',
-  love: 'love',
-  try_again: 'try_again',
+  CRY,
+  EXPLOSION,
+  HANDS,
+  LIKE,
+  LOVE,
+  TRY_AGAIN,
 }
 
 const defaultAnimationSizePortrait = {
@@ -20,16 +27,16 @@ const defaultAnimationSizeLandscape = {
 }
 
 export const ANIMATION_SIZES = {
-  [ANIMATION_IDS.like]: defaultAnimationSizePortrait,
-  [ANIMATION_IDS.love]: defaultAnimationSizePortrait,
-  [ANIMATION_IDS.cry]: defaultAnimationSizePortrait,
-  [ANIMATION_IDS.hands]: defaultAnimationSizePortrait,
-  [ANIMATION_IDS.explosion]: {
+  like: defaultAnimationSizePortrait,
+  love: defaultAnimationSizePortrait,
+  cry: defaultAnimationSizePortrait,
+  hands: defaultAnimationSizePortrait,
+  explosion: {
     desktop: 'height: auto; width: 100%;',
     tablet: 'height: auto; width: 100%;',
     mobile: 'height: auto; width: 90%;',
   },
-  [ANIMATION_IDS.try_again]: {
+  try_again: {
     desktop: 'height: auto; width: 70%;',
     tablet: 'height: auto; width: 70%;',
     mobile: 'height: auto; width: 70%;',
@@ -37,16 +44,16 @@ export const ANIMATION_SIZES = {
 }
 
 export const ANIMATION_SIZES_LANDSCAPE = {
-  [ANIMATION_IDS.like]: defaultAnimationSizeLandscape,
-  [ANIMATION_IDS.love]: defaultAnimationSizeLandscape,
-  [ANIMATION_IDS.cry]: defaultAnimationSizeLandscape,
-  [ANIMATION_IDS.hands]: defaultAnimationSizeLandscape,
-  [ANIMATION_IDS.explosion]: {
+  like: defaultAnimationSizeLandscape,
+  love: defaultAnimationSizeLandscape,
+  cry: defaultAnimationSizeLandscape,
+  hands: defaultAnimationSizeLandscape,
+  explosion: {
     desktop: 'height: auto; width: 70%;',
     tablet: 'height: 50%; max-width: 100%;',
     mobile: 'height: 50%; max-width: 100%;',
   },
-  [ANIMATION_IDS.try_again]: {
+  try_again: {
     desktop: 'height: auto; width: 60%;',
     tablet: 'height: 35%; max-width: 100%;',
     mobile: 'height: 35%; max-width: 100%;',

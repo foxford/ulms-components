@@ -78,11 +78,11 @@ export const AnimationsInput = memo(({
               <TGSPlayer
                 hover
                 ref={playerRef}
-                flip={id === ANIMATION_IDS.cry || id === ANIMATION_IDS.love}
+                flip={id === ANIMATION_IDS.CRY || id === ANIMATION_IDS.LOVE}
                 src={src}
                 style={isDisabled ? { pointerEvents: 'none' } : {}}
-                height={id === ANIMATION_IDS.try_again ? 'auto' : 44}
-                width={id === ANIMATION_IDS.try_again ? '100%' : 44}
+                height={id === ANIMATION_IDS.TRY_AGAIN ? 'auto' : 44}
+                width={id === ANIMATION_IDS.TRY_AGAIN ? '100%' : 44}
               />
             </Styled.AnimationItem>
           ))}

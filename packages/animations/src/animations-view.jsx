@@ -14,7 +14,9 @@ import {
   ANIMATION_SIZES_LANDSCAPE,
 } from './constants'
 
-const getContainerSize = (id = ANIMATION_IDS.explosion) => {
+const getContainerSize = (id) => {
+  if (!id) return null
+
   const screenWidth = document.documentElement.clientWidth
   const screenHeight = document.documentElement.clientHeight
   const isLandscape = screenWidth / screenHeight > 1
@@ -112,7 +114,7 @@ export const AnimationsView = memo(({
     : undefined
 
   const flip =
-    animation?.id === ANIMATION_IDS.cry || animation?.id === ANIMATION_IDS.love
+    animation?.id === ANIMATION_IDS.CRY || animation?.id === ANIMATION_IDS.LOVE
 
   return (
     <ThemeProvider theme={theme}>
