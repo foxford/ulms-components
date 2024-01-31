@@ -9,20 +9,17 @@ import React, {
 import styled, { ThemeProvider } from 'styled-components'
 import { TGSPlayer } from '@ulms/tgs-player'
 
-import {
-  ANIMATION_IDS,
-  ANIMATION_SIZES,
-  ANIMATION_SIZES_LANDSCAPE,
-} from './constants'
+import { ANIMATION_IDS, ANIMATION_SIZES } from './constants'
 import { getAnimationsData } from './utils'
 
-const getContainerSize = (id) => {
+const getContainerSize = (id, animationSizes = ANIMATION_SIZES) => {
   if (!id) return null
 
   const screenWidth = document.documentElement.clientWidth
   const screenHeight = document.documentElement.clientHeight
   const isLandscape = screenWidth / screenHeight > 1
-  const sizes = isLandscape ? ANIMATION_SIZES_LANDSCAPE : ANIMATION_SIZES
+
+  const sizes = animationSizes[isLandscape ? 'landscape' : 'portrait']
 
   if (screenWidth >= 1240) {
     return sizes[id].desktop
@@ -35,12 +32,12 @@ const getContainerSize = (id) => {
 }
 
 const Root = styled.div`
-  ${({ animationId }) => `
+  ${({ animationId, customSizes }) => `
     position: absolute;
     bottom: 0;
     display: flex;
     z-index: 5;
-    ${getContainerSize(animationId)}
+    ${getContainerSize(animationId, customSizes)}
   `}
 `
 
@@ -49,6 +46,7 @@ const getSoundByAnimationId = (id, items) => items?.find?.(_ => _.id === id)?.so
 export const AnimationsView = memo(({
   animation,
   className,
+  customSizes,
   onCompleteHandler,
   publicStorageProvider,
   theme,
@@ -57,6 +55,7 @@ export const AnimationsView = memo(({
   const [items, setItems] = useState([])
   const [isSoundReady, setIsSoundReady] = useState(false)
   const playerRef = useRef(null)
+  const volumeRef = useRef(1)
   const currentAnimationId = useRef(null)
 
   const onPlay = () => {
@@ -87,7 +86,7 @@ export const AnimationsView = memo(({
   }, [])
 
   useEffect(() => {
-    Howler.volume(volume)
+    volumeRef.current = volume
   }, [volume])
 
   useEffect(() => {
@@ -106,11 +105,13 @@ export const AnimationsView = memo(({
 
     if (!sound) return
 
+    sound.volume(animation.soundOn ? volumeRef.current : 0)
+
     if (sound.state() === 'loaded') {
       setIsSoundReady(true)
     } else {
-      sound.load()
       sound.on('load', loadHandler)
+      sound.load()
     }
     sound.on('end', endHandler)
 
@@ -134,6 +135,7 @@ export const AnimationsView = memo(({
         animationId={animation?.id}
         data-testid={`animation-played-${animation?.id}`}
         className={className}
+        customSizes={customSizes}
       >
         <TGSPlayer
           ref={playerRef}

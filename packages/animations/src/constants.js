@@ -27,35 +27,36 @@ const defaultAnimationSizeLandscape = {
 }
 
 export const ANIMATION_SIZES = {
-  like: defaultAnimationSizePortrait,
-  love: defaultAnimationSizePortrait,
-  cry: defaultAnimationSizePortrait,
-  hands: defaultAnimationSizePortrait,
-  explosion: {
-    desktop: 'height: auto; width: 100%;',
-    tablet: 'height: auto; width: 100%;',
-    mobile: 'height: auto; width: 90%;',
+  portrait: {
+    like: defaultAnimationSizePortrait,
+    love: defaultAnimationSizePortrait,
+    cry: defaultAnimationSizePortrait,
+    hands: defaultAnimationSizePortrait,
+    explosion: {
+      desktop: 'height: auto; width: 100%;',
+      tablet: 'height: auto; width: 100%;',
+      mobile: 'height: auto; width: 90%;',
+    },
+    try_again: {
+      desktop: 'height: auto; width: 70%;',
+      tablet: 'height: auto; width: 70%;',
+      mobile: 'height: auto; width: 70%;',
+    },
   },
-  try_again: {
-    desktop: 'height: auto; width: 70%;',
-    tablet: 'height: auto; width: 70%;',
-    mobile: 'height: auto; width: 70%;',
-  },
-}
-
-export const ANIMATION_SIZES_LANDSCAPE = {
-  like: defaultAnimationSizeLandscape,
-  love: defaultAnimationSizeLandscape,
-  cry: defaultAnimationSizeLandscape,
-  hands: defaultAnimationSizeLandscape,
-  explosion: {
-    desktop: 'height: auto; width: 70%;',
-    tablet: 'height: 50%; max-width: 100%;',
-    mobile: 'height: 50%; max-width: 100%;',
-  },
-  try_again: {
-    desktop: 'height: auto; width: 60%;',
-    tablet: 'height: 35%; max-width: 100%;',
-    mobile: 'height: 35%; max-width: 100%;',
+  landscape: {
+    like: defaultAnimationSizeLandscape,
+    love: defaultAnimationSizeLandscape,
+    cry: defaultAnimationSizeLandscape,
+    hands: defaultAnimationSizeLandscape,
+    explosion: {
+      desktop: 'height: auto; width: 70%;',
+      tablet: 'height: 50%; max-width: 100%;',
+      mobile: 'height: 50%; max-width: 100%;',
+    },
+    try_again: {
+      desktop: 'height: auto; width: 60%;',
+      tablet: 'height: 35%; max-width: 100%;',
+      mobile: 'height: 35%; max-width: 100%;',
+    },
   },
 }

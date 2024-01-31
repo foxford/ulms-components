@@ -9,12 +9,21 @@ const getAnimationPublicSrc = (storage, fileName, extension) => storage.getUrl(
   extension
 )
 
-export const getAnimationsData = storage => Object.keys(ANIMATION_IDS).map(key => ({
-  id: ANIMATION_IDS[key],
-  previewSrc: getAnimationPublicSrc(storage, ANIMATION_IDS[key], 'svg'),
-  src: getAnimationPublicSrc(storage, ANIMATION_IDS[key], 'tgs'),
+const sortedAnimationIds = [
+  ANIMATION_IDS.LIKE,
+  ANIMATION_IDS.LOVE,
+  ANIMATION_IDS.EXPLOSION,
+  ANIMATION_IDS.CRY,
+  ANIMATION_IDS.HANDS,
+  ANIMATION_IDS.TRY_AGAIN,
+]
+
+export const getAnimationsData = storage => sortedAnimationIds.map(id => ({
+  id,
+  previewSrc: getAnimationPublicSrc(storage, id, 'svg'),
+  src: getAnimationPublicSrc(storage, id, 'tgs'),
   sound: new Howl({
-    src: getAnimationPublicSrc(storage, ANIMATION_IDS[key], 'mp3'),
+    src: getAnimationPublicSrc(storage, id, 'mp3'),
     preload: false,
   }),
 }))
