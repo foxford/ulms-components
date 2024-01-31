@@ -1,3 +1,4 @@
+import { Howler } from 'howler'
 import React, {
   memo,
   useEffect,
@@ -13,6 +14,7 @@ import {
   ANIMATION_SIZES,
   ANIMATION_SIZES_LANDSCAPE,
 } from './constants'
+import { getAnimationsData } from './utils'
 
 const getContainerSize = (id) => {
   if (!id) return null
@@ -42,15 +44,17 @@ const Root = styled.div`
   `}
 `
 
-const getSoundByAnimationId = (id, items) => items.find(_ => _.id === id).sound
+const getSoundByAnimationId = (id, items) => items?.find?.(_ => _.id === id)?.sound
 
 export const AnimationsView = memo(({
   animation,
   className,
-  items,
   onCompleteHandler,
+  publicStorageProvider,
   theme,
+  volume = 1,
 }) => {
+  const [items, setItems] = useState([])
   const [isSoundReady, setIsSoundReady] = useState(false)
   const playerRef = useRef(null)
   const currentAnimationId = useRef(null)
@@ -62,7 +66,7 @@ export const AnimationsView = memo(({
     // когда пользователь возвращается на вкладку с вебинаром, поэтому делаем дополнительную проверку,
     // что анимация уже запущена, проверяя это тем, что уже проигрывается ее звук (sound.playing()),
     // если это так, то не воспроизводим звук повторно (не вызываем sound.play())
-    animation && isSoundReady && !sound.playing() && sound.play()
+    animation && isSoundReady && !sound?.playing?.() && sound?.play?.()
   }
 
   const onComplete = (animationId) => {
@@ -75,10 +79,16 @@ export const AnimationsView = memo(({
 
   // eslint-disable-next-line arrow-body-style
   useLayoutEffect(() => {
+    setItems(getAnimationsData(publicStorageProvider))
+
     return () => {
       onComplete(currentAnimationId.current)
     }
   }, [])
+
+  useEffect(() => {
+    Howler.volume(volume)
+  }, [volume])
 
   useEffect(() => {
     if (!animation) return
@@ -93,6 +103,8 @@ export const AnimationsView = memo(({
 
     currentAnimationId.current = animation.id
     const sound = getSoundByAnimationId(animation.id, items)
+
+    if (!sound) return
 
     if (sound.state() === 'loaded') {
       setIsSoundReady(true)

@@ -16,7 +16,6 @@ const _TGSPlayer = forwardRef((
     width,
     height,
     className,
-    interactivityConfig,
     onClick,
     flip = false,
     onComplete,
@@ -30,9 +29,11 @@ const _TGSPlayer = forwardRef((
   const playerRef = useRef(null)
   const [player, setPlayer] = useState(null)
   const [showPlayer, setShowPlayer] = useState(true)
+  const setPlayerTimerId = useRef(null)
+  const setShowPlayerTimerId = useRef(null)
 
   useEffect(() => {
-    setTimeout(() => {
+    setPlayerTimerId.current = setTimeout(() => {
       if (playerRef.current) {
         setPlayer(playerRef.current.getLottie())
       }
@@ -40,34 +41,38 @@ const _TGSPlayer = forwardRef((
 
     return () => {
       setPlayer(null)
+      if (setPlayerTimerId.current) {
+        clearTimeout(setPlayerTimerId.current)
+      }
     }
   }, [playerRef.current])
 
   useEffect(() => {
     setShowPlayer(false)
     // Чтобы перезапустить плеер при смене src
-    setTimeout(() => {
+    setShowPlayerTimerId.current = setTimeout(() => {
       setShowPlayer(true)
     }, 0)
+
+    return () => {
+      if (setShowPlayerTimerId.current) {
+        clearTimeout(setShowPlayerTimerId.current)
+      }
+    }
   }, [src])
 
   useEffect(() => {
     if (playOnHover && player) {
-      createInteractivity(interactivityConfig
-        ? {
-          player,
-          ...interactivityConfig,
-        }
-        : {
-          player,
-          mode: 'cursor',
-          actions: [
-            {
-              type: 'hover',
-              forceFlag: false,
-            },
-          ],
-        })
+      createInteractivity({
+        player,
+        mode: 'cursor',
+        actions: [
+          {
+            type: 'hover',
+            forceFlag: false,
+          },
+        ],
+      })
     }
   }, [playOnHover, player])
 

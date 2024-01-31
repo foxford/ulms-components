@@ -1,10 +1,11 @@
-import React, { memo, useEffect, useRef, useState } from 'react'
+import React, { memo, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { ThemeProvider } from 'styled-components'
 import { Volume, VolumeRemove as VolumeOff } from '@foxford/icon-pack'
 import { Spacer } from '@foxford/ui'
 import { TGSPlayer } from '@ulms/tgs-player'
 
 import { ANIMATION_IDS } from './constants'
+import { getAnimationsData } from './utils'
 
 import * as Styled from './animations-input.style'
 
@@ -13,13 +14,18 @@ export const AnimationsInput = memo(({
   isAnimationSoundOn,
   isDisabled,
   isInputVisible,
-  items,
+  publicStorageProvider,
   onChangeSound,
   onSelectAnimation,
   theme,
 }) => {
+  const [items, setItems] = useState([])
   const [isShownDisableTooltip, setIsShownDisableTooltip] = useState(false)
   const playerRef = useRef(null)
+
+  useLayoutEffect(() => {
+    setItems(getAnimationsData(publicStorageProvider))
+  }, [])
 
   useEffect(() => {
     if (isShownDisableTooltip && (!isDisabled || !isInputVisible)) {

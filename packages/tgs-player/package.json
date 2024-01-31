@@ -1,6 +1,6 @@
 {
   "name": "@ulms/tgs-player",
-  "version": "1.0.0-dev.2",
+  "version": "1.0.0-dev.4",
   "description": "",
   "keywords": [
     "lerna"
@@ -24,12 +24,14 @@
   "scripts": {
     "build": "rm -rf ./es/* && BABEL_ENV=es rollup --config ./rollup.config.js index.js"
   },
+  "dependencies": {
+    "@lottiefiles/lottie-interactivity": "~1.6.2",
+    "@lottiefiles/lottie-player": "~2.0.2"
+  },
   "devDependencies": {
     "react": "^16.14 || 17 || 18"
   },
   "peerDependencies": {
-    "@lottiefiles/lottie-interactivity": "~1.6.2",
-    "@lottiefiles/lottie-player": "~2.0.2",
     "react": "^16.14 || 17 || 18",
     "react-dom": "^16.14 || 17 || 18"
   }
