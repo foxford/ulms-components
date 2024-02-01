@@ -21,7 +21,7 @@
 
 .button.button_active:hover,
 .button.button_active {
-  background-color: #E9E9E9;
+  background-color: #ECEDF3;
 }
 
 .button.button_padded {
@@ -29,7 +29,7 @@
 }
 
 .button:hover {
-  background-color: #E9E9E999;
+  background-color: #F5F6F9;
 }
 
 .colorIndicator {

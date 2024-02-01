@@ -29,6 +29,7 @@
 .root .listWrapper .list .preview {
   display: flex;
   padding-bottom: 10px;
+  border-radius: 4px;
 }
 
 .root .listWrapper .list .preview:last-child {
@@ -40,7 +41,7 @@
   margin-right: 8px;
   font-size: 12px;
   line-height: 130%;
-  color: #4A4A4A;
+  color: rgba(37, 38, 44, 0.7);
 ;
 }
 
@@ -72,11 +73,12 @@
   content: "";
   display: block;
   position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  border: 1px solid #1A96F6;
+  top: -2px;
+  right: -2px;
+  bottom: -2px;
+  left: -2px;
+  border-radius: 4px;
+  border: 1px solid #8A51E6;
 }
 
 .root .slideWrapper {
@@ -159,7 +161,7 @@
 
 .root .slideWrapper .controls .linkArrow:hover,
 .root .slideWrapper .controls .linkArrow:active {
-  color: #48A1E6;
+  color: #8A51E6;
 }
 
 .root .slideWrapper .controls .linkArrow svg path {
@@ -168,7 +170,7 @@
 
 .root .slideWrapper .controls .linkArrow:hover svg path,
 .root .slideWrapper .controls .linkArrow:active svg path {
-  fill: #48A1E6;
+  fill: #8A51E6;
 }
 
 .root .slideWrapper .controls .linkArrow .linkArrowIcon {
@@ -178,8 +180,8 @@
 
 .listWrapper,
 .slide {
-  scrollbar-width: 6px;
-  scrollbar-color: #B8B8B8 rgba(184, 184, 184, 0.2);
+  scrollbar-width: thin;
+  scrollbar-color: #d5d7e1 #f5f6f9;
 }
 
 .listWrapper::-webkit-scrollbar,
@@ -189,10 +191,11 @@
 
 .listWrapper::-webkit-scrollbar-thumb,
 .slide::-webkit-scrollbar-thumb {
-  background: #B8B8B8;
+  background-color: #d5d7e1;
 }
 
 .listWrapper::-webkit-scrollbar-track,
 .slide::-webkit-scrollbar-track {
-  background: rgba(184, 184, 184, 0.2);
+  background: #f5f6f9;
+  border-radius: 3px;
 }
