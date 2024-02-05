@@ -4,8 +4,6 @@ import debounce from 'lodash/debounce'
 
 import { Presentation } from './presentation'
 
-const service = window.pdfjsLib
-
 function keyFn (documentUrl, pageNumber, width, height) {
   return `${documentUrl}_${pageNumber}_${width}_${height}`
 }
@@ -17,7 +15,7 @@ const tasks = {}
 
 function getDocument (url, { httpHeaders }) {
   if (!documentCache[url]) {
-    documentCache[url] = service.getDocument({ url, httpHeaders }).promise
+    documentCache[url] = window.pdfjsLib.getDocument({ url, httpHeaders }).promise
   }
 
   return documentCache[url]
