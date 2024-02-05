@@ -129,7 +129,7 @@ const WhiteboardArrowLine = fabric.util.createClass(fabric.WhiteboardLine, {
     this.callSuper('_render', ctx)
 
     // do not render if width/height are zeros or object is not visible
-    if (this.width === 0 || this.height === 0 || !this.visible) return
+    if ((this.width === 0 && this.height === 0) || !this.visible) return
 
     ctx.save()
 

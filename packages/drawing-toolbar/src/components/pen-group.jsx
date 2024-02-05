@@ -172,7 +172,7 @@ export class PenGroup extends React.Component {
               handleClick={value => (brushMode === penToolModeEnum.MARKER)
                 ? this.handleClick('markerColor', value)
                 : this.handleClick('penColor', value)}
-              rows={orientation === 'horizontal' ? 1 : 3}
+              rows={orientation === 'horizontal' ? 2 : 3}
             />
           </div>
         )}
