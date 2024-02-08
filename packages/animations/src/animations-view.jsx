@@ -1,4 +1,3 @@
-import { Howler } from 'howler'
 import React, {
   memo,
   useEffect,
@@ -12,7 +11,12 @@ import { TGSPlayer } from '@ulms/tgs-player'
 import { ANIMATION_IDS, ANIMATION_SIZES } from './constants'
 import { getAnimationsData } from './utils'
 
-const getContainerSize = (id, animationSizes = ANIMATION_SIZES) => {
+const getContainerSize = (
+  id,
+  animationSizes = ANIMATION_SIZES,
+  desktopWidth = 1240,
+  tabletWidth = 1024
+) => {
   if (!id) return null
 
   const screenWidth = document.documentElement.clientWidth
@@ -21,10 +25,12 @@ const getContainerSize = (id, animationSizes = ANIMATION_SIZES) => {
 
   const sizes = animationSizes[isLandscape ? 'landscape' : 'portrait']
 
-  if (screenWidth >= 1240) {
+  if (!sizes) return null
+
+  if (screenWidth >= desktopWidth) {
     return sizes[id].desktop
   }
-  if (screenWidth >= 1024) {
+  if (screenWidth >= tabletWidth) {
     return sizes[id].tablet
   }
 
@@ -32,12 +38,14 @@ const getContainerSize = (id, animationSizes = ANIMATION_SIZES) => {
 }
 
 const Root = styled.div`
-  ${({ animationId, customSizes }) => `
+  ${({
+    animationId, customSizes, desktopWidth, tabletWidth,
+  }) => `
     position: absolute;
     bottom: 0;
     display: flex;
     z-index: 5;
-    ${getContainerSize(animationId, customSizes)}
+    ${getContainerSize(animationId, customSizes, desktopWidth, tabletWidth)}
   `}
 `
 
@@ -47,8 +55,10 @@ export const AnimationsView = memo(({
   animation,
   className,
   customSizes,
+  desktopWidth,
   onCompleteHandler,
   publicStorageProvider,
+  tabletWidth,
   theme,
   volume = 1,
 }) => {
@@ -133,9 +143,11 @@ export const AnimationsView = memo(({
     <ThemeProvider theme={theme}>
       <Root
         animationId={animation?.id}
-        data-testid={`animation-played-${animation?.id}`}
         className={className}
         customSizes={customSizes}
+        data-testid={`animation-played-${animation?.id}`}
+        desktopWidth={desktopWidth}
+        tabletWidth={tabletWidth}
       >
         <TGSPlayer
           ref={playerRef}
