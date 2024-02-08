@@ -25,7 +25,7 @@ const getContainerSize = (
 
   const sizes = animationSizes[isLandscape ? 'landscape' : 'portrait']
 
-  if (!sizes) return null
+  if (!sizes[id]) return null
 
   if (screenWidth >= desktopWidth) {
     return sizes[id].desktop
