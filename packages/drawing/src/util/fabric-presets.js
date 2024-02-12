@@ -77,100 +77,28 @@ fabric.Line.prototype.calcLineEndpointCoords = function calcLineEndpointCoords (
 
 // Эта подмена нужна, чтобы поправить баг с неправильным определением места курсора при печати длинного текста
 // Это копипаста из Фабрика
+const textBoxOnInput = fabric.Textbox.prototype.onInput
+const textBoxFromObject = fabric.Textbox.fromObject
+
 fabric.Textbox.prototype.onInput = function (e) {
-  const { fromPaste } = this
+  textBoxOnInput.call(this, e)
 
-  this.fromPaste = false
-  e && e.stopPropagation()
-  if (!this.isEditing) {
-    return
-  }
-  // decisions about style changes.
-  const nextText = this._splitTextIntoLines(this.hiddenTextarea.value).graphemeText
-  const charCount = this._text.length
-  const nextCharCount = nextText.length
-  let removedText
-  let charDiff = nextCharCount - charCount
-  const { selectionStart } = this
-  const { selectionEnd } = this
-  const selection = selectionStart !== selectionEnd
-  let copiedStyle
-  let removeFrom
-  let removeTo
-
-  if (this.hiddenTextarea.value === '') {
-    this.styles = { }
-    this.updateFromTextArea()
-    this.fire('changed')
-    if (this.canvas) {
-      this.canvas.fire('text:changed', { target: this })
-      this.canvas.requestRenderAll()
-    }
-
-    return
-  }
-
-  const textareaSelection = this.fromStringToGraphemeSelection(
-    this.hiddenTextarea.selectionStart,
-    this.hiddenTextarea.selectionEnd,
-    this.hiddenTextarea.value
-  )
-  const backDelete = selectionStart > textareaSelection.selectionStart
-
-  if (selection) {
-    removedText = this._text.slice(selectionStart, selectionEnd)
-    charDiff += selectionEnd - selectionStart
-  } else if (nextCharCount < charCount) {
-    if (backDelete) {
-      removedText = this._text.slice(selectionEnd + charDiff, selectionEnd)
-    } else {
-      removedText = this._text.slice(selectionStart, selectionStart - charDiff)
-    }
-  }
-  const insertedText = nextText.slice(textareaSelection.selectionEnd - charDiff, textareaSelection.selectionEnd)
-
-  if (removedText && removedText.length) {
-    if (insertedText.length) {
-      // let's copy some style before deleting.
-      // we want to copy the style before the cursor OR the style at the cursor if selection
-      // is bigger than 0.
-      copiedStyle = this.getSelectionStyles(selectionStart, selectionStart + 1, false)
-      // now duplicate the style one for each inserted text.
-      // this return an array of references, but that is fine since we are
-      // copying the style later.
-      copiedStyle = insertedText.map(() => copiedStyle[0])
-    }
-    if (selection) {
-      removeFrom = selectionStart
-      removeTo = selectionEnd
-    } else if (backDelete) {
-      // detect differences between forwardDelete and backDelete
-      removeFrom = selectionEnd - removedText.length
-      removeTo = selectionEnd
-    } else {
-      removeFrom = selectionEnd
-      removeTo = selectionEnd + removedText.length
-    }
-    this.removeStyleFromTo(removeFrom, removeTo)
-  }
-  if (insertedText.length) {
-    if (fromPaste && insertedText.join('') === fabric.copiedText && !fabric.disableStyleCopyPaste) {
-      copiedStyle = fabric.copiedTextStyle
-    }
-    this.insertNewStyleBlock(insertedText, selectionStart, copiedStyle)
-  }
-  this.updateFromTextArea()
-  this.fire('changed')
   if (this.canvas) {
-    this.canvas.fire('text:changed', { target: this })
-
-    // Эти три строчки - новые в onInput
+    // Пересобираем кэш длин символов
     fabric.charWidthsCache[this.value] = {}
     this.canvas.getActiveObject().initDimensions()
     this.canvas.getActiveObject().setCoords()
-    // До этого момента
+
     this.canvas.requestRenderAll()
   }
+}
+
+fabric.Textbox.fromObject = function (object, callback) {
+  if (object.fontFamily.includes('BlinkMacSystemFont')) {
+    // eslint-disable-next-line no-param-reassign
+    object.fontFamily = object.fontFamily.split(', ').filter(item => item !== 'BlinkMacSystemFont').join(', ')
+  }
+  textBoxFromObject.call(this, object, callback)
 }
 
 // Вычисляет абсолютные координаты объекта во вьюпорте документа

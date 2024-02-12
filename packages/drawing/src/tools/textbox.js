@@ -24,6 +24,7 @@ export class TextboxTool extends PositionableObject {
       scaleY: 0.5,
       strokeUniform: true,
       width: 600,
+      _forceClearCache: true,
       ...restOptions,
     }))
   }
