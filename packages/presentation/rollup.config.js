@@ -1,6 +1,6 @@
 /* eslint-disable */
 const cssdupl = require('postcss-discard-duplicates')
-// const cssnext = require('postcss-cssnext')
+const cssnext = require('postcss-cssnext')
 const cssurl = require('postcss-url')
 const Debug = require('debug')
 const env = require('postcss-preset-env')
@@ -40,13 +40,13 @@ const processAsCssModule = function(){
 
 const rollupPlugins = [ // order matters
   json(),
-  svgr(),
+  svgr({ dimensions: false }), // Исправляем ошибку, когда из svg удаляется viewBox
   postcss({
     extract: true,
     plugins: [
       cssurl({ url: 'inline' }),
       env(),
-      // cssnext(),
+      cssnext(),
       cssdupl()
     ].concat(shouldMinifyCss()),
     loaders: [

@@ -77,8 +77,8 @@ export class ShapeTool extends PositionableObject {
         diff = {
           originX: this.__altPressed ? 'center' : ((currentWidth < 0) ? 'right' : 'left'),
           originY: this.__altPressed ? 'center' : ((currentHeight < 0) ? 'bottom' : 'top'),
-          flipX: currentWidth < 0,
-          flipY: currentWidth > 0,
+          flipX: false,
+          flipY: true,
           scaleX: scaleX * multiplier,
           scaleY: scaleY * multiplier,
         }
