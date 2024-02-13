@@ -1,6 +1,6 @@
 {
   "name": "@ulms/animations",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "",
   "keywords": [
     "lerna"
@@ -33,7 +33,7 @@
   "peerDependencies": {
     "@foxford/icon-pack": ">=0.0.6",
     "@foxford/ui": "^2.17.0",
-    "@ulms/tgs-player": "^1.0.0",
+    "@ulms/tgs-player": "1.0.1",
     "@ulms/tooltip": "^1.0.0",
     "howler": "~2.2.4",
     "react": "^16.14 || 17 || 18",
