@@ -27,3 +27,11 @@ export const getAnimationsData = storage => sortedAnimationIds.map(id => ({
     preload: false,
   }),
 }))
+
+export const touchDeviceDetect = () => {
+  const check1 = window?.matchMedia('(pointer: coarse)')?.matches
+  const check2 =
+    'ontouchstart' in window || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0
+
+  return typeof check1 !== 'undefined' ? check1 : check2
+}
