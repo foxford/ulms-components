@@ -75,6 +75,32 @@ fabric.Line.prototype.calcLineEndpointCoords = function calcLineEndpointCoords (
   return { startCoords, endCoords }
 }
 
+// Эта подмена нужна, чтобы поправить баг с неправильным определением места курсора при печати длинного текста
+// Это копипаста из Фабрика
+const textBoxOnInput = fabric.Textbox.prototype.onInput
+const textBoxFromObject = fabric.Textbox.fromObject
+
+fabric.Textbox.prototype.onInput = function (e) {
+  textBoxOnInput.call(this, e)
+
+  if (this.canvas) {
+    // Пересобираем кэш длин символов
+    fabric.charWidthsCache[this.value] = {}
+    this.canvas.getActiveObject().initDimensions()
+    this.canvas.getActiveObject().setCoords()
+
+    this.canvas.requestRenderAll()
+  }
+}
+
+fabric.Textbox.fromObject = function (object, callback) {
+  if (object.fontFamily.includes('BlinkMacSystemFont')) {
+    // eslint-disable-next-line no-param-reassign
+    object.fontFamily = object.fontFamily.split(', ').filter(item => item !== 'BlinkMacSystemFont').join(', ')
+  }
+  textBoxFromObject.call(this, object, callback)
+}
+
 // Вычисляет абсолютные координаты объекта во вьюпорте документа
 fabric.Canvas.prototype.getAbsoluteCoords = function getAbsoluteCoords (object) {
   const canvasZoom = this.getZoom()

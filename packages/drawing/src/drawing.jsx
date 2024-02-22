@@ -669,7 +669,7 @@ export class Drawing extends React.Component {
         this.tool = new TextboxTool(this.canvas, undefined, {
           fill: toCSSColor(brushColor),
           fontSize,
-          fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif',
+          fontFamily: '-apple-system, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif',
         })
 
         break
