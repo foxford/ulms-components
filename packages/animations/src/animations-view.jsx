@@ -43,6 +43,7 @@ const Root = styled.div`
   }) => `
     position: absolute;
     bottom: 0;
+    left: 0;
     display: flex;
     z-index: 5;
     ${getContainerSize(animationId, customSizes, desktopWidth, tabletWidth)}
@@ -100,7 +101,11 @@ export const AnimationsView = memo(({
   }, [volume])
 
   useEffect(() => {
-    if (!animation) return
+    if (!animation) {
+      currentAnimationId.current = null
+
+      return
+    }
 
     const loadHandler = () => {
       setIsSoundReady(true)
@@ -149,15 +154,18 @@ export const AnimationsView = memo(({
         desktopWidth={desktopWidth}
         tabletWidth={tabletWidth}
       >
-        <TGSPlayer
-          ref={playerRef}
-          autoplay
-          flip={flip}
-          src={src}
-          onPlay={onPlay}
-          height='100%'
-          width='100%'
-        />
+        {animation && (
+          <TGSPlayer
+            ref={playerRef}
+            autoplay
+            class='animations-view-tgs-player'
+            flip={flip}
+            src={src}
+            onPlay={onPlay}
+            height='100%'
+            width='100%'
+          />
+        )}
       </Root>
     </ThemeProvider>
   )

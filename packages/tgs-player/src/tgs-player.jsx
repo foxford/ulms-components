@@ -84,9 +84,8 @@ const _TGSPlayer = forwardRef((
       onComplete
           && playerRef.current?.removeEventListener('complete', onComplete)
       onPlay && playerRef.current?.removeEventListener('play', onPlay)
-      setPlayer(null)
     }
-  }, [playerRef.current])
+  }, [showPlayer])
 
   useImperativeHandle(ref, () => ({ player }))
 

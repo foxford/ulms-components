@@ -40,7 +40,7 @@ export const AnimationsItems = styled.div`
 
 export const AnimationItem = styled.div`
   ${({
-    isDisabled, previewSrc, theme,
+    isDisabled, isTouch, previewSrc, theme,
   }) => `
     display: flex;
     align-items: flex-end;
@@ -58,6 +58,7 @@ export const AnimationItem = styled.div`
 
     ${
   !isDisabled
+      && !isTouch
       && `&:hover {
         background: ${theme.colors['bg-brand-primary-100-hover']};
       }`

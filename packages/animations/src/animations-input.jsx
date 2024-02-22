@@ -5,9 +5,11 @@ import { Spacer } from '@foxford/ui'
 import { TGSPlayer } from '@ulms/tgs-player'
 
 import { ANIMATION_IDS } from './constants'
-import { getAnimationsData } from './utils'
+import { getAnimationsData, touchDeviceDetect } from './utils'
 
 import * as Styled from './animations-input.style'
+
+const isTouch = touchDeviceDetect()
 
 export const AnimationsInput = memo(({
   disableTooltipText,
@@ -78,18 +80,21 @@ export const AnimationsInput = memo(({
               data-testid={`animation-${id}`}
               key={id}
               isDisabled={isDisabled}
+              isTouch={isTouch}
               onClick={() => onClickAnimationHandler(id)}
               previewSrc={previewSrc}
             >
-              <TGSPlayer
-                hover
-                ref={playerRef}
-                flip={id === ANIMATION_IDS.CRY || id === ANIMATION_IDS.LOVE}
-                src={src}
-                style={isDisabled ? { pointerEvents: 'none' } : {}}
-                height={id === ANIMATION_IDS.TRY_AGAIN ? 'auto' : 44}
-                width={id === ANIMATION_IDS.TRY_AGAIN ? '100%' : 44}
-              />
+              {!isTouch && (
+                <TGSPlayer
+                  hover
+                  ref={playerRef}
+                  flip={id === ANIMATION_IDS.CRY || id === ANIMATION_IDS.LOVE}
+                  src={src}
+                  style={isDisabled ? { pointerEvents: 'none' } : {}}
+                  height={id === ANIMATION_IDS.TRY_AGAIN ? 'auto' : 44}
+                  width={id === ANIMATION_IDS.TRY_AGAIN ? '100%' : 44}
+                />
+              )}
             </Styled.AnimationItem>
           ))}
         </Styled.AnimationsItems>
