@@ -49,16 +49,19 @@ export class PenGroup extends React.Component {
 
     this.iconsSet = [
       {
+        dataTestId: 'board-panel-paintbrush-button',
         key: penToolModeEnum.PENCIL,
         icon: this.iconsMap[penToolModeEnum.PENCIL],
         title: intl.formatMessage({ id: intlID.PENCIL }),
       },
       {
+        dataTestId: 'board-panel-dotted-pencil-button',
         key: penToolModeEnum.DASHED_PENCIL,
         icon: this.iconsMap[penToolModeEnum.DASHED_PENCIL],
         title: intl.formatMessage({ id: intlID.DASHED_PENCIL }),
       },
       {
+        dataTestId: 'board-panel-highlighter-button',
         key: penToolModeEnum.MARKER,
         icon: this.iconsMap[penToolModeEnum.MARKER],
         title: intl.formatMessage({ id: intlID.HIGHLIGHTER }),
@@ -176,6 +179,7 @@ export class PenGroup extends React.Component {
       >
         <ToolbarButton
           active={tool === toolEnum.PEN}
+          dataTestId='board-panel-group-pen-button'
           group
           title={this._getTitle(brushMode)}
           onClick={() => handleOpen(this.getOptions())}

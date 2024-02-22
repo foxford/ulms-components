@@ -4,14 +4,15 @@ import cn from 'classnames-es'
 import css from './toolbar-button.module.css'
 
 export const ToolbarButton = ({
-  onClick,
-  innerRef,
-  children,
-  title = '',
-  fillWidth = false,
-  padded = false,
   active = false,
+  children,
+  dataTestId,
+  fillWidth = false,
   group = false,
+  innerRef,
+  onClick,
+  padded = false,
+  title = '',
 }) => (
   <div className={css.wrapper}>
     {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events */}
@@ -24,6 +25,7 @@ export const ToolbarButton = ({
         padded && css.button_padded,
         group && css.group,
       )}
+      data-testid={dataTestId}
       onClick={onClick}
       role='button'
       tabIndex='0'

@@ -360,12 +360,23 @@ export class Drawing extends React.Component {
     const {
       clientId,
       onLockSelection,
+      mobile,
+      canDraw,
     } = this.props
 
+    fabric.Object.prototype.objectCaching = !mobile
+
     this.canvas = new fabric.Canvas('canvas', {
+      selection: canDraw,
       enablePointerEvents: 'PointerEvent' in window,
       preserveObjectStacking: true, // Чтобы выделенный объект не выходил на верхний слой
     })
+
+    if (!canDraw) {
+      this.canvas.selection = false
+      fabric.Object.prototype.hasControls = false
+    }
+
     this.canvas._id = clientId
     this.canvas.freeDrawingBrush = new fabric.OptimizedPencilBrush(this.canvas)
 

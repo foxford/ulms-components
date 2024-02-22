@@ -25,6 +25,7 @@ function ActionButtonGroup (props) {
       >
         <Button
           active={item.active}
+          dataTestId={item.dataTestId}
           disabled={item.disabled}
           className={cx({ [css.button]: true, [css.active]: item.active })}
           onClick={item.onClick}
