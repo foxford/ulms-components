@@ -4,48 +4,35 @@ import IconText32 from '../icons/text-settings-32-icon.svg'
 import IconText48 from '../icons/text-settings-48-icon.svg'
 import IconText64 from '../icons/text-settings-64-icon.svg'
 
-import { ToolbarButton } from './toolbar-button'
-
-import css from './settings.module.css'
+import { IconGroupSettings } from './icon-group-settings'
 
 const fontSizes = [32, 48, 64]
-const fontIcons = {
-  [fontSizes[0]]: <IconText32 />,
-  [fontSizes[1]]: <IconText48 />,
-  [fontSizes[2]]: <IconText64 />,
+const testAttributes = {
+  [fontSizes[0]]: 'board-panel-popup-font-size-s',
+  [fontSizes[1]]: 'board-panel-popup-font-size-m',
+  [fontSizes[2]]: 'board-panel-popup-font-size-l',
 }
 
-const testAttributes = ['board-panel-popup-font-size-s', 'board-panel-popup-font-size-m', 'board-panel-popup-font-size-l']
+export const FontSettings = ({
+  currentFontSize, handleClick,
+}) => {
+  const fontIcons = {
+    [fontSizes[0]]: (<IconText32 />),
+    [fontSizes[1]]: (<IconText48 />),
+    [fontSizes[2]]: (<IconText64 />),
+  }
 
-export const FontItem = ({
-  active = false,
-  dataTestId,
-  fontSize,
-  handleClick,
-  innerRef,
-}) => (
-  <ToolbarButton
-    active={active}
-    dataTestId={dataTestId}
-    innerRef={innerRef}
-    onClick={() => handleClick(fontSize)}
-  >
-    {fontIcons[fontSize]}
-  </ToolbarButton>
-)
+  const iconsSet = fontSizes.map(size => ({
+    dataTestId: testAttributes[size],
+    key: size,
+    icon: fontIcons[size],
+  }))
 
-export const FontSettings = ({ currentFontSize, handleClick }) => (
-  <div className={css.wrapper}>
-    <div className={css.row}>
-      {fontSizes.map((itemFontSize, index) => (
-        <FontItem
-          active={currentFontSize === itemFontSize}
-          dataTestId={testAttributes[index]}
-          fontSize={itemFontSize}
-          handleClick={handleClick}
-          key={itemFontSize}
-        />
-      ))}
-    </div>
-  </div>
-)
+  return (
+    <IconGroupSettings
+      iconsSet={iconsSet}
+      currentSelection={currentFontSize}
+      handleClick={handleClick}
+    />
+  )
+}
