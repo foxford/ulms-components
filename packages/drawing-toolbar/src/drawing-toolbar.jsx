@@ -3,6 +3,8 @@ import React from 'react'
 import { injectIntl, IntlProvider } from 'react-intl'
 import { toolEnum } from '@ulms/ui-drawing'
 
+import cn from 'classnames-es'
+
 import { messagesIntl } from '../lang/index'
 
 import { PenGroup } from './components/pen-group'
@@ -19,7 +21,6 @@ import IconSelect from './icons/select-tool-icon.svg'
 import IconLib from './icons/lib-tool-icon.svg'
 import IconStamp from './icons/stamp-tool-icon.svg'
 import { toCSSColor } from './utils'
-import cn from "classnames-es";
 
 function supportPointerEvent () {
   return 'PointerEvent' in window
