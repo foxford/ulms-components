@@ -1,6 +1,6 @@
 {
   "name": "@ulms/ui-drawing-toolbar",
-  "version": "2.4.0-dev.7",
+  "version": "2.4.0-dev.8",
   "description": "",
   "keywords": [
     "lerna"
@@ -30,7 +30,7 @@
     "react-floater": "^0.9.3"
   },
   "peerDependencies": {
-    "@ulms/ui-drawing": "^3.3.x || 3.4.0-dev.5",
+    "@ulms/ui-drawing": "^3.3.x || 3.4.0-dev.6",
     "react": "^16.14",
     "react-dom": "^16.14",
     "react-intl": "^5.20 || 5.21"
