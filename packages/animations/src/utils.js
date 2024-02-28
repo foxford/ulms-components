@@ -26,6 +26,7 @@ export const getAnimationsData = storage => sortedAnimationIds.map(id => ({
     src: getAnimationPublicSrc(storage, id, 'mp3'),
     preload: false,
   }),
+  flip: id === ANIMATION_IDS.CRY || id === ANIMATION_IDS.LOVE,
 }))
 
 export const touchDeviceDetect = () => {
