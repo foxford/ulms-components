@@ -28,9 +28,45 @@ const _TGSPlayer = forwardRef((
 ) => {
   const playerRef = useRef(null)
   const [player, setPlayer] = useState(null)
-  const [showPlayer, setShowPlayer] = useState(true)
   const setPlayerTimerId = useRef(null)
-  const setShowPlayerTimerId = useRef(null)
+  const srcRef = useRef(null)
+
+  useEffect(() => {
+    if (!playerRef.current) return
+
+    const onCompleteModified = () => {
+      srcRef.current && onComplete?.()
+    }
+
+    const onPlayModified = () => {
+      srcRef.current && onPlay?.()
+    }
+
+    onComplete && playerRef.current?.addEventListener('complete', onCompleteModified)
+    onPlay && playerRef.current?.addEventListener('play', onPlayModified)
+
+    // eslint-disable-next-line consistent-return
+    return () => {
+      onComplete
+      && playerRef.current?.removeEventListener('complete', onCompleteModified)
+      onPlay && playerRef.current?.removeEventListener('play', onPlayModified)
+    }
+  }, [onComplete, onPlay])
+
+  useEffect(() => {
+    if (srcRef.current && !src) {
+      // если анимация запустилась в момент, когда пользователь находился на другой вкладке,
+      // то после его возвращения lottie-player вновь проигрывает анимацию, хотя запуск
+      // анимации уже не актуален, поэтому вручную останавливаем проигрывание
+      playerRef.current?.stop?.()
+    }
+
+    srcRef.current = src
+
+    if (src) {
+      playerRef.current.load(src)
+    }
+  }, [src])
 
   useEffect(() => {
     setPlayerTimerId.current = setTimeout(() => {
@@ -48,20 +84,6 @@ const _TGSPlayer = forwardRef((
   }, [playerRef.current])
 
   useEffect(() => {
-    setShowPlayer(false)
-    // Чтобы перезапустить плеер при смене src
-    setShowPlayerTimerId.current = setTimeout(() => {
-      setShowPlayer(true)
-    }, 0)
-
-    return () => {
-      if (setShowPlayerTimerId.current) {
-        clearTimeout(setShowPlayerTimerId.current)
-      }
-    }
-  }, [src])
-
-  useEffect(() => {
     if (playOnHover && player) {
       createInteractivity({
         player,
@@ -76,20 +98,7 @@ const _TGSPlayer = forwardRef((
     }
   }, [playOnHover, player])
 
-  useEffect(() => {
-    onComplete && playerRef.current?.addEventListener('complete', onComplete)
-    onPlay && playerRef.current?.addEventListener('play', onPlay)
-
-    return () => {
-      onComplete
-          && playerRef.current?.removeEventListener('complete', onComplete)
-      onPlay && playerRef.current?.removeEventListener('play', onPlay)
-    }
-  }, [showPlayer])
-
   useImperativeHandle(ref, () => ({ player }))
-
-  if (!showPlayer) return null
 
   return (
     <tgs-player
