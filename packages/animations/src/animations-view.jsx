@@ -8,7 +8,7 @@ import React, {
 import styled, { ThemeProvider } from 'styled-components'
 import { TGSPlayer } from '@ulms/tgs-player'
 
-import { ANIMATION_IDS, ANIMATION_SIZES } from './constants'
+import { ANIMATION_SIZES } from './constants'
 import { getAnimationsData } from './utils'
 
 const getContainerSize = (
@@ -45,7 +45,7 @@ const Root = styled.div`
     bottom: 0;
     left: 0;
     display: flex;
-    z-index: 5;
+    z-index: ${animationId ? 5 : -1};
     ${getContainerSize(animationId, customSizes, desktopWidth, tabletWidth)}
   `}
 `
@@ -64,26 +64,33 @@ export const AnimationsView = memo(({
   volume = 1,
 }) => {
   const [items, setItems] = useState([])
-  const [isSoundReady, setIsSoundReady] = useState(false)
+  const itemsRef = useRef([])
+  const [isSoundReadyMap, setIsSoundReadyMap] = useState({})
+  const [src, setSrc] = useState(null)
+  const [flip, setFlip] = useState(false)
   const playerRef = useRef(null)
   const volumeRef = useRef(1)
   const currentAnimationId = useRef(null)
 
   const onPlay = () => {
+    if (!animation) return
+
     const sound = getSoundByAnimationId(animation.id, items)
+
+    setFlip(items.find(item => item.id === animation.id).flip)
 
     // событие onPlay срабатывает не только при первом запуске, но и еще каждый раз,
     // когда пользователь возвращается на вкладку с вебинаром, поэтому делаем дополнительную проверку,
     // что анимация уже запущена, проверяя это тем, что уже проигрывается ее звук (sound.playing()),
     // если это так, то не воспроизводим звук повторно (не вызываем sound.play())
-    animation && isSoundReady && !sound?.playing?.() && sound?.play?.()
+    isSoundReadyMap[animation.id] && !sound?.playing?.() && sound?.play?.()
   }
 
   const onComplete = (animationId) => {
     if (currentAnimationId.current === animationId) {
-      setIsSoundReady(false)
       onCompleteHandler && onCompleteHandler()
       currentAnimationId.current = null
+      setSrc(null)
     }
   }
 
@@ -92,6 +99,11 @@ export const AnimationsView = memo(({
     setItems(getAnimationsData(publicStorageProvider))
 
     return () => {
+      // останавливаем воспроизведение звука, в случае размонтирования компонента
+      const sound = getSoundByAnimationId(currentAnimationId.current, itemsRef.current)
+
+      sound?.playing?.() && sound?.stop?.()
+
       onComplete(currentAnimationId.current)
     }
   }, [])
@@ -101,6 +113,10 @@ export const AnimationsView = memo(({
   }, [volume])
 
   useEffect(() => {
+    itemsRef.current = items
+  }, [items])
+
+  useEffect(() => {
     if (!animation) {
       currentAnimationId.current = null
 
@@ -108,7 +124,11 @@ export const AnimationsView = memo(({
     }
 
     const loadHandler = () => {
-      setIsSoundReady(true)
+      setIsSoundReadyMap((prevState => ({
+        ...prevState,
+        [animation.id]: true,
+      })))
+      setSrc(items.find(item => item.id === animation.id).src)
     }
 
     const endHandler = () => {
@@ -123,7 +143,11 @@ export const AnimationsView = memo(({
     sound.volume(animation.soundOn ? volumeRef.current : 0)
 
     if (sound.state() === 'loaded') {
-      setIsSoundReady(true)
+      setIsSoundReadyMap((prevState => ({
+        ...prevState,
+        [animation.id]: true,
+      })))
+      setSrc(items.find(item => item.id === animation.id).src)
     } else {
       sound.on('load', loadHandler)
       sound.load()
@@ -137,13 +161,6 @@ export const AnimationsView = memo(({
     }
   }, [animation])
 
-  const src = isSoundReady
-    ? items.find(item => item.id === animation?.id)?.src
-    : undefined
-
-  const flip =
-    animation?.id === ANIMATION_IDS.CRY || animation?.id === ANIMATION_IDS.LOVE
-
   return (
     <ThemeProvider theme={theme}>
       <Root
@@ -154,18 +171,16 @@ export const AnimationsView = memo(({
         desktopWidth={desktopWidth}
         tabletWidth={tabletWidth}
       >
-        {animation && (
-          <TGSPlayer
-            ref={playerRef}
-            autoplay
-            class='animations-view-tgs-player'
-            flip={flip}
-            src={src}
-            onPlay={onPlay}
-            height='100%'
-            width='100%'
-          />
-        )}
+        <TGSPlayer
+          ref={playerRef}
+          autoplay
+          class='animations-view-tgs-player'
+          flip={flip}
+          src={src}
+          onPlay={onPlay}
+          height='100%'
+          width='100%'
+        />
       </Root>
     </ThemeProvider>
   )

@@ -1082,8 +1082,6 @@ export class Drawing extends React.Component {
   }
 
   createCanvasObjects = (pageObjects) => {
-    const { tool } = this.props
-
     this.clearCanvasObjects()
 
     if (pageObjects.length) {
@@ -1095,30 +1093,16 @@ export class Drawing extends React.Component {
 
         this.canvas.renderOnAddRemove = false
 
-        this.canvas.add(...enlivenedObjects)
-
         enlivenedObjects.forEach((object) => {
           // Есть ситуации, когда во время выполнения enlivenObjects this.canvas уже нет
           if (!this.canvas) return
 
-          if (tool !== toolEnum.SELECT) {
-            if (tool === toolEnum.PAN) {
-              object.set({ selectable: false, evented: false }) // Если PAN - не меняем курсор!
-            } else {
-              makeNotInteractive(object)
-            }
-          } else {
-            makeInteractive(object)
-          }
-          this.canvas._objectsMap.set(object._id, object)
+          this._fixObjectInteractivity(object)
 
-          if (LockProvider.isLockedByUser(object)) {
-            LockProvider.lockUserObject(object)
-          }
-          if (LockProvider.isLockedBySelection(object)) {
-            makeNotInteractive(object)
-          }
+          this.canvas._objectsMap.set(object._id, object)
         })
+
+        this.canvas.add(...enlivenedObjects)
 
         this.canvas.renderOnAddRemove = true
         this.canvas.requestRenderAll()
@@ -1141,6 +1125,27 @@ export class Drawing extends React.Component {
     return {
       objectsToRemove,
       objectsToAdd,
+    }
+  }
+
+  _fixObjectInteractivity (object) {
+    const { tool } = this.props
+
+    if (tool !== toolEnum.SELECT) {
+      if (tool === toolEnum.PAN) {
+        object.set({ selectable: false, evented: false }) // Если PAN - не меняем курсор!
+      } else {
+        makeNotInteractive(object)
+      }
+    } else {
+      makeInteractive(object)
+    }
+
+    if (LockProvider.isLockedByUser(object)) {
+      LockProvider.lockUserObject(object)
+    }
+    if (LockProvider.isLockedBySelection(object)) {
+      makeNotInteractive(object)
     }
   }
 
@@ -1173,7 +1178,6 @@ export class Drawing extends React.Component {
   }
 
   updateCanvasObjects (objects) {
-    const { tool } = this.props
     const {
       objectsToAdd,
       objectsToRemove,
@@ -1201,6 +1205,8 @@ export class Drawing extends React.Component {
           // Есть ситуации, когда во время выполнения enlivenObjects this.canvas уже нет
           if (!this.canvas) return
 
+          this._fixObjectInteractivity(object)
+
           if (this.canvas._objectsMap.has(object._id)) { // Обрабатываем случай, когда к моменту "оживления" объекта такой объект уже появился на доске
             this._updateExistingObject(object)
           } else {
@@ -1215,23 +1221,7 @@ export class Drawing extends React.Component {
               this.canvas.add(object)
             }
 
-            if (tool !== toolEnum.SELECT) {
-              if (tool === toolEnum.PAN) {
-                object.set({ selectable: false, evented: false }) // Если PAN - не меняем курсор!
-              } else {
-                makeNotInteractive(object)
-              }
-            } else {
-              makeInteractive(object)
-            }
-
             this.canvas._objectsMap.set(object._id, object)
-            if (LockProvider.isLockedByUser(object)) {
-              LockProvider.lockUserObject(object)
-            }
-            if (LockProvider.isLockedBySelection(object)) {
-              makeNotInteractive(object)
-            }
           }
         })
         this.canvas.renderOnAddRemove = true
