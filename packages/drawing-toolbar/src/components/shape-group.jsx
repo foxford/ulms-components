@@ -12,8 +12,8 @@ import IconSolidTriangle from '../icons/solid-triangle-tool-icon.svg'
 import IconSolidRightTriangle from '../icons/solid-right-triangle-tool-icon.svg'
 
 import { intlID } from '../../lang/constants'
-
 import { HEXtoRGB } from '../utils'
+import { settingsGroupContainerStyles } from '../constants'
 
 import { IconGroupSettings } from './icon-group-settings'
 import { ToolbarButton } from './toolbar-button'
@@ -160,7 +160,7 @@ export class ShapeGroup extends React.Component {
     return (
       <SettingsGroup
         direction='right-start'
-        containerStyles={{ marginTop: '-16px', marginLeft: '-2px' }}
+        containerStyles={settingsGroupContainerStyles}
         isOpen={opened}
         handleClose={handleClose}
         target={this.buttonRef.current}

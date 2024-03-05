@@ -3,13 +3,13 @@ import React from 'react'
 
 import { ToolbarButton } from './components/toolbar-button'
 import { ColorItem, ColorSettings } from './components/color-settings'
-import { FontItem, FontSettings } from './components/font-settings'
+import { FontSettings } from './components/font-settings'
 import { LineSettings } from './components/line-settings'
 import { SettingsGroup } from './components/settings-group'
 import { Divider } from './components/divider'
 
 import { RGBtoHEX, fromCSSColor, toCSSColor, HEXtoRGB } from './utils'
-import { ObjectTypes, ShapeTypes, LineTypes, ColorTypes } from './constants'
+import { ObjectTypes, ShapeTypes, LineTypes, ColorTypes, contextMenuContainerStyles } from './constants'
 
 import IconLineSettingsTool from './icons/line-settings-tool-icon.svg'
 import IconTextSettingsTool from './icons/text-tool-alt-icon.svg'
@@ -241,9 +241,7 @@ export class ContextToolbar extends React.Component {
             {showLineTool && (
             <SettingsGroup
               direction={`${direction}-start`}
-              containerStyles={{
-                left: '-12px', padding: '8px 12px', top: direction === 'top' ? '2px' : '-2px',
-              }}
+              containerStyles={contextMenuContainerStyles(direction)}
               isOpen={lineSettingsOpened}
               handleClose={() => this.setState({ lineSettingsOpened: false })}
               target={this.lineSettingsRef.current}
@@ -271,9 +269,7 @@ export class ContextToolbar extends React.Component {
             {showFontTool && (
             <SettingsGroup
               direction={`${direction}-start`}
-              containerStyles={{
-                left: '-12px', padding: '8px 12px', top: direction === 'top' ? '2px' : '-2px',
-              }}
+              containerStyles={contextMenuContainerStyles(direction)}
               isOpen={fontSettingsOpened}
               handleClose={() => this.setState({ fontSettingsOpened: false })}
               target={this.fontSettingsRef.current}
@@ -303,9 +299,7 @@ export class ContextToolbar extends React.Component {
             {showColorTool && (
             <SettingsGroup
               direction={`${direction}-start`}
-              containerStyles={{
-                left: '-12px', padding: '12px', top: direction === 'top' ? '2px' : '-2px',
-              }}
+              containerStyles={contextMenuContainerStyles(direction)}
               isOpen={colorSettingsOpened}
               handleClose={() => this.setState({ colorSettingsOpened: false })}
               target={this.colorSettingsRef.current}
