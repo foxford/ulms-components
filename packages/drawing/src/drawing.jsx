@@ -2,6 +2,7 @@
 import React from 'react'
 import { fabric } from 'fabric/dist/fabric.min'
 import Hammer from 'hammerjs'
+import 'abortcontroller-polyfill/dist/abortcontroller-polyfill-only'
 
 import {
   penToolModeEnum,
@@ -59,6 +60,9 @@ function clearExternalSelection () {
     document.selection.empty()
   }
 }
+
+let abortController = null
+let signal = null;
 
 export class Drawing extends React.Component {
   constructor (props) {
@@ -1081,32 +1085,73 @@ export class Drawing extends React.Component {
     }
   }
 
-  createCanvasObjects = (pageObjects) => {
-    this.clearCanvasObjects()
+  _abortableCreateObjectsPromise = (pageObjects) => {
+    return new Promise((resolve, reject) => {
+      let shouldAbort = false
+      signal.addEventListener('abort', () => {
+        shouldAbort = true
+        resolve()
+      });
 
-    if (pageObjects.length) {
-      const normalizedObjects = pageObjects.map(_ => normalizeFields({ ..._, remote: true })).filter(_ => !_._removed)
+      const normalizedObjects = pageObjects.map(_ => normalizeFields({..._, remote: true})).filter(_ => !_._removed)
 
+      if(shouldAbort) return
       fabric.util.enlivenObjects(normalizedObjects, (enlivenedObjects) => {
         // Есть ситуации, когда во время выполнения enlivenObjects this.canvas уже нет
-        if (!this.canvas) return
+        if(shouldAbort) return
 
-        this.canvas.renderOnAddRemove = false
+        if (!this.canvas) {
+          resolve()
+          return
+        }
 
         enlivenedObjects.forEach((object) => {
           // Есть ситуации, когда во время выполнения enlivenObjects this.canvas уже нет
-          if (!this.canvas) return
+          if (!this.canvas) {
+            resolve()
+            return
+          }
 
           this._fixObjectInteractivity(object)
 
           this.canvas._objectsMap.set(object._id, object)
         })
-
+        if(shouldAbort) return
+        this.canvas.renderOnAddRemove = false
         this.canvas.add(...enlivenedObjects)
-
         this.canvas.renderOnAddRemove = true
-        this.canvas.requestRenderAll()
+
+        if(shouldAbort) { // Если дошли до этого места и прервали загрузку объектов - надо удалить добавленные объекты
+          this.canvas.remove(...enlivenedObjects)
+          return
+        }
+
+        resolve()
       })
+    })
+  }
+
+  createCanvasObjects = (pageObjects) => {
+    if (abortController) {
+      abortController.abort()
+      signal = null
+      abortController = null
+    }
+
+    abortController = new window.AbortController();
+    signal = abortController.signal;
+
+    this.clearCanvasObjects()
+    if (pageObjects.length) {
+      this._abortableCreateObjectsPromise(pageObjects)
+        .then(() => {
+            this.canvas.requestRenderAll()
+          }
+        )
+        .finally(() => {
+          signal = null
+          abortController = null
+        })
     }
   }
 

@@ -46,7 +46,6 @@
   },
   "dependencies": {
     "classnames-es": "^2.2.6",
-    "d3-queue": "~3.0.7",
     "debug": "^4.1.0",
     "lodash": "^4.17.20",
     "query-string": "^6.2.0",
