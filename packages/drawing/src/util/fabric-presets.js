@@ -80,7 +80,7 @@ fabric.Line.prototype.calcLineEndpointCoords = function calcLineEndpointCoords (
 const textBoxOnInput = fabric.Textbox.prototype.onInput
 const textBoxFromObject = fabric.Textbox.fromObject
 
-fabric.Textbox.prototype.onInput = function (e) {
+fabric.Textbox.prototype.onInput = function onInput (e) {
   textBoxOnInput.call(this, e)
 
   if (this.canvas) {
@@ -93,7 +93,7 @@ fabric.Textbox.prototype.onInput = function (e) {
   }
 }
 
-fabric.Textbox.fromObject = function (object, callback) {
+fabric.Textbox.fromObject = function fromObject (object, callback) {
   if (object.fontFamily.includes('BlinkMacSystemFont')) {
     // eslint-disable-next-line no-param-reassign
     object.fontFamily = object.fontFamily.split(', ').filter(item => item !== 'BlinkMacSystemFont').join(', ')

@@ -1,4 +1,4 @@
-/* eslint-disable react/prop-types, max-classes-per-file */
+/* eslint-disable react/prop-types, max-classes-per-file, promise/catch-or-return */
 import React from 'react'
 import { fabric } from 'fabric/dist/fabric.min'
 import Hammer from 'hammerjs'
@@ -62,7 +62,7 @@ function clearExternalSelection () {
 }
 
 let abortController = null
-let signal = null;
+let signal = null
 
 export class Drawing extends React.Component {
   constructor (props) {
@@ -1085,51 +1085,53 @@ export class Drawing extends React.Component {
     }
   }
 
-  _abortableCreateObjectsPromise = (pageObjects) => {
-    return new Promise((resolve, reject) => {
-      let shouldAbort = false
-      signal.addEventListener('abort', () => {
-        shouldAbort = true
+  _abortableCreateObjectsPromise = pageObjects => new Promise((resolve) => {
+    let shouldAbort = false
+
+    signal.addEventListener('abort', () => {
+      shouldAbort = true
+      resolve()
+    })
+
+    const normalizedObjects = pageObjects.map(_ => normalizeFields({ ..._, remote: true })).filter(_ => !_._removed)
+
+    if (shouldAbort) return
+    fabric.util.enlivenObjects(normalizedObjects, (enlivenedObjects) => {
+      // Есть ситуации, когда во время выполнения enlivenObjects this.canvas уже нет
+      if (shouldAbort) return
+
+      if (!this.canvas) {
         resolve()
-      });
 
-      const normalizedObjects = pageObjects.map(_ => normalizeFields({..._, remote: true})).filter(_ => !_._removed)
+        return
+      }
 
-      if(shouldAbort) return
-      fabric.util.enlivenObjects(normalizedObjects, (enlivenedObjects) => {
+      enlivenedObjects.forEach((object) => {
         // Есть ситуации, когда во время выполнения enlivenObjects this.canvas уже нет
-        if(shouldAbort) return
-
         if (!this.canvas) {
           resolve()
+
           return
         }
 
-        enlivenedObjects.forEach((object) => {
-          // Есть ситуации, когда во время выполнения enlivenObjects this.canvas уже нет
-          if (!this.canvas) {
-            resolve()
-            return
-          }
+        this._fixObjectInteractivity(object)
 
-          this._fixObjectInteractivity(object)
-
-          this.canvas._objectsMap.set(object._id, object)
-        })
-        if(shouldAbort) return
-        this.canvas.renderOnAddRemove = false
-        this.canvas.add(...enlivenedObjects)
-        this.canvas.renderOnAddRemove = true
-
-        if(shouldAbort) { // Если дошли до этого места и прервали загрузку объектов - надо удалить добавленные объекты
-          this.canvas.remove(...enlivenedObjects)
-          return
-        }
-
-        resolve()
+        this.canvas._objectsMap.set(object._id, object)
       })
+      if (shouldAbort) return
+      this.canvas.renderOnAddRemove = false
+      this.canvas.add(...enlivenedObjects)
+      this.canvas.renderOnAddRemove = true
+
+      if (shouldAbort) { // Если дошли до этого места и прервали загрузку объектов - надо удалить добавленные объекты
+        this.canvas.remove(...enlivenedObjects)
+
+        return
+      }
+
+      resolve()
     })
-  }
+  })
 
   createCanvasObjects = (pageObjects) => {
     if (abortController) {
@@ -1138,16 +1140,13 @@ export class Drawing extends React.Component {
       abortController = null
     }
 
-    abortController = new window.AbortController();
-    signal = abortController.signal;
+    abortController = new window.AbortController()
+    signal = abortController.signal
 
     this.clearCanvasObjects()
     if (pageObjects.length) {
       this._abortableCreateObjectsPromise(pageObjects)
-        .then(() => {
-            this.canvas.requestRenderAll()
-          }
-        )
+        .then(() => this.canvas.requestRenderAll())
         .finally(() => {
           signal = null
           abortController = null

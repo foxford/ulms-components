@@ -1,6 +1,6 @@
 {
   "name": "@ulms/ui-drawing",
-  "version": "3.3.19",
+  "version": "3.3.19-dev.0",
   "description": "Whiteboard for uLMS",
   "keywords": [
     "lerna"
@@ -22,6 +22,7 @@
     "src"
   ],
   "scripts": {
+    "lint": "eslint --fix --ext js,jsx ./src",
     "build": "rm -rf ./es/* && BABEL_ENV=es rollup --config ./rollup.config.js index.js"
   },
   "dependencies": {
