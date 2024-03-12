@@ -1097,9 +1097,9 @@ export class Drawing extends React.Component {
 
     if (shouldAbort) return
     fabric.util.enlivenObjects(normalizedObjects, (enlivenedObjects) => {
-      // Есть ситуации, когда во время выполнения enlivenObjects this.canvas уже нет
       if (shouldAbort) return
 
+      // Есть ситуации, когда во время выполнения enlivenObjects this.canvas уже нет
       if (!this.canvas) {
         resolve()
 
