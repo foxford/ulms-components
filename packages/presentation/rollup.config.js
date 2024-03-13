@@ -1,6 +1,6 @@
 /* eslint-disable */
 const cssdupl = require('postcss-discard-duplicates')
-const cssnext = require('postcss-cssnext')
+// const cssnext = require('postcss-cssnext')
 const cssurl = require('postcss-url')
 const Debug = require('debug')
 const env = require('postcss-preset-env')
@@ -46,7 +46,7 @@ const rollupPlugins = [ // order matters
     plugins: [
       cssurl({ url: 'inline' }),
       env(),
-      cssnext(),
+      // cssnext(),
       cssdupl()
     ].concat(shouldMinifyCss()),
     loaders: [
