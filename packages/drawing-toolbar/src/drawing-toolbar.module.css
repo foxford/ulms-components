@@ -1,11 +1,9 @@
 .root {
-  width: 62px;
-  padding: 5px 10px 5px 6px;
+  padding: 8px;
   background-color: #FFFFFF;
-  border: 1px solid #E9E9E9;
-  border-top-right-radius: 5px;
-  border-bottom-right-radius: 5px;
+  border-radius: 12px;
   user-select: none;
+  border: 1px solid #BABCC9;
   z-index: 2;
 
   line-height: 1;
@@ -77,6 +75,7 @@
 
 .row {
   display: flex;
+  gap: 8px;
 }
 .row > .button ~ .button {
   margin-left: 10px;
@@ -85,6 +84,7 @@
 .col {
   display: flex;
   flex-direction: column;
+  gap: 8px;
 }
 .col > .button ~ .button {
   margin-top: 10px;

@@ -3,13 +3,14 @@ import React from 'react'
 import { injectIntl, IntlProvider } from 'react-intl'
 import { toolEnum } from '@ulms/ui-drawing'
 
+import cn from 'classnames-es'
+
 import { messagesIntl } from '../lang/index'
 
 import { PenGroup } from './components/pen-group'
 import { LineGroup } from './components/line-group'
 import { TextGroup } from './components/text-group'
 import { ShapeGroup } from './components/shape-group'
-import { Divider } from './components/divider'
 import { ToolbarButton } from './components/toolbar-button'
 
 import css from './drawing-toolbar.module.css'
@@ -167,7 +168,7 @@ class _DrawingToolbarComponent extends React.Component {
       handleChange,
       sendEvent,
       intl,
-      noSeparator,
+      mobile,
       penGroupContainerStyles,
       penGroupDirection,
       penGroupOrientation,
@@ -186,11 +187,10 @@ class _DrawingToolbarComponent extends React.Component {
     const isTextEnabled = tools && tools.includes(toolEnum.TEXT)
     const isStampEnabled = tools && tools.includes(toolEnum.STAMP)
     const isLibEnabled = tools && tools.includes(toolEnum.LIB)
-    const showSeparator = !noSeparator && (isImageEnabled || isStampEnabled || isLibEnabled)
 
     return (
       <div className={css.root}>
-        <div className={css.col} style={{ color: toCSSColor(brushColor) }}>
+        <div className={cn(mobile ? css.row : css.col)} style={{ color: toCSSColor(brushColor) }}>
           { isSelectEnabled && (
             <ToolbarButton
               active={tool === toolEnum.SELECT}
@@ -283,8 +283,6 @@ class _DrawingToolbarComponent extends React.Component {
             </ToolbarButton>
           )}
 
-          { showSeparator && <Divider horizontal /> }
-
           { isImageEnabled && (
             <ToolbarButton
               active={tool === toolEnum.IMAGE}
@@ -300,7 +298,6 @@ class _DrawingToolbarComponent extends React.Component {
             <ToolbarButton
               active={tool === toolEnum.STAMP}
               dataTestId='board-panel-stamps-button'
-              group
               onClick={this.handleStampClick}
               title={intl.formatMessage({ id: 'STAMP' })}
             >
@@ -312,7 +309,6 @@ class _DrawingToolbarComponent extends React.Component {
             <ToolbarButton
               active={tool === toolEnum.LIB}
               dataTestId='board-panel-library-button'
-              group
               onClick={this.handleLibClick}
               title={intl.formatMessage({ id: 'LIB' })}
             >

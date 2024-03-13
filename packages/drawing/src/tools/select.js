@@ -4,7 +4,7 @@ import debounce from 'lodash/debounce'
 import floatingThrottle from '../util/floating-throttle'
 
 import { fromCSSColor, toCSSColor } from '../util/to-css-color'
-import { calcDistance } from '../util'
+import { calcDistance, snapCoord } from '../util'
 
 import { keycodes, DEBOUNCE_DELAY, toolEnum, defaultToolSettings, MAX_TEXT_LENGTH, THROTTLE_DELAY } from '../constants'
 // eslint-disable-next-line import/no-cycle
@@ -35,6 +35,8 @@ export default class SelectTool extends Base {
 
     this.__timer = null
     this.__shiftPressed = false
+    this.__cmdPressed = false
+    this.__ctrlPressed = false
     this.__mouseDown = false
     this.__mouseDownPoint = null
     this.__isMoving = false
@@ -245,6 +247,13 @@ export default class SelectTool extends Base {
             y2: target.y2,
           })
         } else if (transform.action === 'drag') {
+          if (this.__cmdPressed || this.__ctrlPressed) {
+            target.set({
+              top: snapCoord(target.top),
+              left: snapCoord(target.left),
+            })
+            this._canvas.requestRenderAll()
+          }
           this._throttledSendMessage(target._id, {
             top: target.top,
             left: target.left,
@@ -302,7 +311,14 @@ export default class SelectTool extends Base {
     }
   }
 
+  #handeKeyEvent (e) {
+    this.__cmdPressed = e.metaKey
+    this.__ctrlPressed = e.ctrlKey
+  }
+
   handleKeyDownEvent (e) {
+    this.#handeKeyEvent(e)
+
     if (!this._active) return
     if (this.__object && this.__object.isEditing) return
 
@@ -343,6 +359,8 @@ export default class SelectTool extends Base {
   }
 
   handleKeyUpEvent (e) {
+    this.#handeKeyEvent(e)
+
     if (!this._active) return
 
     this.__shiftPressed = e.shiftKey

@@ -7,8 +7,8 @@ import IconDashedLine from '../icons/dashed-line-tool-icon.svg'
 import IconArrow from '../icons/arrow-tool-icon.svg'
 
 import { intlID } from '../../lang/constants'
-
 import { HEXtoRGB } from '../utils'
+import { settingsGroupContainerStyles } from '../constants'
 
 import { IconGroupSettings } from './icon-group-settings'
 import { ToolbarButton } from './toolbar-button'
@@ -123,7 +123,7 @@ export class LineGroup extends React.Component {
     return (
       <SettingsGroup
         direction='right-start'
-        containerStyles={{ marginTop: '-12px', marginLeft: '4px' }}
+        containerStyles={settingsGroupContainerStyles}
         isOpen={opened}
         handleClose={handleClose}
         target={this.buttonRef.current}
@@ -152,6 +152,7 @@ export class LineGroup extends React.Component {
           active={tool === toolEnum.LINE}
           dataTestId='board-panel-group-line-button'
           group
+          groupColor={color}
           onClick={() => handleOpen(this.getOptions())}
           innerRef={this.buttonRef}
           title={this._getTitle(brushMode)}
