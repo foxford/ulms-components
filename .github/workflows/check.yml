@@ -1,0 +1,7 @@
+name: check
+
+on: [push]
+
+jobs:
+  check:
+    uses: foxford/reusable-workflows/.github/workflows/check-js.yml@v1.1.0
