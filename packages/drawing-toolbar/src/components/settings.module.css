@@ -3,11 +3,15 @@
   height: 100%;
   padding: 0;
   margin: 0;
+  display: flex;
+  flex-flow: column nowrap;
+  gap: 4px;
 }
 
 .row {
   padding: 0;
   margin: 0;
+  gap: 4px;
   display: flex;
   flex-flow: row nowrap;
   align-items: center;
@@ -17,6 +21,7 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, 36px);
   grid-gap: 0 4px;
+  max-width: 240px;
 }
 
 .horizontal .colorRow > div {
@@ -45,19 +50,19 @@
 
 .colorCircle {
   border-radius: 50%;
-  width: 16px;
-  height: 16px;
-}
-
-.fontItem {
-  width: 100%;
-  text-align: center;
-  line-height: 1;
-  margin-top: -2px;
+  width: 20px;
+  height: 20px;
 }
 
 .lineItem {
   width: 20px;
   height: 0;
   transform: rotate(-45deg);
+}
+
+@media screen and (max-width: 1899px) {
+  .colorCircle {
+    width: 16px;
+    height: 16px;
+  }
 }

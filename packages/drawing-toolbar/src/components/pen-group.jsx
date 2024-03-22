@@ -130,7 +130,7 @@ export class PenGroup extends React.Component {
       handleClose,
       handleOpen,
       className,
-      containerStyles = { marginTop: '-12px', marginLeft: '4px' },
+      containerStyles = { marginTop: '-16px', marginLeft: '-2px' },
       direction = 'right-start',
       orientation = 'vertical',
     } = this.props
@@ -172,7 +172,7 @@ export class PenGroup extends React.Component {
               handleClick={value => (brushMode === penToolModeEnum.MARKER)
                 ? this.handleClick('markerColor', value)
                 : this.handleClick('penColor', value)}
-              rows={orientation === 'horizontal' ? 1 : 3}
+              rows={orientation === 'horizontal' ? 2 : 3}
             />
           </div>
         )}
@@ -181,6 +181,7 @@ export class PenGroup extends React.Component {
           active={tool === toolEnum.PEN}
           dataTestId='board-panel-group-pen-button'
           group
+          groupColor={brushMode === penToolModeEnum.MARKER ? markerColor : penColor}
           title={this._getTitle(brushMode)}
           onClick={() => handleOpen(this.getOptions())}
           innerRef={this.buttonRef}

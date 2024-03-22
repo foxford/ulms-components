@@ -32,6 +32,7 @@ export const ColorItem = ({
     dataTestId={dataTestId}
     innerRef={innerRef}
     onClick={() => handleClick(color)}
+    style={{ padding: '10px' }}
   >
     <div
       className={css.colorCircle}

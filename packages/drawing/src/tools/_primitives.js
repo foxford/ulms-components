@@ -65,8 +65,8 @@ const WhiteboardLine = fabric.util.createClass(fabric.Line, {
     options.strokeUniform = true
 
     this.callSuper('initialize', points, options)
-    this.cornerStrokeColor = '#1A96F6'
-    this.cornerColor = '#1A96F6'
+    this.cornerStrokeColor = '#8A51E6'
+    this.cornerColor = '#8A51E6'
     this.cornerStyle = 'rect'
     this.controls = {
       start: new fabric.Control({
@@ -129,7 +129,7 @@ const WhiteboardArrowLine = fabric.util.createClass(fabric.WhiteboardLine, {
     this.callSuper('_render', ctx)
 
     // do not render if width/height are zeros or object is not visible
-    if (this.width === 0 || this.height === 0 || !this.visible) return
+    if ((this.width === 0 && this.height === 0) || !this.visible) return
 
     ctx.save()
 

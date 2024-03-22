@@ -16,12 +16,14 @@ export const SettingsGroup = ({
       placement={direction}
       hideArrow
       styles={{
-        floater: { filter: 'none', maxWidth: 'auto' },
+        floater: {
+          filter: 'none', maxWidth: 'auto',
+        },
         container: {
-          padding: 0,
           backgroundColor: '#fff',
-          border: '1px solid #E9E9E9',
-          borderRadius: 5,
+          border: '1px solid #BABCC9',
+          borderRadius: 12,
+          padding: '16px',
           minWidth: 0,
           minHeight: 0,
           ...containerStyles,
