@@ -1,4 +1,5 @@
 /* eslint-disable react/jsx-props-no-spreading */
+import merge from 'lodash/merge'
 import React, { memo, useMemo } from 'react'
 import styled from 'styled-components'
 import { Tooltip as TooltipComponent } from '@foxford/ui'
@@ -25,6 +26,8 @@ const styles = {
     fontSize: '14px',
     lineHeight: '130%',
     color: '#333',
+    textAlign: 'center',
+    whiteSpace: 'pre-line',
   },
   arrow: {
     spread: 16,
@@ -69,7 +72,10 @@ function _Tooltip ({
   dark,
   ...tooltipProps
 }) {
-  const computedStyles = useMemo(() => dark ? darkStyles : styles, [dark, customStyles])
+  const computedStyles = useMemo(
+    () => merge({}, dark ? darkStyles : styles, customStyles),
+    [dark, customStyles]
+  )
 
   return disabled || hideTooltip
     ? (
