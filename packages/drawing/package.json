@@ -1,6 +1,6 @@
 {
   "name": "@ulms/ui-drawing",
-  "version": "3.4.1-dev.0",
+  "version": "3.4.1",
   "description": "Whiteboard for uLMS",
   "keywords": [
     "lerna"
@@ -32,7 +32,7 @@
     "lodash": "~4.17.21"
   },
   "peerDependencies": {
-    "fabric": "^5.3.0",
-    "react": "^16.14"
+    "fabric": "5.3.0",
+    "react": "16.14"
   }
 }
