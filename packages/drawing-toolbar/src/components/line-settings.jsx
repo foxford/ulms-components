@@ -18,7 +18,6 @@ const lineSizes = {
   EIGHT: 8,
 }
 
-
 export const LineSettings = ({
   currentSize, handleClick, dashed = false,
 }) => {

@@ -46,7 +46,6 @@
   },
   "dependencies": {
     "classnames-es": "^2.2.6",
-    "d3-queue": "~3.0.7",
     "debug": "^4.1.0",
     "lodash": "^4.17.20",
     "query-string": "^6.2.0",
@@ -61,6 +60,7 @@
     "@babel/plugin-proposal-class-properties": "^7.12.13",
     "@babel/plugin-proposal-object-rest-spread": "^7.2.0",
     "@babel/plugin-syntax-dynamic-import": "^7.2.0",
+    "@babel/plugin-transform-private-methods": "^7.24.1",
     "@babel/polyfill": "^7.2.5",
     "@babel/preset-env": "^7.2.3",
     "@babel/preset-react": "^7.12.13",
