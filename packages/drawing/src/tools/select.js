@@ -36,6 +36,7 @@ export default class SelectTool extends Base {
     this.__timer = null
     this.__shiftPressed = false
     this.__cmdPressed = false
+    this.__altPressed = false
     this.__ctrlPressed = false
     this.__mouseDown = false
     this.__mouseDownPoint = null
@@ -92,8 +93,10 @@ export default class SelectTool extends Base {
     this._canvas.selection = false
     this._canvas.perPixelTargetFind = true
     this._canvas.targetFindTolerance = 15
-    this._canvas.defaultCursor = 'default'
-    this._canvas.setCursor && this._canvas.setCursor('default')
+    if (!this._canvas._loading) {
+      this._canvas.defaultCursor = 'default'
+      this._canvas.setCursor && this._canvas.setCursor('default')
+    }
     this._debouncedTriggerModified = debounce(this._triggerModified, DEBOUNCE_DELAY)
     this._floatingThrottledSendMessage =
       floatingThrottle((id, diff) => BroadcastProvider.sendMessage({ id, diff }), this._floatingDelay)
@@ -313,7 +316,9 @@ export default class SelectTool extends Base {
 
   #handeKeyEvent (e) {
     this.__cmdPressed = e.metaKey
+    this.__altPressed = e.altKey
     this.__ctrlPressed = e.ctrlKey
+    this.__shiftPressed = e.shiftKey
   }
 
   handleKeyDownEvent (e) {
@@ -324,8 +329,6 @@ export default class SelectTool extends Base {
 
     if (!this.__mouseDown && !LockProvider.isLockedByUser(this.__object)) {
       const { keyCode } = e
-
-      this.__shiftPressed = e.shiftKey
 
       switch (keyCode) {
         case keycodes.DEL_KEYCODE:
@@ -360,10 +363,6 @@ export default class SelectTool extends Base {
 
   handleKeyUpEvent (e) {
     this.#handeKeyEvent(e)
-
-    if (!this._active) return
-
-    this.__shiftPressed = e.shiftKey
   }
 
   handleObjectAddedEvent (opts) {
@@ -428,8 +427,8 @@ export default class SelectTool extends Base {
   }
 
   reset () {
-    this.__shiftPressed = false
     this.__mouseDown = false
+    this.__mouseDownPoint = null
 
     this._canvas._currentTransform = null
 

@@ -23,8 +23,10 @@ export default class PenTool extends Base {
     this._canvas.freeDrawingBrush.decimate = 2
     this._canvas.perPixelTargetFind = false
     this._canvas.selection = false
-    this._canvas.defaultCursor = 'crosshair'
-    this._canvas.setCursor('crosshair')
+    if(!this._canvas._loading) {
+      this._canvas.defaultCursor = 'crosshair'
+      this._canvas.setCursor('crosshair')
+    }
   }
 
   handleObjectAddedEvent (opts) {

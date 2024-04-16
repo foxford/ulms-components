@@ -121,11 +121,123 @@ fabric.Canvas.prototype.getAbsoluteCoords = function getAbsoluteCoords (object) 
   }
 }
 
+function commonEventInfo (eventData, transform, x, y) {
+  return {
+    e: eventData,
+    transform,
+    pointer: {
+      x,
+      y,
+    },
+  }
+}
+
+/**
+ * Action handler
+ * @private
+ * @param {Event} eventData javascript event that is doing the transform
+ * @param {Object} transform javascript object containing a series of information around the current transform
+ * @param {number} x current mouse x position, canvas normalized
+ * @param {number} y current mouse y position, canvas normalized
+ * @return {Boolean} true if the translation occurred
+ */
+function dragHandler (eventData, transform, x, y) {
+  const { target } = transform
+  const newLeft = x - transform.offsetX
+  const newTop = y - transform.offsetY
+  let lockX = false
+  let lockY = false
+
+  // Если нажат shift - лочим движение по Х или Y
+  if (transform.shiftKey) {
+    if (Math.abs(x - transform.lastX) > Math.abs(y - transform.lastY)) {
+      lockY = true
+    } else {
+      lockX = true
+    }
+  }
+
+  const moveX = !target.get('lockMovementX') && !lockX && target.left !== newLeft
+  const moveY = !target.get('lockMovementY') && !lockY && target.top !== newTop
+
+  moveX && target.set('left', newLeft)
+  moveY && target.set('top', newTop)
+
+  lockX && target.set('left', transform.lastX - transform.offsetX)
+  lockY && target.set('top', transform.lastY - transform.offsetY)
+
+  if (moveX || moveY) {
+    fabric.controlsUtils.fireEvent('moving', commonEventInfo(eventData, transform, x, y))
+  }
+
+  return moveX || moveY
+}
+
+fabric.controlsUtils.dragHandler = dragHandler
+
 const rotateIcon = "data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M16 4C16.5893 6.23917 17.0607 11.4246 14.2322 14.253C11.4038 17.0815 6.21836 16.6101 3.97918 16.0208M16 4L14.2322 6.82843M16 4L18.8284 6.82843M3.97918 16.0208L6.80761 18.8492M3.97918 16.0208L7.61084 14.1318' stroke='%238A51E6'/%3E%3C/svg%3E%0A"
 
 const rotateImg = document.createElement('img')
 
 rotateImg.src = rotateIcon
+
+const SNAP_ANGLE = 45
+
+/**
+ * Action handler for rotation and snapping, without anchor point.
+ * Needs to be wrapped with `wrapWithFixedAnchor` to be effective
+ * @param {Event} eventData javascript event that is doing the transform
+ * @param {Object} transform javascript object containing a series of information around the current transform
+ * @param {number} x current mouse x position, canvas normalized
+ * @param {number} y current mouse y position, canvas normalized
+ * @return {Boolean} true if some change happened
+ * @private
+ */
+function rotationWithSnapping (eventData, transform, x, y) {
+  const t = transform
+
+  const { target } = t
+  const pivotPoint = target.translateToOriginPoint(target.getCenterPoint(), t.originX, t.originY)
+
+  if (target.lockRotation) {
+    return false
+  }
+
+  const lastAngle = Math.atan2(t.ey - pivotPoint.y, t.ex - pivotPoint.x)
+  const curAngle = Math.atan2(y - pivotPoint.y, x - pivotPoint.x)
+  let angle = fabric.util.radiansToDegrees(curAngle - lastAngle + t.theta)
+  let hasRotated = true
+
+  // Теперь еще проверяем нажатый shift
+  if (target.snapAngle > 0 || transform.shiftKey) {
+    const snapAngle = target.snapAngle || SNAP_ANGLE
+    const snapThreshold = target.snapThreshold || snapAngle
+    const rightAngleLocked = Math.ceil(angle / snapAngle) * snapAngle
+    const leftAngleLocked = Math.floor(angle / snapAngle) * snapAngle
+
+    if (Math.abs(angle - leftAngleLocked) < snapThreshold) {
+      angle = leftAngleLocked
+    } else if (Math.abs(angle - rightAngleLocked) < snapThreshold) {
+      angle = rightAngleLocked
+    }
+  }
+
+  // normalize angle to positive value
+  if (angle < 0) {
+    angle = 360 + angle
+  }
+  angle %= 360
+
+  hasRotated = target.angle !== angle
+  target.angle = angle
+
+  return hasRotated
+}
+
+const wrappedRotationWithSnapping = fabric.controlsUtils.wrapWithFireEvent(
+  'rotating',
+  fabric.controlsUtils.wrapWithFixedAnchor(rotationWithSnapping)
+)
 
 function renderRotateIcon () {
   return function renderIcon (ctx, left, top, styleOverride, fabricObject) {
@@ -154,7 +266,7 @@ fabric.Object.prototype.controls.mtr = new fabric.Control({
   offsetX: 12,
   sizeX: 18,
   sizeY: 18,
-  actionHandler: fabric.controlsUtils.rotationWithSnapping,
+  actionHandler: wrappedRotationWithSnapping,
   cursorStyleHandler: fabric.controlsUtils.rotationStyleHandler,
   render: renderRotateIcon(),
   actionName: 'rotate',
@@ -169,7 +281,7 @@ fabric.Textbox.prototype.controls.mtr = new fabric.Control({
   offsetX: 12,
   sizeX: 18,
   sizeY: 18,
-  actionHandler: fabric.controlsUtils.rotationWithSnapping,
+  actionHandler: wrappedRotationWithSnapping,
   cursorStyleHandler: fabric.controlsUtils.rotationStyleHandler,
   render: renderRotateIcon(),
   actionName: 'rotate',

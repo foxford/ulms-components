@@ -147,10 +147,6 @@ export class ShapeTool extends PositionableObject {
     changed && this._reshape()
   }
 
-  snapCoord (coord) {
-    return Math.round(coord / 10) * 10
-  }
-
   #preparePoint (e) {
     const point = this._canvas.getPointer(e)
 

@@ -36,9 +36,11 @@ export class PositionableObject extends Base {
     this._canvas.isDrawingMode = false
     this._canvas.perPixelTargetFind = false
     this._canvas.selection = false
-    this._canvas.defaultCursor = 'crosshair'
-    this._canvas.setCursor('crosshair')
-    this._canvas.forEachObject(_ => makeNotInteractive(_))
+    if (!this._canvas._loading) {
+      this._canvas.defaultCursor = 'crosshair'
+      this._canvas.setCursor('crosshair')
+      this._canvas.forEachObject(_ => makeNotInteractive(_))
+    }
   }
 
   __resolveObject () {
