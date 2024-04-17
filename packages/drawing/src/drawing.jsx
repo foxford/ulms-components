@@ -1146,7 +1146,13 @@ export class Drawing extends React.Component {
     this.clearCanvasObjects()
     if (pageObjects.length) {
       this._abortableCreateObjectsPromise(pageObjects)
-        .then(() => this.canvas.requestRenderAll())
+        .then(() => {
+          if (this.canvas) {
+            this.canvas.requestRenderAll()
+          }
+
+          return null
+        })
         .finally(() => {
           signal = null
           abortController = null

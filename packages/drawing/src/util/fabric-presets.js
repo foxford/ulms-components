@@ -86,8 +86,11 @@ fabric.Textbox.prototype.onInput = function onInput (e) {
   if (this.canvas) {
     // Пересобираем кэш длин символов
     fabric.charWidthsCache[this.value] = {}
-    this.canvas.getActiveObject().initDimensions()
-    this.canvas.getActiveObject().setCoords()
+
+    if (this.canvas.getActiveObject()) {
+      this.canvas.getActiveObject().initDimensions()
+      this.canvas.getActiveObject().setCoords()
+    }
 
     this.canvas.requestRenderAll()
   }
