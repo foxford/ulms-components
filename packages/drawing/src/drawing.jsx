@@ -1162,7 +1162,13 @@ export class Drawing extends React.Component {
       this.canvas.setCursor('wait')
 
       this._abortableCreateObjectsPromise(pageObjects)
-        .then(() => this.canvas.requestRenderAll())
+        .then(() => {
+          if (this.canvas) {
+            this.canvas.requestRenderAll()
+          }
+
+          return null
+        })
         .finally(() => {
           signal = null
           abortController = null
