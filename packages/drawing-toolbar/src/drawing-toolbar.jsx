@@ -39,9 +39,13 @@ class _DrawingToolbarComponent extends React.Component {
     this.textGroupRef = React.createRef()
 
     this.state = { opened: '' }
+
+    this.mounted = false
   }
 
   componentDidMount () {
+    this.mounted = true
+
     document.addEventListener(eventName, this.handleDocumentClickEvent)
   }
 
@@ -53,6 +57,8 @@ class _DrawingToolbarComponent extends React.Component {
 
     if (tool !== prevProps.tool || brushMode !== prevProps.brushMode) {
       setTimeout(() => { // Чтобы успели примениться значения для getOptions
+        if (!this.mounted) return
+
         let options = null
 
         if (tool === toolEnum.TEXT) options = this.textGroupRef.current.getOptions()
@@ -96,6 +102,8 @@ class _DrawingToolbarComponent extends React.Component {
   }
 
   componentWillUnmount () {
+    this.mounted = false
+
     document.removeEventListener(eventName, this.handleDocumentClickEvent)
   }
 
@@ -153,12 +161,6 @@ class _DrawingToolbarComponent extends React.Component {
     if (closestToolbarElement === null && closestFloaterElement === null) {
       this.setState({ opened: '' })
     }
-  }
-
-  toggleOpened (val) {
-    const { opened } = this.state
-
-    this.setState({ opened: val !== opened ? val : '' })
   }
 
   render () {
