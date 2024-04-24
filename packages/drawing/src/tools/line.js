@@ -44,9 +44,10 @@ export class LineTool extends Base {
 
     this._canvas.isDrawingMode = false
     this._canvas.selection = false
-    this._canvas.defaultCursor = 'crosshair'
-    this._canvas.setCursor('crosshair')
-
+    if (!this._canvas._loading) {
+      this._canvas.defaultCursor = 'crosshair'
+      this._canvas.setCursor('crosshair')
+    }
     // In order not to bypass objects every time, we pass only when the brush is initialized
     if (props.initial) {
       this._canvas.forEachObject(_ => makeNotInteractive(_))

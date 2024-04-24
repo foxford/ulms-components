@@ -183,8 +183,10 @@ export default class EraserTool extends Base {
     this._canvas.isDrawingMode = false
     this._canvas.perPixelTargetFind = true
     this._canvas.selection = false
-    this._canvas.defaultCursor = 'cell'
-    this._canvas.setCursor('cell')
+    if (!this._canvas._loading) {
+      this._canvas.defaultCursor = 'cell'
+      this._canvas.setCursor('cell')
+    }
 
     this._width = options.eraserWidth || this._width
     this._precision = options.precision || this._precision

@@ -320,6 +320,14 @@ export class Drawing extends React.Component {
     onMouseUp && onMouseUp({ ...opts, vptCoords: this.canvas.vptCoords })
   }
 
+  _handleMouseOver = (opts) => {
+    this.tool && this.eventsEndabled && this.tool.handleMouseOverEvent(opts)
+  }
+
+  _handleMouseOut = (opts) => {
+    this.tool && this.eventsEndabled && this.tool.handleMouseOutEvent(opts)
+  }
+
   _handleTextEditStartEvent = (opts) => {
     if (opts.target.hiddenTextarea) {
       // limit textarea length
@@ -500,6 +508,8 @@ export class Drawing extends React.Component {
     this.canvas.on('mouse:down', this._handleMouseDown)
     this.canvas.on('mouse:move', this._handleMouseMove)
     this.canvas.on('mouse:up', this._handleMouseUp)
+    this.canvas.on('mouse:over', this._handleMouseOver)
+    this.canvas.on('mouse:out', this._handleMouseOut)
     this.canvas.on('text:editing:entered', this._handleTextEditStartEvent)
     this.canvas.on('text:editing:exited', this._handleTextEditEndEvent)
     this.canvas.on('text:changed', this._handleTextChangedEvent)
@@ -1144,7 +1154,13 @@ export class Drawing extends React.Component {
     signal = abortController.signal
 
     this.clearCanvasObjects()
+
     if (pageObjects.length) {
+      this.canvas._loading = true
+      this.canvas.defaultCursor = 'wait'
+      this.canvas.freeDrawingCursor = 'wait'
+      this.canvas.setCursor('wait')
+
       this._abortableCreateObjectsPromise(pageObjects)
         .then(() => {
           if (this.canvas) {
@@ -1156,6 +1172,11 @@ export class Drawing extends React.Component {
         .finally(() => {
           signal = null
           abortController = null
+          this.canvas._loading = false
+          this.canvas.defaultCursor = 'default'
+          this.canvas.freeDrawingCursor = 'crosshair'
+          this.canvas.setCursor('default')
+          this.configureTool()
         })
     }
   }

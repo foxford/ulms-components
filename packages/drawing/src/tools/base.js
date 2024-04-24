@@ -33,6 +33,10 @@ export class Base {
 
   handleMouseUpEvent () {}
 
+  handleMouseOverEvent () {}
+
+  handleMouseOutEvent () {}
+
   handleObjectAddedEvent () {}
 
   handleSelectionUpdatedEvent () {}

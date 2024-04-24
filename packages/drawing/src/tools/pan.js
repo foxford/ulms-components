@@ -18,9 +18,11 @@ export default class PanTool extends Base {
     this._canvas.isDrawingMode = false
     this._canvas.perPixelTargetFind = false
     this._canvas.selection = false
-    this._canvas.defaultCursor = 'grab'
-    this._canvas.setCursor('grab')
-    this._canvas.forEachObject(_ => makeNotInteractive(_))
+    if (!this._canvas._loading) {
+      this._canvas.defaultCursor = 'grab'
+      this._canvas.setCursor('grab')
+      this._canvas.forEachObject(_ => makeNotInteractive(_))
+    }
   }
 
   handleMouseDownEvent (opts) {
