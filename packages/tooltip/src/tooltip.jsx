@@ -26,7 +26,7 @@ const styles = {
     fontSize: '14px',
     lineHeight: '130%',
     color: '#333',
-    textAlign: 'center',
+    textAlign: 'start',
     whiteSpace: 'pre-line',
   },
   arrow: {
