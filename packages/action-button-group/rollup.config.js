@@ -5,14 +5,14 @@ const cssurl = require('postcss-url')
 const Debug = require('debug')
 const env = require('postcss-preset-env')
 const svgr = require('@svgr/rollup')
-const strip = require('@rollup/plugin-strip')
-const terser = require('@rollup/plugin-terser')
-const json = require('@rollup/plugin-json')
-const { nodeResolve } = require('@rollup/plugin-node-resolve')
-const { babel } = require('@rollup/plugin-babel')
-const commonjs = require('@rollup/plugin-commonjs')
-const postcss = require('rollup-plugin-postcss')
-const cssnano = require('cssnano')
+import strip from '@rollup/plugin-strip';
+import terser from '@rollup/plugin-terser';
+import json from '@rollup/plugin-json';
+import { nodeResolve as npm } from '@rollup/plugin-node-resolve';
+import { babel } from '@rollup/plugin-babel';
+import commonjs from '@rollup/plugin-commonjs';
+import postcss from 'rollup-plugin-postcss';
+import cssnano from 'cssnano';
 
 const { name, peerDependencies } = require('./package.json')
 const { postcssLoader } = require('./rollup/loaders')
@@ -40,7 +40,7 @@ const processAsCssModule = function(){
 
 const rollupPlugins = [ // order matters
   json(),
-  svgr(),
+  svgr({ dimensions: false }), // Исправляем ошибку, когда из svg удаляется viewBox
   postcss({
     extract: true,
     plugins: [
@@ -70,7 +70,7 @@ const rollupPlugins = [ // order matters
       },
     ],
   }),
-  nodeResolve({
+  npm({
     browser: true,
     extensions: ['.js', '.jsx']
   }),
@@ -123,4 +123,4 @@ const dist = (entry = 'index.js', frm = './', out = './es') => {
   return opts
 }
 
-module.exports = dist
+module.exports = dist()
