@@ -40,7 +40,7 @@ const processAsCssModule = function(){
 
 const rollupPlugins = [ // order matters
   json(),
-  svgr(),
+  svgr({ dimensions: false }), // Исправляем ошибку, когда из svg удаляется viewBox
   postcss({
     extract: true,
     plugins: [

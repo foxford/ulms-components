@@ -1,0 +1,25 @@
+{
+  "name": "@ulms/ui-action-button-group",
+  "version": "2.3.0",
+  "description": "",
+  "keywords": [
+    "lerna"
+  ],
+  "license": "MIT",
+  "author": "",
+  "main": "index.js",
+  "module": "es/index.js",
+  "files": [
+    "es",
+    "src"
+  ],
+  "scripts": {
+    "build": "rm -rf ./es/* && BABEL_ENV=es rollup --config ./rollup.config.js index.js"
+  },
+  "dependencies": {
+    "classnames-es": "^2.2.6"
+  },
+  "peerDependencies": {
+    "react": "^16.14"
+  }
+}
