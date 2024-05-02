@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types,react/jsx-props-no-spreading */
 import React from 'react'
-import clsx from 'clsx'
+import cn from 'classnames-es'
 import { cssTransition, toast, ToastContainer } from 'react-toastify'
 
 import 'react-toastify/dist/ReactToastify.min.css'
@@ -28,7 +28,7 @@ function NotificationContainer ({
     <ToastContainer
       autoClose={4000}
       bodyClassName={css.body}
-      className={clsx(css.container, isCompact && css.isCompact, className)}
+      className={cn(css.container, isCompact && css.isCompact, className)}
       closeButton={false}
       closeOnClick={false}
       draggable={!!isCompact}

@@ -2,9 +2,6 @@
   "name": "@ulms/ui-frame",
   "version": "1.0.3",
   "description": "",
-  "keywords": [
-    "lerna"
-  ],
   "homepage": "https://github.com/netology-group/ulms-media-ui#readme",
   "bugs": {
     "url": "https://github.com/netology-group/ulms-media-ui/issues"

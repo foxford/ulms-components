@@ -2,9 +2,6 @@
   "name": "@ulms/ui-spinner",
   "version": "1.0.1",
   "description": "",
-  "keywords": [
-    "lerna"
-  ],
   "homepage": "https://github.com/netology-group/ulms-media-ui#readme",
   "bugs": {
     "url": "https://github.com/netology-group/ulms-media-ui/issues"
@@ -25,8 +22,8 @@
     "build": "rm -rf ./es/* && BABEL_ENV=es rollup --config ./rollup.config.js index.js"
   },
   "dependencies": {
-    "@ulms/ui-icons": "^1.0.0",
-    "classnames-es": "^2.2.6"
+    "@ulms/ui-icons": "*",
+    "classnames-es": "2.2.6"
   },
   "peerDependencies": {
     "react": "^16.14"

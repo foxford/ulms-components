@@ -2,9 +2,6 @@
   "name": "@ulms/cache-buster",
   "version": "1.1.1",
   "description": "",
-  "keywords": [
-    "lerna"
-  ],
   "homepage": "https://github.com/netology-group/ulms-media-ui#readme",
   "bugs": {
     "url": "https://github.com/netology-group/ulms-media-ui/issues"
