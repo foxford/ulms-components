@@ -1,3 +1,0 @@
-/* globals test */
-
-test('ok', () => {})

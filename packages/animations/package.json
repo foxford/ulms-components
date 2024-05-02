@@ -2,9 +2,6 @@
   "name": "@ulms/animations",
   "version": "1.0.4",
   "description": "",
-  "keywords": [
-    "lerna"
-  ],
   "homepage": "https://github.com/netology-group/ulms-media-ui#readme",
   "bugs": {
     "url": "https://github.com/netology-group/ulms-media-ui/issues"
@@ -33,8 +30,8 @@
   "peerDependencies": {
     "@foxford/icon-pack": ">=0.0.6",
     "@foxford/ui": "^2.17.0",
-    "@ulms/tgs-player": "1.0.2",
-    "@ulms/tooltip": "^1.0.0",
+    "@ulms/tgs-player": "*",
+    "@ulms/tooltip": "*",
     "howler": "~2.2.4",
     "react": "^16.14 || 17 || 18",
     "react-dom": "^16.14 || 17 || 18",

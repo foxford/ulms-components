@@ -1,44 +1,22 @@
 {
-  "name": "@ulms/components",
-  "version": "2.4.0",
-  "description": "UI components library",
-  "homepage": "https://github.com/netology-group/ulms-media-ui",
-  "bugs": {
-    "url": "https://github.com/netology-group/ulms-media-ui/issues"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/netology-group/ulms-media-ui.git"
-  },
-  "license": "BSD-4-Clause",
-  "author": "OLC Netology group LLC",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
   "scripts": {
     "_lint": "eslint --ext js,jsx",
     "preanalyze": "npm run build/dev",
     "analyze": "source-map-explorer ./packages/*/es/index.js",
-    "prebootstrap": "rm -rf ./packages/**/.*.sw*",
-    "bootstrap": "lerna list | sed 's/@ulms\\///g' | sed 's/ui-//g' | xargs -I{} scripts/populate-rollup.sh {} && lerna bootstrap",
-    "prebuild": "npm run prebootstrap",
-    "build": "lerna exec 'NODE_ENV=production npm run build'",
-    "build/dev": "lerna exec 'npm run build'",
+    "build": "NODE_ENV=production lerna run build",
+    "build/dev": "lerna run build",
     "precoverage": "rm -rf coverage",
     "coverage": "BABEL_ENV=jest jest ./packages --coverage --ci",
     "coverage/report": "npm run coverage && codecov --disable=gcov",
-    "prepare": "npm run bootstrap",
+    "_prepare": "lerna list | sed 's/@ulms\\///g' | sed 's/ui-//g' | xargs -I{} scripts/populate-rollup.sh {}",
     "prepublishOnly": "npm run build",
     "test": "npm run test/lint && npm run test/all",
     "test/all": "BABEL_ENV=jest jest",
     "test/lint": "npm run _lint -- packages/*/src"
-  },
-  "dependencies": {
-    "classnames-es": "^2.2.6",
-    "debug": "^4.1.0",
-    "lodash": "^4.17.20",
-    "query-string": "^6.2.0",
-    "react-sizeme": "~2.6.7",
-    "react-visibility-sensor": "~5.0",
-    "recompose": "^0.30.0",
-    "scroll-into-view-if-needed": "~2.2"
   },
   "devDependencies": {
     "@babel/cli": "^7.12.16",
@@ -88,7 +66,7 @@
     "eslint-plugin-unicorn": "^6.0.1",
     "eslint-restricted-globals": "^0.2.0",
     "jest": "^26.6.3",
-    "lerna": "5.5.2",
+    "lerna": "8.1.2",
     "mkdirp": "^0.5.1",
     "ncp": "^2.0.0",
     "postcss": "^8.4.21",
@@ -103,15 +81,6 @@
     "rollup-plugin-postcss": "^4.0.2",
     "source-map-explorer": "^2.5.2",
     "webpack": "^4.26.1"
-  },
-  "peerDependencies": {
-    "fabric": "^5.3.0",
-    "postcss": "^8.0.0",
-    "react": "^16.14",
-    "react-dom": "^16.14",
-    "react-sizeme": "~2.6.7",
-    "react-visibility-sensor": "~5.0",
-    "scroll-into-view-if-needed": "~2.2"
   },
   "engines": {
     "node": ">=16.15",

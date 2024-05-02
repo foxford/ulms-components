@@ -78,10 +78,14 @@ const rollupPlugins = [ // order matters
   }),
   npm({
     browser: true,
-    extensions: ['.js', '.jsx'],
+    extensions: ['.js', '.jsx']
   }),
   commonjs({
-    include: 'node_modules/**',
+    include: /node_modules/,
+    namedExports: {
+      'react-sizeme': ['SizeMe'],
+      'fabric': ['fabric']
+    }
   }),
   babel({
     babelrc: false,

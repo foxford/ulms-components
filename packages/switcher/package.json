@@ -2,9 +2,6 @@
   "name": "@ulms/ui-switcher",
   "version": "1.0.2",
   "description": "",
-  "keywords": [
-    "lerna"
-  ],
   "homepage": "https://github.com/netology-group/ulms-media-ui#readme",
   "bugs": {
     "url": "https://github.com/netology-group/ulms-media-ui/issues"
@@ -25,7 +22,7 @@
     "build": "rm -rf ./es/* && BABEL_ENV=es rollup --config ./rollup.config.js index.js"
   },
   "dependencies": {
-    "classnames-es": "^2.2.6"
+    "classnames-es": "2.2.6"
   },
   "peerDependencies": {
     "react": "^16.14"

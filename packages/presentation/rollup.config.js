@@ -75,7 +75,7 @@ const rollupPlugins = [ // order matters
     extensions: ['.js', '.jsx']
   }),
   commonjs({
-    include: 'node_modules/**',
+    include: /node_modules/,
     namedExports: {
       'react-sizeme': ['SizeMe'],
       'fabric': ['fabric']
