@@ -7,7 +7,7 @@ import IconDashedLine from '../icons/dashed-line-tool-icon.svg'
 import IconArrow from '../icons/arrow-tool-icon.svg'
 
 import { intlID } from '../../lang/constants'
-import { HEXtoRGB } from '../utils'
+import { HEXtoRGB, RGBtoHEX } from '../utils'
 import { settingsGroupContainerStyles } from '../constants'
 
 import { IconGroupSettings } from './icon-group-settings'
@@ -22,7 +22,8 @@ import css from './settings.module.css'
 export class LineGroup extends React.Component {
   constructor (props) {
     super(props)
-    const { intl } = props
+    const { intl, options } = props
+    const isLineToolSelected = props.tool === toolEnum.LINE
 
     this.iconsMap = {
       [lineToolModeEnum.LINE]: <IconLine />,
@@ -33,9 +34,9 @@ export class LineGroup extends React.Component {
     this.buttonRef = React.createRef()
 
     this.state = {
-      color: defaultToolSettings.color,
-      size: defaultToolSettings.size,
-      brushMode: defaultToolSettings.line,
+      color: isLineToolSelected ? RGBtoHEX(options.brushColor) : defaultToolSettings.color,
+      size: isLineToolSelected ? options.brushWidth : defaultToolSettings.size,
+      brushMode: isLineToolSelected ? options.brushMode : defaultToolSettings.line,
     }
 
     this.iconsSet = [
