@@ -1,6 +1,6 @@
 {
   "name": "@ulms/services",
-  "version": "1.0.0",
+  "version": "1.0.1-alpha.0",
   "license": "MIT",
   "main": "index.js",
   "module": "es/index.js",

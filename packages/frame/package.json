@@ -1,6 +1,6 @@
 {
   "name": "@ulms/ui-frame",
-  "version": "1.0.3",
+  "version": "1.0.4-alpha.0",
   "license": "MIT",
   "main": "index.js",
   "module": "es/index.js",
