@@ -8,7 +8,7 @@ import IconMarker from '../icons/marker-tool-icon.svg'
 
 import { intlID } from '../../lang/constants'
 
-import { HEXtoRGB } from '../utils'
+import { HEXtoRGB, RGBtoHEX } from '../utils'
 
 import { IconGroupSettings } from './icon-group-settings'
 import { ToolbarButton } from './toolbar-button'
@@ -26,6 +26,13 @@ const lineToMarkerMap = {
   8: 20,
 }
 
+const markerToLineMap = {
+  5: 1,
+  10: 2,
+  15: 4,
+  20: 8,
+}
+
 export class PenGroup extends React.Component {
   constructor (props) {
     super(props)
@@ -33,12 +40,32 @@ export class PenGroup extends React.Component {
 
     this.buttonRef = React.createRef()
 
+    let penColor = defaultToolSettings.color
+    let penSize = defaultToolSettings.size
+    let { markerColor } = defaultToolSettings
+    let { markerSize } = defaultToolSettings
+    let brushMode = penToolModeEnum.PENCIL
+
+    if (props.tool === toolEnum.PEN) {
+      const { options } = props
+
+      brushMode = props.brushMode || penToolModeEnum.PENCIL
+
+      if (brushMode === penToolModeEnum.MARKER) {
+        markerColor = RGBtoHEX(options.brushColor)
+        markerSize = markerToLineMap[options.brushWidth] || defaultToolSettings.markerSize
+      } else {
+        penColor = RGBtoHEX(options.brushColor)
+        penSize = options.brushWidth
+      }
+    }
+
     this.state = {
-      penColor: defaultToolSettings.color,
-      penSize: defaultToolSettings.size,
-      markerColor: defaultToolSettings.markerColor,
-      markerSize: defaultToolSettings.markerSize,
-      brushMode: penToolModeEnum.PENCIL,
+      penColor,
+      penSize,
+      markerColor,
+      markerSize,
+      brushMode,
     }
 
     this.iconsMap = {

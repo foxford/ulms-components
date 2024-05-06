@@ -167,6 +167,8 @@ class _DrawingToolbarComponent extends React.Component {
     const {
       brushColor,
       brushMode,
+      brushWidth,
+      fontSize,
       handleChange,
       sendEvent,
       intl,
@@ -178,6 +180,13 @@ class _DrawingToolbarComponent extends React.Component {
       tools,
     } = this.props
     const { opened } = this.state
+
+    const brushOptions = {
+      brushColor,
+      brushMode,
+      brushWidth,
+      fontSize,
+    }
 
     const isEraserEnabled = tools && tools.includes(toolEnum.ERASER)
     const isImageEnabled = tools && tools.includes(toolEnum.IMAGE)
@@ -229,6 +238,7 @@ class _DrawingToolbarComponent extends React.Component {
               direction={penGroupDirection}
               orientation={penGroupOrientation}
               sendEvent={sendEvent}
+              options={brushOptions}
             />
           )}
 
@@ -244,6 +254,7 @@ class _DrawingToolbarComponent extends React.Component {
               handleOpen={options => this.handleOpen(toolEnum.SHAPE, options)}
               handleChange={handleChange}
               sendEvent={sendEvent}
+              options={brushOptions}
             />
           )}
 
@@ -258,6 +269,7 @@ class _DrawingToolbarComponent extends React.Component {
               handleOpen={options => this.handleOpen(toolEnum.LINE, options)}
               handleChange={handleChange}
               sendEvent={sendEvent}
+              options={brushOptions}
             />
           )}
 
@@ -271,6 +283,7 @@ class _DrawingToolbarComponent extends React.Component {
               handleOpen={options => this.handleOpen(toolEnum.TEXT, options)}
               handleChange={handleChange}
               sendEvent={sendEvent}
+              options={brushOptions}
             />
           )}
 

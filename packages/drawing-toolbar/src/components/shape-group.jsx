@@ -12,7 +12,7 @@ import IconSolidTriangle from '../icons/solid-triangle-tool-icon.svg'
 import IconSolidRightTriangle from '../icons/solid-right-triangle-tool-icon.svg'
 
 import { intlID } from '../../lang/constants'
-import { HEXtoRGB } from '../utils'
+import { HEXtoRGB, RGBtoHEX } from '../utils'
 import { settingsGroupContainerStyles } from '../constants'
 
 import { IconGroupSettings } from './icon-group-settings'
@@ -26,13 +26,15 @@ import css from './settings.module.css'
 export class ShapeGroup extends React.Component {
   constructor (props) {
     super(props)
+    const { options } = props
     // const { intl } = props
+    const isShapeToolSelected = props.tool === toolEnum.SHAPE
 
     this.buttonRef = React.createRef()
 
     this.state = {
-      color: defaultToolSettings.color,
-      brushMode: defaultToolSettings.shape,
+      color: isShapeToolSelected ? RGBtoHEX(options.brushColor) : defaultToolSettings.color,
+      brushMode: isShapeToolSelected ? options.brushMode : defaultToolSettings.shape,
     }
 
     this.iconsMap = {

@@ -5,7 +5,7 @@ import { toolEnum, defaultToolSettings } from '@ulms/ui-drawing'
 import IconText from '../icons/text-tool-icon.svg'
 
 import { intlID } from '../../lang/constants'
-import { HEXtoRGB } from '../utils'
+import { HEXtoRGB, RGBtoHEX } from '../utils'
 import { settingsGroupContainerStyles } from '../constants'
 
 import { ToolbarButton } from './toolbar-button'
@@ -19,11 +19,14 @@ import css from './settings.module.css'
 export class TextGroup extends React.Component {
   constructor (props) {
     super(props)
+    const { options } = props
+    const isTextToolSelected = props.tool === toolEnum.TEXT
+
     this.buttonRef = React.createRef()
 
     this.state = {
-      color: defaultToolSettings.color,
-      fontSize: defaultToolSettings.fontSize,
+      color: isTextToolSelected ? RGBtoHEX(options.brushColor) : defaultToolSettings.color,
+      fontSize: isTextToolSelected ? options.fontSize : defaultToolSettings.fontSize,
     }
   }
 
