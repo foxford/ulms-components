@@ -2,8 +2,11 @@ import React from 'react'
 
 import css from './divider.module.css'
 
-export const Divider = ({ horizontal = false }) => (
-  horizontal
-    ? <div className={css.horizontalDivider} />
-    : <div className={css.verticalDivider} />
-)
+// eslint-disable-next-line import/prefer-default-export
+export function Divider({ horizontal = false }) {
+  return horizontal ? (
+    <div className={css.horizontalDivider} />
+  ) : (
+    <div className={css.verticalDivider} />
+  )
+}

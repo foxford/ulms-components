@@ -1,16 +1,14 @@
-/* eslint-disable */
-
 import { Base } from './base'
-import { makeNotInteractive } from "./object";
+import { makeNotInteractive } from './object'
 
 export default class PenTool extends Base {
-  constructor (canvas) {
+  constructor(canvas) {
     super(canvas)
 
-    this._canvas.forEachObject(_ => makeNotInteractive(_))
+    this._canvas.forEachObject((_) => makeNotInteractive(_))
   }
 
-  configure (props) {
+  configure(props) {
     this._canvas.isDrawingMode = true
     this._canvas.freeDrawingBrush.color = props.lineColor
     this._canvas.freeDrawingBrush.width = props.lineWidth
@@ -23,31 +21,32 @@ export default class PenTool extends Base {
     this._canvas.freeDrawingBrush.decimate = 2
     this._canvas.perPixelTargetFind = false
     this._canvas.selection = false
-    if(!this._canvas._loading) {
+    if (!this._canvas._loading) {
       this._canvas.defaultCursor = 'crosshair'
       this._canvas.setCursor('crosshair')
     }
   }
 
-  handleObjectAddedEvent (opts) {
-    Object.assign(opts.target, { evented: false, selectable: false })
+  // eslint-disable-next-line class-methods-use-this
+  handleObjectAddedEvent(options) {
+    Object.assign(options.target, { evented: false, selectable: false })
   }
 
-  makeActive () {
+  makeActive() {
     super.makeActive()
 
     this._canvas.freeDrawingBrush.setActiveValue(true)
     this._canvas.isDrawingMode = true
   }
 
-  makeInactive () {
+  makeInactive() {
     super.makeInactive()
 
     this._canvas.freeDrawingBrush.setActiveValue(false)
     this._canvas.isDrawingMode = false
   }
 
-  reset () {
+  reset() {
     this._canvas.freeDrawingBrush.reset()
   }
 }

@@ -1,4 +1,5 @@
-:host, .root {
+:host,
+.root {
   --media-ui-icons-color: #333;
   --media-ui-action-button-group-button-padding-top: 14px;
   --media-ui-action-button-group-button-padding-right: 14px;
@@ -11,12 +12,15 @@
   font-size: 1em;
   position: relative;
 }
+
 .root:hover {
   cursor: pointer;
 }
+
 .root.disabled {
   cursor: not-allowed;
 }
+
 .root + .root {
   margin-left: 25px;
 }
@@ -24,39 +28,42 @@
 /* TODO: add media-queries */
 
 .root .button {
-  padding: var(--media-ui-action-button-group-button-padding-top) var(--media-ui-action-button-group-button-padding-right) var(--media-ui-action-button-group-button-padding-bottom) var(--media-ui-action-button-group-button-padding-left);
+  padding: var(--media-ui-action-button-group-button-padding-top)
+    var(--media-ui-action-button-group-button-padding-right)
+    var(--media-ui-action-button-group-button-padding-bottom)
+    var(--media-ui-action-button-group-button-padding-left);
+
   --media-ui-button-padding-bottom: 0;
   --media-ui-button-padding-left: 0;
   --media-ui-button-padding-right: 0;
   --media-ui-button-padding-top: 0;
+
   user-select: none;
-}
-.root .button {
   background: transparent;
   border: 0;
   font-weight: 500;
   position: relative;
 }
-.root:hover
-,.root:hover .button .content > *
-{
-  color: #48A1E6;
+
+.root:hover,
+.root:hover .button .content > * {
+  color: #48a1e6;
 }
-.root:active
-,.root.active
-,.root:active .button .content > *
-,.root.active .button .content > *
-{
-  color: #48A1E6;
+
+.root:active,
+.root.active,
+.root:active .button .content > *,
+.root.active .button .content > * {
+  color: #48a1e6;
 }
-.root .button.active .content > *
-,.root .button:active .content > *
-{
+
+.root .button.active .content > *,
+.root .button:active .content > * {
   filter: brightness(83%);
 }
 
 .root .textAfter {
-  padding-left: 10px
+  padding-left: 10px;
 }
 
 .root .underline {
@@ -64,26 +71,26 @@
   width: 100%;
   margin-top: 11px;
 }
+
 .root:hover .underline {
-  background-color: #48A1E6;
+  background-color: #48a1e6;
 }
-.root:active .underline
-,.root.active .underline
-{
-  background-color: #48A1E6;
+
+.root:active .underline,
+.root.active .underline {
+  background-color: #48a1e6;
   filter: brightness(83%);
 }
 
 .root .bullet {
   position: absolute;
-  top: 8px;
   right: 8px;
   width: 6px;
   height: 6px;
   top: 0;
 }
-.root .bullet > svg path {
-  fill: #FF7256;
-  stroke: #FF7256;
-}
 
+.root .bullet > svg path {
+  fill: #ff7256;
+  stroke: #ff7256;
+}

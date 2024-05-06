@@ -6,7 +6,7 @@ import { makeInteractive, makeNotInteractive } from './tools/object'
 import SelectTool from './tools/select'
 
 class CLockProvider {
-  constructor () {
+  constructor() {
     this.__lockedIds = []
     this.__canvas = null
     this.__tool = null
@@ -14,27 +14,31 @@ class CLockProvider {
     this.__waitForCanvas = false
   }
 
-  set canvas (canvas) {
+  set canvas(canvas) {
     this.__canvas = canvas
 
     if (canvas && this.__waitForCanvas) {
       this.__waitForCanvas = false
 
       if (this.__tool === toolEnum.SELECT) {
-        this.__lockedIds.forEach((id) => {
+        for (const id of this.__lockedIds) {
           if (this.__canvas._objectsMap.has(id)) {
             makeNotInteractive(this.__canvas._objectsMap.get(id))
           }
-        })
+        }
       }
     }
   }
 
-  get lockedIds () { return this.__lockedIds }
+  set tool(tool) {
+    this.__tool = tool
+  }
 
-  set tool (tool) { this.__tool = tool }
+  get lockedIds() {
+    return this.__lockedIds
+  }
 
-  set lockedIds (ids) {
+  set lockedIds(ids) {
     const newIds = Array.isArray(ids) ? ids : [ids]
 
     if (this.__canvas) {
@@ -42,32 +46,32 @@ class CLockProvider {
         const removedIds = []
         const addedIds = []
 
-        this.__lockedIds.forEach((id) => {
-          if (newIds.indexOf(id) === -1) {
+        for (const id of this.__lockedIds) {
+          if (!newIds.includes(id)) {
             removedIds.push(id)
           }
-        })
+        }
 
-        newIds.forEach((id) => {
-          if (this.__lockedIds.indexOf(id) === -1) {
+        for (const id of newIds) {
+          if (!this.__lockedIds.includes(id)) {
             addedIds.push(id)
           }
-        })
+        }
 
-        addedIds.forEach((id) => {
+        for (const id of addedIds) {
           if (this.__canvas._objectsMap.has(id)) {
             const object = this.__canvas._objectsMap.get(id)
 
             makeNotInteractive(object)
             SelectTool.removeFromSelection(this.__canvas, object)
           }
-        })
+        }
 
-        removedIds.forEach((id) => {
+        for (const id of removedIds) {
           if (this.__canvas._objectsMap.has(id)) {
             makeInteractive(this.__canvas._objectsMap.get(id))
           }
-        })
+        }
       }
     } else {
       this.__waitForCanvas = true
@@ -75,19 +79,19 @@ class CLockProvider {
     this.__lockedIds = newIds
   }
 
-  isLockedByUser (object) {
+  isLockedByUser(object) {
     return object && object[USER_LOCK_LABEL]
   }
 
-  isLockedBySelection (object) {
+  isLockedBySelection(object) {
     return this.__lockedIds.includes(object._id)
   }
 
-  isLocked (object) {
+  isLocked(object) {
     return this.isLockedByUser(object) || this.isLockedBySelection(object)
   }
 
-  lockUserObject (object, options = {}) {
+  lockUserObject(object, options = {}) {
     const props = {
       ...options,
       borderColor: 'rgba(255,0,0,0.75)',
@@ -108,7 +112,7 @@ class CLockProvider {
     return object
   }
 
-  unlockUserObject (object, options = {}) {
+  unlockUserObject(object, options = {}) {
     const props = {
       ...options,
       borderColor: 'rgba(102,153,255,0.75)',
@@ -129,24 +133,30 @@ class CLockProvider {
     return object
   }
 
-  resetObjectUserLock (object) {
+  resetObjectUserLock(object) {
     // eslint-disable-next-line no-unused-vars
     const { [USER_LOCK_LABEL]: userLockLabel, ...restObject } = object
 
     return restObject
   }
 
-  toggleUserLock (obj) {
+  toggleUserLock(object_) {
     // ToDo: Заглушка. Пока работаем с одним объектом.
     // Когда появится множественное выделение - надо переработать
-    const object = Array.isArray(obj) ? obj[0] : obj
+    const object = Array.isArray(object_) ? object_[0] : object_
 
-    this.isLockedByUser(object) ? this.unlockUserObject(object) : this.lockUserObject(object)
+    if (this.isLockedByUser(object)) {
+      this.unlockUserObject(object)
+    } else {
+      this.lockUserObject(object)
+    }
 
-    this.__canvas.requestRenderAll()
-
-    this.__canvas && this.__canvas.fire('object:modified', { target: object })
+    if (this.__canvas) {
+      this.__canvas.requestRenderAll()
+      this.__canvas.fire('object:modified', { target: object })
+    }
   }
 }
 
+// eslint-disable-next-line import/prefer-default-export
 export const LockProvider = new CLockProvider()

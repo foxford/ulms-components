@@ -38,6 +38,7 @@ export const ANIMATION_SIZES = {
       mobile: 'height: auto; width: 80%;',
     },
     try_again: {
+      // eslint-disable-next-line sonarjs/no-duplicate-string
       desktop: 'height: auto; width: 70%;',
       tablet: 'height: auto; width: 70%;',
       mobile: 'height: auto; width: 55%;',

@@ -1,6 +1,6 @@
 import dj from 'dayjs'
-import dayjs_en from 'dayjs/locale/en'
-import dayjs_ru from 'dayjs/locale/ru'
+import dayjsEn from 'dayjs/locale/en'
+import dayjsRu from 'dayjs/locale/ru'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
 import isBetween from 'dayjs/plugin/isBetween'
 import LocalizedFormat from 'dayjs/plugin/localizedFormat'
@@ -10,20 +10,21 @@ import utc from 'dayjs/plugin/utc'
 import weekday from 'dayjs/plugin/weekday'
 
 const LOCALES = {
-  en: dayjs_en,
-  ru: dayjs_ru,
+  en: dayjsEn,
+  ru: dayjsRu,
 }
 
 // Create instance of dayjs with settings https://github.com/iamkun/dayjs/issues/1227
+// eslint-disable-next-line import/prefer-default-export
 export class DayjsAdapter {
   static LOCALES = LOCALES
 
-  constructor () {
+  constructor() {
     this.dayjs = dj
     this.extend()
   }
 
-  extend () {
+  extend() {
     this.dayjs.extend(utc)
     this.dayjs.extend(timezone)
     this.dayjs.extend(customParseFormat)
@@ -33,7 +34,7 @@ export class DayjsAdapter {
     this.dayjs.extend(relativeTime)
   }
 
-  initLocale (locale) {
+  initLocale(locale) {
     const browserLocale = navigator.language.split('-')[0]
 
     if (locale === undefined || locale === null) {
@@ -49,6 +50,7 @@ export class DayjsAdapter {
     this.dayjs.locale(locale, DayjsAdapter.LOCALES[locale])
   }
 
+  // eslint-disable-next-line class-methods-use-this
   setDefaultLocale = () => {}
 
   setTimezone = (tz = 'Europe/Moscow') => {

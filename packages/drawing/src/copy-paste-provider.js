@@ -1,32 +1,38 @@
 /* eslint-disable no-param-reassign,no-undef */
 import { fabric } from 'fabric/dist/fabric.min'
 
-import { COPY_PASTE_SHIFT, defaultToolSettings, MAX_TEXT_LENGTH } from './constants'
+import {
+  COPY_PASTE_SHIFT,
+  defaultToolSettings,
+  MAX_TEXT_LENGTH,
+} from './constants'
 import { serializeObject } from './util/serialize-object'
 import { toCSSColor, HEXtoRGB } from './util/to-css-color'
 
-function b64Encode (str) {
-  return btoa(encodeURIComponent(str))
+const TEXT_PLAIN_MIME_TYPE = 'text/plain'
+
+function b64Encode(string_) {
+  return btoa(encodeURIComponent(string_))
 }
 
-function b64Decode (str) {
-  return decodeURIComponent(atob(str))
+function b64Decode(string_) {
+  return decodeURIComponent(atob(string_))
 }
 
 class CCopyPasteProvider {
   clipboardType = 'whiteboard/object'
 
-  constructor () {
+  constructor() {
     this.__clipboard = null
     this.__canvas = null
     this.__copyPasteIncrement = 0
   }
 
-  set canvas (canvas) {
+  set canvas(canvas) {
     this.__canvas = canvas
   }
 
-  get isEmpty () {
+  get isEmpty() {
     return !this.__clipboard
   }
 
@@ -46,39 +52,39 @@ class CCopyPasteProvider {
 
   paste = () => {
     if (this.__canvas && this.__clipboard) {
-      this.__clipboard.clone(((clonedObj) => {
+      this.__clipboard.clone((clonedObject) => {
         this.__canvas.discardActiveObject()
-        clonedObj.set({
-          left: clonedObj.left + COPY_PASTE_SHIFT,
-          top: clonedObj.top + COPY_PASTE_SHIFT,
+        clonedObject.set({
+          left: clonedObject.left + COPY_PASTE_SHIFT,
+          top: clonedObject.top + COPY_PASTE_SHIFT,
           hasBorders: true,
           hasControls: true,
           _selected: true, // Чтобы сработало выделение на новом объекте
           evented: true,
         })
-        if (clonedObj.type === 'activeSelection') {
+        if (clonedObject.type === 'activeSelection') {
           // active selection needs a reference to the canvas.
-          clonedObj.canvas = this.__canvas
-          clonedObj.forEachObject((obj) => {
-            this.__canvas.add(obj)
+          clonedObject.canvas = this.__canvas
+          clonedObject.forEachObject((object) => {
+            this.__canvas.add(object)
           })
           // this should solve the unselectability
-          clonedObj.setCoords()
+          clonedObject.setCoords()
         } else {
-          this.__canvas.add(clonedObj)
+          this.__canvas.add(clonedObject)
         }
         this.__clipboard.top += COPY_PASTE_SHIFT
         this.__clipboard.left += COPY_PASTE_SHIFT
-        this.__canvas.setActiveObject(clonedObj)
+        this.__canvas.setActiveObject(clonedObject)
         this.__canvas.requestRenderAll()
-      }))
+      })
     }
   }
 
   copyToClipboard = (event) => {
     if (this.__canvas && this.__canvas.getActiveObject()) {
-      this.__canvas.getActiveObject().clone(async (clonedObj) => {
-        await this._copyObjectToClipboard(event, clonedObj)
+      this.__canvas.getActiveObject().clone(async (clonedObject) => {
+        await this._copyObjectToClipboard(event, clonedObject)
         this.__copyPasteIncrement = 1
       })
     }
@@ -86,8 +92,8 @@ class CCopyPasteProvider {
 
   cutToClipboard = (event) => {
     if (this.__canvas && this.__canvas.getActiveObject()) {
-      this.__canvas.getActiveObject().clone(async (clonedObj) => {
-        if (await this._copyObjectToClipboard(event, clonedObj)) {
+      this.__canvas.getActiveObject().clone(async (clonedObject) => {
+        if (await this._copyObjectToClipboard(event, clonedObject)) {
           this.__canvas.remove(this.__canvas.getActiveObject())
           this.__copyPasteIncrement = 0
         }
@@ -96,21 +102,27 @@ class CCopyPasteProvider {
   }
 
   _copyObjectToClipboard = async (event, object) => {
-    const serializedObj = serializeObject(object)
+    const serializedObject = serializeObject(object)
 
     try {
-      if (object.type !== 'image') {
-        const clipboardData = event.clipboardData || window.clipboardData || event.originalEvent.clipboardData
-
-        clipboardData.setData('text/plain', 'Whiteboard object')
-        clipboardData.setData(this.clipboardType, JSON.stringify(serializedObj))
-      } else {
-        const type = 'text/plain'
-
-        const blob = new Blob([b64Encode(JSON.stringify(serializedObj))], { type })
-        const data = [new ClipboardItem({ [type]: blob })]
+      if (object.type === 'image') {
+        const blob = new Blob([b64Encode(JSON.stringify(serializedObject))], {
+          type: TEXT_PLAIN_MIME_TYPE,
+        })
+        const data = [new ClipboardItem({ [TEXT_PLAIN_MIME_TYPE]: blob })]
 
         await navigator.clipboard.write(data)
+      } else {
+        const clipboardData =
+          event.clipboardData ||
+          window.clipboardData ||
+          event.originalEvent.clipboardData
+
+        clipboardData.setData(TEXT_PLAIN_MIME_TYPE, 'Whiteboard object')
+        clipboardData.setData(
+          this.clipboardType,
+          JSON.stringify(serializedObject),
+        )
       }
 
       event.preventDefault()
@@ -118,16 +130,16 @@ class CCopyPasteProvider {
       return true
     } catch (error) {
       // eslint-disable-next-line no-console
-      console.warn('Error copy to clipboard: ', error)
+      console.warn('Error copy to clipboard:', error)
 
       return false
     }
   }
 
-  _processClipboardData (event, clipboardDataSrc) {
+  _processClipboardData(event, clipboardDataSource) {
     this.__canvas.discardActiveObject()
-    if (clipboardDataSrc) {
-      fabric.util.enlivenObjects([clipboardDataSrc], ([fObject]) => {
+    if (clipboardDataSource) {
+      fabric.util.enlivenObjects([clipboardDataSource], ([fObject]) => {
         if (fObject) {
           fObject.set({
             left: fObject.left + COPY_PASTE_SHIFT * this.__copyPasteIncrement,
@@ -153,35 +165,49 @@ class CCopyPasteProvider {
   }
 
   pasteFromClipboard = (event) => {
-    const clipboardData = event.clipboardData || event.originalEvent.clipboardData || window.clipboardData
+    const clipboardData =
+      event.clipboardData ||
+      event.originalEvent.clipboardData ||
+      window.clipboardData
 
-    if (!(clipboardData && (clipboardData.types.includes(this.clipboardType) || clipboardData.types.includes('text/plain')))) {
+    if (
+      !(
+        clipboardData &&
+        (clipboardData.types.includes(this.clipboardType) ||
+          clipboardData.types.includes(TEXT_PLAIN_MIME_TYPE))
+      )
+    ) {
       return true
     }
 
     if (clipboardData.types.includes(this.clipboardType)) {
       try {
-        const clipboardDataSrc = JSON.parse(clipboardData.getData(this.clipboardType))
+        const clipboardDataSource = JSON.parse(
+          clipboardData.getData(this.clipboardType),
+        )
 
-        return this._processClipboardData(event, clipboardDataSrc)
+        return this._processClipboardData(event, clipboardDataSource)
       } catch (error) {
         // eslint-disable-next-line no-console
         console.warn(error)
 
         return true
       }
-    } else if (clipboardData.types.includes('text/plain')) {
+    } else if (clipboardData.types.includes(TEXT_PLAIN_MIME_TYPE)) {
       try {
-        const clipboardDataSrc = JSON.parse(b64Decode(clipboardData.getData('text/plain')))
+        const clipboardDataSource = JSON.parse(
+          b64Decode(clipboardData.getData(TEXT_PLAIN_MIME_TYPE)),
+        )
 
-        return this._processClipboardData(event, clipboardDataSrc)
+        return this._processClipboardData(event, clipboardDataSource)
       } catch {
         const text = new fabric.Textbox('', {
           backgroundColor: defaultToolSettings.transparentColor,
           borderScaleFactor: 1,
           fill: toCSSColor(HEXtoRGB(defaultToolSettings.color)),
           fontSize: defaultToolSettings.fontSize,
-          fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif',
+          fontFamily:
+            '-apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif',
           padding: 7,
           perPixelTargetFind: false,
           scaleX: 0.5,
@@ -190,14 +216,17 @@ class CCopyPasteProvider {
           width: 600,
         })
 
-        const clipboardText = clipboardData.getData('text/plain')
+        const clipboardText = clipboardData.getData(TEXT_PLAIN_MIME_TYPE)
 
-        text.set('text', clipboardText.substring(0, MAX_TEXT_LENGTH))
+        text.set('text', clipboardText.slice(0, Math.max(0, MAX_TEXT_LENGTH)))
 
-        if (text._unwrappedTextLines.length === 1 && text._textLines.length === 1) {
+        if (
+          text._unwrappedTextLines.length === 1 &&
+          text._textLines.length === 1
+        ) {
           const w = text.measureLine(0).width
 
-          if ((text.get('width') - w) < 50) {
+          if (text.get('width') - w < 50) {
             text.set('width', w + 50)
           }
         }
@@ -225,4 +254,5 @@ class CCopyPasteProvider {
   }
 }
 
+// eslint-disable-next-line import/prefer-default-export
 export const CopyPasteProvider = new CCopyPasteProvider()

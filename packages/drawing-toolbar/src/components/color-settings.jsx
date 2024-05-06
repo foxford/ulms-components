@@ -20,36 +20,40 @@ const colors = [
   { dataTestId: 'board-panel-popup-color-aquamarine-button', value: '#9DF1F7' },
 ]
 
-export const ColorItem = ({
+export function ColorItem({
   active = false,
   color,
   dataTestId,
   handleClick,
   innerRef,
-}) => (
-  <ToolbarButton
-    active={active}
-    dataTestId={dataTestId}
-    innerRef={innerRef}
-    onClick={() => handleClick(color)}
-    style={{ padding: '10px' }}
-  >
-    <div
-      className={css.colorCircle}
-      style={{ backgroundColor: color, border: color.toLowerCase() === '#ffffff' ? '1px solid #B8B8B8' : 'none' }}
-    />
-  </ToolbarButton>
-)
+}) {
+  return (
+    <ToolbarButton
+      active={active}
+      dataTestId={dataTestId}
+      innerRef={innerRef}
+      onClick={() => handleClick(color)}
+      style={{ padding: '10px' }}
+    >
+      <div
+        className={css.colorCircle}
+        style={{
+          backgroundColor: color,
+          border:
+            color.toLowerCase() === '#ffffff' ? '1px solid #B8B8B8' : 'none',
+        }}
+      />
+    </ToolbarButton>
+  )
+}
 
-export const ColorSettings = ({
-  currentColor, handleClick, rows = 3,
-}) => {
+export function ColorSettings({ currentColor, handleClick, rows = 3 }) {
   const splitColors = useMemo(() => {
     const chunkSize = Math.max(colors.length / rows, 1)
     const result = []
 
-    for (let i = 0; i < colors.length; i += chunkSize) {
-      result.push(colors.slice(i, i + chunkSize))
+    for (let index = 0; index < colors.length; index += chunkSize) {
+      result.push(colors.slice(index, index + chunkSize))
     }
 
     return result
@@ -57,9 +61,10 @@ export const ColorSettings = ({
 
   return (
     <div className={css.wrapper}>
-      {splitColors.map((colorsRow, i) => (
-        <div className={cn(css.row, css.colorRow)} key={i}>
-          {colorsRow.map(color => (
+      {splitColors.map((colorsRow, index) => (
+        // eslint-disable-next-line react/no-array-index-key
+        <div className={cn(css.row, css.colorRow)} key={index}>
+          {colorsRow.map((color) => (
             <ColorItem
               active={currentColor.toLowerCase() === color.value.toLowerCase()}
               color={color.value}

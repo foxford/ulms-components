@@ -16,8 +16,9 @@ import { ColorSettings } from './color-settings'
 
 import css from './settings.module.css'
 
+// eslint-disable-next-line import/prefer-default-export
 export class TextGroup extends React.Component {
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.buttonRef = React.createRef()
 
@@ -29,9 +30,7 @@ export class TextGroup extends React.Component {
 
   handleClick = (name, value) => {
     const { handleChange, sendEvent } = this.props
-    const {
-      color, fontSize,
-    } = { ...this.state, [name]: value }
+    const { color, fontSize } = { ...this.state, [name]: value }
 
     this.setState({ [name]: value })
     handleChange({
@@ -53,44 +52,35 @@ export class TextGroup extends React.Component {
     return { fontSize, brushColor: { ...HEXtoRGB(color), a: 1 } }
   }
 
-  render () {
-    const {
-      opened,
-      tool,
-      intl,
-      handleClose,
-      handleOpen,
-      className,
-    } = this.props
-    const {
-      fontSize,
-      color,
-    } = this.state
+  render() {
+    const { opened, tool, intl, handleClose, handleOpen, className } =
+      this.props
+    const { fontSize, color } = this.state
 
     return (
       <SettingsGroup
-        direction='right-start'
+        direction="right-start"
         containerStyles={settingsGroupContainerStyles}
         isOpen={opened}
         handleClose={handleClose}
         target={this.buttonRef.current}
-        content={(
+        content={
           <div className={cn(css.column, className)}>
             <FontSettings
               currentFontSize={fontSize}
-              handleClick={value => this.handleClick('fontSize', value)}
+              handleClick={(value) => this.handleClick('fontSize', value)}
             />
             <Divider horizontal />
             <ColorSettings
               currentColor={color}
-              handleClick={value => this.handleClick('color', value)}
+              handleClick={(value) => this.handleClick('color', value)}
             />
           </div>
-        )}
+        }
       >
         <ToolbarButton
           active={tool === toolEnum.TEXT}
-          dataTestId='board-panel-text-button'
+          dataTestId="board-panel-text-button"
           title={intl.formatMessage({ id: intlID.TEXT })}
           group
           groupColor={color}

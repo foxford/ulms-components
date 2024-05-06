@@ -1,12 +1,7 @@
 import { DateService } from './index'
 
-import {
-  HOURS_IN_DAY,
-  MINUTES_IN_HOUR,
-  SECONDS_IN_MINUTE,
-} from './constants'
+import { HOURS_IN_DAY, MINUTES_IN_HOUR, SECONDS_IN_MINUTE } from './constants'
 
-/* eslint-disable */
 /** Examples:
  * declensionOfNumber(1, ['минута', 'минуты', 'минут']) => 'минута'
  * declensionOfNumber(2, ['минута', 'минуты', 'минут']) => 'минуты'
@@ -17,8 +12,7 @@ export const declensionOfNumber = (number, words) =>
     number % 100 > 4 && number % 100 < 20
       ? 2
       : [2, 0, 1, 1, 1, 2][number % 10 < 5 ? number % 10 : 5]
-  ];
-/* eslint-enable */
+  ]
 
 export const getTimeBeforeDeadline = (deadline) => {
   const deadlineDate = DateService.tz(deadline)
@@ -59,18 +53,19 @@ export const getDoubleXpDeadlineText = (deadline) => {
   } = getTimeBeforeDeadline(deadline)
 
   if (
-    daysToDeadline === 0
-    && hoursToDeadline === 0
-    && minutesToDeadline === 0
-    && secondsToDeadline === 0
-  ) return ''
+    daysToDeadline === 0 &&
+    hoursToDeadline === 0 &&
+    minutesToDeadline === 0 &&
+    secondsToDeadline === 0
+  )
+    return ''
 
   const days =
-    (daysToDeadline > 0
-      && (hoursToDeadline > 0
-        || minutesToDeadline > 0
-        || secondsToDeadline > 0))
-    || hoursToDeadline >= HOURS_IN_DAY - 1
+    (daysToDeadline > 0 &&
+      (hoursToDeadline > 0 ||
+        minutesToDeadline > 0 ||
+        secondsToDeadline > 0)) ||
+    hoursToDeadline >= HOURS_IN_DAY - 1
       ? daysToDeadline + 1
       : daysToDeadline
   const hours =
@@ -81,13 +76,29 @@ export const getDoubleXpDeadlineText = (deadline) => {
   let doubleXpText
 
   if (days > 0) {
-    const deadlineInDays = `${days} ${declensionOfNumber(days, ['день', 'дня', 'дней'])}`
+    const deadlineInDays = `${days} ${declensionOfNumber(days, [
+      'день',
+      'дня',
+      'дней',
+    ])}`
 
-    doubleXpText = `${declensionOfNumber(days, ['Остался', 'Осталось', 'Осталось'])} ${deadlineInDays}`
+    doubleXpText = `${declensionOfNumber(days, [
+      'Остался',
+      'Осталось',
+      'Осталось',
+    ])} ${deadlineInDays}`
   } else {
-    const deadlineInHours = `${hours} ${declensionOfNumber(hours, ['час', 'часа', 'часов'])}`
+    const deadlineInHours = `${hours} ${declensionOfNumber(hours, [
+      'час',
+      'часа',
+      'часов',
+    ])}`
 
-    doubleXpText = `${declensionOfNumber(hours, ['Остался', 'Осталось', 'Осталось'])} ${deadlineInHours}`
+    doubleXpText = `${declensionOfNumber(hours, [
+      'Остался',
+      'Осталось',
+      'Осталось',
+    ])} ${deadlineInHours}`
   }
 
   return doubleXpText

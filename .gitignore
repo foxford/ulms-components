@@ -1,5 +1,6 @@
 *.sw*
 .DS_Store
+.eslintcache
 .idea
 .nyc_output
 .nx
@@ -8,8 +9,4 @@
 node_modules
 lerna-debug.log
 
-/packages/*/es/*
-!/packages/*/es/.gitkeep
-
-/packages/*/rollup
-/packages/*/.babelrc.json
+packages/*/es

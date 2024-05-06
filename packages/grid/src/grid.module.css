@@ -1,12 +1,14 @@
-.root{}
+/* stylelint-disable-next-line block-no-empty */
+.root {
+}
 
-.root .row{
+.root .row {
   height: 100%;
   margin-left: 0;
   margin-right: 0;
 }
 
-.root .col{
+.root .col {
   display: flex;
   height: 100%;
   margin-left: -10px;
@@ -15,21 +17,17 @@
 
 /* Debug mode */
 
-.root.debug .row{
-  background: transparent;
-}
-
-.root.debug .row > div[class^="Grid_col"]{
-  background: transparent;
-  outline: none;
-}
-
-.root.debug .row{
+.root.debug .row {
   background: rgba(0, 0, 255, 0.1);
   outline: 1px dashed rgba(0, 0, 155, 0.5);
 }
 
-.root.debug .col{
+.root.debug .row > div[class^='Grid_col'] {
+  background: transparent;
+  outline: none;
+}
+
+.root.debug .col {
   background: rgba(0, 255, 0, 0.1);
   outline: 1px dashed rgba(0, 155, 0, 0.5);
 }

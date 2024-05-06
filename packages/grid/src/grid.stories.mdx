@@ -1,5 +1,5 @@
-import { Meta, Story, Canvas } from '@storybook/addon-docs/blocks';
-import { Grid } from './grid';
+import { Meta, Story, Canvas } from '@storybook/addon-docs/blocks'
+import { Grid } from './grid'
 
 <Meta title="Molecules/Grid" component={Grid} />
 
@@ -28,9 +28,12 @@ export const Template = ({ debug }) => (
 )
 
 <Canvas>
-  <Story name="Default" args={{
-    debug: true,
-  }}>
+  <Story
+    name="Default"
+    args={{
+      debug: true,
+    }}
+  >
     {Template.bind({})}
   </Story>
 </Canvas>

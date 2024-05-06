@@ -1,22 +1,60 @@
 {
-  "extends": ["adequate-react"],
   "env": {
     "browser": true,
-    "jquery": true
+    "es6": true,
+    "node": true
   },
-  "globals": {
-    "globalThis": true
+  "extends": [
+    "airbnb",
+    "airbnb/hooks",
+    "plugin:import/recommended",
+    "plugin:promise/recommended",
+    "plugin:sonarjs/recommended",
+    "plugin:unicorn/recommended",
+    "prettier"
+  ],
+  "ignorePatterns": [],
+  "plugins": ["import", "promise", "sonarjs", "unicorn"],
+  "parser": "@babel/eslint-parser",
+  "parserOptions": {
+    "ecmaVersion": "latest",
+    "ecmaFeatures": {
+      "jsx": true,
+      "experimentalObjectRestSpread": true
+    },
+    "sourceType": "module"
   },
   "rules": {
-    "node/no-unsupported-features/es-syntax": 0,
-    "no-underscore-dangle": 0,
-    "react/prop-types": 0,
-    "max-len": ["error", {
-      "code": 120,
-      "ignoreStrings": true,
-      "ignoreTemplateLiterals": true,
-      "ignoreComments": true,
-      "ignoreTrailingComments": true
-    }]
+    "jsx-a11y/click-events-have-key-events": "off",
+    "jsx-a11y/no-static-element-interactions": "off",
+    "consistent-return": "off",
+    "no-console": "off",
+    "no-restricted-syntax": "off",
+    "no-underscore-dangle": "off",
+    "sonarjs/cognitive-complexity": "off",
+    "sonarjs/no-nested-template-literals": "off",
+    "unicorn/no-null": "off",
+    "react/prop-types": "off",
+    "react-hooks/exhaustive-deps": "off",
+    "no-plusplus": [
+      2,
+      {
+        "allowForLoopAfterthoughts": true
+      }
+    ],
+    "unicorn/prevent-abbreviations": [
+      2,
+      {
+        "allowList": {
+          "prevProps": true,
+          "prevState": true
+        },
+        "replacements": {
+          "args": false,
+          "props": false,
+          "ref": false
+        }
+      }
+    ]
   }
 }

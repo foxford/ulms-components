@@ -1,31 +1,18 @@
 {
   "name": "@ulms/animations",
   "version": "1.0.4",
-  "description": "",
-  "homepage": "https://github.com/netology-group/ulms-media-ui#readme",
-  "bugs": {
-    "url": "https://github.com/netology-group/ulms-media-ui/issues"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/netology-group/ulms-media-ui.git"
-  },
   "license": "MIT",
-  "author": "",
   "main": "index.js",
   "module": "es/index.js",
   "files": [
-    "es",
-    "src"
+    "es"
   ],
   "scripts": {
-    "build": "rm -rf ./es/* && BABEL_ENV=es rollup --config ./rollup.config.js index.js"
+    "build": "rm -rf ./es/* && rollup --config ../../rollup.config.mjs"
   },
   "devDependencies": {
-    "babel-plugin-styled-components": "^2.1.4",
     "react": "^16.14 || 17 || 18",
-    "react-dom": "^16.14 || 17 || 18",
-    "rollup-plugin-import-file": "^1.0.1"
+    "react-dom": "^16.14 || 17 || 18"
   },
   "peerDependencies": {
     "@foxford/icon-pack": ">=0.0.6",

@@ -1,17 +1,14 @@
 {
   "name": "@ulms/ui-action-button-group",
   "version": "2.3.0",
-  "description": "",
   "license": "MIT",
-  "author": "",
   "main": "index.js",
   "module": "es/index.js",
   "files": [
-    "es",
-    "src"
+    "es"
   ],
   "scripts": {
-    "build": "rm -rf ./es/* && BABEL_ENV=es rollup --config ./rollup.config.js index.js"
+    "build": "rm -rf ./es/* && rollup --config ../../rollup.config.mjs"
   },
   "dependencies": {
     "classnames-es": "2.2.6"

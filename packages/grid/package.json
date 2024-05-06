@@ -1,17 +1,7 @@
 {
   "name": "@ulms/ui-grid",
   "version": "1.1.1",
-  "description": "Allows to use back-to-back columns for application layout. Not intended to wrap SplitPane-like elements.",
-  "homepage": "https://github.com/netology-group/ulms-media-ui#readme",
-  "bugs": {
-    "url": "https://github.com/netology-group/ulms-media-ui/issues"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/netology-group/ulms-media-ui.git"
-  },
   "license": "MIT",
-  "author": "",
   "main": "index.js",
   "module": "es/index.js",
   "files": [
@@ -19,7 +9,7 @@
     "src"
   ],
   "scripts": {
-    "build": "rm -rf ./es/* && BABEL_ENV=es rollup --config ./rollup.config.js index.js"
+    "build": "rm -rf ./es/* && rollup --config ../../rollup.config.mjs"
   },
   "dependencies": {
     "classnames-es": "2.2.6"

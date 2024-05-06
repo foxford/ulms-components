@@ -1,7 +1,7 @@
 import { fabric } from 'fabric/dist/fabric.min'
 
 export default class DynamicPattern {
-  constructor (canvas) {
+  constructor(canvas) {
     this._canvas = canvas
     this._destroyed = false
     this._offsetX = null
@@ -26,8 +26,8 @@ export default class DynamicPattern {
     return this._patternCanvas.getElement()
   }
 
-  setPattern (src) {
-    this._patternImageSrc = src
+  setPattern(source) {
+    this._patternImageSrc = source
 
     if (!this._patternCanvas) {
       this._patternCanvas = new fabric.StaticCanvas()
@@ -35,46 +35,48 @@ export default class DynamicPattern {
       this._patternCanvas.enableRetinaScaling = false
     }
 
-    fabric.Image.fromURL(this._patternImageSrc, (imageObject) => {
-      if (this._destroyed) {
-        return
-      }
+    fabric.Image.fromURL(
+      this._patternImageSrc,
+      (imageObject) => {
+        if (this._destroyed) {
+          return
+        }
 
-      this._patternImageWidth = imageObject.width
-      this._patternImageHeight = imageObject.height
+        this._patternImageWidth = imageObject.width
+        this._patternImageHeight = imageObject.height
 
-      if (this._patternCanvas) {
-        this._patternCanvas.clear()
-        this._patternCanvas.add(imageObject)
-        this._patternCanvas.renderAll()
-      }
+        if (this._patternCanvas) {
+          this._patternCanvas.clear()
+          this._patternCanvas.add(imageObject)
+          this._patternCanvas.renderAll()
+        }
 
-      if (!this._pattern) {
-        this._pattern = new fabric.Pattern({
-          source: this._getPatternSource(),
-          repeat: 'repeat',
-        })
-      }
+        if (!this._pattern) {
+          this._pattern = new fabric.Pattern({
+            source: this._getPatternSource(),
+            repeat: 'repeat',
+          })
+        }
 
-      if (!this._patternRect && this._canvas && this._pattern) {
-        this._patternRect = new fabric.Rect({
-          width: this._canvas.width,
-          height: this._canvas.height,
-          fill: this._pattern,
-          objectCaching: false,
-        })
+        if (!this._patternRect && this._canvas && this._pattern) {
+          this._patternRect = new fabric.Rect({
+            width: this._canvas.width,
+            height: this._canvas.height,
+            fill: this._pattern,
+            objectCaching: false,
+          })
 
-        this._canvas.add(this._patternRect)
-      }
+          this._canvas.add(this._patternRect)
+        }
 
-      this._render()
-    }, { crossOrigin: 'anonymous' })
+        this._render()
+      },
+      { crossOrigin: 'anonymous' },
+    )
   }
 
-  update (options) {
-    const {
-      offsetX, offsetY, zoom,
-    } = options
+  update(options) {
+    const { offsetX, offsetY, zoom } = options
 
     this._offsetX = offsetX
     this._offsetY = offsetY
@@ -83,7 +85,7 @@ export default class DynamicPattern {
     this._render()
   }
 
-  _render () {
+  _render() {
     if (this._patternRect) {
       this._patternRect.setOptions({
         width: this._canvas.width,
@@ -108,7 +110,7 @@ export default class DynamicPattern {
     }
   }
 
-  destroy () {
+  destroy() {
     this._destroyed = true
 
     if (this._canvas) {

@@ -17,19 +17,20 @@ describe('TextboxTool tool', () => {
   beforeEach(() => {
     jest
       .spyOn(window, 'requestAnimationFrame')
-      .mockImplementationOnce(cb => cb())
+      .mockImplementationOnce((callback) => callback())
   })
 
   afterEach(() => {})
 
   it('`handleTextEditStartEvent` sets style for hiddenTextarea', () => {
-    const wrap = shallow((
+    const wrap = shallow(
+      // eslint-disable-next-line react/jsx-filename-extension
       <Drawing
         tokenProvider={tokenProvider}
         pageObjects={[]}
         tool={toolEnum.TEXT}
-      />
-    ))
+      />,
+    )
 
     const instance = wrap.instance()
     const tt = new TextboxTool(instance.canvas, undefined, {})
@@ -41,7 +42,9 @@ describe('TextboxTool tool', () => {
     tt.handleTextEditStartEvent()
 
     expect(tt.__object.hiddenTextarea.style).toEqual({
-      width: '10px', height: '10px', fontSize: '10px',
+      width: '10px',
+      height: '10px',
+      fontSize: '10px',
     })
   })
 })

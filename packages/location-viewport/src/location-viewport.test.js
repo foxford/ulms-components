@@ -8,7 +8,10 @@ import {
 } from './_utils'
 
 // eslint-disable-next-line max-len
-const getProjectionPoint = (xy1, xyLower, xyUpper) => xy2 => fCalcIntermediateCoords(xy2, xy1)(xyLower, xyUpper)
+const getProjectionPoint = (xy1, xyLower, xyUpper) => (xy2) =>
+  fCalcIntermediateCoords(xy2, xy1)(xyLower, xyUpper)
+
+const getRot = (xy1, options) => (xy2) => rotation(xy2, xy1, options)
 
 test('`calcIntermediateCoords` is ok', () => {
   const getXY1 = getProjectionPoint([150, 150], [100, 100], [200, 200])
@@ -54,10 +57,10 @@ test('`calcIntermediateCoords` is ok', () => {
   expect(getXY1([200, 100])).toEqual([200, 100])
   expect(getXY1([150, 100])).toEqual([150, 100])
 
-  expect(getXY1([0, 175])).toEqual([100, (fLineY([150, 150], [0, 175])(100))])
-  expect(getXY1([175, 300])).toEqual([(fLineX([150, 150], [175, 300])(200)), 200])
-  expect(getXY1([300, 175])).toEqual([200, (fLineY([150, 150], [300, 175])(200))])
-  expect(getXY1([175, 0])).toEqual([(fLineX([150, 150], [175, 0])(100)), 100])
+  expect(getXY1([0, 175])).toEqual([100, fLineY([150, 150], [0, 175])(100)])
+  expect(getXY1([175, 300])).toEqual([fLineX([150, 150], [175, 300])(200), 200])
+  expect(getXY1([300, 175])).toEqual([200, fLineY([150, 150], [300, 175])(200)])
+  expect(getXY1([175, 0])).toEqual([fLineX([150, 150], [175, 0])(100), 100])
 })
 
 test('`rangeBounds` is ok', () => {
@@ -73,7 +76,6 @@ test('`rangeBounds` is ok', () => {
 })
 
 test('`rotation` is ok', () => {
-  const getRot = (xy1, opts) => xy2 => rotation(xy2, xy1, opts)
   const regularAxisRotation = getRot([150, 150], { invert: 1 })
 
   expect(regularAxisRotation([200, 200])).toEqual(45)

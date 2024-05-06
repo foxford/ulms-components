@@ -20,32 +20,60 @@ class CKeyboardListenerProvider {
 
   #keyUpCaptureListeners = []
 
-  set enabled (enabled) {
+  set enabled(enabled) {
     this.#enabled = enabled
   }
 
   /**
    * Init keyboard listeners
    *
-   * @param {HTMLElement, HTMLDocument} el Dom element
+   * @param {HTMLElement, HTMLDocument} element Dom element
    */
-  init (el) {
+  init(element) {
     if (this.#element && this.#element.removeEventListener) {
-      this.#element.removeEventListener(keyboardEvents.keyDown, this.#handleKeyDownEvent)
-      this.#element.removeEventListener(keyboardEvents.keyUp, this.#handleKeyUpEvent)
-      this.#element.removeEventListener(keyboardEvents.keyDown, this.#handleKeyDownCaptureEvent, true)
-      this.#element.removeEventListener(keyboardEvents.keyUp, this.#handleKeyUpCaptureEvent, true)
+      this.#element.removeEventListener(
+        keyboardEvents.keyDown,
+        this.#handleKeyDownEvent,
+      )
+      this.#element.removeEventListener(
+        keyboardEvents.keyUp,
+        this.#handleKeyUpEvent,
+      )
+      this.#element.removeEventListener(
+        keyboardEvents.keyDown,
+        this.#handleKeyDownCaptureEvent,
+        true,
+      )
+      this.#element.removeEventListener(
+        keyboardEvents.keyUp,
+        this.#handleKeyUpCaptureEvent,
+        true,
+      )
       this.#element.removeEventListener('copy', this.handleCopyEvent)
       this.#element.removeEventListener('cut', this.handleCutEvent)
       this.#element.removeEventListener('paste', this.handlePasteEvent)
     }
 
-    if (el && el.addEventListener) {
-      this.#element = el
-      this.#element.addEventListener(keyboardEvents.keyDown, this.#handleKeyDownEvent)
-      this.#element.addEventListener(keyboardEvents.keyUp, this.#handleKeyUpEvent)
-      this.#element.addEventListener(keyboardEvents.keyDown, this.#handleKeyDownCaptureEvent, true)
-      this.#element.addEventListener(keyboardEvents.keyUp, this.#handleKeyUpCaptureEvent, true)
+    if (element && element.addEventListener) {
+      this.#element = element
+      this.#element.addEventListener(
+        keyboardEvents.keyDown,
+        this.#handleKeyDownEvent,
+      )
+      this.#element.addEventListener(
+        keyboardEvents.keyUp,
+        this.#handleKeyUpEvent,
+      )
+      this.#element.addEventListener(
+        keyboardEvents.keyDown,
+        this.#handleKeyDownCaptureEvent,
+        true,
+      )
+      this.#element.addEventListener(
+        keyboardEvents.keyUp,
+        this.#handleKeyUpCaptureEvent,
+        true,
+      )
       this.#element.addEventListener('copy', this.handleCopyEvent)
       this.#element.addEventListener('cut', this.handleCutEvent)
       this.#element.addEventListener('paste', this.handlePasteEvent)
@@ -55,12 +83,26 @@ class CKeyboardListenerProvider {
   /**
    * Removes all listeners
    */
-  destroy () {
+  destroy() {
     if (this.#element && this.#element.removeEventListener) {
-      this.#element.removeEventListener(keyboardEvents.keyDown, this.#handleKeyDownEvent)
-      this.#element.removeEventListener(keyboardEvents.keyUp, this.#handleKeyUpEvent)
-      this.#element.removeEventListener(keyboardEvents.keyDown, this.#handleKeyDownCaptureEvent, true)
-      this.#element.removeEventListener(keyboardEvents.keyUp, this.#handleKeyUpCaptureEvent, true)
+      this.#element.removeEventListener(
+        keyboardEvents.keyDown,
+        this.#handleKeyDownEvent,
+      )
+      this.#element.removeEventListener(
+        keyboardEvents.keyUp,
+        this.#handleKeyUpEvent,
+      )
+      this.#element.removeEventListener(
+        keyboardEvents.keyDown,
+        this.#handleKeyDownCaptureEvent,
+        true,
+      )
+      this.#element.removeEventListener(
+        keyboardEvents.keyUp,
+        this.#handleKeyUpCaptureEvent,
+        true,
+      )
       this.#element.removeEventListener('copy', this.handleCopyEvent)
       this.#element.removeEventListener('cut', this.handleCutEvent)
       this.#element.removeEventListener('paste', this.handlePasteEvent)
@@ -71,59 +113,72 @@ class CKeyboardListenerProvider {
     this.#element = null
   }
 
-  handleCopyEvent = (e) => {
-    if (this.#enabled && this.canHandleCopyEvent(e)) {
-      CopyPasteProvider.copyToClipboard(e)
+  handleCopyEvent = (event) => {
+    if (this.#enabled && this.canHandleCopyEvent(event)) {
+      CopyPasteProvider.copyToClipboard(event)
     }
   }
 
-  handleCutEvent = (e) => {
-    if (this.#enabled && this.canHandleCopyEvent(e)) {
-      CopyPasteProvider.cutToClipboard(e)
+  handleCutEvent = (event) => {
+    if (this.#enabled && this.canHandleCopyEvent(event)) {
+      CopyPasteProvider.cutToClipboard(event)
     }
   }
 
-  handlePasteEvent = (e) => {
-    if (this.#enabled && this.canHandleEvent(e)) {
-      CopyPasteProvider.pasteFromClipboard(e)
+  handlePasteEvent = (event) => {
+    if (this.#enabled && this.canHandleEvent(event)) {
+      CopyPasteProvider.pasteFromClipboard(event)
     }
   }
 
   // eslint-disable-next-line class-methods-use-this
-  canHandleEvent (e) {
-    const { tagName } = (e.target || e.srcElement)
+  canHandleEvent(event) {
+    const { tagName } = event.target || event.srcElement
 
-    return !(tagName.isContentEditable || tagName === 'INPUT' || tagName === 'SELECT' || tagName === 'TEXTAREA')
+    return !(
+      tagName.isContentEditable ||
+      tagName === 'INPUT' ||
+      tagName === 'SELECT' ||
+      tagName === 'TEXTAREA'
+    )
   }
 
   // eslint-disable-next-line class-methods-use-this
-  canHandleCopyEvent (e) {
-    const { tagName } = (e.target || e.srcElement)
+  canHandleCopyEvent(event) {
+    const { tagName } = event.target || event.srcElement
 
     return tagName === 'BODY'
   }
 
-  #handleKeyDownEvent = (e) => {
-    if (this.canHandleEvent(e)) {
-      this.#keyDownListeners.forEach((handler) => { handler(e) })
+  #handleKeyDownEvent = (event) => {
+    if (this.canHandleEvent(event)) {
+      for (const handler of this.#keyDownListeners) {
+        handler(event)
+      }
     }
   }
 
-  #handleKeyUpEvent = (e) => {
-    if (this.canHandleEvent(e)) {
-      this.#keyUpListeners.forEach((handler) => { handler(e) })
+  #handleKeyUpEvent = (event) => {
+    if (this.canHandleEvent(event)) {
+      for (const handler of this.#keyUpListeners) {
+        handler(event)
+      }
     }
   }
 
-  #handleKeyDownCaptureEvent = (e) => {
-    if (this.canHandleEvent(e)) {
-      this.#keyDownCaptureListeners.forEach((handler) => { handler(e) })
+  #handleKeyDownCaptureEvent = (event) => {
+    if (this.canHandleEvent(event)) {
+      for (const handler of this.#keyDownCaptureListeners) {
+        handler(event)
+      }
     }
   }
 
-  #handleKeyUpCaptureEvent = (e) => {
-    if (this.canHandleEvent(e)) {
-      this.#keyUpCaptureListeners.forEach((handler) => { handler(e) })
+  #handleKeyUpCaptureEvent = (event) => {
+    if (this.canHandleEvent(event)) {
+      for (const handler of this.#keyUpCaptureListeners) {
+        handler(event)
+      }
     }
   }
 
@@ -135,28 +190,37 @@ class CKeyboardListenerProvider {
    */
   on = (event, handler) => {
     if (typeof handler !== 'function') {
-      throw new TypeError('KeyboardListenerProvider error: handler must be a function!')
+      throw new TypeError(
+        'KeyboardListenerProvider error: handler must be a function!',
+      )
     }
 
     switch (event) {
-      case keyboardEvents.keyDown:
+      case keyboardEvents.keyDown: {
         this.#keyDownListeners.push(handler)
         break
+      }
 
-      case keyboardEvents.keyUp:
+      case keyboardEvents.keyUp: {
         this.#keyUpListeners.push(handler)
         break
+      }
 
-      case keyboardEvents.keyDownCapture:
+      case keyboardEvents.keyDownCapture: {
         this.#keyDownCaptureListeners.push(handler)
         break
+      }
 
-      case keyboardEvents.keyUpCapture:
+      case keyboardEvents.keyUpCapture: {
         this.#keyUpCaptureListeners.push(handler)
         break
+      }
 
-      default:
-        throw new TypeError('KeyboardListenerProvider error: event must be "keydown" or "keyup"!')
+      default: {
+        throw new TypeError(
+          'KeyboardListenerProvider error: event must be "keydown" or "keyup"!',
+        )
+      }
     }
   }
 
@@ -170,36 +234,43 @@ class CKeyboardListenerProvider {
     let index
 
     switch (event) {
-      case keyboardEvents.keyDown:
-        index = this.#keyDownListeners.findIndex(item => item === handler)
+      case keyboardEvents.keyDown: {
+        index = this.#keyDownListeners.indexOf(handler)
         if (index !== -1) {
           this.#keyDownListeners.splice(index, 1)
         }
         break
+      }
 
-      case keyboardEvents.keyUp:
-        index = this.#keyUpListeners.findIndex(item => item === handler)
+      case keyboardEvents.keyUp: {
+        index = this.#keyUpListeners.indexOf(handler)
         if (index !== -1) {
           this.#keyUpListeners.splice(index, 1)
         }
         break
+      }
 
-      case keyboardEvents.keyDownCapture:
-        index = this.#keyDownCaptureListeners.findIndex(item => item === handler)
+      case keyboardEvents.keyDownCapture: {
+        index = this.#keyDownCaptureListeners.indexOf(handler)
         if (index !== -1) {
           this.#keyDownCaptureListeners.splice(index, 1)
         }
         break
+      }
 
-      case keyboardEvents.keyUpCapture:
-        index = this.#keyUpCaptureListeners.findIndex(item => item === handler)
+      case keyboardEvents.keyUpCapture: {
+        index = this.#keyUpCaptureListeners.indexOf(handler)
         if (index !== -1) {
           this.#keyUpCaptureListeners.splice(index, 1)
         }
         break
+      }
 
-      default:
-        throw new TypeError('KeyboardListenerProvider error: event must be "keydown" or "keyup"!')
+      default: {
+        throw new TypeError(
+          'KeyboardListenerProvider error: event must be "keydown" or "keyup"!',
+        )
+      }
     }
   }
 }

@@ -3,16 +3,25 @@ import { fabric } from 'fabric/dist/fabric.min'
 import { CursorProvider } from '../cursor-provider'
 import { stampToolModeEnum } from '../constants'
 
-import { PositionableObject, adjustPosition, makeNotInteractive } from './object'
+import {
+  PositionableObject,
+  adjustPosition,
+  makeNotInteractive,
+} from './object'
 
 const createStampFromUrl = (url, callback, event) => {
-  fabric.Image.fromURL(url, (image) => {
-    callback(image, event)
-  }, { crossOrigin: 'anonymous' })
+  fabric.Image.fromURL(
+    url,
+    (image) => {
+      callback(image, event)
+    },
+    { crossOrigin: 'anonymous' },
+  )
 }
 
 const cursorName = 'cursor_stamp.svg'
 
+// eslint-disable-next-line import/prefer-default-export
 export class StampTool extends PositionableObject {
   #image
 
@@ -20,7 +29,7 @@ export class StampTool extends PositionableObject {
 
   #publicStorage
 
-  constructor (canvas, mode, publicStorageProvider, options = {}) {
+  constructor(canvas, mode, publicStorageProvider, options = {}) {
     super(canvas, () => {}, options)
 
     this.#mode = mode
@@ -30,12 +39,15 @@ export class StampTool extends PositionableObject {
     this.#publicStorage = publicStorageProvider
   }
 
-  configure (props) {
+  configure(props) {
     super.configure(props)
     const { stampSrc } = props
 
     if (stampSrc) {
-      createStampFromUrl(this.#publicStorage.getUrl(this.#publicStorage.types.STAMP, stampSrc), this._onLoad)
+      createStampFromUrl(
+        this.#publicStorage.getUrl(this.#publicStorage.types.STAMP, stampSrc),
+        this._onLoad,
+      )
     } else {
       CursorProvider.setCursor()
       this.#image = null
@@ -45,8 +57,11 @@ export class StampTool extends PositionableObject {
     this._canvas.setCursor(this._cursorString)
   }
 
-  get _cursorString () {
-    return `url("${this.#publicStorage.getUrl(this.#publicStorage.types.STAMP, cursorName)}") 5 19, crosshair`
+  get _cursorString() {
+    return `url("${this.#publicStorage.getUrl(
+      this.#publicStorage.types.STAMP,
+      cursorName,
+    )}") 5 19, crosshair`
   }
 
   _onLoad = (image) => {
@@ -62,36 +77,41 @@ export class StampTool extends PositionableObject {
   }
 
   // eslint-disable-next-line class-methods-use-this
-  handleObjectAddedEvent () { }
+  handleObjectAddedEvent() {}
 
-  handleMouseUpEvent () {
+  handleMouseUpEvent() {
     this._canvas.defaultCursor = this._cursorString
     this._canvas.setCursor(this._cursorString)
   }
 
-  handleMouseDownEvent (event) {
+  handleMouseDownEvent(event) {
     if (this.#image) {
-      this.#image.clone((clonedObj) => {
-        const [x, y] = adjustPosition(clonedObj, event.absolutePointer, '-1 0', this._canvas.getZoom())
+      this.#image.clone((clonedObject) => {
+        const [x, y] = adjustPosition(
+          clonedObject,
+          event.absolutePointer,
+          '-1 0',
+          this._canvas.getZoom(),
+        )
 
-        clonedObj.set({ left: x, top: y }).setCoords()
+        clonedObject.set({ left: x, top: y }).setCoords()
 
         CursorProvider.hide() // Временно убираем курсор с доски, чтобы не сбивать логику выставления order
 
-        this._canvas.add(clonedObj)
+        this._canvas.add(clonedObject)
 
         CursorProvider.show() // Теперь можно снова показать курсор
 
         if (this.#mode === stampToolModeEnum.STAMP) {
-          makeNotInteractive(clonedObj)
+          makeNotInteractive(clonedObject)
         }
         if (this.#mode === stampToolModeEnum.STICKER) {
-          clonedObj.set({
+          clonedObject.set({
             _selected: true,
             hasBorders: true,
             hasControls: true,
           })
-          this._canvas.setActiveObject(clonedObj)
+          this._canvas.setActiveObject(clonedObject)
         }
         this._canvas.requestRenderAll()
       })
@@ -99,7 +119,7 @@ export class StampTool extends PositionableObject {
   }
 
   // eslint-disable-next-line class-methods-use-this
-  destroy () {
+  destroy() {
     CursorProvider.setCursor()
     this.#image = null
   }

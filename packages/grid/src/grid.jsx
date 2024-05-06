@@ -7,24 +7,35 @@ import './dist/index.css'
 
 import css from './grid.module.css'
 
-const rowProps = props => ({
+const rowProps = (props) => ({
   ...props,
   vAlignChildren: props.vAlignChildren || 'stretch',
   className: cx(props.className, css.row),
 })
 
-const gridProps = props => ({
+const gridProps = (props) => ({
   ...props,
   className: cx(props.className, css.root, { [css.debug]: props.debug }),
 })
 
-// eslint-disable-next-line react/destructuring-assignment
-const Grid = props => <G {...gridProps(props)}>{props.children}</G>
+function Grid(props) {
+  // eslint-disable-next-line react/destructuring-assignment
+  return <G {...gridProps(props)}>{props.children}</G>
+}
 
-// eslint-disable-next-line react/destructuring-assignment
-Grid.Row = props => <G.Row {...rowProps(props)}>{props.children}</G.Row>
+Grid.Row = function Row(props) {
+  // eslint-disable-next-line react/destructuring-assignment
+  return <G.Row {...rowProps(props)}>{props.children}</G.Row>
+}
 
-// eslint-disable-next-line react/destructuring-assignment
-Grid.Col = props => <G.Col {...props}><div className={css.col}>{props.children}</div></G.Col>
+Grid.Col = function Col(props) {
+  return (
+    <G.Col {...props}>
+      {/* eslint-disable-next-line react/destructuring-assignment */}
+      <div className={css.col}>{props.children}</div>
+    </G.Col>
+  )
+}
 
+// eslint-disable-next-line import/prefer-default-export
 export { Grid }

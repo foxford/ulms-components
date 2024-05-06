@@ -6,12 +6,13 @@
  */
 export const calcDistance = (point1, point2) => {
   if (point1 && point2) {
+    // eslint-disable-next-line unicorn/prefer-modern-math-apis
     return Math.sqrt((point2.x - point1.x) ** 2 + (point2.y - point1.y) ** 2)
   }
 
   return 0
 }
 
-export function snapCoord (coord) {
+export function snapCoord(coord) {
   return Math.round(coord / 10) * 10
 }

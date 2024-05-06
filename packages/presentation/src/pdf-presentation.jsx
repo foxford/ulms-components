@@ -4,29 +4,38 @@ import debounce from 'lodash/debounce'
 
 import { Presentation } from './presentation'
 
-function keyFn (documentUrl, pageNumber, width, height) {
+function keyFunction(documentUrl, pageNumber, width, height) {
   return `${documentUrl}_${pageNumber}_${width}_${height}`
 }
-const reportError = error => console.error(error) // eslint-disable-line no-console
+const reportError = (error) => console.error(error) // eslint-disable-line no-console
 
 const documentCache = {}
 const imageCache = {}
 const tasks = {}
 
-function getDocument (url, { httpHeaders }) {
+function getDocument(url, { httpHeaders }) {
   if (!documentCache[url]) {
-    documentCache[url] = window.pdfjsLib.getDocument({ url, httpHeaders }).promise
+    documentCache[url] = window.pdfjsLib.getDocument({
+      url,
+      httpHeaders,
+    }).promise
   }
 
   return documentCache[url]
 }
 
-export function getImage (key) {
+export function getImage(key) {
   return imageCache[key]
 }
 
-export function renderPage (documentUrl, pageNumber, width, height, { httpHeaders }) {
-  const key = keyFn(documentUrl, pageNumber, width, height)
+export function renderPage(
+  documentUrl,
+  pageNumber,
+  width,
+  height,
+  { httpHeaders },
+) {
+  const key = keyFunction(documentUrl, pageNumber, width, height)
   let canvas
   let context
   let renderViewport
@@ -34,10 +43,13 @@ export function renderPage (documentUrl, pageNumber, width, height, { httpHeader
   if (!tasks[key]) {
     tasks[key] = new Promise((resolve, reject) => {
       getDocument(documentUrl, { httpHeaders })
-        .then(document => document.getPage(pageNumber))
+        .then((document) => document.getPage(pageNumber))
         .then((page) => {
           const initialViewport = page.getViewport({ scale: 1 })
-          const scale = Math.min(width / initialViewport.width, height / initialViewport.height)
+          const scale = Math.min(
+            width / initialViewport.width,
+            height / initialViewport.height,
+          )
 
           renderViewport = page.getViewport({ scale })
 
@@ -59,7 +71,6 @@ export function renderPage (documentUrl, pageNumber, width, height, { httpHeader
         .then(() => {
           canvas.toBlob((blob) => {
             if (blob) {
-              // eslint-disable-next-line node/no-unsupported-features/node-builtins
               const url = window.URL.createObjectURL(blob)
               const imageData = {
                 url,
@@ -74,7 +85,8 @@ export function renderPage (documentUrl, pageNumber, width, height, { httpHeader
               context = null
               renderViewport = null
 
-              imageCache[`${documentUrl}_${pageNumber}_${width}_${height}`] = imageData
+              imageCache[`${documentUrl}_${pageNumber}_${width}_${height}`] =
+                imageData
 
               resolve(imageData)
             }
@@ -84,7 +96,7 @@ export function renderPage (documentUrl, pageNumber, width, height, { httpHeader
 
           return null
         })
-        .catch(error => reject(error))
+        .catch((error) => reject(error))
     })
   }
 
@@ -103,7 +115,7 @@ export class PDFPresentation extends React.Component {
 
   static CANVAS_PREVIEW_HEIGHT = 68
 
-  constructor () {
+  constructor() {
     super()
 
     this.debouncedUpdateCollection = debounce(this.updateCollection, 100)
@@ -120,7 +132,7 @@ export class PDFPresentation extends React.Component {
     }
   }
 
-  componentDidMount () {
+  componentDidMount() {
     const { url } = this.props
 
     this.mounted = true
@@ -130,17 +142,22 @@ export class PDFPresentation extends React.Component {
     }
   }
 
-  componentDidUpdate (prevProps) {
+  componentDidUpdate(prevProps) {
     const { url, onPagesUpdated } = this.props
 
     if (url !== prevProps.url) {
-      this.setState({ pagesCollection: [] }) // eslint-disable-line
-      onPagesUpdated && onPagesUpdated(0)
+      // eslint-disable-next-line react/no-did-update-set-state
+      this.setState({ pagesCollection: [] })
+
+      if (onPagesUpdated) {
+        onPagesUpdated(0)
+      }
+
       this.updateCollection()
     }
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     this.mounted = false
 
     if (this.timerToRepeatedRequestId) {
@@ -160,20 +177,29 @@ export class PDFPresentation extends React.Component {
 
     const getter = (documentUrl, documentPage, width, height) => () => {
       tokenProvider()
-        .then(token => renderPage(documentUrl, documentPage, width, height, { httpHeaders: { authorization: `Bearer ${token}` } }))
+        .then((token) =>
+          renderPage(documentUrl, documentPage, width, height, {
+            httpHeaders: { authorization: `Bearer ${token}` },
+          }),
+        )
         .then(() => {
           this.debouncedUpdateCollection()
 
           return null
-        }).catch(reportError)
+        })
+        .catch(reportError)
 
       return null
     }
 
-    for (let i = 0; i < count; i++) {
-      const page = i + 1
-      const imageDataCached = getImage(keyFn(url, page, CANVAS_WIDTH, CANVAS_HEIGHT))
-      const previewDataCached = getImage(keyFn(url, page, CANVAS_PREVIEW_WIDTH, CANVAS_PREVIEW_HEIGHT)) // eslint-disable-line max-len
+    for (let index = 0; index < count; index++) {
+      const page = index + 1
+      const imageDataCached = getImage(
+        keyFunction(url, page, CANVAS_WIDTH, CANVAS_HEIGHT),
+      )
+      const previewDataCached = getImage(
+        keyFunction(url, page, CANVAS_PREVIEW_WIDTH, CANVAS_PREVIEW_HEIGHT),
+      ) // eslint-disable-line max-len
       const item = {
         page,
         image: null,
@@ -215,14 +241,17 @@ export class PDFPresentation extends React.Component {
   }
 
   updateCollection = () => {
-    const {
-      tokenProvider, url, onPagesUpdated,
-    } = this.props
+    const { tokenProvider, url, onPagesUpdated } = this.props
 
     tokenProvider()
-      .then(token => getDocument(url, { httpHeaders: { authorization: `Bearer ${token}` } }))
+      .then((token) =>
+        getDocument(url, { httpHeaders: { authorization: `Bearer ${token}` } }),
+      )
       .then((document) => {
-        onPagesUpdated && onPagesUpdated(document.numPages)
+        if (onPagesUpdated) {
+          onPagesUpdated(document.numPages)
+        }
+
         if (this.mounted) {
           this.setState({
             pagesCollection: this.createCollection(document.numPages),
@@ -246,7 +275,7 @@ export class PDFPresentation extends React.Component {
 
     this.timerToRepeatedRequestId = setInterval(() => {
       this.setState(
-        prevState => ({
+        (prevState) => ({
           repeatedRequestTimer: prevState.repeatedRequestTimer - 1,
         }),
         () => {
@@ -256,32 +285,35 @@ export class PDFPresentation extends React.Component {
             clearInterval(this.timerToRepeatedRequestId)
             this.timerToRepeatedRequestId = null
 
-            this.setState(({
+            this.setState({
               hasError: false,
               repeatedRequestTimer: REPEATED_REQUEST_TIMER_VALUE,
-            }))
+            })
 
             this.updateCollection()
-            ++this.attemptNumber
+
+            this.attemptNumber += 1
           }
-        }
+        },
       )
     }, 1000)
   }
 
-  render () {
-    const {
-      hasError, pagesCollection, repeatedRequestTimer,
-    } = this.state
+  render() {
+    const { hasError, pagesCollection, repeatedRequestTimer } = this.state
     const {
       // eslint-disable-next-line no-unused-vars
-      url, innerRef, ...otherProps
+      url,
+      innerRef,
+      ...otherProps
     } = this.props
 
     const errorText = hasError
-      ? `Произошла ошибка при загрузке презентации. ${this.attemptNumber === MAX_NUMBER_ATTEMPTS_TO_REPEAT_REQUEST
-        ? 'Попробуйте перезагрузить страницу'
-        : `Повторная попытка через ${repeatedRequestTimer}`}`
+      ? `Произошла ошибка при загрузке презентации. ${
+          this.attemptNumber === MAX_NUMBER_ATTEMPTS_TO_REPEAT_REQUEST
+            ? 'Попробуйте перезагрузить страницу'
+            : `Повторная попытка через ${repeatedRequestTimer}`
+        }`
       : undefined
 
     // TODO: fix other props handling

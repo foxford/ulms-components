@@ -5,7 +5,7 @@ import { FetchVersionResolver, VersionChecker } from './utils'
 const refresh = () => globalThis.location.reload()
 
 class CacheBuster extends React.Component {
-  constructor (props) {
+  constructor(props) {
     super(props)
 
     this.state = {
@@ -18,10 +18,8 @@ class CacheBuster extends React.Component {
     this._versionChecker = null
   }
 
-  componentDidMount () {
-    const {
-      interval, url, version: localVersion,
-    } = this.props
+  componentDidMount() {
+    const { interval, url, version: localVersion } = this.props
 
     const resolver = new FetchVersionResolver(url)
 
@@ -29,7 +27,8 @@ class CacheBuster extends React.Component {
 
     if (interval) {
       this.intervalId = setInterval(() => {
-        this._versionChecker.check()
+        this._versionChecker
+          .check()
           .then(this.checkMajorVersion)
           .catch((error) => {
             // eslint-disable-next-line no-console
@@ -38,7 +37,8 @@ class CacheBuster extends React.Component {
       }, interval * 1e3)
     }
 
-    this._versionChecker.check()
+    this._versionChecker
+      .check()
       .then(this.checkVersion)
       .catch((error) => {
         this.setState({
@@ -49,7 +49,7 @@ class CacheBuster extends React.Component {
       })
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     clearInterval(this.intervalId)
 
     this.intervalId = null
@@ -61,26 +61,25 @@ class CacheBuster extends React.Component {
     }
   }
 
+  // eslint-disable-next-line class-methods-use-this
   checkMajorVersion = (result) => {
-    const {
-      error, major, version,
-    } = result
+    const { error, major, version } = result
 
     if (error) {
       // eslint-disable-next-line no-console
       console.log('[CacheBuster] interval check error:', error)
     } else if (major) {
       // eslint-disable-next-line no-console
-      console.log(`[CacheBuster] app version ${version} - refresh needed (forced)`)
+      console.log(
+        `[CacheBuster] app version ${version} - refresh needed (forced)`,
+      )
 
       refresh()
     }
   }
 
   checkVersion = (result) => {
-    const {
-      error, major, minor, patch, version,
-    } = result
+    const { error, major, minor, patch, version } = result
 
     if (error) {
       // eslint-disable-next-line no-console
@@ -98,7 +97,11 @@ class CacheBuster extends React.Component {
     const versionMismatch = major || minor || patch
 
     // eslint-disable-next-line no-console
-    console.log(`[CacheBuster] app version ${version} - ${versionMismatch ? 'refresh needed' : 'OK'}`)
+    console.log(
+      `[CacheBuster] app version ${version} - ${
+        versionMismatch ? 'refresh needed' : 'OK'
+      }`,
+    )
 
     this.setState({
       error: null,
@@ -107,13 +110,9 @@ class CacheBuster extends React.Component {
     })
   }
 
-  render () {
+  render() {
     const { children } = this.props
-    const {
-      error,
-      loading,
-      versionMismatch,
-    } = this.state
+    const { error, loading, versionMismatch } = this.state
 
     return children({
       error,
@@ -130,4 +129,5 @@ CacheBuster.defaultProps = {
   version: '',
 }
 
+// eslint-disable-next-line import/prefer-default-export
 export { CacheBuster }

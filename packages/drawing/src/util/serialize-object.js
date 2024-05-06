@@ -10,24 +10,26 @@ const enhancedFields = [
   '_drawByStretch',
 ]
 
-function maybeRemoveToken (object) {
-  if (object.type === 'image' && object.src.indexOf('?access_token=') !== -1) {
-    object.src = object.src.split('?')[0] // eslint-disable-line
+function maybeRemoveToken(object) {
+  if (object.type === 'image' && object.src.includes('?access_token=')) {
+    // eslint-disable-next-line no-param-reassign,prefer-destructuring
+    object.src = object.src.split('?')[0]
   }
 
   return object
 }
 
-export function serializeObject (obj) {
-  return maybeRemoveToken(obj.toObject(enhancedFields))
+export function serializeObject(object) {
+  return maybeRemoveToken(object.toObject(enhancedFields))
 }
 
-export function normalizeFields (object) {
+export function normalizeFields(object) {
   return {
     ...object,
+    // eslint-disable-next-line unicorn/no-array-reduce,unicorn/prefer-object-from-entries
     ...enhancedFields.reduce((a, field) => {
       // eslint-disable-next-line no-param-reassign
-      a[field] = (object[field] !== undefined) ? object[field] : undefined
+      a[field] = object[field] === undefined ? undefined : object[field]
 
       return a
     }, {}),

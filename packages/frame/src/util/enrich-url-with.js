@@ -1,44 +1,59 @@
-export const enrichUrlWith = (url, params = {}, type, origin, omitOriginParams) => {
-  if (!Object.keys(params).length) {
+// eslint-disable-next-line import/prefer-default-export
+export const enrichUrlWith = (
+  url,
+  // eslint-disable-next-line default-param-last
+  parameters = {},
+  type,
+  origin,
+  omitOriginParameters,
+) => {
+  if (Object.keys(parameters).length === 0) {
     return origin ? url.replace(type, origin) : url
   }
 
   const append = []
 
-  Object.keys(params).forEach((a) => {
-    append.push(`${a}=${params[a]}`)
-  })
+  for (const a of Object.keys(parameters)) {
+    append.push(`${a}=${parameters[a]}`)
+  }
 
-  const hasParams = origin ? origin.split('?').length === 2 : false
+  const hasParameters = origin ? origin.split('?').length === 2 : false
   const hasHash = origin ? origin.split('#').length === 2 : false
 
   let nextUrl
 
   if (origin) {
-    const [originUrl, originParams = ''] = origin.split('?')
+    const [originUrl, originParameters = ''] = origin.split('?')
 
     let _url = url
 
-    if (omitOriginParams) {
+    if (omitOriginParameters) {
       // for dev reason when target frame url do n
       const [_urlUrl] = url.split('/')
 
       _url = _urlUrl
     }
 
-    nextUrl = `${_url.replace(type, originUrl)}${originParams ? `?${originParams}` : ''}`
+    nextUrl = `${_url.replace(type, originUrl)}${
+      originParameters ? `?${originParameters}` : ''
+    }`
   } else {
     nextUrl = url
   }
 
-  if (hasParams) {
-    const [prevUrl, prevParams = '', prevHash = ''] = nextUrl.split(/[?#]/)
+  if (hasParameters) {
+    const [previousUrl, previousParameters = '', previousHash = ''] =
+      nextUrl.split(/[#?]/)
 
-    nextUrl = `${prevUrl}?${prevParams}&${append.join('&')}${prevHash ? `#${prevHash}` : ''}`
+    nextUrl = `${previousUrl}?${previousParameters}&${append.join('&')}${
+      previousHash ? `#${previousHash}` : ''
+    }`
   } else if (hasHash) {
-    const [prevUrl, prevHash = ''] = nextUrl.split('#')
+    const [previousUrl, previousHash = ''] = nextUrl.split('#')
 
-    nextUrl = `${prevUrl}?${append.join('&')}${prevHash ? `#${prevHash}` : '#'}`
+    nextUrl = `${previousUrl}?${append.join('&')}${
+      previousHash ? `#${previousHash}` : '#'
+    }`
   } else {
     nextUrl = `${nextUrl}?${append.join('&')}`
   }

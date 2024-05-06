@@ -8,28 +8,37 @@ import CursorIcon from './cursor.svg'
 
 import css from './location-viewport.module.css'
 
-const getPosition = a => typeof a === 'number' ? `${a}px` : a
+const getPosition = (a) => (typeof a === 'number' ? `${a}px` : a)
 
 const isOutOfRange = (a, high, low = 0) => a < low || a > high
 
-const adjustTop = (top, height) => { if (!height) { throw new TypeError('Absent height') } else { return height - top } }
+const adjustTop = (top, height) => {
+  if (height) {
+    return height - top
+  }
 
-// eslint-disable-next-line react/prefer-stateless-function
+  throw new TypeError('Absent height')
+}
+
+// eslint-disable-next-line react/prefer-stateless-function, import/prefer-default-export
 export class LocationObjectCursor extends React.Component {
-  constructor (props) {
+  constructor(props) {
     super(props)
 
     this.ref = React.createRef()
     this.cursorSize = 20
   }
 
-  componentDidMount () {
+  componentDidMount() {
     const style = getComputedStyle(this.ref.current)
 
-    this.cursorSize = parseInt(style.getPropertyValue('--location-viewport-object-size'))
+    this.cursorSize = Number.parseInt(
+      style.getPropertyValue('--location-viewport-object-size'),
+      10,
+    )
   }
 
-  shouldComponentUpdate (nextProps) {
+  shouldComponentUpdate(nextProps) {
     const { top, left } = this.props
 
     if (nextProps.left !== left || nextProps.top !== top) return 1
@@ -37,7 +46,7 @@ export class LocationObjectCursor extends React.Component {
     return 0
   }
 
-  render () {
+  render() {
     const {
       boundLower,
       boundUpper,
@@ -50,14 +59,16 @@ export class LocationObjectCursor extends React.Component {
     } = this.props
     let { top } = this.props
 
-    if (!opts.inverted) { top = adjustTop(top, opts.sizeX) }
+    if (!opts.inverted) {
+      top = adjustTop(top, opts.sizeX)
+    }
     // adjust top coordinate for regular coordinate plane
 
     if (boundUpper.length !== 2 || boundLower.length !== 2) {
       // eslint-disable-next-line no-console
       console.error('Wrong bound format')
 
-      return undefined
+      return
     }
 
     const [xLo, yLo] = boundLower
@@ -68,18 +79,22 @@ export class LocationObjectCursor extends React.Component {
     const y = rangeBound(top, yUp, yLo)
     // get coordinates according the bound
 
-    const [xi, yi] = fCalcIntermediateCoords([x, y], [xC, yC])([xLo, yLo], [xUp, yUp])
+    const [xi, yi] = fCalcIntermediateCoords([x, y], [xC, yC])(
+      [xLo, yLo],
+      [xUp, yUp],
+    )
 
     let rot = 0
     let transform
     let textPosition = 'auto auto -12px 12px'
 
-    if (isOutOfRange(left, Math.max(xUp - this.cursorSize, 0), xLo)
-      || isOutOfRange(top, Math.max(yUp - this.cursorSize, 0), yLo)
+    if (
+      isOutOfRange(left, Math.max(xUp - this.cursorSize, 0), xLo) ||
+      isOutOfRange(top, Math.max(yUp - this.cursorSize, 0), yLo)
     ) {
       rot = rotation([xi, yi], [xC, yC], {
-        defRotation: defaultCursorRotation,
-        invert: !opts.inverted ? 1 : -1,
+        defaultRotation: defaultCursorRotation,
+        invert: opts.inverted ? -1 : 1,
       })
 
       transform = `rotate(${Math.round(rot)}deg)`
@@ -97,7 +112,7 @@ export class LocationObjectCursor extends React.Component {
 
     const styles = {
       left: xi,
-      top: !opts.inverted ? adjustTop(yi, opts.sizeX) : yi,
+      top: opts.inverted ? yi : adjustTop(yi, opts.sizeX),
       // adjust top for CSS styles
     }
 
@@ -106,21 +121,17 @@ export class LocationObjectCursor extends React.Component {
         className={cx(css.cursor, className)}
         style={{
           ...style,
-          transform: `translate(${getPosition(styles.left)}, ${getPosition(styles.top)})`,
+          transform: `translate(${getPosition(styles.left)}, ${getPosition(
+            styles.top,
+          )})`,
         }}
         ref={this.ref}
       >
-        <div
-          className={css.cursorItem}
-          style={{ transform }}
-        >
+        <div className={css.cursorItem} style={{ transform }}>
           <CursorIcon />
         </div>
         {text && (
-          <div
-            className={css.cursorText}
-            style={{ inset: textPosition }}
-          >
+          <div className={css.cursorText} style={{ inset: textPosition }}>
             {text}
           </div>
         )}
@@ -136,4 +147,3 @@ LocationObjectCursor.defaultProps = {
   opts: { inverted: true }, // or {{ inverted: false, sizeX: Number }}
   style: {},
 }
-

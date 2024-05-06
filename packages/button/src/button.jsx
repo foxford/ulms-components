@@ -4,10 +4,9 @@ import cx from 'classnames-es'
 
 import css from './button.module.css'
 
-function Button (props) {
-  const {
-    active, children, className, dataTestId, disabled, onClick, title,
-  } = props
+function Button(props) {
+  const { active, children, className, dataTestId, disabled, onClick, title } =
+    props
 
   return (
     <button
@@ -16,11 +15,12 @@ function Button (props) {
       disabled={disabled}
       onClick={onClick}
       title={title}
-      type='button'
+      type="button"
     >
       {children}
     </button>
   )
 }
 
+// eslint-disable-next-line import/prefer-default-export
 export { Button }
