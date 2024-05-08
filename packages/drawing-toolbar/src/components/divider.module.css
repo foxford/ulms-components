@@ -1,10 +1,10 @@
 .horizontalDivider {
-  border-bottom: 1px solid #D5D7E1;
+  border-bottom: 1px solid #d5d7e1;
   margin: 12px 0;
   width: 100%;
 }
 
 .verticalDivider {
-  border-left: 1px solid #D5D7E1;
+  border-left: 1px solid #d5d7e1;
   margin: 0;
 }

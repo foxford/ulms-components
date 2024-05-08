@@ -18,24 +18,23 @@ import IconEraser from './icons/eraser-tool-icon.svg'
 import IconImage from './icons/image-tool-icon.svg'
 import IconPan from './icons/pan-toolbar-icon.svg'
 import IconSelect from './icons/select-tool-icon.svg'
-import IconLib from './icons/lib-tool-icon.svg'
+import IconLibrary from './icons/lib-tool-icon.svg'
 import IconStamp from './icons/stamp-tool-icon.svg'
 import { toCSSColor } from './utils'
 
-function supportPointerEvent () {
+function supportPointerEvent() {
   return 'PointerEvent' in window
 }
 
 const eventName = supportPointerEvent() ? 'pointerdown' : 'mousedown'
 
 class _DrawingToolbarComponent extends React.Component {
-  constructor (props) {
+  constructor(props) {
     super(props)
 
     this.lineGroupRef = React.createRef()
     this.penGroupRef = React.createRef()
     this.shapeGroupRef = React.createRef()
-    this.stampGroupRef = React.createRef()
     this.textGroupRef = React.createRef()
 
     this.state = { opened: '' }
@@ -43,28 +42,31 @@ class _DrawingToolbarComponent extends React.Component {
     this.mounted = false
   }
 
-  componentDidMount () {
+  componentDidMount() {
     this.mounted = true
 
     document.addEventListener(eventName, this.handleDocumentClickEvent)
   }
 
-  componentDidUpdate (prevProps) {
-    const {
-      tool, brushMode, handleChange, sendEvent,
-    } = this.props
+  componentDidUpdate(prevProps) {
+    const { tool, brushMode, handleChange, sendEvent } = this.props
     const { opened } = this.state
 
     if (tool !== prevProps.tool || brushMode !== prevProps.brushMode) {
-      setTimeout(() => { // Чтобы успели примениться значения для getOptions
+      setTimeout(() => {
+        // Чтобы успели примениться значения для getOptions
         if (!this.mounted) return
 
         let options = null
 
-        if (tool === toolEnum.TEXT) options = this.textGroupRef.current.getOptions()
-        if (tool === toolEnum.SHAPE) options = this.shapeGroupRef.current.getOptions()
-        if (tool === toolEnum.PEN) options = this.penGroupRef.current.getOptions()
-        if (tool === toolEnum.LINE) options = this.lineGroupRef.current.getOptions()
+        if (tool === toolEnum.TEXT)
+          options = this.textGroupRef.current.getOptions()
+        if (tool === toolEnum.SHAPE)
+          options = this.shapeGroupRef.current.getOptions()
+        if (tool === toolEnum.PEN)
+          options = this.penGroupRef.current.getOptions()
+        if (tool === toolEnum.LINE)
+          options = this.lineGroupRef.current.getOptions()
         if (tool === toolEnum.STAMP) return
         if (tool === toolEnum.LIB) {
           this.handleLibClick()
@@ -79,14 +81,25 @@ class _DrawingToolbarComponent extends React.Component {
         }
 
         if (options) {
-          if (tool === toolEnum.STAMP || tool === toolEnum.SHAPE || tool === toolEnum.TEXT) {
+          if (
+            tool === toolEnum.STAMP ||
+            tool === toolEnum.SHAPE ||
+            tool === toolEnum.TEXT
+          ) {
             handleChange({
-              ...options, tool,
+              ...options,
+              tool,
             })
-            sendEvent(tool === toolEnum.STAMP ? 'Stamp' : tool, options.brushMode ? options.brushMode : null, options)
+            sendEvent(
+              tool === toolEnum.STAMP ? 'Stamp' : tool,
+              options.brushMode ?? null,
+              options,
+            )
           } else {
             handleChange({
-              ...options, tool, brushMode,
+              ...options,
+              tool,
+              brushMode,
             })
             sendEvent(tool, brushMode, options)
           }
@@ -101,7 +114,7 @@ class _DrawingToolbarComponent extends React.Component {
     }
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     this.mounted = false
 
     document.removeEventListener(eventName, this.handleDocumentClickEvent)
@@ -163,7 +176,7 @@ class _DrawingToolbarComponent extends React.Component {
     }
   }
 
-  render () {
+  render() {
     const {
       brushColor,
       brushMode,
@@ -197,15 +210,18 @@ class _DrawingToolbarComponent extends React.Component {
     const isLineEnabled = tools && tools.includes(toolEnum.LINE)
     const isTextEnabled = tools && tools.includes(toolEnum.TEXT)
     const isStampEnabled = tools && tools.includes(toolEnum.STAMP)
-    const isLibEnabled = tools && tools.includes(toolEnum.LIB)
+    const isLibraryEnabled = tools && tools.includes(toolEnum.LIB)
 
     return (
       <div className={css.root}>
-        <div className={cn(mobile ? css.row : css.col)} style={{ color: toCSSColor(brushColor) }}>
-          { isSelectEnabled && (
+        <div
+          className={cn(mobile ? css.row : css.col)}
+          style={{ color: toCSSColor(brushColor) }}
+        >
+          {isSelectEnabled && (
             <ToolbarButton
               active={tool === toolEnum.SELECT}
-              dataTestId='board-panel-choose-button'
+              dataTestId="board-panel-choose-button"
               onClick={() => this.handleOpen(toolEnum.SELECT)}
               title={intl.formatMessage({ id: 'SELECT' })}
             >
@@ -213,10 +229,10 @@ class _DrawingToolbarComponent extends React.Component {
             </ToolbarButton>
           )}
 
-          { isPanEnabled && (
+          {isPanEnabled && (
             <ToolbarButton
               active={tool === toolEnum.PAN}
-              dataTestId='board-panel-move-button'
+              dataTestId="board-panel-move-button"
               onClick={() => this.handleOpen(toolEnum.PAN)}
               title={intl.formatMessage({ id: 'HAND' })}
             >
@@ -224,7 +240,7 @@ class _DrawingToolbarComponent extends React.Component {
             </ToolbarButton>
           )}
 
-          { isPenEnabled && (
+          {isPenEnabled && (
             <PenGroup
               opened={opened === toolEnum.PEN}
               className={css.floater}
@@ -232,7 +248,7 @@ class _DrawingToolbarComponent extends React.Component {
               tool={tool}
               brushMode={brushMode}
               ref={this.penGroupRef}
-              handleOpen={options => this.handleOpen(toolEnum.PEN, options)}
+              handleOpen={(options) => this.handleOpen(toolEnum.PEN, options)}
               handleChange={handleChange}
               containerStyles={penGroupContainerStyles}
               direction={penGroupDirection}
@@ -242,23 +258,23 @@ class _DrawingToolbarComponent extends React.Component {
             />
           )}
 
-          { isShapeEnabled && (
+          {isShapeEnabled && (
             <ShapeGroup
-              dataTestId='board-panel-group-shape-button'
+              dataTestId="board-panel-group-shape-button"
               opened={opened === toolEnum.SHAPE}
               className={css.floater}
               intl={intl}
               tool={tool}
               brushMode={brushMode}
               ref={this.shapeGroupRef}
-              handleOpen={options => this.handleOpen(toolEnum.SHAPE, options)}
+              handleOpen={(options) => this.handleOpen(toolEnum.SHAPE, options)}
               handleChange={handleChange}
               sendEvent={sendEvent}
               options={brushOptions}
             />
           )}
 
-          { isLineEnabled && (
+          {isLineEnabled && (
             <LineGroup
               opened={opened === toolEnum.LINE}
               className={css.floater}
@@ -266,7 +282,7 @@ class _DrawingToolbarComponent extends React.Component {
               tool={tool}
               brushMode={brushMode}
               ref={this.lineGroupRef}
-              handleOpen={options => this.handleOpen(toolEnum.LINE, options)}
+              handleOpen={(options) => this.handleOpen(toolEnum.LINE, options)}
               handleChange={handleChange}
               sendEvent={sendEvent}
               options={brushOptions}
@@ -280,17 +296,17 @@ class _DrawingToolbarComponent extends React.Component {
               intl={intl}
               tool={tool}
               ref={this.textGroupRef}
-              handleOpen={options => this.handleOpen(toolEnum.TEXT, options)}
+              handleOpen={(options) => this.handleOpen(toolEnum.TEXT, options)}
               handleChange={handleChange}
               sendEvent={sendEvent}
               options={brushOptions}
             />
           )}
 
-          { isEraserEnabled && (
+          {isEraserEnabled && (
             <ToolbarButton
               active={tool === toolEnum.ERASER}
-              dataTestId='board-panel-eraser-button'
+              dataTestId="board-panel-eraser-button"
               onClick={() => this.handleOpen(toolEnum.ERASER)}
               title={intl.formatMessage({ id: 'ERASER' })}
             >
@@ -298,10 +314,10 @@ class _DrawingToolbarComponent extends React.Component {
             </ToolbarButton>
           )}
 
-          { isImageEnabled && (
+          {isImageEnabled && (
             <ToolbarButton
               active={tool === toolEnum.IMAGE}
-              dataTestId='board-panel-image-button'
+              dataTestId="board-panel-image-button"
               onClick={this.handleImageClick}
               title={intl.formatMessage({ id: 'UPLOAD_IMAGE' })}
             >
@@ -309,10 +325,10 @@ class _DrawingToolbarComponent extends React.Component {
             </ToolbarButton>
           )}
 
-          { isStampEnabled && (
+          {isStampEnabled && (
             <ToolbarButton
               active={tool === toolEnum.STAMP}
-              dataTestId='board-panel-stamps-button'
+              dataTestId="board-panel-stamps-button"
               onClick={this.handleStampClick}
               title={intl.formatMessage({ id: 'STAMP' })}
             >
@@ -320,14 +336,14 @@ class _DrawingToolbarComponent extends React.Component {
             </ToolbarButton>
           )}
 
-          { isLibEnabled && (
+          {isLibraryEnabled && (
             <ToolbarButton
               active={tool === toolEnum.LIB}
-              dataTestId='board-panel-library-button'
+              dataTestId="board-panel-library-button"
               onClick={this.handleLibClick}
               title={intl.formatMessage({ id: 'LIB' })}
             >
-              <IconLib />
+              <IconLibrary />
             </ToolbarButton>
           )}
         </div>
@@ -339,12 +355,8 @@ class _DrawingToolbarComponent extends React.Component {
 const DrawingToolbarComponent = injectIntl(_DrawingToolbarComponent)
 
 export class DrawingToolbarIntl extends React.PureComponent {
-  render () {
-    const {
-      defaultLocale = 'ru',
-      locale = 'ru',
-      ...props
-    } = this.props
+  render() {
+    const { defaultLocale = 'ru', locale = 'ru', ...props } = this.props
 
     return (
       <IntlProvider

@@ -1,0 +1,9 @@
+.nx
+
+coverage
+node_modules
+packages/*/es
+packages/*/src/dist
+
+# Optional eslint cache
+.eslintcache

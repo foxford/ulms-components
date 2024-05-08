@@ -5,47 +5,47 @@ import { enrichUrlWith } from './util/enrich-url-with'
 
 // TODO: move static methods to the frame-controller
 
-const isUndef = a => typeof a === 'undefined'
+const isUndef = (a) => a === undefined
 
+// eslint-disable-next-line import/prefer-default-export
 export class Frame extends React.PureComponent {
-  static get actions () {
-    return new Map([['getState', 'get_state'], ['updateState', 'update_state'], ['notify', 'notify']])
+  static get actions() {
+    return new Map([
+      ['getState', 'get_state'],
+      ['updateState', 'update_state'],
+      ['notify', 'notify'],
+    ])
   }
 
-  static get type () {
+  static get type() {
     return 'about:iframe#taskdigests'
   }
 
-  static getAction (name) {
+  static getAction(name) {
     const keys = [...Frame.actions.keys()]
     const names = [...Frame.actions.values()]
 
-    const actionIndex = keys.findIndex(a => a === name)
+    const actionIndex = keys.indexOf(name)
     if (actionIndex === -1) throw new Error('Can not find action')
 
     return names[actionIndex]
   }
 
-  static isComponent (data = {}) {
+  static isComponent(data = {}) {
     return data.url && data.url.startsWith(Frame.type)
   }
 
-  static wrapMessage (da, ta) {
+  static wrapMessage(da, ta) {
     return Frame.data(da, ta)
   }
 
-  static data ({
-    id,
-    page = 1,
-    title,
-  }, data) {
+  static data({ id, page = 1, title }, data) {
     // eslint-disable-next-line no-console
     console.warn('`Frame::data` is deprecated. Use Frame::wrapMessage instead')
 
     let _data = {
       page,
       title,
-      // eslint-disable-next-line node/no-unsupported-features/node-builtins
       url: new URL(`${Frame.type}/${id}`).href,
     }
 
@@ -59,7 +59,7 @@ export class Frame extends React.PureComponent {
     return _data
   }
 
-  constructor (props) {
+  constructor(props) {
     super(props)
 
     const { url } = props
@@ -69,20 +69,26 @@ export class Frame extends React.PureComponent {
     this.iframeR = React.createRef()
   }
 
-  componentDidMount () {
-    this._currentCtx && this._currentCtx.addEventListener('message', this.handleMessage)
+  componentDidMount() {
+    if (this._currentCtx) {
+      this._currentCtx.addEventListener('message', this.handleMessage)
+    }
   }
 
-  componentWillUnmount () {
-    this._currentCtx && this._currentCtx.removeEventListener('message', this.handleMessage)
+  componentWillUnmount() {
+    if (this._currentCtx) {
+      this._currentCtx.removeEventListener('message', this.handleMessage)
+    }
   }
 
-  get _childCtx () {
+  get _childCtx() {
     return this.iframeR.current && this.iframeR.current.contentWindow
   }
 
-  get _currentCtx () {
-    return this.iframeR.current && this.iframeR.current.ownerDocument.defaultView
+  get _currentCtx() {
+    return (
+      this.iframeR.current && this.iframeR.current.ownerDocument.defaultView
+    )
   }
 
   handleMessage = ({ source, data }) => {
@@ -120,7 +126,10 @@ export class Frame extends React.PureComponent {
 
     if (onIncoming) {
       // eslint-disable-next-line no-console
-      if (debug) console.warn('`onIncoming` would be deprecated for messages with type&payload data. Use specific handler insted.')
+      if (debug)
+        console.warn(
+          '`onIncoming` would be deprecated for messages with type&payload data. Use specific handler insted.',
+        )
 
       onIncoming(data)
     }
@@ -152,6 +161,7 @@ export class Frame extends React.PureComponent {
     }
   }
 
+  // eslint-disable-next-line react/no-unused-class-component-methods
   postGetState = (message) => {
     this.postMessage({
       type: Frame.actions.get('getState'),
@@ -159,6 +169,7 @@ export class Frame extends React.PureComponent {
     })
   }
 
+  // eslint-disable-next-line react/no-unused-class-component-methods
   postUpdateState = (message) => {
     this.postMessage({
       type: Frame.actions.get('updateState'),
@@ -166,6 +177,7 @@ export class Frame extends React.PureComponent {
     })
   }
 
+  // eslint-disable-next-line react/no-unused-class-component-methods
   postNotify = (message) => {
     this.postMessage({
       type: Frame.actions.get('notify'),
@@ -173,17 +185,23 @@ export class Frame extends React.PureComponent {
     })
   }
 
-  render () {
+  render() {
     const {
       className,
       omitOriginParams,
       origin,
-      params = {},
+      params: parameters = {},
       title,
       url: _url,
     } = this.props
 
-    const url = enrichUrlWith(_url, params, Frame.type, origin, omitOriginParams)
+    const url = enrichUrlWith(
+      _url,
+      parameters,
+      Frame.type,
+      origin,
+      omitOriginParams,
+    )
 
     return (
       <iframe

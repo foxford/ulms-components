@@ -10,7 +10,10 @@ Enzyme.configure({ adapter: new Adapter() })
 const { shallow } = Enzyme
 
 test('ok', () => {
-  const instance = shallow(<Frame url={`${Frame.type}/path/to/page`} />).instance()
+  const instance = shallow(
+    // eslint-disable-next-line react/jsx-filename-extension
+    <Frame url={`${Frame.type}/path/to/page`} />,
+  ).instance()
 
   expect(instance.props.url).toBe(`${Frame.type}/path/to/page`)
 })

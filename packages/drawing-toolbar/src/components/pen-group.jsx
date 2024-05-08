@@ -1,6 +1,10 @@
 import React from 'react'
 import cn from 'classnames-es'
-import { penToolModeEnum, toolEnum, defaultToolSettings } from '@ulms/ui-drawing'
+import {
+  penToolModeEnum,
+  toolEnum,
+  defaultToolSettings,
+} from '@ulms/ui-drawing'
 
 import IconPen from '../icons/pen-tool-icon.svg'
 import IconDashedPen from '../icons/dashed-pen-tool-icon.svg'
@@ -33,8 +37,9 @@ const markerToLineMap = {
   20: 8,
 }
 
+// eslint-disable-next-line import/prefer-default-export
 export class PenGroup extends React.Component {
-  constructor (props) {
+  constructor(props) {
     super(props)
     const { intl } = props
 
@@ -53,7 +58,8 @@ export class PenGroup extends React.Component {
 
       if (brushMode === penToolModeEnum.MARKER) {
         markerColor = RGBtoHEX(options.brushColor)
-        markerSize = markerToLineMap[options.brushWidth] || defaultToolSettings.markerSize
+        markerSize =
+          markerToLineMap[options.brushWidth] || defaultToolSettings.markerSize
       } else {
         penColor = RGBtoHEX(options.brushColor)
         penSize = options.brushWidth
@@ -69,9 +75,9 @@ export class PenGroup extends React.Component {
     }
 
     this.iconsMap = {
-      [penToolModeEnum.PENCIL]: (<IconPen />),
-      [penToolModeEnum.DASHED_PENCIL]: (<IconDashedPen />),
-      [penToolModeEnum.MARKER]: (<IconMarker />),
+      [penToolModeEnum.PENCIL]: <IconPen />,
+      [penToolModeEnum.DASHED_PENCIL]: <IconDashedPen />,
+      [penToolModeEnum.MARKER]: <IconMarker />,
     }
 
     this.iconsSet = [
@@ -96,61 +102,69 @@ export class PenGroup extends React.Component {
     ]
   }
 
-  componentDidUpdate (prevProps) {
+  componentDidUpdate(prevProps) {
     const { brushMode, tool } = this.props
 
     if (tool === toolEnum.PEN && brushMode !== prevProps.brushMode) {
+      // eslint-disable-next-line react/no-did-update-set-state
       this.setState({ brushMode })
     }
   }
 
-  _getTitle = key => this.iconsSet.find(item => item.key === key).title
+  _getTitle = (key) => this.iconsSet.find((item) => item.key === key).title
 
   handleClick = (name, value) => {
     const { handleChange, sendEvent } = this.props
-    const {
-      brushMode, penColor, penSize, markerColor, markerSize,
-    } = { ...this.state, [name]: value }
+    const { brushMode, penColor, penSize, markerColor, markerSize } = {
+      ...this.state,
+      [name]: value,
+    }
 
     this.setState({ [name]: value })
 
     handleChange({
       tool: toolEnum.PEN,
       brushMode,
-      brushColor: (brushMode === penToolModeEnum.MARKER)
-        ? { ...HEXtoRGB(markerColor), a: defaultToolSettings.markerAlpha }
-        : { ...HEXtoRGB(penColor), a: 1 },
-      brushWidth: (brushMode === penToolModeEnum.MARKER) ? lineToMarkerMap[markerSize] : penSize,
+      brushColor:
+        brushMode === penToolModeEnum.MARKER
+          ? { ...HEXtoRGB(markerColor), a: defaultToolSettings.markerAlpha }
+          : { ...HEXtoRGB(penColor), a: 1 },
+      brushWidth:
+        brushMode === penToolModeEnum.MARKER
+          ? lineToMarkerMap[markerSize]
+          : penSize,
     })
     if (name !== 'brushMode') {
       sendEvent(toolEnum.PEN, brushMode, {
-        brushColor: (brushMode === penToolModeEnum.MARKER)
-          ? { ...HEXtoRGB(markerColor), a: defaultToolSettings.markerAlpha }
-          : { ...HEXtoRGB(penColor), a: 1 },
-        brushWidth: (brushMode === penToolModeEnum.MARKER) ? lineToMarkerMap[markerSize] : penSize,
+        brushColor:
+          brushMode === penToolModeEnum.MARKER
+            ? { ...HEXtoRGB(markerColor), a: defaultToolSettings.markerAlpha }
+            : { ...HEXtoRGB(penColor), a: 1 },
+        brushWidth:
+          brushMode === penToolModeEnum.MARKER
+            ? lineToMarkerMap[markerSize]
+            : penSize,
       })
     }
   }
 
   getOptions = () => {
-    const {
-      brushMode,
-      markerSize,
-      markerColor,
-      penSize,
-      penColor,
-    } = this.state
+    const { brushMode, markerSize, markerColor, penSize, penColor } = this.state
 
     return {
       brushMode,
-      brushColor: (brushMode === penToolModeEnum.MARKER)
-        ? { ...HEXtoRGB(markerColor), a: defaultToolSettings.markerAlpha }
-        : { ...HEXtoRGB(penColor), a: 1 },
-      brushWidth: (brushMode === penToolModeEnum.MARKER) ? lineToMarkerMap[markerSize] : penSize,
+      brushColor:
+        brushMode === penToolModeEnum.MARKER
+          ? { ...HEXtoRGB(markerColor), a: defaultToolSettings.markerAlpha }
+          : { ...HEXtoRGB(penColor), a: 1 },
+      brushWidth:
+        brushMode === penToolModeEnum.MARKER
+          ? lineToMarkerMap[markerSize]
+          : penSize,
     }
   }
 
-  render () {
+  render() {
     const {
       opened,
       tool,
@@ -161,13 +175,7 @@ export class PenGroup extends React.Component {
       direction = 'right-start',
       orientation = 'vertical',
     } = this.props
-    const {
-      brushMode,
-      markerSize,
-      penSize,
-      markerColor,
-      penColor,
-    } = this.state
+    const { brushMode, markerSize, penSize, markerColor, penColor } = this.state
 
     return (
       <SettingsGroup
@@ -176,39 +184,49 @@ export class PenGroup extends React.Component {
         isOpen={opened}
         handleClose={handleClose}
         target={this.buttonRef.current}
-        content={(
+        content={
           <div className={cn(css.column, css[orientation], className)}>
             <div className={css.column__group}>
               <IconGroupSettings
                 iconsSet={this.iconsSet}
                 currentSelection={brushMode}
-                handleClick={value => this.handleClick('brushMode', value)}
+                handleClick={(value) => this.handleClick('brushMode', value)}
               />
               <Divider horizontal={orientation === 'vertical'} />
               <LineSettings
-                currentSize={brushMode === penToolModeEnum.MARKER ? markerSize : penSize}
+                currentSize={
+                  brushMode === penToolModeEnum.MARKER ? markerSize : penSize
+                }
                 dashed={brushMode === penToolModeEnum.DASHED_PENCIL}
-                handleClick={value => (brushMode === penToolModeEnum.MARKER)
-                  ? this.handleClick('markerSize', value)
-                  : this.handleClick('penSize', value)}
+                handleClick={(value) =>
+                  brushMode === penToolModeEnum.MARKER
+                    ? this.handleClick('markerSize', value)
+                    : this.handleClick('penSize', value)
+                }
               />
             </div>
             <Divider horizontal />
             <ColorSettings
-              currentColor={brushMode === penToolModeEnum.MARKER ? markerColor : penColor}
-              handleClick={value => (brushMode === penToolModeEnum.MARKER)
-                ? this.handleClick('markerColor', value)
-                : this.handleClick('penColor', value)}
+              currentColor={
+                brushMode === penToolModeEnum.MARKER ? markerColor : penColor
+              }
+              handleClick={(value) =>
+                brushMode === penToolModeEnum.MARKER
+                  ? this.handleClick('markerColor', value)
+                  : this.handleClick('penColor', value)
+              }
               rows={orientation === 'horizontal' ? 2 : 3}
             />
           </div>
-        )}
+        }
       >
         <ToolbarButton
           active={tool === toolEnum.PEN}
-          dataTestId='board-panel-group-pen-button'
+          dataTestId="board-panel-group-pen-button"
           group
-          groupColor={brushMode === penToolModeEnum.MARKER ? markerColor : penColor}
+          groupColor={
+            brushMode === penToolModeEnum.MARKER ? markerColor : penColor
+          }
           title={this._getTitle(brushMode)}
           onClick={() => handleOpen(this.getOptions())}
           innerRef={this.buttonRef}

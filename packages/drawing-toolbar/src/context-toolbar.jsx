@@ -9,7 +9,13 @@ import { SettingsGroup } from './components/settings-group'
 import { Divider } from './components/divider'
 
 import { RGBtoHEX, fromCSSColor, toCSSColor, HEXtoRGB } from './utils'
-import { ObjectTypes, ShapeTypes, LineTypes, ColorTypes, contextMenuContainerStyles } from './constants'
+import {
+  ObjectTypes,
+  ShapeTypes,
+  LineTypes,
+  ColorTypes,
+  contextMenuContainerStyles,
+} from './constants'
 
 import IconLineSettingsTool from './icons/line-settings-tool-icon.svg'
 import IconTextSettingsTool from './icons/text-tool-alt-icon.svg'
@@ -35,8 +41,9 @@ const markerToLineMap = {
   20: 8,
 }
 
+// eslint-disable-next-line import/prefer-default-export
 export class ContextToolbar extends React.Component {
-  constructor (props) {
+  constructor(props) {
     super(props)
 
     this.lineSettingsRef = React.createRef()
@@ -58,7 +65,7 @@ export class ContextToolbar extends React.Component {
     }
   }
 
-  componentDidMount () {
+  componentDidMount() {
     const { selectedObject } = this.props
 
     if (selectedObject) {
@@ -66,30 +73,42 @@ export class ContextToolbar extends React.Component {
     }
   }
 
-  componentDidUpdate (prevProps) {
+  componentDidUpdate(prevProps) {
     const { selectedObject } = this.props
 
     if (selectedObject !== prevProps.selectedObject) {
-      selectedObject && this.processSelectedObject(selectedObject)
+      if (selectedObject) {
+        this.processSelectedObject(selectedObject)
+      }
+
+      // eslint-disable-next-line react/no-did-update-set-state
       this.setState({
-        colorSettingsOpened: false, fontSettingsOpened: false, lineSettingsOpened: false,
+        colorSettingsOpened: false,
+        fontSettingsOpened: false,
+        lineSettingsOpened: false,
       })
     }
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     this.setState({
-      colorSettingsOpened: false, fontSettingsOpened: false, lineSettingsOpened: false,
+      colorSettingsOpened: false,
+      fontSettingsOpened: false,
+      lineSettingsOpened: false,
     })
   }
 
-  handleAction = (actionFunc) => {
+  handleAction = (actionFunction) => {
     this.setState({
-      colorSettingsOpened: false, fontSettingsOpened: false, lineSettingsOpened: false,
+      colorSettingsOpened: false,
+      fontSettingsOpened: false,
+      lineSettingsOpened: false,
     })
-    actionFunc && actionFunc()
+
+    if (actionFunction) actionFunction()
   }
 
+  // eslint-disable-next-line react/no-unused-class-component-methods
   flipX = () => {
     const { selectedObject, onDrawUpdate } = this.props
 
@@ -97,6 +116,7 @@ export class ContextToolbar extends React.Component {
     onDrawUpdate(selectedObject)
   }
 
+  // eslint-disable-next-line react/no-unused-class-component-methods
   flipY = () => {
     const { selectedObject, onDrawUpdate } = this.props
 
@@ -105,38 +125,48 @@ export class ContextToolbar extends React.Component {
   }
 
   handleLineChanged = (newSize) => {
-    const {
-      selectedObject, onDrawUpdate, onSendEvent,
-    } = this.props
+    const { selectedObject, onDrawUpdate, onSendEvent } = this.props
     const { stroke } = selectedObject
     const { a } = fromCSSColor(stroke)
     const isMarker = a < 0.9
 
-    selectedObject.set({ strokeWidth: isMarker ? lineToMarkerMap[newSize] : newSize })
+    selectedObject.set({
+      strokeWidth: isMarker ? lineToMarkerMap[newSize] : newSize,
+    })
     onDrawUpdate(selectedObject)
-    onSendEvent && onSendEvent({ object: selectedObject, diff: { strokeWidth: selectedObject.strokeWidth } })
-    this.setState({ currentSize: isMarker ? lineToMarkerMap[newSize] : newSize })
+
+    if (onSendEvent) {
+      onSendEvent({
+        object: selectedObject,
+        diff: { strokeWidth: selectedObject.strokeWidth }, // eslint-disable-line unicorn/consistent-destructuring
+      })
+    }
+
+    this.setState({
+      currentSize: isMarker ? lineToMarkerMap[newSize] : newSize,
+    })
   }
 
   handleFontChanged = (newFontSize) => {
-    const {
-      selectedObject, onDrawUpdate, onSendEvent,
-    } = this.props
+    const { selectedObject, onDrawUpdate, onSendEvent } = this.props
 
     selectedObject.set({ fontSize: newFontSize })
     onDrawUpdate(selectedObject)
-    onSendEvent && onSendEvent({ object: selectedObject, diff: { fontSize: selectedObject.fontSize } })
+
+    if (onSendEvent) {
+      onSendEvent({
+        object: selectedObject,
+        diff: { fontSize: selectedObject.fontSize },
+      })
+    }
+
     this.setState({ currentFontSize: newFontSize })
   }
 
   handleColorChanged = (color) => {
     const newColor = HEXtoRGB(color)
-    const {
-      selectedObject, onDrawUpdate, onSendEvent,
-    } = this.props
-    const {
-      type, fill, stroke,
-    } = selectedObject
+    const { selectedObject, onDrawUpdate, onSendEvent } = this.props
+    const { type, fill, stroke } = selectedObject
 
     if (type === ObjectTypes.TEXT) {
       selectedObject.set({ fill: toCSSColor({ ...newColor, a: 1 }) })
@@ -161,23 +191,28 @@ export class ContextToolbar extends React.Component {
       }
     }
     onDrawUpdate(selectedObject)
-    onSendEvent && onSendEvent({
-      object: selectedObject, diff: { fill: selectedObject.fill, stroke: selectedObject.stroke },
-    })
+
+    if (onSendEvent) {
+      onSendEvent({
+        object: selectedObject,
+        diff: { fill: selectedObject.fill, stroke: selectedObject.stroke }, // eslint-disable-line unicorn/consistent-destructuring
+      })
+    }
+
     this.setState({ currentColor: color })
   }
 
-  processSelectedObject (selectedObject) {
-    const {
-      type, fill, stroke, fontSize, strokeWidth, strokeDashArray,
-    } = selectedObject
+  processSelectedObject(selectedObject) {
+    const { type, fill, stroke, fontSize, strokeWidth, strokeDashArray } =
+      selectedObject
 
     const { a: fillA } = fill ? fromCSSColor(fill) : { a: 0 }
 
     const dashed = !!strokeDashArray
     const showColorTool = ColorTypes.includes(type)
     const showFontTool = type === ObjectTypes.TEXT
-    const showLineTool = LineTypes.includes(type) || (ShapeTypes.includes(type) && fillA < 0.01)
+    const showLineTool =
+      LineTypes.includes(type) || (ShapeTypes.includes(type) && fillA < 0.01)
 
     let currentColor = ''
     let currentSize = 0
@@ -205,11 +240,18 @@ export class ContextToolbar extends React.Component {
     }
 
     this.setState({
-      showColorTool, currentColor, showFontTool, currentFontSize, showLineTool, currentSize, isMarker, dashed,
+      showColorTool,
+      currentColor,
+      showFontTool,
+      currentFontSize,
+      showLineTool,
+      currentSize,
+      isMarker,
+      dashed,
     })
   }
 
-  render () {
+  render() {
     const {
       colorSettingsRows,
       isLocked,
@@ -239,122 +281,116 @@ export class ContextToolbar extends React.Component {
         {!isLocked && (
           <>
             {showLineTool && (
-            <SettingsGroup
-              direction={`${direction}-start`}
-              containerStyles={contextMenuContainerStyles(direction)}
-              isOpen={lineSettingsOpened}
-              handleClose={() => this.setState({ lineSettingsOpened: false })}
-              target={this.lineSettingsRef.current}
-              content={(
-                <LineSettings
-                  dashed={dashed}
-                  currentSize={isMarker ? markerToLineMap[currentSize] : currentSize}
-                  handleClick={this.handleLineChanged}
-                />
-              )}
-            >
-              <ToolbarButton
-                active={lineSettingsOpened}
-                onClick={() => this.setState({
-                  lineSettingsOpened: !lineSettingsOpened,
-                  colorSettingsOpened: false,
-                  fontSettingsOpened: false,
-                })}
-                innerRef={this.lineSettingsRef}
+              <SettingsGroup
+                direction={`${direction}-start`}
+                containerStyles={contextMenuContainerStyles(direction)}
+                isOpen={lineSettingsOpened}
+                handleClose={() => this.setState({ lineSettingsOpened: false })}
+                target={this.lineSettingsRef.current}
+                content={
+                  <LineSettings
+                    dashed={dashed}
+                    currentSize={
+                      isMarker ? markerToLineMap[currentSize] : currentSize
+                    }
+                    handleClick={this.handleLineChanged}
+                  />
+                }
               >
-                <IconLineSettingsTool />
-              </ToolbarButton>
-            </SettingsGroup>
+                <ToolbarButton
+                  active={lineSettingsOpened}
+                  onClick={() =>
+                    this.setState({
+                      lineSettingsOpened: !lineSettingsOpened,
+                      colorSettingsOpened: false,
+                      fontSettingsOpened: false,
+                    })
+                  }
+                  innerRef={this.lineSettingsRef}
+                >
+                  <IconLineSettingsTool />
+                </ToolbarButton>
+              </SettingsGroup>
             )}
             {showFontTool && (
-            <SettingsGroup
-              direction={`${direction}-start`}
-              containerStyles={contextMenuContainerStyles(direction)}
-              isOpen={fontSettingsOpened}
-              handleClose={() => this.setState({ fontSettingsOpened: false })}
-              target={this.fontSettingsRef.current}
-              content={(
-                <FontSettings
-                  currentFontSize={currentFontSize}
-                  handleClick={this.handleFontChanged}
-                />
-              )}
-            >
-              <ToolbarButton
-                active={fontSettingsOpened}
-                onClick={() => {
-                  this.setState({
-                    fontSettingsOpened: !fontSettingsOpened,
-                    lineSettingsOpened: false,
-                    colorSettingsOpened: false,
-                  })
-                }}
-                innerRef={this.fontSettingsRef}
+              <SettingsGroup
+                direction={`${direction}-start`}
+                containerStyles={contextMenuContainerStyles(direction)}
+                isOpen={fontSettingsOpened}
+                handleClose={() => this.setState({ fontSettingsOpened: false })}
+                target={this.fontSettingsRef.current}
+                content={
+                  <FontSettings
+                    currentFontSize={currentFontSize}
+                    handleClick={this.handleFontChanged}
+                  />
+                }
               >
-                <IconTextSettingsTool />
-              </ToolbarButton>
-
-            </SettingsGroup>
+                <ToolbarButton
+                  active={fontSettingsOpened}
+                  onClick={() => {
+                    this.setState({
+                      fontSettingsOpened: !fontSettingsOpened,
+                      lineSettingsOpened: false,
+                      colorSettingsOpened: false,
+                    })
+                  }}
+                  innerRef={this.fontSettingsRef}
+                >
+                  <IconTextSettingsTool />
+                </ToolbarButton>
+              </SettingsGroup>
             )}
             {showColorTool && (
-            <SettingsGroup
-              direction={`${direction}-start`}
-              containerStyles={contextMenuContainerStyles(direction)}
-              isOpen={colorSettingsOpened}
-              handleClose={() => this.setState({ colorSettingsOpened: false })}
-              target={this.colorSettingsRef.current}
-              content={(
-                <ColorSettings
-                  currentColor={currentColor}
-                  handleClick={this.handleColorChanged}
-                  rows={colorSettingsRows}
+              <SettingsGroup
+                direction={`${direction}-start`}
+                containerStyles={contextMenuContainerStyles(direction)}
+                isOpen={colorSettingsOpened}
+                handleClose={() =>
+                  this.setState({ colorSettingsOpened: false })
+                }
+                target={this.colorSettingsRef.current}
+                content={
+                  <ColorSettings
+                    currentColor={currentColor}
+                    handleClick={this.handleColorChanged}
+                    rows={colorSettingsRows}
+                  />
+                }
+              >
+                <ColorItem
+                  color={currentColor}
+                  innerRef={this.colorSettingsRef}
+                  active={colorSettingsOpened}
+                  handleClick={() =>
+                    this.setState({
+                      colorSettingsOpened: !colorSettingsOpened,
+                      fontSettingsOpened: false,
+                      lineSettingsOpened: false,
+                    })
+                  }
                 />
-              )}
-            >
-              <ColorItem
-                color={currentColor}
-                innerRef={this.colorSettingsRef}
-                active={colorSettingsOpened}
-                handleClick={() => this.setState({
-                  colorSettingsOpened: !colorSettingsOpened,
-                  fontSettingsOpened: false,
-                  lineSettingsOpened: false,
-                })}
-              />
-            </SettingsGroup>
+              </SettingsGroup>
             )}
-            {showColorTool && (
-              <Divider />
-            )}
+            {showColorTool && <Divider />}
           </>
         )}
-        <ToolbarButton
-          onClick={() => this.handleAction(onLock)}
-        >
+        <ToolbarButton onClick={() => this.handleAction(onLock)}>
           {isLocked ? <IconLockLocked /> : <IconLockUnlocked />}
         </ToolbarButton>
         {!isLocked && (
           <>
-            <ToolbarButton
-              onClick={() => this.handleAction(onCopyPaste)}
-            >
+            <ToolbarButton onClick={() => this.handleAction(onCopyPaste)}>
               <IconCopyPaste />
             </ToolbarButton>
-            <ToolbarButton
-              onClick={() => this.handleAction(onDelete)}
-            >
+            <ToolbarButton onClick={() => this.handleAction(onDelete)}>
               <IconDelete />
-
             </ToolbarButton>
             <Divider />
-            <ToolbarButton
-              onClick={() => this.handleAction(onBringToFront)}
-            >
+            <ToolbarButton onClick={() => this.handleAction(onBringToFront)}>
               <IconBringFront />
             </ToolbarButton>
-            <ToolbarButton
-              onClick={() => this.handleAction(onSendToBack)}
-            >
+            <ToolbarButton onClick={() => this.handleAction(onSendToBack)}>
               <IconBringBack />
             </ToolbarButton>
           </>

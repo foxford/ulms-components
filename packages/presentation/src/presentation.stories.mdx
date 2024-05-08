@@ -1,8 +1,7 @@
-import { Meta, Story, Canvas } from '@storybook/addon-docs/blocks';
-import { Presentation, PDFPresentation } from '../index';
+import { Meta, Story, Canvas } from '@storybook/addon-docs/blocks'
+import { Presentation, PDFPresentation } from '../index'
 
 <Meta title="Organisms/Presentation" component={Presentation} />
-
 
 # Presentation
 
@@ -24,7 +23,7 @@ export const Template = ({
           imageHeight: 480,
           preview: 'https://placeimg.com/120/68/any',
           previewWidth: 120,
-          previewHeight: 68
+          previewHeight: 68,
         },
         {
           page: 2,
@@ -33,7 +32,7 @@ export const Template = ({
           imageHeight: 480,
           preview: 'https://placeimg.com/120/68/any',
           previewWidth: 120,
-          previewHeight: 68
+          previewHeight: 68,
         },
         {
           page: 3,
@@ -42,11 +41,13 @@ export const Template = ({
           imageHeight: 480,
           preview: 'https://placeimg.com/120/68/any',
           previewWidth: 120,
-          previewHeight: 68
+          previewHeight: 68,
         },
       ]}
       fitToWidth={fitToWidth}
-      onChange={() => { console.log('Change page') }}
+      onChange={() => {
+        console.log('Change page')
+      }}
       showActions={showActions}
       showPagesCount={showPagesCount}
       showPreviews={showPreviews}
@@ -66,7 +67,9 @@ export const PDFTemplate = ({
     <PDFPresentation
       index={index}
       fitToWidth={fitToWidth}
-      onChange={() => { console.log('Change page') }}
+      onChange={() => {
+        console.log('Change page')
+      }}
       showActions={showActions}
       showPagesCount={showPagesCount}
       showPreviews={showPreviews}
@@ -77,23 +80,29 @@ export const PDFTemplate = ({
 )
 
 <Canvas>
-  <Story name="default" args={{
-    index: 0,
-    fitToWidth: true,
-    showActions: true,
-    showPagesCount: true,
-    showPreviews: true,
-  }}>
+  <Story
+    name="default"
+    args={{
+      index: 0,
+      fitToWidth: true,
+      showActions: true,
+      showPagesCount: true,
+      showPreviews: true,
+    }}
+  >
     {Template.bind({})}
   </Story>
-  <Story name="pdf" args={{
-    index: 0,
-    fitToWidth: true,
-    showActions: true,
-    showPagesCount: true,
-    showPreviews: true,
-    url: 'http://subnets.ru/books/Getting-Started-with-Webrtc-2013-Rob-Manson.pdf'
-  }}>
+  <Story
+    name="pdf"
+    args={{
+      index: 0,
+      fitToWidth: true,
+      showActions: true,
+      showPagesCount: true,
+      showPreviews: true,
+      url: 'http://subnets.ru/books/Getting-Started-with-Webrtc-2013-Rob-Manson.pdf',
+    }}
+  >
     {PDFTemplate.bind({})}
   </Story>
 </Canvas>

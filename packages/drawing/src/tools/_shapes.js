@@ -2,6 +2,8 @@ import { fabric } from 'fabric/dist/fabric.min'
 
 import { defaultToolSettings } from '../constants'
 
+const DEFAULT_FILLER = 'rgba(0,0,0,1)'
+
 const commonDefaults = {
   noScaleCache: false,
 }
@@ -16,26 +18,27 @@ const strokeDefaults = {
   strokeUniform: true,
 }
 
-export const triangle = (params = {}) => new fabric.Triangle({
-  ...commonDefaults,
-  ...dimensionDefaults,
-  ...strokeDefaults,
-  ...params,
-  stroke: params.stroke,
-  fill: params.fill || defaultToolSettings.transparentColor,
-  strokeLineCap: 'butt',
-  strokeLineJoin: 'miter',
-  strokeMiterLimit: 40,
-})
+export const triangle = (parameters = {}) =>
+  new fabric.Triangle({
+    ...commonDefaults,
+    ...dimensionDefaults,
+    ...strokeDefaults,
+    ...parameters,
+    stroke: parameters.stroke,
+    fill: parameters.fill || defaultToolSettings.transparentColor,
+    strokeLineCap: 'butt',
+    strokeLineJoin: 'miter',
+    strokeMiterLimit: 40,
+  })
 
-export const triangleSolid = (params = {}) => {
-  const filler = params.stroke || params.fill || 'rgba(0,0,0,1)'
+export const triangleSolid = (parameters = {}) => {
+  const filler = parameters.stroke || parameters.fill || DEFAULT_FILLER
 
   return new fabric.Triangle({
     ...commonDefaults,
     ...dimensionDefaults,
     ...strokeDefaults,
-    ...params,
+    ...parameters,
     stroke: filler,
     fill: filler,
     strokeLineCap: 'butt',
@@ -44,29 +47,31 @@ export const triangleSolid = (params = {}) => {
   })
 }
 
-const trianglePath = (width = 100, height = 100) => `'M 0 0 L ${width} 0 L 0 ${height} z'`
+const trianglePath = (width = 100, height = 100) =>
+  `'M 0 0 L ${width} 0 L 0 ${height} z'`
 
-export const rightTriangle = (params = {}) => new fabric.Path(trianglePath(params.width, params.height), {
-  ...commonDefaults,
-  ...dimensionDefaults,
-  ...strokeDefaults,
-  ...params,
-  flipY: true,
-  stroke: params.stroke,
-  fill: params.fill || defaultToolSettings.transparentColor,
-  strokeLineCap: 'butt',
-  strokeLineJoin: 'miter',
-  strokeMiterLimit: 40,
-})
-
-export const rightTriangleSolid = (params = {}) => {
-  const filler = params.stroke || params.fill || 'rgba(0,0,0,1)'
-
-  return new fabric.Path(trianglePath(params.width, params.height), {
+export const rightTriangle = (parameters = {}) =>
+  new fabric.Path(trianglePath(parameters.width, parameters.height), {
     ...commonDefaults,
     ...dimensionDefaults,
     ...strokeDefaults,
-    ...params,
+    ...parameters,
+    flipY: true,
+    stroke: parameters.stroke,
+    fill: parameters.fill || defaultToolSettings.transparentColor,
+    strokeLineCap: 'butt',
+    strokeLineJoin: 'miter',
+    strokeMiterLimit: 40,
+  })
+
+export const rightTriangleSolid = (parameters = {}) => {
+  const filler = parameters.stroke || parameters.fill || DEFAULT_FILLER
+
+  return new fabric.Path(trianglePath(parameters.width, parameters.height), {
+    ...commonDefaults,
+    ...dimensionDefaults,
+    ...strokeDefaults,
+    ...parameters,
     flipY: true,
     stroke: filler,
     fill: filler,
@@ -76,45 +81,47 @@ export const rightTriangleSolid = (params = {}) => {
   })
 }
 
-export const circle = (params = {}) => new fabric.WhiteboardCircle({
-  ...commonDefaults,
-  radius: 65,
-  ...strokeDefaults,
-  ...params,
-  stroke: params.stroke,
-  fill: params.fill || defaultToolSettings.transparentColor,
-})
+export const circle = (parameters = {}) =>
+  new fabric.WhiteboardCircle({
+    ...commonDefaults,
+    radius: 65,
+    ...strokeDefaults,
+    ...parameters,
+    stroke: parameters.stroke,
+    fill: parameters.fill || defaultToolSettings.transparentColor,
+  })
 
-export const circleSolid = (params = {}) => {
-  const filler = params.stroke || params.fill || 'rgba(0,0,0,1)'
+export const circleSolid = (parameters = {}) => {
+  const filler = parameters.stroke || parameters.fill || DEFAULT_FILLER
 
   return new fabric.WhiteboardCircle({
     ...commonDefaults,
     radius: 65,
     ...strokeDefaults,
-    ...params,
+    ...parameters,
     stroke: filler,
     fill: filler,
   })
 }
 
-export const rectangle = (params = {}) => new fabric.Rect({
-  ...commonDefaults,
-  ...dimensionDefaults,
-  ...strokeDefaults,
-  ...params,
-  stroke: params.stroke,
-  fill: params.fill || defaultToolSettings.transparentColor,
-})
+export const rectangle = (parameters = {}) =>
+  new fabric.Rect({
+    ...commonDefaults,
+    ...dimensionDefaults,
+    ...strokeDefaults,
+    ...parameters,
+    stroke: parameters.stroke,
+    fill: parameters.fill || defaultToolSettings.transparentColor,
+  })
 
-export const rectangleSolid = (params = {}) => {
-  const filler = params.stroke || params.fill || 'rgba(0,0,0,1)'
+export const rectangleSolid = (parameters = {}) => {
+  const filler = parameters.stroke || parameters.fill || DEFAULT_FILLER
 
   return new fabric.Rect({
     ...commonDefaults,
     ...dimensionDefaults,
     ...strokeDefaults,
-    ...params,
+    ...parameters,
     stroke: filler,
     fill: filler,
   })

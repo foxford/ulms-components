@@ -35,7 +35,7 @@ const styles = {
     color: '#fff',
   },
   options: {
-    zIndex: 10000,
+    zIndex: 10_000,
   },
 }
 
@@ -63,7 +63,7 @@ const Root = styled.div`
   `}}
 `
 
-function _Tooltip ({
+function _Tooltip({
   children,
   className,
   customStyles = {},
@@ -74,28 +74,27 @@ function _Tooltip ({
 }) {
   const computedStyles = useMemo(
     () => merge({}, dark ? darkStyles : styles, customStyles),
-    [dark, customStyles]
+    [dark, customStyles],
   )
 
-  return disabled || hideTooltip
-    ? (
-      <Root className={className} disabled={disabled}>
-        {children}
-      </Root>
-    )
-    : (
-      <TooltipComponent
-        event='hover'
-        eventDelay={0}
-        offset={5}
-        styles={computedStyles}
-        {...tooltipProps}
-      >
-        {children}
-      </TooltipComponent>
-    )
+  return disabled || hideTooltip ? (
+    <Root className={className} disabled={disabled}>
+      {children}
+    </Root>
+  ) : (
+    <TooltipComponent
+      event="hover"
+      eventDelay={0}
+      offset={5}
+      styles={computedStyles}
+      {...tooltipProps}
+    >
+      {children}
+    </TooltipComponent>
+  )
 }
 
 const Tooltip = memo(_Tooltip)
 
+// eslint-disable-next-line import/prefer-default-export
 export { Tooltip }

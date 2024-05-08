@@ -29,8 +29,13 @@ export const LineTypes = [ObjectTypes.LINE, ObjectTypes.ARROW]
 
 export const ColorTypes = [...ShapeTypes, ...LineTypes, ObjectTypes.TEXT]
 
-export const settingsGroupContainerStyles = { marginTop: '-16px', marginLeft: '-2px' }
+export const settingsGroupContainerStyles = {
+  marginTop: '-16px',
+  marginLeft: '-2px',
+}
 
-export const contextMenuContainerStyles = direction => ({
-  left: '-12px', padding: '8px 12px', top: direction === 'top' ? '2px' : '-2px',
+export const contextMenuContainerStyles = (direction) => ({
+  left: '-12px',
+  padding: '8px 12px',
+  top: direction === 'top' ? '2px' : '-2px',
 })

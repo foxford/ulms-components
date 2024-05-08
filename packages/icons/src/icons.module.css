@@ -9,10 +9,8 @@
   --icons-size-xl: 34px;
   --icons-size-xxl: 38px;
   --icons-size-xxxl: 42px;
-}
 
-.root {
-  color: currentColor;
+  color: currentcolor;
   color: var(--media-ui-icons-color);
   display: inline-block;
   flex-shrink: 0;
@@ -20,9 +18,11 @@
   vertical-align: baseline;
   width: 1em;
 }
+
 .root:hover {
   color: var(--media-ui-icons-color-hover);
 }
+
 .root:active {
   color: var(--media-ui-icons-color-active);
 }
@@ -34,14 +34,15 @@
 }
 
 .root svg path {
-  fill: currentColor;
+  fill: currentcolor;
 }
 
 .root.bullet svg path {
   fill: transparent;
-  stroke: currentColor;
+  stroke: currentcolor;
 }
 
+/* stylelint-disable */
 :export {
   sizeXXXS: var(--icons-size-xxxs);
   sizeXXS: var(--icons-size-xxs);
@@ -54,3 +55,4 @@
   sizeXXL: var(--icons-size-xxl);
   sizeXXXL: var(--icons-size-xxxl);
 }
+/* stylelint-enable */

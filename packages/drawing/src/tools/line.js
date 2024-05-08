@@ -7,8 +7,9 @@ import { WhiteboardLine } from './_primitives'
 const MIN_DELTA = 0.2
 const POINT_DELTA = 2
 
+// eslint-disable-next-line import/prefer-default-export
 export class LineTool extends Base {
-  constructor (canvas) {
+  constructor(canvas) {
     super(canvas)
 
     this.__object = null
@@ -21,10 +22,10 @@ export class LineTool extends Base {
     this.__startPoint = null
     this.__currentPoint = null
 
-    this._canvas.forEachObject(_ => makeNotInteractive(_))
+    this._canvas.forEachObject((_) => makeNotInteractive(_))
   }
 
-  _createObject () {
+  _createObject() {
     this.__object = new WhiteboardLine([], {
       fill: this.__color,
       stroke: this.__color,
@@ -37,7 +38,7 @@ export class LineTool extends Base {
     })
   }
 
-  configure (props) {
+  configure(props) {
     this.__color = props.lineColor
     this.__width = props.lineWidth
     this.__dash = props.dashArray
@@ -50,39 +51,40 @@ export class LineTool extends Base {
     }
     // In order not to bypass objects every time, we pass only when the brush is initialized
     if (props.initial) {
-      this._canvas.forEachObject(_ => makeNotInteractive(_))
+      this._canvas.forEachObject((_) => makeNotInteractive(_))
     }
   }
 
-  #handleKeyEvent (e) {
+  #handleKeyEvent(event) {
     if (!this._active) return
 
     const changed =
-      this.__shiftPressed !== e.shiftKey
-      || this.__cmdPressed !== e.metaKey
-      || this.__ctrlPressed !== e.ctrlKey
+      this.__shiftPressed !== event.shiftKey ||
+      this.__cmdPressed !== event.metaKey ||
+      this.__ctrlPressed !== event.ctrlKey
 
-    this.__shiftPressed = e.shiftKey
-    this.__cmdPressed = e.metaKey
-    this.__ctrlPressed = e.ctrlKey
+    this.__shiftPressed = event.shiftKey
+    this.__cmdPressed = event.metaKey
+    this.__ctrlPressed = event.ctrlKey
 
-    changed && this._reshape()
+    if (changed) this._reshape()
   }
 
-  handleKeyDownEvent (e) {
-    this.#handleKeyEvent(e)
+  handleKeyDownEvent(event) {
+    this.#handleKeyEvent(event)
   }
 
-  handleKeyUpEvent (e) {
-    this.#handleKeyEvent(e)
+  handleKeyUpEvent(event) {
+    this.#handleKeyEvent(event)
   }
 
-  #preparePoint (e) {
-    const point = this._canvas.getPointer(e)
+  #preparePoint(event) {
+    const point = this._canvas.getPointer(event)
 
     if (!(this.__cmdPressed || this.__ctrlPressed)) {
       return point
     }
+
     point.x = snapCoord(point.x)
     point.y = snapCoord(point.y)
 
@@ -90,14 +92,14 @@ export class LineTool extends Base {
   }
 
   // eslint-disable-next-line class-methods-use-this
-  handleObjectAddedEvent (opts) {
-    makeNotInteractive(opts.target)
+  handleObjectAddedEvent(options) {
+    makeNotInteractive(options.target)
   }
 
-  handleMouseDownEvent (opts) {
+  handleMouseDownEvent(options) {
     if (!this._active) return
 
-    this.__startPoint = this.#preparePoint(opts.e)
+    this.__startPoint = this.#preparePoint(options.e)
 
     this._createObject()
 
@@ -110,20 +112,23 @@ export class LineTool extends Base {
     this.__isDrawing = true
   }
 
-  handleMouseMoveEvent (opts) {
+  handleMouseMoveEvent(options) {
     if (!this._active) return
     if (!this.__isDrawing) return
 
-    this.__currentPoint = this.#preparePoint(opts.e)
+    this.__currentPoint = this.#preparePoint(options.e)
     this._reshape()
   }
 
-  _reshape () {
+  _reshape() {
     if (!this.__isDrawing) return
 
     const { x, y } = this.__currentPoint
 
-    if (this.__isOnCanvas || calcDistance(this.__startPoint, { x, y }) > POINT_DELTA) {
+    if (
+      this.__isOnCanvas ||
+      calcDistance(this.__startPoint, { x, y }) > POINT_DELTA
+    ) {
       let diff = {
         x1: this.__startPoint.x,
         y1: this.__startPoint.y,
@@ -138,28 +143,39 @@ export class LineTool extends Base {
         const minDelta = Math.min(deltaX, deltaY)
         const delta = deltaX - deltaY
 
-        if (Math.abs(delta) < (maxDelta * MIN_DELTA)) {
+        if (Math.abs(delta) < maxDelta * MIN_DELTA) {
           diff = {
-            ...diff, x2: this.__startPoint.x - signX * minDelta, y2: this.__startPoint.y - signY * minDelta,
+            ...diff,
+            x2: this.__startPoint.x - signX * minDelta,
+            y2: this.__startPoint.y - signY * minDelta,
           }
         } else if (delta > 0) {
           diff = {
-            ...diff, x2: x, y2: this.__startPoint.y + 0.001,
+            ...diff,
+            x2: x,
+            y2: this.__startPoint.y + 0.001,
           }
         } else {
           diff = {
-            ...diff, x2: this.__startPoint.x + 0.001, y2: y,
+            ...diff,
+            x2: this.__startPoint.x + 0.001,
+            y2: y,
           }
         }
       } else {
         diff = {
-          ...diff, x2: x, y2: y,
+          ...diff,
+          x2: x,
+          y2: y,
         }
       }
 
       this.__object.set(diff)
 
-      this.__object._id && this._throttledSendMessage(this.__object._id, diff)
+      if (this.__object._id) {
+        this._throttledSendMessage(this.__object._id, diff)
+      }
+
       if (!this.__isOnCanvas) {
         this.__isOnCanvas = true
         this._canvas.add(this.__object)
@@ -169,7 +185,7 @@ export class LineTool extends Base {
     }
   }
 
-  handleMouseUpEvent () {
+  handleMouseUpEvent() {
     if (!this._active) return
     if (!this.__isDrawing) return
 
@@ -186,7 +202,7 @@ export class LineTool extends Base {
     this._canvas.renderAll()
   }
 
-  reset () {
+  reset() {
     this._canvas.renderAll()
 
     this.__isDrawing = false

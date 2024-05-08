@@ -1,4 +1,3 @@
-// eslint-disable-next-line import/no-extraneous-dependencies
 import debounce from 'lodash/debounce'
 
 import { keycodes, DEBOUNCE_DELAY } from '../constants'
@@ -8,6 +7,7 @@ import { Base } from './base'
 import { makeInteractive, makeNotInteractive } from './object'
 import SelectTool from './select'
 
+// eslint-disable-next-line import/prefer-default-export
 export class LockTool extends Base {
   static updateAllLock = (canvas) => {
     canvas.forEachObject((object) => {
@@ -20,7 +20,7 @@ export class LockTool extends Base {
     })
   }
 
-  static updateObjectLock (object) {
+  static updateObjectLock(object) {
     if (LockProvider.isLockedBySelection(object)) {
       makeNotInteractive(object)
     } else {
@@ -28,8 +28,8 @@ export class LockTool extends Base {
     }
   }
 
-  constructor (ctx, onLock) {
-    super(ctx)
+  constructor(context, onLock) {
+    super(context)
 
     this.__mouseDown = false
     this.__selectionLocked = false
@@ -37,26 +37,27 @@ export class LockTool extends Base {
 
     this.__onLockListener = onLock
 
-    onLock && this._canvas.on('text:editing:exited', this._handleEditingExited)
-    onLock && this._canvas.on('text:editing:entered', this._handleEditingEntered)
-
-    onLock && this._canvas.on('mouse:down', this._handleMouseDownEvent)
-    onLock && this._canvas.on('mouse:move', this._handleMouseMoveEvent)
-    onLock && this._canvas.on('mouse:up', this._handleMouseUpEvent)
+    if (this.__onLockListener) {
+      this._canvas.on('text:editing:exited', this._handleEditingExited)
+      this._canvas.on('text:editing:entered', this._handleEditingEntered)
+      this._canvas.on('mouse:down', this._handleMouseDownEvent)
+      this._canvas.on('mouse:move', this._handleMouseMoveEvent)
+      this._canvas.on('mouse:up', this._handleMouseUpEvent)
+    }
 
     this._debouncedUnlock = debounce(() => {
       this._unlock()
     }, DEBOUNCE_DELAY)
   }
 
-  get activeSelection () {
+  get activeSelection() {
     return this._canvas.getActiveObjects()
   }
 
   _handleEditingExited = (event) => {
     const { target } = event
 
-    if (target.type === 'textbox' && target.text.length !== 0) {
+    if (target.type === 'textbox' && target.text.length > 0) {
       this._unlock()
       this.__textEditing = false
     }
@@ -72,15 +73,15 @@ export class LockTool extends Base {
   }
 
   _lock = () => {
-    if (this.activeSelection.length) {
+    if (this.activeSelection.length > 0) {
       const lockedIds = []
 
-      this.activeSelection.forEach((_) => {
+      for (const _ of this.activeSelection) {
         if (!LockProvider.isLockedByUser(_)) {
           lockedIds.push(_._id)
         }
-      })
-      if (lockedIds.length) {
+      }
+      if (lockedIds.length > 0) {
         this.__selectionLocked = true
         this.__onLockListener({ lockedIds })
       }
@@ -92,30 +93,36 @@ export class LockTool extends Base {
     this.__selectionLocked = false
   }
 
-  handleKeyDownEvent = (e) => {
-    if (!this._mouseMove && !this.__selectionLocked && !this.__textEditing) {
-      if ((e.keyCode === keycodes.UP_KEYCODE)
-        || (e.keyCode === keycodes.DOWN_KEYCODE)
-        || (e.keyCode === keycodes.LEFT_KEYCODE)
-        || (e.keyCode === keycodes.RIGHT_KEYCODE)) {
-        this._lock()
-      }
+  handleKeyDownEvent = (event) => {
+    if (
+      !this._mouseMove &&
+      !this.__selectionLocked &&
+      !this.__textEditing &&
+      (event.keyCode === keycodes.UP_KEYCODE ||
+        event.keyCode === keycodes.DOWN_KEYCODE ||
+        event.keyCode === keycodes.LEFT_KEYCODE ||
+        event.keyCode === keycodes.RIGHT_KEYCODE)
+    ) {
+      this._lock()
     }
   }
 
-  handleKeyUpEvent = (e) => {
-    if (!this._mouseMove && this.__selectionLocked && !this.__textEditing) {
-      if ((e.keyCode === keycodes.UP_KEYCODE)
-        || (e.keyCode === keycodes.DOWN_KEYCODE)
-        || (e.keyCode === keycodes.LEFT_KEYCODE)
-        || (e.keyCode === keycodes.RIGHT_KEYCODE)) {
-        this._debouncedUnlock()
-      }
+  handleKeyUpEvent = (event) => {
+    if (
+      !this._mouseMove &&
+      this.__selectionLocked &&
+      !this.__textEditing &&
+      (event.keyCode === keycodes.UP_KEYCODE ||
+        event.keyCode === keycodes.DOWN_KEYCODE ||
+        event.keyCode === keycodes.LEFT_KEYCODE ||
+        event.keyCode === keycodes.RIGHT_KEYCODE)
+    ) {
+      this._debouncedUnlock()
     }
   }
 
   _handleMouseDownEvent = () => {
-    if (!this.activeSelection.length) return
+    if (this.activeSelection.length === 0) return
 
     this.__mouseDown = true
   }
@@ -133,13 +140,14 @@ export class LockTool extends Base {
     }
   }
 
-  destroy () {
-    this.__onLockListener && this._canvas.on('text:editing:exited', this._handleEditingExited)
-    this.__onLockListener && this._canvas.on('text:editing:entered', this._handleEditingEntered)
-
-    this.__onLockListener && this._canvas.on('mouse:down', this._handleMouseDownEvent)
-    this.__onLockListener && this._canvas.on('mouse:move', this._handleMouseMoveEvent)
-    this.__onLockListener && this._canvas.on('mouse:up', this._handleMouseUpEvent)
+  destroy() {
+    if (this.__onLockListener) {
+      this._canvas.on('text:editing:exited', this._handleEditingExited)
+      this._canvas.on('text:editing:entered', this._handleEditingEntered)
+      this._canvas.on('mouse:down', this._handleMouseDownEvent)
+      this._canvas.on('mouse:move', this._handleMouseMoveEvent)
+      this._canvas.on('mouse:up', this._handleMouseUpEvent)
+    }
 
     this._canvas = undefined
   }

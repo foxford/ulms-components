@@ -1,7 +1,7 @@
 const DRAW_UPDATE_MESSAGE = 'draw-update'
 
 class CBroadcastProvider {
-  constructor () {
+  constructor() {
     this.__provider = null
   }
 
@@ -9,30 +9,31 @@ class CBroadcastProvider {
     DRAW_UPDATE: 'draw-update',
   }
 
-  set provider (provider) {
+  set provider(provider) {
     this.__provider = provider
   }
 
-  subscribe (handler) {
+  subscribe(handler) {
     if (this.__provider) {
       this.__provider.subscribe(DRAW_UPDATE_MESSAGE, handler)
     }
   }
 
-  unsubscribe () {
+  unsubscribe() {
     this.__provider.unsubscribe(DRAW_UPDATE_MESSAGE)
   }
 
-  sendMessage (data) {
+  sendMessage(data) {
     if (this.__provider) {
       this.__provider.publish(DRAW_UPDATE_MESSAGE, data)
     }
   }
 
-  destroy () {
+  destroy() {
     this.unsubscribe()
     this.__provider = null
   }
 }
 
+// eslint-disable-next-line import/prefer-default-export
 export const BroadcastProvider = new CBroadcastProvider()

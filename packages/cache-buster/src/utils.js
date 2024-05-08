@@ -1,6 +1,6 @@
 /* eslint-disable max-classes-per-file */
-function toSemver (versionStr) {
-  const [major, minor, patch] = versionStr.split('.')
+function toSemver(versionString) {
+  const [major, minor, patch] = versionString.split('.')
 
   return {
     major,
@@ -10,27 +10,27 @@ function toSemver (versionStr) {
 }
 
 export class FetchVersionResolver {
-  constructor (url, key = 'version') {
+  constructor(url, key = 'version') {
     this._url = url
     this._key = key
   }
 
-  resolve () {
+  resolve() {
     return fetch(this._url, { cache: 'no-cache' })
-      .then(response => response.json())
-      .then(response => response[this._key])
+      .then((response) => response.json())
+      .then((response) => response[this._key])
   }
 }
 
 export class VersionChecker {
-  constructor (resolver, version) {
+  constructor(resolver, version) {
     this._resolver = resolver
     this._version = version
 
     this._checkPromise = null
   }
 
-  static compare (local, remote) {
+  static compare(local, remote) {
     const localVersion = toSemver(local)
     const remoteVersion = toSemver(remote)
 
@@ -41,9 +41,10 @@ export class VersionChecker {
     }
   }
 
-  check () {
+  check() {
     if (!this._checkPromise) {
-      this._checkPromise = this._resolver.resolve()
+      this._checkPromise = this._resolver
+        .resolve()
         .then((version) => {
           this._checkPromise = null
 
@@ -59,7 +60,7 @@ export class VersionChecker {
     return this._checkPromise
   }
 
-  destroy () {
+  destroy() {
     this._resolver = null
     this._checkPromise = null
   }

@@ -1,29 +1,18 @@
 {
   "name": "@ulms/ui-presentation",
-  "version": "1.8.1",
-  "description": "",
-  "homepage": "https://github.com/netology-group/ulms-media-ui#readme",
-  "bugs": {
-    "url": "https://github.com/netology-group/ulms-media-ui/issues"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/netology-group/ulms-media-ui.git"
-  },
+  "version": "1.8.2",
   "license": "MIT",
-  "author": "",
   "main": "index.js",
   "module": "es/index.js",
   "files": [
-    "es",
-    "src"
+    "es"
   ],
   "scripts": {
-    "build": "rm -rf ./es/* && BABEL_ENV=es rollup --config ./rollup.config.js index.js"
+    "build": "rm -rf ./es/* && rollup --config ../../rollup.config.mjs"
   },
   "dependencies": {
-    "@ulms/ui-icons": "*",
-    "@ulms/ui-spinner": "*",
+    "@ulms/ui-icons": "^1.0.2",
+    "@ulms/ui-spinner": "^1.0.2",
     "classnames-es": "2.2.6",
     "lodash": "~4.17.21",
     "prop-types": "^15.8.1",

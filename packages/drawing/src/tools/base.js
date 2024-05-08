@@ -5,53 +5,57 @@ import throttle from 'lodash/throttle'
 import { BroadcastProvider } from '../broadcast-provider'
 import { THROTTLE_DELAY } from '../constants'
 
+// eslint-disable-next-line import/prefer-default-export
 export class Base {
-  constructor (canvas) {
+  constructor(canvas) {
     this._active = true
     this._canvas = canvas
 
-    this._throttledSendMessage = throttle((id, diff) => BroadcastProvider.sendMessage({ id, diff }), THROTTLE_DELAY)
+    this._throttledSendMessage = throttle(
+      (id, diff) => BroadcastProvider.sendMessage({ id, diff }),
+      THROTTLE_DELAY,
+    )
   }
 
-  configure () {}
+  configure() {}
 
-  destroy () {}
+  destroy() {}
 
-  handleTextEditStartEvent () {}
+  handleTextEditStartEvent() {}
 
-  handleTextEditEndEvent () {}
+  handleTextEditEndEvent() {}
 
-  handleTextChangedEvent () {}
+  handleTextChangedEvent() {}
 
-  handleKeyDownEvent () {}
+  handleKeyDownEvent() {}
 
-  handleKeyUpEvent () {}
+  handleKeyUpEvent() {}
 
-  handleMouseDownEvent () {}
+  handleMouseDownEvent() {}
 
-  handleMouseMoveEvent () {}
+  handleMouseMoveEvent() {}
 
-  handleMouseUpEvent () {}
+  handleMouseUpEvent() {}
 
-  handleMouseOverEvent () {}
+  handleMouseOverEvent() {}
 
-  handleMouseOutEvent () {}
+  handleMouseOutEvent() {}
 
-  handleObjectAddedEvent () {}
+  handleObjectAddedEvent() {}
 
-  handleSelectionUpdatedEvent () {}
+  handleSelectionUpdatedEvent() {}
 
-  handleSelectionCreatedEvent () {}
+  handleSelectionCreatedEvent() {}
 
-  handleSelectionClearedEvent () {}
+  handleSelectionClearedEvent() {}
 
-  makeActive () {
+  makeActive() {
     this._active = true
   }
 
-  makeInactive () {
+  makeInactive() {
     this._active = false
   }
 
-  reset () {}
+  reset() {}
 }

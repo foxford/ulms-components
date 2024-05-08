@@ -17,7 +17,7 @@ describe('`updateAllSelection` on onlineIds change is ok', () => {
   beforeEach(() => {
     jest
       .spyOn(window, 'requestAnimationFrame')
-      .mockImplementationOnce(cb => cb())
+      .mockImplementationOnce((callback) => callback())
   })
 
   afterEach(() => {})
@@ -27,14 +27,15 @@ describe('`updateAllSelection` on onlineIds change is ok', () => {
 
     lockProvider.lockedIds = []
 
-    const wrap = shallow((
+    const wrap = shallow(
+      // eslint-disable-next-line react/jsx-filename-extension
       <Drawing
         _lockProvider={lockProvider}
         tokenProvider={tokenProvider}
         pageObjects={[]}
         tool={toolEnum.SELECT}
-      />
-    ))
+      />,
+    )
 
     const instance = wrap.instance()
 
@@ -44,17 +45,17 @@ describe('`updateAllSelection` on onlineIds change is ok', () => {
   })
 
   it('`handleTextEditStartEvent` sets style for hiddenTextarea', () => {
-    const wrap = shallow((
+    const wrap = shallow(
       <Drawing
         tokenProvider={tokenProvider}
         pageObjects={[]}
         tool={toolEnum.SELECT}
-      />
-    ))
+      />,
+    )
 
     const instance = wrap.instance()
     const st = new SelectTool(instance.canvas, {})
-    const opts = {
+    const options = {
       target: {
         hiddenTextarea: {
           style: {},
@@ -62,10 +63,12 @@ describe('`updateAllSelection` on onlineIds change is ok', () => {
       },
     }
 
-    st.handleTextEditStartEvent(opts)
+    st.handleTextEditStartEvent(options)
 
-    expect(opts.target.hiddenTextarea.style).toEqual({
-      width: '10px', height: '10px', fontSize: '10px',
+    expect(options.target.hiddenTextarea.style).toEqual({
+      width: '10px',
+      height: '10px',
+      fontSize: '10px',
     })
   })
 })

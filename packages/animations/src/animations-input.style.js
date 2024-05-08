@@ -2,11 +2,12 @@ import styled from 'styled-components'
 import { Text } from '@foxford/ui'
 import { Tooltip } from '@ulms/tooltip'
 
-const calculateColor = ({ disabled, theme }) => `${
-  disabled
-    ? theme.colors['content-disabled']
-    : theme.colors['content-onmain-primary']
-}`
+const calculateColor = ({ disabled, theme }) =>
+  `${
+    disabled
+      ? theme.colors['content-disabled']
+      : theme.colors['content-onmain-primary']
+  }`
 
 export const Root = styled.div`
   ${({ isDisabled, theme }) => `
@@ -39,9 +40,7 @@ export const AnimationsItems = styled.div`
 `
 
 export const AnimationItem = styled.div`
-  ${({
-    isDisabled, isTouch, previewSrc, theme,
-  }) => `
+  ${({ isDisabled, isTouch, previewSrc, theme }) => `
     display: flex;
     align-items: flex-end;
     justify-content: center;
@@ -57,12 +56,12 @@ export const AnimationItem = styled.div`
     }
 
     ${
-  !isDisabled
-      && !isTouch
-      && `&:hover {
+      !isDisabled &&
+      !isTouch &&
+      `&:hover {
         background: ${theme.colors['bg-brand-primary-100-hover']};
       }`
-}
+    }
   `}
 `
 

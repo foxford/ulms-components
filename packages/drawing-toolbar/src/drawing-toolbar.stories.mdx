@@ -1,5 +1,5 @@
-import { Meta, Story, Canvas } from '@storybook/addon-docs/blocks';
-import { DrawingToolbar } from '../index';
+import { Meta, Story, Canvas } from '@storybook/addon-docs/blocks'
+import { DrawingToolbar } from '../index'
 
 <Meta title="Organisms/DrawingToolbar" component={DrawingToolbar} />
 
@@ -33,14 +33,18 @@ export const Template = ({
     fit={fit}
     grid={grid}
     handleChange={(_) => {
-      const notify = (_) => { new Notification(JSON.stringify(_)) }
-      if(window.Notification && Notification.permission === "granted"){
+      const notify = (_) => {
+        new Notification(JSON.stringify(_))
+      }
+      if (window.Notification && Notification.permission === 'granted') {
         notify(_)
-      } else if(window.Notification && Notification.permission !== "denied"){
+      } else if (window.Notification && Notification.permission !== 'denied') {
         Notification.requestPermission()
           .then(function (permission) {
             // If the user accepts, let's create a notification
-            if (permission === "granted") { notify(_) }
+            if (permission === 'granted') {
+              notify(_)
+            }
           })
           .catch(console.error)
       } else {
@@ -60,22 +64,38 @@ export const Template = ({
 )
 
 <Canvas>
-  <Story name="default" args={{
-    brushColor: { r:0, g:0, b: 0, a: 1 },
-    brushMode: 'line',
-    brushWidth: { pencil: 2, marker: 12, line: 2 },
-    eraserPrecision: 4,
-    eraserWidth: 8,
-    fit: false,
-    grid: true,
-    hasLockSelection: false,
-    locale: 'ru',
-    shapeMode: 'rect',
-    stampMode: 'pleased',
-    tool: 'pen',
-    tools: ['color', 'eraser', 'fit', 'grid', 'image', 'lock', 'pan', 'pen', 'select', 'shape', 'text', 'zoom'],
-    zoom: 1,
-  }}>
+  <Story
+    name="default"
+    args={{
+      brushColor: { r: 0, g: 0, b: 0, a: 1 },
+      brushMode: 'line',
+      brushWidth: { pencil: 2, marker: 12, line: 2 },
+      eraserPrecision: 4,
+      eraserWidth: 8,
+      fit: false,
+      grid: true,
+      hasLockSelection: false,
+      locale: 'ru',
+      shapeMode: 'rect',
+      stampMode: 'pleased',
+      tool: 'pen',
+      tools: [
+        'color',
+        'eraser',
+        'fit',
+        'grid',
+        'image',
+        'lock',
+        'pan',
+        'pen',
+        'select',
+        'shape',
+        'text',
+        'zoom',
+      ],
+      zoom: 1,
+    }}
+  >
     {Template.bind({})}
   </Story>
 </Canvas>

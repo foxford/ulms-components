@@ -2,86 +2,97 @@ import { fabric } from 'fabric/dist/fabric.min'
 
 import tp from './token-provider'
 
-function matchesStorageURIScheme (url) {
+function matchesStorageURIScheme(url) {
   const re = /^.*\/api\/(.*)\/sets\/(.*)\/objects\/(.*)$/
 
   return url.match(re)
 }
 
 fabric.disableStyleCopyPaste = true
-const originalFabricLoadImageFn = fabric.util.loadImage
+const originalFabricLoadImageFunction = fabric.util.loadImage
 
-fabric.util.loadImage = function loadImage (url, callback, context, crossOrigin) {
+fabric.util.loadImage = function loadImage(
+  url,
+  callback,
+  context,
+  crossOrigin,
+) {
   if (matchesStorageURIScheme(url)) {
     tp.getToken()
       .then((token) => {
-        if (url.indexOf('access_token') !== -1) {
-          originalFabricLoadImageFn(
+        if (url.includes('access_token')) {
+          originalFabricLoadImageFunction(
             url.replace(/\?access_token=(.*)$/i, `?access_token=${token}`),
             callback,
             context,
-            crossOrigin
+            crossOrigin,
           )
         } else {
-          originalFabricLoadImageFn(`${url}?access_token=${token}`, callback, context, crossOrigin)
+          originalFabricLoadImageFunction(
+            `${url}?access_token=${token}`,
+            callback,
+            context,
+            crossOrigin,
+          )
         }
 
         return null
       })
-      .catch(error => console.log(error)) // eslint-disable-line no-console
+      .catch((error) => console.log(error)) // eslint-disable-line no-console
   } else {
-    originalFabricLoadImageFn(url, callback, context, crossOrigin)
+    originalFabricLoadImageFunction(url, callback, context, crossOrigin)
   }
 }
 
-fabric.Line.prototype.calcLineEndpointCoords = function calcLineEndpointCoords () {
-  if (!this.canvas) {
-    return {
-      startCoords: { x: 0, y: 0 },
-      endCoords: { x: 0, y: 0 },
+fabric.Line.prototype.calcLineEndpointCoords =
+  function calcLineEndpointCoords() {
+    if (!this.canvas) {
+      return {
+        startCoords: { x: 0, y: 0 },
+        endCoords: { x: 0, y: 0 },
+      }
     }
+
+    const linePoints = this.calcLinePoints()
+    const scaleX = this.scaleX || 1
+    const scaleY = this.scaleY || 1
+    const zoom = this.canvas.getZoom()
+    const x = this.canvas.viewportTransform[4]
+    const y = this.canvas.viewportTransform[5]
+
+    let startCoords
+    let endCoords
+
+    if ((this.flipY && this.flipX) || (!this.flipY && !this.flipX)) {
+      startCoords = {
+        x: x + (this.left + linePoints.x1 * scaleX) * zoom,
+        y: y + (this.top + linePoints.y1 * scaleY) * zoom,
+      }
+      endCoords = {
+        x: x + (this.left + linePoints.x2 * scaleX) * zoom,
+        y: y + (this.top + linePoints.y2 * scaleY) * zoom,
+      }
+    } else {
+      startCoords = {
+        x: x + (this.left + linePoints.x1 * scaleX) * zoom,
+        y: y + (this.top + linePoints.y2 * scaleY) * zoom,
+      }
+      endCoords = {
+        x: x + (this.left + linePoints.x2 * scaleX) * zoom,
+        y: y + (this.top + linePoints.y1 * scaleY) * zoom,
+      }
+    }
+
+    return { startCoords, endCoords }
   }
-
-  const linePoints = this.calcLinePoints()
-  const scaleX = this.scaleX || 1
-  const scaleY = this.scaleY || 1
-  const zoom = this.canvas.getZoom()
-  const x = this.canvas.viewportTransform[4]
-  const y = this.canvas.viewportTransform[5]
-
-  let startCoords
-  let endCoords
-
-  if ((this.flipY && this.flipX) || (!this.flipY && !this.flipX)) {
-    startCoords = {
-      x: x + (this.left + linePoints.x1 * scaleX) * zoom,
-      y: y + (this.top + linePoints.y1 * scaleY) * zoom,
-    }
-    endCoords = {
-      x: x + (this.left + linePoints.x2 * scaleX) * zoom,
-      y: y + (this.top + linePoints.y2 * scaleY) * zoom,
-    }
-  } else {
-    startCoords = {
-      x: x + (this.left + linePoints.x1 * scaleX) * zoom,
-      y: y + (this.top + linePoints.y2 * scaleY) * zoom,
-    }
-    endCoords = {
-      x: x + (this.left + linePoints.x2 * scaleX) * zoom,
-      y: y + (this.top + linePoints.y1 * scaleY) * zoom,
-    }
-  }
-
-  return { startCoords, endCoords }
-}
 
 // Эта подмена нужна, чтобы поправить баг с неправильным определением места курсора при печати длинного текста
 // Это копипаста из Фабрика
 const textBoxOnInput = fabric.Textbox.prototype.onInput
 const textBoxFromObject = fabric.Textbox.fromObject
 
-fabric.Textbox.prototype.onInput = function onInput (e) {
-  textBoxOnInput.call(this, e)
+fabric.Textbox.prototype.onInput = function onInput(event) {
+  textBoxOnInput.call(this, event)
 
   if (this.canvas) {
     // Пересобираем кэш длин символов
@@ -96,23 +107,24 @@ fabric.Textbox.prototype.onInput = function onInput (e) {
   }
 }
 
-fabric.Textbox.fromObject = function fromObject (object, callback) {
+fabric.Textbox.fromObject = function fromObject(object, callback) {
   if (object.fontFamily.includes('BlinkMacSystemFont')) {
     // eslint-disable-next-line no-param-reassign
-    object.fontFamily = object.fontFamily.split(', ').filter(item => item !== 'BlinkMacSystemFont').join(', ')
+    object.fontFamily = object.fontFamily
+      .split(', ')
+      .filter((item) => item !== 'BlinkMacSystemFont')
+      .join(', ')
   }
   textBoxFromObject.call(this, object, callback)
 }
 
 // Вычисляет абсолютные координаты объекта во вьюпорте документа
-fabric.Canvas.prototype.getAbsoluteCoords = function getAbsoluteCoords (object) {
+fabric.Canvas.prototype.getAbsoluteCoords = function getAbsoluteCoords(object) {
   const canvasZoom = this.getZoom()
   const x = this.viewportTransform[4]
   const y = this.viewportTransform[5]
 
-  const {
-    top, left, width, height,
-  } = object.getBoundingRect(true)
+  const { top, left, width, height } = object.getBoundingRect(true)
 
   return {
     left: x + left * canvasZoom,
@@ -124,7 +136,7 @@ fabric.Canvas.prototype.getAbsoluteCoords = function getAbsoluteCoords (object) 
   }
 }
 
-function commonEventInfo (eventData, transform, x, y) {
+function commonEventInfo(eventData, transform, x, y) {
   return {
     e: eventData,
     transform,
@@ -144,33 +156,37 @@ function commonEventInfo (eventData, transform, x, y) {
  * @param {number} y current mouse y position, canvas normalized
  * @return {Boolean} true if the translation occurred
  */
-function dragHandler (eventData, transform, x, y) {
-  const { target } = transform
-  const newLeft = x - transform.offsetX
-  const newTop = y - transform.offsetY
+function dragHandler(eventData, transform, x, y) {
+  const { lastX, lastY, offsetX, offsetY, shiftKey, target } = transform
+  const newLeft = x - offsetX
+  const newTop = y - offsetY
   let lockX = false
   let lockY = false
 
   // Если нажат shift - лочим движение по Х или Y
-  if (transform.shiftKey) {
-    if (Math.abs(x - transform.lastX) > Math.abs(y - transform.lastY)) {
+  if (shiftKey) {
+    if (Math.abs(x - lastX) > Math.abs(y - lastY)) {
       lockY = true
     } else {
       lockX = true
     }
   }
 
-  const moveX = !target.get('lockMovementX') && !lockX && target.left !== newLeft
+  const moveX =
+    !target.get('lockMovementX') && !lockX && target.left !== newLeft
   const moveY = !target.get('lockMovementY') && !lockY && target.top !== newTop
 
-  moveX && target.set('left', newLeft)
-  moveY && target.set('top', newTop)
+  if (moveX) target.set('left', newLeft)
+  if (moveY) target.set('top', newTop)
 
-  lockX && target.set('left', transform.lastX - transform.offsetX)
-  lockY && target.set('top', transform.lastY - transform.offsetY)
+  if (lockX) target.set('left', lastX - offsetX)
+  if (lockY) target.set('top', lastY - offsetY)
 
   if (moveX || moveY) {
-    fabric.controlsUtils.fireEvent('moving', commonEventInfo(eventData, transform, x, y))
+    fabric.controlsUtils.fireEvent(
+      'moving',
+      commonEventInfo(eventData, transform, x, y),
+    )
   }
 
   return moveX || moveY
@@ -178,7 +194,8 @@ function dragHandler (eventData, transform, x, y) {
 
 fabric.controlsUtils.dragHandler = dragHandler
 
-const rotateIcon = "data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M16 4C16.5893 6.23917 17.0607 11.4246 14.2322 14.253C11.4038 17.0815 6.21836 16.6101 3.97918 16.0208M16 4L14.2322 6.82843M16 4L18.8284 6.82843M3.97918 16.0208L6.80761 18.8492M3.97918 16.0208L7.61084 14.1318' stroke='%238A51E6'/%3E%3C/svg%3E%0A"
+const rotateIcon =
+  "data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M16 4C16.5893 6.23917 17.0607 11.4246 14.2322 14.253C11.4038 17.0815 6.21836 16.6101 3.97918 16.0208M16 4L14.2322 6.82843M16 4L18.8284 6.82843M3.97918 16.0208L6.80761 18.8492M3.97918 16.0208L7.61084 14.1318' stroke='%238A51E6'/%3E%3C/svg%3E%0A"
 
 const rotateImg = document.createElement('img')
 
@@ -196,23 +213,26 @@ const SNAP_ANGLE = 45
  * @return {Boolean} true if some change happened
  * @private
  */
-function rotationWithSnapping (eventData, transform, x, y) {
-  const t = transform
+function rotationWithSnapping(eventData, transform, x, y) {
+  const { ex, ey, originX, originY, shiftKey, target, theta } = transform
 
-  const { target } = t
-  const pivotPoint = target.translateToOriginPoint(target.getCenterPoint(), t.originX, t.originY)
+  const pivotPoint = target.translateToOriginPoint(
+    target.getCenterPoint(),
+    originX,
+    originY,
+  )
 
   if (target.lockRotation) {
     return false
   }
 
-  const lastAngle = Math.atan2(t.ey - pivotPoint.y, t.ex - pivotPoint.x)
-  const curAngle = Math.atan2(y - pivotPoint.y, x - pivotPoint.x)
-  let angle = fabric.util.radiansToDegrees(curAngle - lastAngle + t.theta)
+  const lastAngle = Math.atan2(ey - pivotPoint.y, ex - pivotPoint.x)
+  const currentAngle = Math.atan2(y - pivotPoint.y, x - pivotPoint.x)
+  let angle = fabric.util.radiansToDegrees(currentAngle - lastAngle + theta)
   let hasRotated = true
 
   // Теперь еще проверяем нажатый shift
-  if (target.snapAngle > 0 || transform.shiftKey) {
+  if (target.snapAngle > 0 || shiftKey) {
     const snapAngle = target.snapAngle || SNAP_ANGLE
     const snapThreshold = target.snapThreshold || snapAngle
     const rightAngleLocked = Math.ceil(angle / snapAngle) * snapAngle
@@ -239,18 +259,18 @@ function rotationWithSnapping (eventData, transform, x, y) {
 
 const wrappedRotationWithSnapping = fabric.controlsUtils.wrapWithFireEvent(
   'rotating',
-  fabric.controlsUtils.wrapWithFixedAnchor(rotationWithSnapping)
+  fabric.controlsUtils.wrapWithFixedAnchor(rotationWithSnapping),
 )
 
-function renderRotateIcon () {
-  return function renderIcon (ctx, left, top, styleOverride, fabricObject) {
+function renderRotateIcon() {
+  return function renderIcon(context, left, top, styleOverride, fabricObject) {
     const size = this.cornerSize
 
-    ctx.save()
-    ctx.translate(left, top)
-    ctx.rotate(fabric.util.degreesToRadians(fabricObject.angle))
-    ctx.drawImage(rotateImg, -size / 2, -size / 2, size, size)
-    ctx.restore()
+    context.save()
+    context.translate(left, top)
+    context.rotate(fabric.util.degreesToRadians(fabricObject.angle))
+    context.drawImage(rotateImg, -size / 2, -size / 2, size, size)
+    context.restore()
   }
 }
 

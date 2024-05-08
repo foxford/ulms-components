@@ -1,12 +1,17 @@
 import { calcDistance, snapCoord } from '../util'
 
-import { PositionableObject, adjustPosition, makeNotInteractive } from './object'
+import {
+  PositionableObject,
+  adjustPosition,
+  makeNotInteractive,
+} from './object'
 
 const POINT_DELTA = 2
 
+// eslint-disable-next-line import/prefer-default-export
 export class ShapeTool extends PositionableObject {
-  constructor (canvas, objectFn, options = {}) {
-    super(canvas, objectFn, options)
+  constructor(canvas, objectFunction, options = {}) {
+    super(canvas, objectFunction, options)
 
     this.__isOnCanvas = false
     this.__startPoint = null
@@ -18,13 +23,14 @@ export class ShapeTool extends PositionableObject {
     this.__ctrlPressed = false
   }
 
-  _reshape () {
+  _reshape() {
     if (!this._active) return
     if (!this.__isDrawing) return
 
     if (
-      this.__isOnCanvas
-      || (this.__currentPoint && calcDistance(this.__startPoint, this.__currentPoint) > POINT_DELTA)
+      this.__isOnCanvas ||
+      (this.__currentPoint &&
+        calcDistance(this.__startPoint, this.__currentPoint) > POINT_DELTA)
     ) {
       const currentWidth = this.__currentPoint.x - this.__startPoint.x
       const currentHeight = this.__currentPoint.y - this.__startPoint.y
@@ -41,23 +47,24 @@ export class ShapeTool extends PositionableObject {
       let scaleX
       let scaleY
 
-      if (this.__object.type === 'circle' || this.__object.type === 'WhiteboardCircle') {
-        if (this.__altPressed) {
-          diff = {
-            radius,
-            originX: 'center',
-            originY: 'center',
-          }
-        } else {
-          diff = {
-            radius: deltaX > deltaY ? deltaX / 2 : deltaY / 2,
-            originX: ((currentWidth < 0) ? 'right' : 'left'),
-            originY: ((currentHeight < 0) ? 'bottom' : 'top'),
-          }
-        }
+      if (
+        this.__object.type === 'circle' ||
+        this.__object.type === 'WhiteboardCircle'
+      ) {
+        diff = this.__altPressed
+          ? {
+              radius,
+              originX: 'center',
+              originY: 'center',
+            }
+          : {
+              radius: deltaX > deltaY ? deltaX / 2 : deltaY / 2,
+              originX: currentWidth < 0 ? 'right' : 'left',
+              originY: currentHeight < 0 ? 'bottom' : 'top',
+            }
       } else if (
-        this.__object.type === 'path'
-        || this.__object.type === 'WhiteboardRightTriangle'
+        this.__object.type === 'path' ||
+        this.__object.type === 'WhiteboardRightTriangle'
       ) {
         const { width: originalWidth, height: originalHeight } = this.__object
 
@@ -75,8 +82,16 @@ export class ShapeTool extends PositionableObject {
         }
 
         diff = {
-          originX: this.__altPressed ? 'center' : ((currentWidth < 0) ? 'right' : 'left'),
-          originY: this.__altPressed ? 'center' : ((currentHeight < 0) ? 'bottom' : 'top'),
+          originX: this.__altPressed
+            ? 'center'
+            : currentWidth < 0
+              ? 'right'
+              : 'left',
+          originY: this.__altPressed
+            ? 'center'
+            : currentHeight < 0
+              ? 'bottom'
+              : 'top',
           flipX: false,
           flipY: true,
           scaleX: scaleX * multiplier,
@@ -98,15 +113,27 @@ export class ShapeTool extends PositionableObject {
         diff = {
           width: width * multiplier,
           height: height * multiplier,
-          originX: this.__altPressed ? 'center' : ((currentWidth < 0) ? 'right' : 'left'),
-          originY: this.__altPressed ? 'center' : ((currentHeight < 0) ? 'bottom' : 'top'),
+          originX: this.__altPressed
+            ? 'center'
+            : currentWidth < 0
+              ? 'right'
+              : 'left',
+          originY: this.__altPressed
+            ? 'center'
+            : currentHeight < 0
+              ? 'bottom'
+              : 'top',
           flipX: currentWidth < 0,
           flipY: currentHeight < 0,
         }
       }
 
       this.__object.set(diff)
-      this.__object._id && this._throttledSendMessage(this.__object._id, diff)
+
+      if (this.__object._id) {
+        this._throttledSendMessage(this.__object._id, diff)
+      }
+
       if (!this.__isOnCanvas) {
         this.__isOnCanvas = true
         this.__object.set({
@@ -120,35 +147,35 @@ export class ShapeTool extends PositionableObject {
   }
 
   // eslint-disable-next-line class-methods-use-this
-  handleObjectAddedEvent (opts) {
-    makeNotInteractive(opts.target)
+  handleObjectAddedEvent(options) {
+    makeNotInteractive(options.target)
   }
 
-  handleKeyDownEvent (e) {
-    this.#handleKeyEvent(e)
+  handleKeyDownEvent(event) {
+    this.#handleKeyEvent(event)
   }
 
-  handleKeyUpEvent (e) {
-    this.#handleKeyEvent(e)
+  handleKeyUpEvent(event) {
+    this.#handleKeyEvent(event)
   }
 
-  #handleKeyEvent (e) {
+  #handleKeyEvent(event) {
     const changed =
-      this.__shiftPressed !== e.shiftKey
-      || this.__altPressed !== e.altKey
-      || this.__cmdPressed !== e.metaKey
-      || this.__ctrlPressed !== e.ctrlKey
+      this.__shiftPressed !== event.shiftKey ||
+      this.__altPressed !== event.altKey ||
+      this.__cmdPressed !== event.metaKey ||
+      this.__ctrlPressed !== event.ctrlKey
 
-    this.__shiftPressed = e.shiftKey
-    this.__altPressed = e.altKey
-    this.__cmdPressed = e.metaKey
-    this.__ctrlPressed = e.ctrlKey
+    this.__shiftPressed = event.shiftKey
+    this.__altPressed = event.altKey
+    this.__cmdPressed = event.metaKey
+    this.__ctrlPressed = event.ctrlKey
 
-    changed && this._reshape()
+    if (changed) this._reshape()
   }
 
-  #preparePoint (e) {
-    const point = this._canvas.getPointer(e)
+  #preparePoint(event) {
+    const point = this._canvas.getPointer(event)
 
     if (!(this.__cmdPressed || this.__ctrlPressed)) {
       return point
@@ -159,11 +186,11 @@ export class ShapeTool extends PositionableObject {
     return point
   }
 
-  handleMouseDownEvent (opts) {
+  handleMouseDownEvent(options) {
     if (!this._active) return
 
-    this.__resolveObject(opts)
-    this.__startPoint = this.#preparePoint(opts.e)
+    this.__resolveObject(options)
+    this.__startPoint = this.#preparePoint(options.e)
     this.__object.set({
       left: this.__startPoint.x,
       top: this.__startPoint.y,
@@ -175,32 +202,36 @@ export class ShapeTool extends PositionableObject {
     this.__isDrawing = true
   }
 
-  handleMouseMoveEvent (opts) {
+  handleMouseMoveEvent(options) {
     if (!this._active) return
     if (!this.__isDrawing) return
 
-    this.__currentPoint = this.#preparePoint(opts.e)
+    this.__currentPoint = this.#preparePoint(options.e)
     this._reshape()
   }
 
-  handleMouseUpEvent (opts) {
+  handleMouseUpEvent(options) {
     if (!this._active) return
     if (!this.__isDrawing) return
 
-    if (!this.__isOnCanvas) {
-      const [x, y] = adjustPosition(this.__object, opts.absolutePointer, this.__options.adjustCenter)
+    if (this.__isOnCanvas) {
+      this.__object.set({ _noHistory: undefined })
+      // Чтобы объект можно было выделить!
+      this.__object.setCoords()
+      // Фиксируем изменения в эвенте
+      this._canvas.fire('object:modified', { target: this.__object })
+    } else {
+      const [x, y] = adjustPosition(
+        this.__object,
+        options.absolutePointer,
+        this.__options.adjustCenter,
+      )
 
       this.__object.set({
         left: x,
         top: y,
       })
       this._canvas.add(this.__object)
-    } else {
-      this.__object.set({ _noHistory: undefined })
-      // Чтобы объект можно было выделить!
-      this.__object.setCoords()
-      // Фиксируем изменения в эвенте
-      this._canvas.fire('object:modified', { target: this.__object })
     }
 
     if (this.__options.selectOnInit) this._canvas.setActiveObject(this.__object)

@@ -1,25 +1,14 @@
 {
   "name": "@ulms/tgs-player",
-  "version": "1.0.2",
-  "description": "",
-  "homepage": "https://github.com/netology-group/ulms-media-ui#readme",
-  "bugs": {
-    "url": "https://github.com/netology-group/ulms-media-ui/issues"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/netology-group/ulms-media-ui.git"
-  },
+  "version": "1.0.3",
   "license": "MIT",
-  "author": "",
   "main": "index.js",
   "module": "es/index.js",
   "files": [
-    "es",
-    "src"
+    "es"
   ],
   "scripts": {
-    "build": "rm -rf ./es/* && BABEL_ENV=es rollup --config ./rollup.config.js index.js"
+    "build": "rm -rf ./es/* && rollup --config ../../rollup.config.mjs"
   },
   "dependencies": {
     "@lottiefiles/lottie-interactivity": "~1.6.2",

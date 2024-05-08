@@ -46,23 +46,12 @@ const icons = new Map([
   ['video', Video],
 ])
 
-const sizeValue = size => css[`size${size.toUpperCase()}`]
+const sizeValue = (size) => css[`size${size.toUpperCase()}`]
 
-const Icons = ({
-  children,
-  fn,
-  height,
-  name,
-  size,
-  width,
-}) => {
-  const IconFn = typeof fn === 'function'
-    ? fn()
-    : null
+function Icons({ children, fn, height, name, size, width }) {
+  const IconFunction = typeof fn === 'function' ? fn() : null
 
-  const Icon = name
-    ? icons.get(name)
-    : IconFn
+  const Icon = name ? icons.get(name) : IconFunction
 
   const style = {}
   if (width || size) style.width = width || sizeValue(size)
@@ -95,4 +84,5 @@ Icons.Slides = Slides
 Icons.TrashOutline = TrashOutline
 Icons.Video = Video
 
+// eslint-disable-next-line import/prefer-default-export
 export { Icons }

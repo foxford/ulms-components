@@ -45,6 +45,7 @@
 
 .cursorItem > * {
   --icons-size-xs: var(--location-viewport-object-size);
+
   display: block;
 }
 
@@ -55,4 +56,3 @@
     --location-viewport-text-line-height: 14px;
   }
 }
-

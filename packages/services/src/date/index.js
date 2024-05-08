@@ -1,37 +1,37 @@
 import { DayjsAdapter } from './dayjs'
 
 class DateService {
-  constructor (adapter) {
+  constructor(adapter) {
     this.provider = adapter
   }
 
-  initLocale (locale = navigator.language.split('-')[0]) {
+  initLocale(locale = navigator.language.split('-')[0]) {
     this.provider.initLocale(locale)
   }
 
-  setDateTimezone (tz) {
+  setDateTimezone(tz) {
     this.provider.setTimezone(tz)
   }
 
-  getProvider () {
+  getProvider() {
     return this.provider.getInstance()
   }
 
-  _ (...args) {
+  _(...args) {
     return this.getProvider()(...args)
   }
 
-  tz (date, timezone) {
+  tz(date, timezone) {
     // Порядок вызова нельзя трогать, если надо лучше создать отдельный метод
     return this.getProvider()(date).tz(timezone)
   }
 
-  utc (...args) {
+  utc(...args) {
     return this.getProvider().utc(...args)
   }
 
-  unix (arg) {
-    return this.getProvider().unix(arg)
+  unix(argument) {
+    return this.getProvider().unix(argument)
   }
 }
 
@@ -40,6 +40,9 @@ const adapter = new DayjsAdapter()
 adapter.setTimezone()
 const service = new DateService(adapter)
 
-service.setDateTimezone(new Intl.DateTimeFormat()?.resolvedOptions?.()?.timeZone)
+service.setDateTimezone(
+  new Intl.DateTimeFormat()?.resolvedOptions?.()?.timeZone,
+)
 
+// eslint-disable-next-line import/prefer-default-export
 export { service as DateService }
