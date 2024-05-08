@@ -1,8 +1,9 @@
 import { WhiteboardArrowLine } from './_primitives'
 import { LineTool } from './line'
 
+// eslint-disable-next-line import/prefer-default-export
 export class ArrowTool extends LineTool {
-  _createObject () {
+  _createObject() {
     this.__object = new WhiteboardArrowLine([], {
       fill: this.__color,
       stroke: this.__color,

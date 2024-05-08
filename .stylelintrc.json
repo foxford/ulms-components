@@ -1,0 +1,11 @@
+{
+  "extends": ["stylelint-config-standard", "stylelint-config-prettier"],
+  "rules": {
+    "alpha-value-notation": null,
+    "color-function-notation": null,
+    "custom-property-pattern": null,
+    "keyframes-name-pattern": null,
+    "selector-class-pattern": null,
+    "shorthand-property-no-redundant-values": null
+  }
+}

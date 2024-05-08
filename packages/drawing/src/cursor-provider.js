@@ -1,18 +1,18 @@
 import { adjustPosition, makeNotInteractive } from './tools/object'
 
 class CCursorProvider {
-  constructor () {
+  constructor() {
     this.__canvas = null
     this.__cursor = null
     this.__cursorOnBoard = false
     this.__adjustPoint = '-0.5 -0.5'
   }
 
-  set canvas (canvas) {
+  set canvas(canvas) {
     this.__canvas = canvas
   }
 
-  setCursor (cursorObject, adjustPoint = '-0.5 -0.5') {
+  setCursor(cursorObject, adjustPoint = '-0.5 -0.5') {
     this._clearCursor()
     if (cursorObject) {
       cursorObject.clone((object) => {
@@ -30,9 +30,13 @@ class CCursorProvider {
     }
   }
 
-  onMouseMove (event) {
+  onMouseMove(event) {
     if (this.__canvas && this.__cursor) {
-      const [x, y] = adjustPosition(this.__cursor, event.absolutePointer, this.__adjustPoint)
+      const [x, y] = adjustPosition(
+        this.__cursor,
+        event.absolutePointer,
+        this.__adjustPoint,
+      )
 
       this.__cursor.set({ left: x, top: y }).setCoords()
 
@@ -45,7 +49,7 @@ class CCursorProvider {
     }
   }
 
-  _clearCursor () {
+  _clearCursor() {
     if (this.__canvas && this.__cursor) {
       this.__canvas.remove(this.__cursor)
       this.__cursor = null
@@ -53,19 +57,19 @@ class CCursorProvider {
     }
   }
 
-  hide () {
+  hide() {
     if (this.__canvas && this.__cursor) {
       this.__canvas.remove(this.__cursor)
     }
   }
 
-  show () {
+  show() {
     if (this.__canvas && this.__cursor) {
       this.__canvas.add(this.__cursor)
     }
   }
 
-  destroy () {
+  destroy() {
     if (this.__canvas) {
       this._clearCursor()
     }
@@ -74,4 +78,5 @@ class CCursorProvider {
   }
 }
 
+// eslint-disable-next-line import/prefer-default-export
 export const CursorProvider = new CCursorProvider()

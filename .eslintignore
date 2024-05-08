@@ -1,3 +1,4 @@
-/packages/*/es
-/packages/*/src/dist
 node_modules
+/packages/*/es
+# case for @ulms/ui-grid package (legacy)
+/packages/*/src/dist

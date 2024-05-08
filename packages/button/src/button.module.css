@@ -1,4 +1,5 @@
-:host, .root {
+:host,
+.root {
   --media-ui-button-padding-bottom: 14px;
   --media-ui-button-padding-left: 14px;
   --media-ui-button-padding-right: 14px;
@@ -6,7 +7,10 @@
 }
 
 .root {
-  border-radius: var(--media-ui-button-border-top-left-radius) var(--media-ui-button-border-top-right-radius) var(--media-ui-button-border-bottom-right-radius) var(--media-ui-button-border-bottom-left-radius);
+  border-radius: var(--media-ui-button-border-top-left-radius)
+    var(--media-ui-button-border-top-right-radius)
+    var(--media-ui-button-border-bottom-right-radius)
+    var(--media-ui-button-border-bottom-left-radius);
   box-sizing: content-box;
   color: var(--media-ui-button-color);
   cursor: pointer;
@@ -14,28 +18,27 @@
   min-height: var(--media-ui-button-height-min, 20px);
   min-width: var(--media-ui-button-width-min, 20px);
   outline: none;
-  padding-bottom: var(--media-ui-button-padding-bottom);
-  padding-left: var(--media-ui-button-padding-left);
-  padding-right: var(--media-ui-button-padding-right);
-  padding-top: var(--media-ui-button-padding-top);
+  padding: var(--media-ui-button-padding-top)
+    var(--media-ui-button-padding-right) var(--media-ui-button-padding-bottom)
+    var(--media-ui-button-padding-left);
   position: relative;
-}
-
-.root.active
-,.root:hover:not(:disabled)
-,.root:active:not(:disabled)
-{
-  cursor: pointer;
-}
-.root:hover:not(:disabled){
-  color: var(--media-ui-button-color-hover);
-}
-.root.active:not(:disabled)
-,.root:active:not(:disabled)
-{
-  color: var(--media-ui-button-color-active);
 }
 
 .root:disabled {
   cursor: not-allowed;
+}
+
+.root.active,
+.root:hover:not(:disabled),
+.root:active:not(:disabled) {
+  cursor: pointer;
+}
+
+.root:hover:not(:disabled) {
+  color: var(--media-ui-button-color-hover);
+}
+
+.root.active:not(:disabled),
+.root:active:not(:disabled) {
+  color: var(--media-ui-button-color-active);
 }

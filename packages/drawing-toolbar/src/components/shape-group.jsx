@@ -1,6 +1,10 @@
 import React from 'react'
 import cn from 'classnames-es'
-import { shapeToolModeEnum, toolEnum, defaultToolSettings } from '@ulms/ui-drawing'
+import {
+  shapeToolModeEnum,
+  toolEnum,
+  defaultToolSettings,
+} from '@ulms/ui-drawing'
 
 import IconRect from '../icons/rectangle-tool-icon.svg'
 import IconCircle from '../icons/circle-tool-icon.svg'
@@ -23,8 +27,9 @@ import { ColorSettings } from './color-settings'
 
 import css from './settings.module.css'
 
+// eslint-disable-next-line import/prefer-default-export
 export class ShapeGroup extends React.Component {
-  constructor (props) {
+  constructor(props) {
     super(props)
     const { options } = props
     // const { intl } = props
@@ -33,22 +38,26 @@ export class ShapeGroup extends React.Component {
     this.buttonRef = React.createRef()
 
     this.state = {
-      color: isShapeToolSelected ? RGBtoHEX(options.brushColor) : defaultToolSettings.color,
-      brushMode: isShapeToolSelected ? options.brushMode : defaultToolSettings.shape,
+      color: isShapeToolSelected
+        ? RGBtoHEX(options.brushColor)
+        : defaultToolSettings.color,
+      brushMode: isShapeToolSelected
+        ? options.brushMode
+        : defaultToolSettings.shape,
     }
 
     this.iconsMap = {
-      [shapeToolModeEnum.RECT]: (<IconRect />),
-      [shapeToolModeEnum.CIRCLE]: (<IconCircle />),
-      [shapeToolModeEnum.TRIANGLE]: (<IconTriangle />),
-      [shapeToolModeEnum.RIGHT_TRIANGLE]: (<IconRightTriangle />),
+      [shapeToolModeEnum.RECT]: <IconRect />,
+      [shapeToolModeEnum.CIRCLE]: <IconCircle />,
+      [shapeToolModeEnum.TRIANGLE]: <IconTriangle />,
+      [shapeToolModeEnum.RIGHT_TRIANGLE]: <IconRightTriangle />,
     }
 
     this.iconsSolidMap = {
-      [shapeToolModeEnum.RECT_SOLID]: (<IconSolidRect />),
-      [shapeToolModeEnum.CIRCLE_SOLID]: (<IconSolidCircle />),
-      [shapeToolModeEnum.TRIANGLE_SOLID]: (<IconSolidTriangle />),
-      [shapeToolModeEnum.RIGHT_TRIANGLE_SOLID]: (<IconSolidRightTriangle />),
+      [shapeToolModeEnum.RECT_SOLID]: <IconSolidRect />,
+      [shapeToolModeEnum.CIRCLE_SOLID]: <IconSolidCircle />,
+      [shapeToolModeEnum.TRIANGLE_SOLID]: <IconSolidTriangle />,
+      [shapeToolModeEnum.RIGHT_TRIANGLE_SOLID]: <IconSolidRightTriangle />,
     }
 
     this.iconsSet = [
@@ -106,19 +115,18 @@ export class ShapeGroup extends React.Component {
     ]
   }
 
-  componentDidUpdate (prevProps) {
+  componentDidUpdate(prevProps) {
     const { brushMode, tool } = this.props
 
     if (tool === toolEnum.SHAPE && brushMode !== prevProps.brushMode) {
+      // eslint-disable-next-line react/no-did-update-set-state
       this.setState({ brushMode })
     }
   }
 
   handleClick = (name, value) => {
     const { handleChange, sendEvent } = this.props
-    const {
-      brushMode, color,
-    } = { ...this.state, [name]: value }
+    const { brushMode, color } = { ...this.state, [name]: value }
 
     this.setState({ [name]: value })
     handleChange({
@@ -134,10 +142,7 @@ export class ShapeGroup extends React.Component {
   }
 
   getOptions = () => {
-    const {
-      brushMode,
-      color,
-    } = this.state
+    const { brushMode, color } = this.state
 
     return {
       brushMode,
@@ -145,51 +150,42 @@ export class ShapeGroup extends React.Component {
     }
   }
 
-  render () {
-    const {
-      opened,
-      tool,
-      handleClose,
-      handleOpen,
-      className,
-      intl,
-    } = this.props
-    const {
-      brushMode,
-      color,
-    } = this.state
+  render() {
+    const { opened, tool, handleClose, handleOpen, className, intl } =
+      this.props
+    const { brushMode, color } = this.state
 
     return (
       <SettingsGroup
-        direction='right-start'
+        direction="right-start"
         containerStyles={settingsGroupContainerStyles}
         isOpen={opened}
         handleClose={handleClose}
         target={this.buttonRef.current}
-        content={(
+        content={
           <div className={cn(css.column, className)}>
             <IconGroupSettings
               iconsSet={this.iconsSet}
               currentSelection={brushMode}
-              handleClick={value => this.handleClick('brushMode', value)}
+              handleClick={(value) => this.handleClick('brushMode', value)}
             />
             <Divider horizontal />
             <IconGroupSettings
               iconsSet={this.solidIconsSet}
               currentSelection={brushMode}
-              handleClick={value => this.handleClick('brushMode', value)}
+              handleClick={(value) => this.handleClick('brushMode', value)}
             />
             <Divider horizontal />
             <ColorSettings
               currentColor={color}
-              handleClick={value => this.handleClick('color', value)}
+              handleClick={(value) => this.handleClick('color', value)}
             />
           </div>
-        )}
+        }
       >
         <ToolbarButton
           active={tool === toolEnum.SHAPE}
-          dataTestId='board-panel-group-shape-button'
+          dataTestId="board-panel-group-shape-button"
           group
           groupColor={color}
           title={intl.formatMessage({ id: intlID.SHAPE })}

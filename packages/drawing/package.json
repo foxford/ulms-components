@@ -1,26 +1,14 @@
 {
   "name": "@ulms/ui-drawing",
-  "version": "3.4.4",
-  "description": "Whiteboard for uLMS",
-  "homepage": "https://github.com/netology-group/ulms-media-ui#readme",
-  "bugs": {
-    "url": "https://github.com/netology-group/ulms-media-ui/issues"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/netology-group/ulms-media-ui.git"
-  },
+  "version": "3.4.5",
   "license": "MIT",
-  "author": "",
   "main": "index.js",
   "module": "es/index.js",
   "files": [
-    "es",
-    "src"
+    "es"
   ],
   "scripts": {
-    "lint": "eslint --fix --ext js,jsx ./src",
-    "build": "rm -rf ./es/* && BABEL_ENV=es rollup --config ./rollup.config.js index.js"
+    "build": "rm -rf ./es/* && rollup --config ../../rollup.config.mjs"
   },
   "dependencies": {
     "abortcontroller-polyfill": "1.7.5",

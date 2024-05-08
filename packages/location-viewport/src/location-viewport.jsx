@@ -9,13 +9,13 @@ import css from './location-viewport.module.css'
 
 const Emitter = (...argv) => new EventTarget(...argv)
 
-// eslint-disable-next-line react/prefer-stateless-function
+// eslint-disable-next-line react/prefer-stateless-function, import/prefer-default-export
 export class LocationViewport extends React.PureComponent {
-  static emitter (...argv) {
+  static emitter(...argv) {
     return Emitter(...argv)
   }
 
-  constructor (props) {
+  constructor(props) {
     super(props)
 
     this.__viewportEl = undefined
@@ -24,38 +24,34 @@ export class LocationViewport extends React.PureComponent {
     this.state = { objects: props.cursors || [] }
   }
 
-  componentDidMount () {
+  componentDidMount() {
     const { emitter } = this.props
 
-    emitter && emitter.addEventListener('broadcast_message.create', (e) => {
-      if (!e.detail || !e.detail.data) {
-        // eslint-disable-next-line no-console
-        console.warn('Can not parse broadcast event')
+    if (emitter) {
+      emitter.addEventListener('broadcast_message.create', (event) => {
+        if (!event.detail || !event.detail.data) {
+          // eslint-disable-next-line no-console
+          console.warn('Can not parse broadcast event')
 
-        return
-      }
+          return
+        }
 
-      const { data } = e.detail
+        const { data } = event.detail
 
-      const objects = Array.isArray(data) ? data : [data]
+        const objects = Array.isArray(data) ? data : [data]
 
-      this.setState({ objects })
-    })
+        this.setState({ objects })
+      })
+    }
   }
 
-  set viewportEl (el) {
-    this.__viewportEl = el
+  // eslint-disable-next-line react/no-unused-class-component-methods
+  set viewportEl(element) {
+    this.__viewportEl = element
   }
 
-  render () {
-    const {
-      boundLower,
-      boundUpper,
-      className,
-      height,
-      id,
-      width,
-    } = this.props
+  render() {
+    const { boundLower, boundUpper, className, height, id, width } = this.props
 
     const { objects } = this.state
 
@@ -72,29 +68,33 @@ export class LocationViewport extends React.PureComponent {
           height: viewportHeight,
         }}
       >
-        <div className={css.outer} ref={(el) => { this.viewportEl = el }}>
-          <>
-            {objects.map((obj) => {
-              const { x, y } = obj.aCoords.tl
+        <div
+          className={css.outer}
+          ref={(element) => {
+            // eslint-disable-next-line react/no-unused-class-component-methods
+            this.viewportEl = element
+          }}
+        >
+          {objects.map((object) => {
+            const { x, y } = object.aCoords.tl
 
-              return (
-                <ObjectPortal key={`id_${obj.id}`} node={this.__viewportEl}>
-                  <LocationObjectCursor
-                    boundLower={boundLower}
-                    boundUpper={boundUpper}
-                    className={css.object}
-                    defaultCursorRotation={45}
-                    id={obj.id}
-                    left={x}
-                    style={obj.style}
-                    text={obj.text}
-                    top={y}
-                    viewport={this.__viewportEl}
-                  />
-                </ObjectPortal>
-              )
-            })}
-          </>
+            return (
+              <ObjectPortal key={`id_${object.id}`} node={this.__viewportEl}>
+                <LocationObjectCursor
+                  boundLower={boundLower}
+                  boundUpper={boundUpper}
+                  className={css.object}
+                  defaultCursorRotation={45}
+                  id={object.id}
+                  left={x}
+                  style={object.style}
+                  text={object.text}
+                  top={y}
+                  viewport={this.__viewportEl}
+                />
+              </ObjectPortal>
+            )
+          })}
         </div>
       </section>
     )

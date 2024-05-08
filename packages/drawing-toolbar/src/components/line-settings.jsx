@@ -18,21 +18,20 @@ const lineSizes = {
   EIGHT: 8,
 }
 
-export const LineSettings = ({
-  currentSize, handleClick, dashed = false,
-}) => {
+// eslint-disable-next-line import/prefer-default-export
+export function LineSettings({ currentSize, handleClick, dashed = false }) {
   const iconsMap = {
-    [lineSizes.ONE]: (<IconLine1 />),
-    [lineSizes.TWO]: (<IconLine2 />),
-    [lineSizes.FOUR]: (<IconLine4 />),
-    [lineSizes.EIGHT]: (<IconLine8 />),
+    [lineSizes.ONE]: <IconLine1 />,
+    [lineSizes.TWO]: <IconLine2 />,
+    [lineSizes.FOUR]: <IconLine4 />,
+    [lineSizes.EIGHT]: <IconLine8 />,
   }
 
   const dashedIconsMap = {
-    [lineSizes.ONE]: (<IconDashedLine1 />),
-    [lineSizes.TWO]: (<IconDashedLine2 />),
-    [lineSizes.FOUR]: (<IconDashedLine4 />),
-    [lineSizes.EIGHT]: (<IconDashedLine8 />),
+    [lineSizes.ONE]: <IconDashedLine1 />,
+    [lineSizes.TWO]: <IconDashedLine2 />,
+    [lineSizes.FOUR]: <IconDashedLine4 />,
+    [lineSizes.EIGHT]: <IconDashedLine8 />,
   }
 
   const iconsSet = [

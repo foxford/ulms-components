@@ -13,8 +13,16 @@ import { messagesIntl } from '../lang/index'
 
 import css from './presentation.module.css'
 
-function calculateSize (containerWidth, containerHeight, imageWidth, imageHeight) {
-  const scale = Math.min(containerWidth / imageWidth, containerHeight / imageHeight)
+function calculateSize(
+  containerWidth,
+  containerHeight,
+  imageWidth,
+  imageHeight,
+) {
+  const scale = Math.min(
+    containerWidth / imageWidth,
+    containerHeight / imageHeight,
+  )
 
   return {
     width: imageWidth * scale,
@@ -22,7 +30,12 @@ function calculateSize (containerWidth, containerHeight, imageWidth, imageHeight
   }
 }
 
-function calculateFitSize (containerWidth, containerHeight, imageWidth, imageHeight) {
+function calculateFitSize(
+  containerWidth,
+  containerHeight,
+  imageWidth,
+  imageHeight,
+) {
   const scale = containerWidth / imageWidth
 
   return {
@@ -36,11 +49,11 @@ class PresentationComponent extends React.Component {
 
   prevImageHeight
 
-  componentDidMount () {
+  componentDidMount() {
     this.maybeScrollToActive()
   }
 
-  componentDidUpdate (prevProps) {
+  componentDidUpdate(prevProps) {
     const { index } = this.props
 
     if (prevProps.index !== index) {
@@ -57,45 +70,52 @@ class PresentationComponent extends React.Component {
   }
 
   handleNext = () => {
-    const {
-      index, collection, onChange,
-    } = this.props
+    const { index, collection, onChange } = this.props
 
     if (index < collection.length - 1) {
       onChange(index + 1)
     }
   }
 
-  handleKeyDownEvent = (e) => {
-    switch (e.keyCode) {
+  handleKeyDownEvent = (event) => {
+    switch (event.keyCode) {
       case 33: // PageUp
       // falls through
 
-      case 37: // ArrowLeft
+      case 37: {
+        // ArrowLeft
         this.handlePrevious()
 
         break
+      }
 
       case 34: // PageDown
       // falls through
 
-      case 39: // ArrowRight
+      case 39: {
+        // ArrowRight
         this.handleNext()
 
         break
+      }
 
       default:
-      // Nothing to do here..
+      // Nothing to do here...
     }
   }
 
   handlePageResize = (width, height) => {
     const { onPageResize } = this.props
 
-    if (onPageResize && this.prevImageWidth !== width && this.prevImageHeight !== height) {
+    if (
+      onPageResize &&
+      this.prevImageWidth !== width &&
+      this.prevImageHeight !== height
+    ) {
       this.prevImageWidth = width
       this.prevImageHeight = height
-      onPageResize && onPageResize(width, height)
+
+      onPageResize(width, height)
     }
   }
 
@@ -107,8 +127,10 @@ class PresentationComponent extends React.Component {
     }
   }
 
-  scrollToActive () {
-    const element = this.container.querySelector(`.${css.preview}.${css.active}`)
+  scrollToActive() {
+    const element = this.container.querySelector(
+      `.${css.preview}.${css.active}`,
+    )
 
     if (element) {
       scrollIntoView(element, {
@@ -119,7 +141,7 @@ class PresentationComponent extends React.Component {
     }
   }
 
-  render () {
+  render() {
     const {
       centered = 'Horizontal',
       collection,
@@ -137,37 +159,45 @@ class PresentationComponent extends React.Component {
 
     return (
       <div
-        ref={(ref) => { this.container = ref }}
+        ref={(ref) => {
+          this.container = ref
+        }}
         className={css.root}
         onKeyDown={this.handleKeyDownEvent}
         tabIndex={-1}
         data-presentation-root
       >
         <div className={cx(css.listWrapper, showPreviews && css.isShown)}>
-          <div className={css.list} data-testid='presentation-preview-panel'>
-            {
-              collection.map((item, idx) => (
-                <div
-                  className={cx(css.preview, idx === index && css.active)}
-                  key={idx}
-                  onClick={() => { onChange(idx) }}
-                  onKeyPress={() => { onChange(idx) }}
-                  role='button'
-                  tabIndex={0}
-                >
-                  <div className={css.number}>{item.page}</div>
-                  <div className={css.image}>
-                    {showPreviews && (
-                      <VisibilitySensor partialVisibility>
-                        {({ isVisible }) => isVisible && item.preview
-                          ? <img alt='preview' src={item.preview} />
-                          : <div className={css.placeholder} />}
-                      </VisibilitySensor>
-                    )}
-                  </div>
+          <div className={css.list} data-testid="presentation-preview-panel">
+            {collection.map((item, index_) => (
+              <div
+                className={cx(css.preview, index_ === index && css.active)}
+                key={index_} // eslint-disable-line react/no-array-index-key
+                onClick={() => {
+                  onChange(index_)
+                }}
+                onKeyPress={() => {
+                  onChange(index_)
+                }}
+                role="button"
+                tabIndex={0}
+              >
+                <div className={css.number}>{item.page}</div>
+                <div className={css.image}>
+                  {showPreviews && (
+                    <VisibilitySensor partialVisibility>
+                      {({ isVisible }) =>
+                        isVisible && item.preview ? (
+                          <img alt="preview" src={item.preview} />
+                        ) : (
+                          <div className={css.placeholder} />
+                        )
+                      }
+                    </VisibilitySensor>
+                  )}
                 </div>
-              ))
-            }
+              </div>
+            ))}
           </div>
         </div>
 
@@ -176,44 +206,65 @@ class PresentationComponent extends React.Component {
             {({ size: { height, width } }) => {
               let result
 
-              if (collection[index] && collection[index].image && height > 0 && width > 0) {
+              if (
+                collection[index] &&
+                collection[index].image &&
+                height > 0 &&
+                width > 0
+              ) {
                 const imageSize = fitToWidth
                   ? calculateFitSize(
-                    width,
-                    height,
-                    collection[index].imageWidth,
-                    collection[index].imageHeight
-                  )
+                      width,
+                      height,
+                      collection[index].imageWidth,
+                      collection[index].imageHeight,
+                    )
                   : calculateSize(
-                    width,
-                    height,
-                    collection[index].imageWidth,
-                    collection[index].imageHeight
-                  )
+                      width,
+                      height,
+                      collection[index].imageWidth,
+                      collection[index].imageHeight,
+                    )
 
                 this.handlePageResize(imageSize.width, imageSize.height)
 
                 result = (
-                  <div className={cx(css.slide, { [css.fitToWidth]: fitToWidth })} ref={innerRef} data-id='presentation-slide'>
+                  <div
+                    className={cx(css.slide, { [css.fitToWidth]: fitToWidth })}
+                    ref={innerRef}
+                    data-id="presentation-slide"
+                  >
                     <img
-                      alt='mainimage'
-                      className={cx(css.mainImage, { [css[`centered${centered}`]]: !fitToWidth })}
+                      alt="mainimage"
+                      className={cx(css.mainImage, {
+                        [css[`centered${centered}`]]: !fitToWidth,
+                      })}
                       src={collection[index].image}
                       width={imageSize.width}
                       height={imageSize.height}
                     />
-                    {
-                      slotSlide && (
-                        <div className={cx(css.slotSlide, { [css[`centered${centered}`]]: !fitToWidth })}>
-                          {slotSlide(imageSize.width, imageSize.height)}
-                        </div>
-                      )
-                    }
+                    {slotSlide && (
+                      <div
+                        className={cx(css.slotSlide, {
+                          [css[`centered${centered}`]]: !fitToWidth,
+                        })}
+                      >
+                        {slotSlide(imageSize.width, imageSize.height)}
+                      </div>
+                    )}
                   </div>
                 )
               } else {
                 result = (
-                  <div className={cx(css.slide, { [css.fitToWidth]: fitToWidth }, css.slide_centerContent,)} data-id='presentation-slide' ref={innerRef}>
+                  <div
+                    className={cx(
+                      css.slide,
+                      { [css.fitToWidth]: fitToWidth },
+                      css.slide_centerContent,
+                    )}
+                    data-id="presentation-slide"
+                    ref={innerRef}
+                  >
                     {error ? <p>{error}</p> : <Spinner />}
                   </div>
                 )
@@ -222,55 +273,62 @@ class PresentationComponent extends React.Component {
               return result
             }}
           </SizeMe>
-          {
-            collection[index] && (showPagesCount || (showActions && onChange)) && (
+          {collection[index] &&
+            (showPagesCount || (showActions && onChange)) && (
               <div className={css.controls}>
-                {
-                  showActions && onChange && (
-                    <div>
-                      <button
-                        type='button'
-                        className={css.linkArrow}
-                        onClick={this.handlePrevious}
-                        disabled={index === 0}
-                        data-presentation-previous
-                      >
-                        <span className={css.linkArrowIcon}><Icons name='arrow-left' size='xs' /></span>
-                        {intl.formatMessage({ id: 'PREVIOUS' })}
-                      </button>
-                    </div>
-                  )
-                }
-                {
-                  showPagesCount && (
-                    <div className={css.text}>
-                      {intl.formatMessage({ id: 'PAGES' }, { page: collection[index].page, total: collection.length })}
-                    </div>
-                  )
-                }
-                {
-                  showActions && onChange && (
-                    <div>
-                      <button
-                        type='button'
-                        className={css.linkArrow}
-                        onClick={this.handleNext}
-                        disabled={index === collection.length - 1}
-                        data-presentation-next
-                      >
-                        {intl.formatMessage({ id: 'NEXT' })}
-                        <span className={css.linkArrowIcon}><Icons name='arrow-right' size='xs' /></span>
-                      </button>
-                    </div>
-                  )
-                }
+                {showActions && onChange && (
+                  <div>
+                    <button
+                      type="button"
+                      className={css.linkArrow}
+                      onClick={this.handlePrevious}
+                      disabled={index === 0}
+                      data-presentation-previous
+                    >
+                      <span className={css.linkArrowIcon}>
+                        <Icons name="arrow-left" size="xs" />
+                      </span>
+                      {intl.formatMessage({ id: 'PREVIOUS' })}
+                    </button>
+                  </div>
+                )}
+                {showPagesCount && (
+                  <div className={css.text}>
+                    {intl.formatMessage(
+                      { id: 'PAGES' },
+                      {
+                        page: collection[index].page,
+                        total: collection.length,
+                      },
+                    )}
+                  </div>
+                )}
+                {showActions && onChange && (
+                  <div>
+                    <button
+                      type="button"
+                      className={css.linkArrow}
+                      onClick={this.handleNext}
+                      disabled={index === collection.length - 1}
+                      data-presentation-next
+                    >
+                      {intl.formatMessage({ id: 'NEXT' })}
+                      <span className={css.linkArrowIcon}>
+                        <Icons name="arrow-right" size="xs" />
+                      </span>
+                    </button>
+                  </div>
+                )}
               </div>
-            )
-          }
+            )}
         </div>
       </div>
     )
   }
+}
+
+PresentationComponent.defaultProps = {
+  centered: 'Horizontal',
 }
 
 PresentationComponent.propTypes = {
@@ -280,7 +338,7 @@ PresentationComponent.propTypes = {
 const PresentationComponentIntl = injectIntl(PresentationComponent)
 
 export class PresentationIntl extends React.PureComponent {
-  render () {
+  render() {
     const {
       defaultLocale = 'ru',
       locale = 'ru',

@@ -1,4 +1,4 @@
-:root{
+:root {
   --font-weight: var(--panel-font-weight, 700);
   --header-border: var(--panel-header-border);
   --header-color: var(--panel-header-color, var(--mineShaft, #333));
@@ -10,43 +10,45 @@
   --line-height: var(--panel-line-height, 1.2em);
 }
 
-.root{
+.root {
   height: 100%;
   flex: 1;
 }
 
-.root .root{
+.root .root {
   height: auto;
 }
 
-.interlayer{
+.interlayer {
   display: flex;
   height: 100%;
 }
 
-.debug{
+.debug {
   background: rgba(0, 0, 255, 0.1);
   outline: 1px dashed rgba(0, 0, 155, 0.5);
 }
 
 /* <Panel.Header> */
-.header{
+.header {
   border: var(--header-border);
   color: var(--panel-header-color);
   font-weight: var(--font-weight);
   line-height: var(--line-height);
   margin: var(--header-margin);
-  padding: var(--header-padding-top) var(--header-padding-right) var(--header-padding-bottom) var(--header-padding-left);
+  padding: var(--header-padding-top) var(--header-padding-right)
+    var(--header-padding-bottom) var(--header-padding-left);
 }
 
 /* add padding for all adjacent panels */
-.header.adjacent ~ .root{
+.header.adjacent ~ .root {
   padding-left: var(--header-padding-left);
 }
+
 /* </Panel.Header> */
 
 /* <Panel.Inner> */
-.inner{
+.inner {
   padding-left: var(--header-padding-left);
   padding-right: var(--header-padding-right);
 }

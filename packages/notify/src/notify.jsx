@@ -21,9 +21,7 @@ const ALERT_SIZE = {
   SMALL: 's',
 }
 
-function NotificationContainer ({
-  className, containerProps = {}, isCompact,
-}) {
+function NotificationContainer({ className, containerProps = {}, isCompact }) {
   return (
     <ToastContainer
       autoClose={4000}
@@ -32,7 +30,7 @@ function NotificationContainer ({
       closeButton={false}
       closeOnClick={false}
       draggable={!!isCompact}
-      draggableDirection='y'
+      draggableDirection="y"
       draggablePercent={90}
       hideProgressBar
       isCompact={isCompact}
@@ -48,59 +46,76 @@ function NotificationContainer ({
  * @param {React.ReactElement} AlertComponent
  * @param {{ size: 's' | 'l' }} config
  */
-function createNotify (AlertComponent, config) {
+function createNotify(AlertComponent, config) {
   const defaultParameters = {
     size: ALERT_SIZE.SMALL,
     ...config,
   }
 
-  const calculateAlertSize = params => params?.alertProps?.size || params?.size || defaultParameters.size
+  const calculateAlertSize = (parameters) =>
+    parameters?.alertProps?.size > 0 ||
+    parameters?.size > 0 ||
+    defaultParameters.size > 0
 
-  const getAlertProps = params => ({
-    size: calculateAlertSize(params),
-    ...params?.alertProps,
+  const getAlertProps = (parameters) => ({
+    size: calculateAlertSize(parameters),
+    ...parameters?.alertProps,
   })
 
-  const getConfig = (params) => {
-    const size = calculateAlertSize(params)
+  const getConfig = (parameters) => {
+    const size = calculateAlertSize(parameters)
 
     return {
-      position: size === ALERT_SIZE.SMALL ? toast.POSITION.TOP_CENTER : toast.POSITION.BOTTOM_LEFT,
-      transition: size === ALERT_SIZE.SMALL ? smallAlertTransition : largeAlertTransition,
-      ...params,
+      position:
+        size === ALERT_SIZE.SMALL
+          ? toast.POSITION.TOP_CENTER
+          : toast.POSITION.BOTTOM_LEFT,
+      transition:
+        size === ALERT_SIZE.SMALL ? smallAlertTransition : largeAlertTransition,
+      ...parameters,
     }
   }
 
   return {
-    error (children, params = {}) {
+    error(children, parameters = {}) {
       return toast(
-        <AlertComponent type='error' {...getAlertProps(params)}>{children}</AlertComponent>,
-        getConfig(params)
+        <AlertComponent type="error" {...getAlertProps(parameters)}>
+          {children}
+        </AlertComponent>,
+        getConfig(parameters),
       )
     },
-    info (children, params = {}) {
+    info(children, parameters = {}) {
       return toast(
-        <AlertComponent type='info' {...getAlertProps(params)}>{children}</AlertComponent>,
-        getConfig(params)
+        <AlertComponent type="info" {...getAlertProps(parameters)}>
+          {children}
+        </AlertComponent>,
+        getConfig(parameters),
       )
     },
-    success (children, params = {}) {
+    success(children, parameters = {}) {
       return toast(
-        <AlertComponent type='success' {...getAlertProps(params)}>{children}</AlertComponent>,
-        getConfig(params)
+        <AlertComponent type="success" {...getAlertProps(parameters)}>
+          {children}
+        </AlertComponent>,
+        getConfig(parameters),
       )
     },
-    warn (children, params = {}) {
+    warn(children, parameters = {}) {
       return toast(
-        <AlertComponent type='warning' {...getAlertProps(params)}>{children}</AlertComponent>,
-        getConfig(params)
+        <AlertComponent type="warning" {...getAlertProps(parameters)}>
+          {children}
+        </AlertComponent>,
+        getConfig(parameters),
       )
     },
-    custom (children, params = {}) {
-      return toast(children, getConfig(params))
+    custom(children, parameters = {}) {
+      return toast(children, getConfig(parameters))
     },
     toast,
   }
 }
 
-export { NotificationContainer, createNotify, toast }
+export { NotificationContainer, createNotify }
+
+export { toast } from 'react-toastify'

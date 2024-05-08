@@ -10,22 +10,19 @@ const handler = {
 }
 
 class Updater extends React.Component {
-  constructor () {
+  constructor() {
     super()
 
     // eslint-disable-next-line react/no-unused-state
     this.state = { objects: [] }
   }
 
-  render () {
+  render() {
     // eslint-disable-next-line react/prop-types
     const { children } = this.props
 
-    return (
-      <div className='drawingupdater'>
-        {children}
-      </div>
-    )
+    // eslint-disable-next-line react/jsx-filename-extension
+    return <div className="drawingupdater">{children}</div>
   }
 }
 
@@ -52,16 +49,23 @@ export const test = () => (
     <Updater ref={handler.parent}>
       <Drawing
         brushColor={{
-          r: 0, g: 0, b: 0, a: 1,
+          r: 0,
+          g: 0,
+          b: 0,
+          a: 1,
         }}
         ref={handler.self}
         width={300}
         height={300}
-        objects={handler.parent.current ? handler.parent.current.state.objects : []}
+        objects={
+          handler.parent.current ? handler.parent.current.state.objects : []
+        }
         onDraw={(object) => {
-          const { parent: { current: p } } = handler
+          const {
+            parent: { current: p },
+          } = handler
 
-          p.setState({ objects: p.state.objects.concat(object) })
+          p.setState({ objects: [...p.state.objects, ...object] })
         }}
         canDraw
         uniqId={() => Math.random()}

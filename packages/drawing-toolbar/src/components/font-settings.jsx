@@ -13,16 +13,15 @@ const testAttributes = {
   [fontSizes[2]]: 'board-panel-popup-font-size-l',
 }
 
-export const FontSettings = ({
-  currentFontSize, handleClick,
-}) => {
+// eslint-disable-next-line import/prefer-default-export
+export function FontSettings({ currentFontSize, handleClick }) {
   const fontIcons = {
-    [fontSizes[0]]: (<IconText32 />),
-    [fontSizes[1]]: (<IconText48 />),
-    [fontSizes[2]]: (<IconText64 />),
+    [fontSizes[0]]: <IconText32 />,
+    [fontSizes[1]]: <IconText48 />,
+    [fontSizes[2]]: <IconText64 />,
   }
 
-  const iconsSet = fontSizes.map(size => ({
+  const iconsSet = fontSizes.map((size) => ({
     dataTestId: testAttributes[size],
     key: size,
     icon: fontIcons[size],

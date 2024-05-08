@@ -4,27 +4,22 @@ import cx from 'classnames-es'
 
 import css from './panel.module.css'
 
-const Header = ({
-  children,
-  className,
-  noAdjacent,
-  title,
-}) => (
-  <div
-    className={cx(css.header, className, { [css.adjacent]: !noAdjacent })}
-  >
-    {title || children}
-  </div>
-)
+function Header({ children, className, noAdjacent, title }) {
+  return (
+    <div className={cx(css.header, className, { [css.adjacent]: !noAdjacent })}>
+      {title || children}
+    </div>
+  )
+}
 
-const Inner = ({ children }) => !children
-  ? null
-  : (<div className={css.inner}>{children}</div>)
+function Inner({ children }) {
+  return children ? <div className={css.inner}>{children}</div> : null
+}
 
 const panelStyle = (props) => {
   const style = {}
 
-  if (typeof props.size !== 'undefined') style.flexGrow = props.size
+  if (props.size !== undefined) style.flexGrow = props.size
 
   return {
     ...props.style,
@@ -32,14 +27,8 @@ const panelStyle = (props) => {
   }
 }
 
-const Panel = (props) => {
-  const {
-    children,
-    className,
-    content,
-    debug,
-    direction,
-  } = props
+function Panel(props) {
+  const { children, className, content, debug, direction } = props
 
   return (
     <div
@@ -50,8 +39,11 @@ const Panel = (props) => {
         className={css.interlayer}
         style={{ flexDirection: direction || 'column' }}
       >
-        {/* eslint-disable-next-line react/jsx-props-no-spreading */}
-        {children || [<Header key='h' {...props} />, <Inner key='i'>{content}</Inner>]}
+        {children || [
+          // eslint-disable-next-line react/jsx-props-no-spreading
+          <Header key="h" {...props} />,
+          <Inner key="i">{content}</Inner>,
+        ]}
       </div>
     </div>
   )
@@ -60,4 +52,5 @@ const Panel = (props) => {
 Panel.Header = Header
 Panel.Inner = Inner
 
+// eslint-disable-next-line import/prefer-default-export
 export { Panel }

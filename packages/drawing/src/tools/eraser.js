@@ -8,13 +8,18 @@ const areSamePoints = ([xy1, xy2]) => xy1[0] === xy2[0] && xy1[1] === xy2[1]
 
 const isContinuous = ([xy1, xy2]) => xy1[0] === xy2[0] || xy1[1] === xy2[1]
 
-const getLineY = ([x1, y1], [x2, y2]) => x => y1 + (y2 - y1) * (x - x1) / (x2 - x1)
+const getLineY =
+  ([x1, y1], [x2, y2]) =>
+  (x) =>
+    y1 + ((y2 - y1) * (x - x1)) / (x2 - x1)
 
-const getCircleY = ([x0, y0], r) => (x) => {
-  const coord = Math.sqrt(r ** 2 - (x - x0) ** 2)
+const getCircleY =
+  ([x0, y0], r) =>
+  (x) => {
+    const coord = Math.sqrt(r ** 2 - (x - x0) ** 2)
 
-  return [y0 - coord, y0 + coord]
-}
+    return [y0 - coord, y0 + coord]
+  }
 
 const getCirclePath = ([x0, y0], r) => {
   const getYByX = getCircleY([x0, y0], r)
@@ -23,19 +28,20 @@ const getCirclePath = ([x0, y0], r) => {
   for (let xx = x0 - r; xx <= x0 + r; xx++) {
     const maybeY = getYByX(xx)
 
-    circlePath = circlePath.concat([[xx, maybeY[0]], [xx, maybeY[1]]])
+    circlePath = [...circlePath, [xx, maybeY[0]], [xx, maybeY[1]]]
   }
 
   return circlePath.slice(1, -1)
   // remove same coords on edges
 }
 
-const getConcentricPath = (point, r, opts) => {
+const getConcentricPath = (point, r, options) => {
   let resultPath = [point]
   // save initial point (center)
 
-  for (let i = 0; i <= r; i += opts.precision || 1) {
-    if (i !== 0) resultPath = resultPath.concat(getCirclePath(point, i))
+  for (let index = 0; index <= r; index += options.precision || 1) {
+    if (index !== 0)
+      resultPath = [...resultPath, ...getCirclePath(point, index)]
   }
 
   return resultPath
@@ -60,26 +66,26 @@ const getLinePathByTuple = (tuple) => {
   return realPath
 }
 
-const aproximateByTuple = (acc, tuple) => {
+const aproximateByTuple = (accumulator, tuple) => {
   const realPath = getLinePathByTuple(tuple)
 
   // eslint-disable-next-line no-param-reassign
-  acc = acc.concat(realPath)
+  accumulator = [...accumulator, ...realPath]
 
-  return acc
+  return accumulator
 }
 
-function makeAproximatedVector (vector) {
+function makeAproximatedVector(vector) {
   let uniquePath = [vector[0]]
-  let prevPoint
+  let previousPoint
   let eachTuple
 
-  vector.forEach((point, i) => {
-    if (i !== 0) {
+  for (const [index, point] of vector.entries()) {
+    if (index !== 0) {
       // skip initial point
 
-      prevPoint = uniquePath[uniquePath.length - 1]
-      eachTuple = [prevPoint, point]
+      previousPoint = uniquePath.at(-1)
+      eachTuple = [previousPoint, point]
 
       if (!areSamePoints(eachTuple)) {
         const hasBreak = !isContinuous(eachTuple)
@@ -93,31 +99,35 @@ function makeAproximatedVector (vector) {
         }
       }
     }
-  })
+  }
 
   return uniquePath
 }
 
-function adjustPath (vector, opts) {
+function adjustPath(vector, options) {
   let realPath = vector
 
-  if (opts.precision !== 1) realPath = vector.filter((_, i) => !(i % opts.precision))
+  if (options.precision !== 1)
+    realPath = vector.filter((_, index) => !(index % options.precision))
 
   return realPath
 }
 
-const gotIntersection = (path, predicate) => Boolean(~path.findIndex(xy => predicate(xy[0], xy[1])))
+const gotIntersection = (path, predicate) =>
+  // eslint-disable-next-line no-bitwise
+  Boolean(~path.findIndex((xy) => predicate(xy[0], xy[1])))
 
-function isNotTransparentOnArea (context, object, {
-  r, x, y,
-}, opts) {
-  const circlePath = getConcentricPath([x, y], r, opts)
+function isNotTransparentOnArea(context, object, { r, x, y }, options) {
+  const circlePath = getConcentricPath([x, y], r, options)
 
-  return gotIntersection(circlePath, (_x, _y) => !context.isTargetTransparent(object, _x, _y))
+  return gotIntersection(
+    circlePath,
+    (_x, _y) => !context.isTargetTransparent(object, _x, _y),
+  )
 }
 
 export default class EraserTool extends Base {
-  constructor (canvas) {
+  constructor(canvas) {
     super(canvas)
 
     this._isDown = false
@@ -130,30 +140,33 @@ export default class EraserTool extends Base {
     })
   }
 
-  __applyEraseByPath (_) {
+  __applyEraseByPath(_) {
     const result = []
 
-    const realPath = adjustPath(makeAproximatedVector((_)), { precision: this._precision })
+    const realPath = adjustPath(makeAproximatedVector(_), {
+      precision: this._precision,
+    })
 
     this._canvas.forEachObject((object) => {
       if (!object.isOnScreen()) return
       if (LockProvider.isLocked(object)) return
 
-      realPath.forEach((point) => {
+      for (const point of realPath) {
         const p = new fabric.Point(point[0], point[1])
 
-        if (!object.containsPoint(p)) return
+        // eslint-disable-next-line no-continue
+        if (!object.containsPoint(p)) continue
 
         if (!this._canvas.isTargetTransparent(object, point[0], point[1])) {
           result.push(object)
         }
-      })
+      }
     })
 
     return result
   }
 
-  __applyEraseByPoint ([x, y]) {
+  __applyEraseByPoint([x, y]) {
     const result = []
     const point = new fabric.Point(x, y)
 
@@ -161,9 +174,16 @@ export default class EraserTool extends Base {
       if (!object.isOnScreen() || !object.containsPoint(point)) return
       if (LockProvider.isLocked(object)) return
 
-      const isNotTransparent = isNotTransparentOnArea(this._canvas, object, {
-        r: this._width, x, y,
-      }, { precision: this._precision })
+      const isNotTransparent = isNotTransparentOnArea(
+        this._canvas,
+        object,
+        {
+          r: this._width,
+          x,
+          y,
+        },
+        { precision: this._precision },
+      )
 
       if (isNotTransparent) {
         result.push(object)
@@ -173,13 +193,13 @@ export default class EraserTool extends Base {
     return result
   }
 
-  __removeObjects (list) {
+  __removeObjects(list) {
     if (list.length > 0) {
       this._canvas.remove(...list)
     }
   }
 
-  configure (options) {
+  configure(options) {
     this._canvas.isDrawingMode = false
     this._canvas.perPixelTargetFind = true
     this._canvas.selection = false
@@ -192,10 +212,10 @@ export default class EraserTool extends Base {
     this._precision = options.precision || this._precision
   }
 
-  handleMouseDownEvent (opts) {
+  handleMouseDownEvent(options) {
     if (!this._active) return
 
-    const { x, y } = this._canvas.getPointer(opts.e, true)
+    const { x, y } = this._canvas.getPointer(options.e, true)
 
     this._isDown = true
     this._isContinuousDraw = []
@@ -204,23 +224,23 @@ export default class EraserTool extends Base {
     this._isContinuousDraw.push([x, y])
   }
 
-  handleMouseMoveEvent (opts) {
+  handleMouseMoveEvent(options) {
     if (!this._active) return
     if (!this._isDown) return
 
-    const { x, y } = this._canvas.getPointer(opts.e, true)
+    const { x, y } = this._canvas.getPointer(options.e, true)
 
     this._isContinuousDraw.push([x, y])
     // push any tuple on position update
     // path will be applied later on mouseup event
   }
 
-  handleMouseUpEvent () {
+  handleMouseUpEvent() {
     if (!this._active) return
 
     this._isDown = false
 
-    if (!this._isContinuousDraw.length) return
+    if (this._isContinuousDraw.length === 0) return
 
     let list
 
@@ -235,7 +255,7 @@ export default class EraserTool extends Base {
     if (list) this.__removeObjects(list)
   }
 
-  reset () {
+  reset() {
     this._isDown = false
     this._isContinuousDraw = []
   }
