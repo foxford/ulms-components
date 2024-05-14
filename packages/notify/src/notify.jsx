@@ -53,9 +53,8 @@ function createNotify(AlertComponent, config) {
   }
 
   const calculateAlertSize = (parameters) =>
-    parameters?.alertProps?.size > 0 ||
-    parameters?.size > 0 ||
-    defaultParameters.size > 0
+    // eslint-disable-next-line unicorn/explicit-length-check
+    parameters?.alertProps?.size || parameters?.size || defaultParameters.size
 
   const getAlertProps = (parameters) => ({
     size: calculateAlertSize(parameters),
