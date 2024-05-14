@@ -115,8 +115,10 @@ const _TGSPlayer = forwardRef(
         ref={playerRef}
         src={src}
         style={{
-          height: Number.isNaN(height) ? height : `${height}px`,
-          width: Number.isNaN(width) ? width : `${width}px`,
+          // eslint-disable-next-line no-restricted-globals, unicorn/prefer-number-properties
+          height: isNaN(height) ? height : `${height}px`,
+          // eslint-disable-next-line no-restricted-globals, unicorn/prefer-number-properties
+          width: isNaN(width) ? width : `${width}px`,
           transform: flip ? 'scaleX(-1)' : 'none',
           ...style,
         }}
