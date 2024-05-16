@@ -1,6 +1,6 @@
 {
   "name": "@ulms/ui-presentation",
-  "version": "1.8.2",
+  "version": "1.9.0",
   "license": "MIT",
   "main": "index.js",
   "module": "es/index.js",
@@ -11,8 +11,8 @@
     "build": "rm -rf ./es/* && rollup --config ../../rollup.config.mjs"
   },
   "dependencies": {
-    "@ulms/ui-icons": "^1.0.2",
-    "@ulms/ui-spinner": "^1.0.2",
+    "@ulms/ui-icons": "^1.1.0",
+    "@ulms/ui-spinner": "^1.1.0",
     "classnames-es": "2.2.6",
     "lodash": "~4.17.21",
     "prop-types": "^15.8.1",

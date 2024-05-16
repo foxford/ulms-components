@@ -1,6 +1,6 @@
 {
   "name": "@ulms/ui-panel",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "license": "MIT",
   "main": "index.js",
   "module": "es/index.js",
