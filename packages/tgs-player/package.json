@@ -1,6 +1,6 @@
 {
   "name": "@ulms/tgs-player",
-  "version": "1.0.4",
+  "version": "1.1.0",
   "license": "MIT",
   "main": "index.js",
   "module": "es/index.js",
