@@ -27,6 +27,8 @@
 }
 
 .cursorItem {
+  width: var(--location-viewport-object-size);
+  height: var(--location-viewport-object-size);
   position: relative;
   display: block;
   transform-origin: top left;
@@ -44,8 +46,6 @@
 }
 
 .cursorItem > * {
-  --icons-size-xs: var(--location-viewport-object-size);
-
   display: block;
 }
 
