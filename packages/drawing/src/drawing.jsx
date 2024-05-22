@@ -1293,6 +1293,9 @@ export class Drawing extends React.Component {
         .finally(() => {
           signal = null
           abortController = null
+
+          if (!this.canvas) return
+
           this.canvas._loading = false
           this.canvas.defaultCursor = 'default'
           this.canvas.freeDrawingCursor = 'crosshair'
