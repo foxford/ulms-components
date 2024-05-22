@@ -7,7 +7,7 @@ import React, {
   useState,
   useImperativeHandle,
 } from 'react'
-import '@lottiefiles/lottie-player/dist/tgs-player'
+// import '@lottiefiles/lottie-player/dist/tgs-player'
 import createInteractivity from '@lottiefiles/lottie-interactivity'
 
 const _TGSPlayer = forwardRef(
