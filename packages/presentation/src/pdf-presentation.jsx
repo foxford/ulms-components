@@ -13,12 +13,41 @@ const documentCache = {}
 const imageCache = {}
 const tasks = {}
 
-function getDocument(url, { httpHeaders }) {
+function getDocument(url, { httpHeaders }, trackEvent) {
   if (!documentCache[url]) {
-    documentCache[url] = window.pdfjsLib.getDocument({
+    const t0 = window.performance.now()
+    const documentPromise = window.pdfjsLib.getDocument({
       url,
       httpHeaders,
     }).promise
+
+    // eslint-disable-next-line promise/catch-or-return
+    documentPromise.then((document) => {
+      const t1 = window.performance.now()
+
+      if (trackEvent) {
+        // eslint-disable-next-line promise/catch-or-return,promise/always-return
+        document.getDownloadInfo().then((downloadInfo) => {
+          const meta = {
+            numPages: document.numPages,
+            size: downloadInfo.length,
+            url,
+          }
+
+          trackEvent(
+            'Debug',
+            'PDFJS.GetDocumentTime',
+            'v1',
+            (t1 - t0).toFixed(0),
+            meta,
+          )
+        })
+      }
+
+      return null
+    })
+
+    documentCache[url] = documentPromise
   }
 
   return documentCache[url]
@@ -34,6 +63,7 @@ export function renderPage(
   width,
   height,
   { httpHeaders },
+  trackEvent,
 ) {
   const key = keyFunction(documentUrl, pageNumber, width, height)
   let canvas
@@ -42,8 +72,16 @@ export function renderPage(
 
   if (!tasks[key]) {
     tasks[key] = new Promise((resolve, reject) => {
-      getDocument(documentUrl, { httpHeaders })
-        .then((document) => document.getPage(pageNumber))
+      let document
+      let t0
+
+      getDocument(documentUrl, { httpHeaders }, trackEvent)
+        .then((_document) => {
+          document = _document
+          t0 = window.performance.now()
+
+          return _document.getPage(pageNumber)
+        })
         .then((page) => {
           const initialViewport = page.getViewport({ scale: 1 })
           const scale = Math.min(
@@ -87,6 +125,24 @@ export function renderPage(
 
               imageCache[`${documentUrl}_${pageNumber}_${width}_${height}`] =
                 imageData
+
+              const t1 = window.performance.now()
+
+              if (trackEvent) {
+                const meta = {
+                  numPages: document.numPages,
+                  pageNumber,
+                  url: documentUrl,
+                }
+
+                trackEvent(
+                  'Debug',
+                  'PDFJS.PageRenderTime',
+                  'v1',
+                  (t1 - t0).toFixed(0),
+                  meta,
+                )
+              }
 
               resolve(imageData)
             }
@@ -166,7 +222,7 @@ export class PDFPresentation extends React.Component {
   }
 
   createCollection = (count) => {
-    const { tokenProvider, url } = this.props
+    const { tokenProvider, trackEvent, url } = this.props
     const {
       CANVAS_WIDTH,
       CANVAS_HEIGHT,
@@ -175,22 +231,30 @@ export class PDFPresentation extends React.Component {
     } = PDFPresentation
     const collection = []
 
-    const getter = (documentUrl, documentPage, width, height) => () => {
-      tokenProvider()
-        .then((token) =>
-          renderPage(documentUrl, documentPage, width, height, {
-            httpHeaders: { authorization: `Bearer ${token}` },
-          }),
-        )
-        .then(() => {
-          this.debouncedUpdateCollection()
+    const getter =
+      (documentUrl, documentPage, width, height, trackEventFunction) => () => {
+        tokenProvider()
+          .then((token) =>
+            renderPage(
+              documentUrl,
+              documentPage,
+              width,
+              height,
+              {
+                httpHeaders: { authorization: `Bearer ${token}` },
+              },
+              trackEventFunction,
+            ),
+          )
+          .then(() => {
+            this.debouncedUpdateCollection()
 
-          return null
-        })
-        .catch(reportError)
+            return null
+          })
+          .catch(reportError)
 
-      return null
-    }
+        return null
+      }
 
     for (let index = 0; index < count; index++) {
       const page = index + 1
@@ -216,7 +280,7 @@ export class PDFPresentation extends React.Component {
         item.imageHeight = imageDataCached.height
       } else {
         Object.defineProperty(item, 'image', {
-          get: getter(url, page, CANVAS_WIDTH, CANVAS_HEIGHT),
+          get: getter(url, page, CANVAS_WIDTH, CANVAS_HEIGHT, trackEvent),
           enumerable: true,
           configurable: true,
         })
@@ -241,11 +305,15 @@ export class PDFPresentation extends React.Component {
   }
 
   updateCollection = () => {
-    const { tokenProvider, url, onPagesUpdated } = this.props
+    const { tokenProvider, trackEvent, url, onPagesUpdated } = this.props
 
     tokenProvider()
       .then((token) =>
-        getDocument(url, { httpHeaders: { authorization: `Bearer ${token}` } }),
+        getDocument(
+          url,
+          { httpHeaders: { authorization: `Bearer ${token}` } },
+          trackEvent,
+        ),
       )
       .then((document) => {
         if (onPagesUpdated) {
