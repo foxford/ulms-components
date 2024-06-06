@@ -40,6 +40,7 @@ class _DrawingToolbarComponent extends React.Component {
     this.state = { opened: '' }
 
     this.mounted = false
+    this.timeoutId = undefined
   }
 
   componentDidMount() {
@@ -53,7 +54,11 @@ class _DrawingToolbarComponent extends React.Component {
     const { opened } = this.state
 
     if (tool !== prevProps.tool || brushMode !== prevProps.brushMode) {
-      setTimeout(() => {
+      this.clearTimeoutId()
+
+      this.timeoutId = setTimeout(() => {
+        this.clearTimeoutId()
+
         // Чтобы успели примениться значения для getOptions
         if (!this.mounted) return
 
@@ -117,6 +122,8 @@ class _DrawingToolbarComponent extends React.Component {
   componentWillUnmount() {
     this.mounted = false
 
+    this.clearTimeoutId()
+
     document.removeEventListener(eventName, this.handleDocumentClickEvent)
   }
 
@@ -173,6 +180,14 @@ class _DrawingToolbarComponent extends React.Component {
 
     if (closestToolbarElement === null && closestFloaterElement === null) {
       this.setState({ opened: '' })
+    }
+  }
+
+  clearTimeoutId() {
+    if (this.timeoutId) {
+      clearTimeout(this.timeoutId)
+
+      this.timeoutId = undefined
     }
   }
 
