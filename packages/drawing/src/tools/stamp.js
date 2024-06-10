@@ -37,6 +37,11 @@ export class StampTool extends PositionableObject {
     this.#image = null
 
     this.#publicStorage = publicStorageProvider
+
+    this._cursorString = `url("${this.#publicStorage.getUrl(
+      this.#publicStorage.types.STAMP,
+      cursorName,
+    )}") 5 19, crosshair`
   }
 
   configure(props) {
@@ -55,13 +60,6 @@ export class StampTool extends PositionableObject {
 
     this._canvas.defaultCursor = this._cursorString
     this._canvas.setCursor(this._cursorString)
-  }
-
-  get _cursorString() {
-    return `url("${this.#publicStorage.getUrl(
-      this.#publicStorage.types.STAMP,
-      cursorName,
-    )}") 5 19, crosshair`
   }
 
   _onLoad = (image) => {
