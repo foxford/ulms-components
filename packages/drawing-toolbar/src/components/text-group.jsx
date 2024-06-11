@@ -5,8 +5,12 @@ import { toolEnum, defaultToolSettings } from '@ulms/ui-drawing'
 import IconText from '../icons/text-tool-icon.svg'
 
 import { intlID } from '../../lang/constants'
+
+import {
+  compactSettingsGroupContainerStyles,
+  settingsGroupContainerStyles,
+} from '../constants'
 import { HEXtoRGB, RGBtoHEX } from '../utils'
-import { settingsGroupContainerStyles } from '../constants'
 
 import { ToolbarButton } from './toolbar-button'
 import { SettingsGroup } from './settings-group'
@@ -60,25 +64,47 @@ export class TextGroup extends React.Component {
   }
 
   render() {
-    const { opened, tool, intl, handleClose, handleOpen, className } =
+    const { compact, opened, tool, intl, handleClose, handleOpen, className } =
       this.props
     const { fontSize, color } = this.state
 
     return (
       <SettingsGroup
-        direction="right-start"
-        containerStyles={settingsGroupContainerStyles}
+        direction={compact ? 'top' : 'right-start'}
+        compact={compact}
+        containerStyles={
+          compact
+            ? compactSettingsGroupContainerStyles
+            : settingsGroupContainerStyles
+        }
         isOpen={opened}
         handleClose={handleClose}
-        target={this.buttonRef.current}
+        offset={compact ? 4 : undefined}
+        target={compact ? '.drawing-toolbar' : this.buttonRef.current}
         content={
-          <div className={cn(css.column, className)}>
+          <div
+            className={cn(
+              css['settings-group'],
+              {
+                [css.column]: !compact,
+                [css.compact]: compact,
+                [css.row]: compact,
+              },
+              className,
+            )}
+          >
             <FontSettings
+              compact={compact}
               currentFontSize={fontSize}
+              gap={compact ? 12 : 4}
               handleClick={(value) => this.handleClick('fontSize', value)}
             />
-            <Divider horizontal />
+            <Divider
+              className={cn(compact && css['divider-with-margin'])}
+              horizontal={!compact}
+            />
             <ColorSettings
+              compact={compact}
               currentColor={color}
               handleClick={(value) => this.handleClick('color', value)}
             />
@@ -87,6 +113,7 @@ export class TextGroup extends React.Component {
       >
         <ToolbarButton
           active={tool === toolEnum.TEXT}
+          compact={compact}
           dataTestId="board-panel-text-button"
           title={intl.formatMessage({ id: intlID.TEXT })}
           group

@@ -20,9 +20,17 @@ const colors = [
   { dataTestId: 'board-panel-popup-color-aquamarine-button', value: '#9DF1F7' },
 ]
 
+const colorsForCompactMode = [
+  { dataTestId: 'board-panel-popup-color-black-button', value: '#000000' },
+  { dataTestId: 'board-panel-popup-color-red-button', value: '#F94B28' },
+  { dataTestId: 'board-panel-popup-color-blue-button', value: '#1A96F6' },
+  { dataTestId: 'board-panel-popup-color-green-button', value: '#7FC92E' },
+]
+
 export function ColorItem({
   active = false,
   color,
+  compact,
   dataTestId,
   handleClick,
   innerRef,
@@ -30,10 +38,11 @@ export function ColorItem({
   return (
     <ToolbarButton
       active={active}
+      compact={compact}
       dataTestId={dataTestId}
       innerRef={innerRef}
       onClick={() => handleClick(color)}
-      style={{ padding: '10px' }}
+      style={{ padding: compact ? '6px' : '10px' }}
     >
       <div
         className={css.colorCircle}
@@ -47,8 +56,17 @@ export function ColorItem({
   )
 }
 
-export function ColorSettings({ currentColor, handleClick, rows = 3 }) {
+export function ColorSettings({
+  compact,
+  currentColor,
+  handleClick,
+  rows = 3,
+}) {
   const splitColors = useMemo(() => {
+    if (compact) {
+      return [colorsForCompactMode]
+    }
+
     const chunkSize = Math.max(colors.length / rows, 1)
     const result = []
 
@@ -57,7 +75,7 @@ export function ColorSettings({ currentColor, handleClick, rows = 3 }) {
     }
 
     return result
-  }, [rows])
+  }, [compact, rows])
 
   return (
     <div className={css.wrapper}>
@@ -68,6 +86,7 @@ export function ColorSettings({ currentColor, handleClick, rows = 3 }) {
             <ColorItem
               active={currentColor.toLowerCase() === color.value.toLowerCase()}
               color={color.value}
+              compact={compact}
               dataTestId={color.dataTestId}
               handleClick={handleClick}
               key={color.value}

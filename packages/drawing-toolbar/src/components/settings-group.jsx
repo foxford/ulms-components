@@ -10,9 +10,11 @@ export function SettingsGroup({
   target,
   isOpen,
   handleClose,
+  compact,
   content,
   overlay,
   containerStyles,
+  offset,
 }) {
   return (
     <div>
@@ -29,7 +31,7 @@ export function SettingsGroup({
             backgroundColor: '#fff',
             border: '1px solid #BABCC9',
             borderRadius: 12,
-            padding: '16px',
+            padding: compact ? 8 : 16,
             minWidth: 0,
             minHeight: 0,
             ...containerStyles,
@@ -38,6 +40,7 @@ export function SettingsGroup({
           options: { zIndex: 250 },
         }}
         target={target}
+        offset={offset}
         open={isOpen}
       >
         {children}
