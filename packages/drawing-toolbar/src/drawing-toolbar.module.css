@@ -78,9 +78,20 @@
   user-select: none;
 }
 
+.tools {
+  gap: var(--gap);
+}
+
 .row {
+  --gap: var(--drawing-toolbar-gap, 8px);
+
   display: flex;
-  gap: 8px;
+}
+
+@media screen and (min-width: 375px) {
+  .root.compact .row {
+    --gap: var(--drawing-toolbar-gap, 15px);
+  }
 }
 
 .row > .button ~ .button {
@@ -88,9 +99,10 @@
 }
 
 .col {
+  --gap: var(--drawing-toolbar-gap, 8px);
+
   display: flex;
   flex-direction: column;
-  gap: 8px;
 }
 
 .col > .button ~ .button {
@@ -133,4 +145,8 @@
   line-height: 20px;
   color: #b8b8b8;
   text-align: center;
+}
+
+.toolbarButtonWrapper {
+  display: flex;
 }

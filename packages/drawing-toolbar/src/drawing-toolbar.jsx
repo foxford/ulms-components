@@ -28,6 +28,14 @@ function supportPointerEvent() {
 
 const eventName = supportPointerEvent() ? 'pointerdown' : 'mousedown'
 
+function ToolbarButtonWrapper({ children, order = 0 }) {
+  return (
+    <div className={css.toolbarButtonWrapper} style={{ order }}>
+      {children}
+    </div>
+  )
+}
+
 class _DrawingToolbarComponent extends React.Component {
   constructor(props) {
     super(props)
@@ -196,6 +204,8 @@ class _DrawingToolbarComponent extends React.Component {
       brushColor,
       brushMode,
       brushWidth,
+      className,
+      compact,
       fontSize,
       handleChange,
       sendEvent,
@@ -227,139 +237,191 @@ class _DrawingToolbarComponent extends React.Component {
     const isStampEnabled = tools && tools.includes(toolEnum.STAMP)
     const isLibraryEnabled = tools && tools.includes(toolEnum.LIB)
 
+    // eslint-disable-next-line unicorn/prefer-object-from-entries,unicorn/no-array-reduce
+    const toolsByOrder = tools.reduce(
+      (result, toolName, index) => ({
+        ...result,
+        [toolName]: index,
+      }),
+      {},
+    )
+
     return (
-      <div className={css.root}>
+      <div
+        className={cn(
+          'drawing-toolbar',
+          css.root,
+          compact && css.compact,
+          className,
+        )}
+      >
         <div
-          className={cn(mobile ? css.row : css.col)}
+          className={cn(css.tools, mobile ? css.row : css.col)}
           style={{ color: toCSSColor(brushColor) }}
         >
           {isSelectEnabled && (
-            <ToolbarButton
-              active={tool === toolEnum.SELECT}
-              dataTestId="board-panel-choose-button"
-              onClick={() => this.handleOpen(toolEnum.SELECT)}
-              title={intl.formatMessage({ id: 'SELECT' })}
-            >
-              <IconSelect />
-            </ToolbarButton>
+            <ToolbarButtonWrapper order={toolsByOrder[toolEnum.SELECT]}>
+              <ToolbarButton
+                active={tool === toolEnum.SELECT}
+                compact={compact}
+                dataTestId="board-panel-choose-button"
+                onClick={() => this.handleOpen(toolEnum.SELECT)}
+                title={intl.formatMessage({ id: 'SELECT' })}
+              >
+                <IconSelect />
+              </ToolbarButton>
+            </ToolbarButtonWrapper>
           )}
 
           {isPanEnabled && (
-            <ToolbarButton
-              active={tool === toolEnum.PAN}
-              dataTestId="board-panel-move-button"
-              onClick={() => this.handleOpen(toolEnum.PAN)}
-              title={intl.formatMessage({ id: 'HAND' })}
-            >
-              <IconPan />
-            </ToolbarButton>
+            <ToolbarButtonWrapper order={toolsByOrder[toolEnum.PAN]}>
+              <ToolbarButton
+                active={tool === toolEnum.PAN}
+                compact={compact}
+                dataTestId="board-panel-move-button"
+                onClick={() => this.handleOpen(toolEnum.PAN)}
+                title={intl.formatMessage({ id: 'HAND' })}
+              >
+                <IconPan />
+              </ToolbarButton>
+            </ToolbarButtonWrapper>
           )}
 
           {isPenEnabled && (
-            <PenGroup
-              opened={opened === toolEnum.PEN}
-              className={css.floater}
-              intl={intl}
-              tool={tool}
-              brushMode={brushMode}
-              ref={this.penGroupRef}
-              handleOpen={(options) => this.handleOpen(toolEnum.PEN, options)}
-              handleChange={handleChange}
-              containerStyles={penGroupContainerStyles}
-              direction={penGroupDirection}
-              orientation={penGroupOrientation}
-              sendEvent={sendEvent}
-              options={brushOptions}
-            />
+            <ToolbarButtonWrapper order={toolsByOrder[toolEnum.PEN]}>
+              <PenGroup
+                opened={opened === toolEnum.PEN}
+                className={css.floater}
+                compact={compact}
+                intl={intl}
+                tool={tool}
+                brushMode={brushMode}
+                ref={this.penGroupRef}
+                handleOpen={(options) => this.handleOpen(toolEnum.PEN, options)}
+                handleChange={handleChange}
+                containerStyles={penGroupContainerStyles}
+                direction={penGroupDirection}
+                orientation={penGroupOrientation}
+                sendEvent={sendEvent}
+                options={brushOptions}
+              />
+            </ToolbarButtonWrapper>
           )}
 
           {isShapeEnabled && (
-            <ShapeGroup
-              dataTestId="board-panel-group-shape-button"
-              opened={opened === toolEnum.SHAPE}
-              className={css.floater}
-              intl={intl}
-              tool={tool}
-              brushMode={brushMode}
-              ref={this.shapeGroupRef}
-              handleOpen={(options) => this.handleOpen(toolEnum.SHAPE, options)}
-              handleChange={handleChange}
-              sendEvent={sendEvent}
-              options={brushOptions}
-            />
+            <ToolbarButtonWrapper order={toolsByOrder[toolEnum.SHAPE]}>
+              <ShapeGroup
+                dataTestId="board-panel-group-shape-button"
+                compact={compact}
+                opened={opened === toolEnum.SHAPE}
+                className={css.floater}
+                intl={intl}
+                tool={tool}
+                brushMode={brushMode}
+                ref={this.shapeGroupRef}
+                handleOpen={(options) =>
+                  this.handleOpen(toolEnum.SHAPE, options)
+                }
+                handleChange={handleChange}
+                sendEvent={sendEvent}
+                options={brushOptions}
+              />
+            </ToolbarButtonWrapper>
           )}
 
           {isLineEnabled && (
-            <LineGroup
-              opened={opened === toolEnum.LINE}
-              className={css.floater}
-              intl={intl}
-              tool={tool}
-              brushMode={brushMode}
-              ref={this.lineGroupRef}
-              handleOpen={(options) => this.handleOpen(toolEnum.LINE, options)}
-              handleChange={handleChange}
-              sendEvent={sendEvent}
-              options={brushOptions}
-            />
+            <ToolbarButtonWrapper order={toolsByOrder[toolEnum.LINE]}>
+              <LineGroup
+                opened={opened === toolEnum.LINE}
+                className={css.floater}
+                compact={compact}
+                intl={intl}
+                tool={tool}
+                brushMode={brushMode}
+                ref={this.lineGroupRef}
+                handleOpen={(options) =>
+                  this.handleOpen(toolEnum.LINE, options)
+                }
+                handleChange={handleChange}
+                sendEvent={sendEvent}
+                options={brushOptions}
+              />
+            </ToolbarButtonWrapper>
           )}
 
           {isTextEnabled && (
-            <TextGroup
-              opened={opened === toolEnum.TEXT}
-              className={css.floater}
-              intl={intl}
-              tool={tool}
-              ref={this.textGroupRef}
-              handleOpen={(options) => this.handleOpen(toolEnum.TEXT, options)}
-              handleChange={handleChange}
-              sendEvent={sendEvent}
-              options={brushOptions}
-            />
+            <ToolbarButtonWrapper order={toolsByOrder[toolEnum.TEXT]}>
+              <TextGroup
+                opened={opened === toolEnum.TEXT}
+                className={css.floater}
+                compact={compact}
+                intl={intl}
+                tool={tool}
+                ref={this.textGroupRef}
+                handleOpen={(options) =>
+                  this.handleOpen(toolEnum.TEXT, options)
+                }
+                handleChange={handleChange}
+                sendEvent={sendEvent}
+                options={brushOptions}
+              />
+            </ToolbarButtonWrapper>
           )}
 
           {isEraserEnabled && (
-            <ToolbarButton
-              active={tool === toolEnum.ERASER}
-              dataTestId="board-panel-eraser-button"
-              onClick={() => this.handleOpen(toolEnum.ERASER)}
-              title={intl.formatMessage({ id: 'ERASER' })}
-            >
-              <IconEraser />
-            </ToolbarButton>
+            <ToolbarButtonWrapper order={toolsByOrder[toolEnum.ERASER]}>
+              <ToolbarButton
+                active={tool === toolEnum.ERASER}
+                compact={compact}
+                dataTestId="board-panel-eraser-button"
+                onClick={() => this.handleOpen(toolEnum.ERASER)}
+                title={intl.formatMessage({ id: 'ERASER' })}
+              >
+                <IconEraser />
+              </ToolbarButton>
+            </ToolbarButtonWrapper>
           )}
 
           {isImageEnabled && (
-            <ToolbarButton
-              active={tool === toolEnum.IMAGE}
-              dataTestId="board-panel-image-button"
-              onClick={this.handleImageClick}
-              title={intl.formatMessage({ id: 'UPLOAD_IMAGE' })}
-            >
-              <IconImage />
-            </ToolbarButton>
+            <ToolbarButtonWrapper order={toolsByOrder[toolEnum.IMAGE]}>
+              <ToolbarButton
+                active={tool === toolEnum.IMAGE}
+                compact={compact}
+                dataTestId="board-panel-image-button"
+                onClick={this.handleImageClick}
+                title={intl.formatMessage({ id: 'UPLOAD_IMAGE' })}
+              >
+                <IconImage />
+              </ToolbarButton>
+            </ToolbarButtonWrapper>
           )}
 
           {isStampEnabled && (
-            <ToolbarButton
-              active={tool === toolEnum.STAMP}
-              dataTestId="board-panel-stamps-button"
-              onClick={this.handleStampClick}
-              title={intl.formatMessage({ id: 'STAMP' })}
-            >
-              <IconStamp />
-            </ToolbarButton>
+            <ToolbarButtonWrapper order={toolsByOrder[toolEnum.STAMP]}>
+              <ToolbarButton
+                active={tool === toolEnum.STAMP}
+                compact={compact}
+                dataTestId="board-panel-stamps-button"
+                onClick={this.handleStampClick}
+                title={intl.formatMessage({ id: 'STAMP' })}
+              >
+                <IconStamp />
+              </ToolbarButton>
+            </ToolbarButtonWrapper>
           )}
 
           {isLibraryEnabled && (
-            <ToolbarButton
-              active={tool === toolEnum.LIB}
-              dataTestId="board-panel-library-button"
-              onClick={this.handleLibClick}
-              title={intl.formatMessage({ id: 'LIB' })}
-            >
-              <IconLibrary />
-            </ToolbarButton>
+            <ToolbarButtonWrapper order={toolsByOrder[toolEnum.LIB]}>
+              <ToolbarButton
+                active={tool === toolEnum.LIB}
+                compact={compact}
+                dataTestId="board-panel-library-button"
+                onClick={this.handleLibClick}
+                title={intl.formatMessage({ id: 'LIB' })}
+              >
+                <IconLibrary />
+              </ToolbarButton>
+            </ToolbarButtonWrapper>
           )}
         </div>
       </div>

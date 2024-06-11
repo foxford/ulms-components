@@ -16,8 +16,12 @@ import IconSolidTriangle from '../icons/solid-triangle-tool-icon.svg'
 import IconSolidRightTriangle from '../icons/solid-right-triangle-tool-icon.svg'
 
 import { intlID } from '../../lang/constants'
+
+import {
+  compactSettingsGroupContainerStyles,
+  settingsGroupContainerStyles,
+} from '../constants'
 import { HEXtoRGB, RGBtoHEX } from '../utils'
-import { settingsGroupContainerStyles } from '../constants'
 
 import { IconGroupSettings } from './icon-group-settings'
 import { ToolbarButton } from './toolbar-button'
@@ -151,42 +155,83 @@ export class ShapeGroup extends React.Component {
   }
 
   render() {
-    const { opened, tool, handleClose, handleOpen, className, intl } =
+    const { className, compact, handleClose, handleOpen, intl, opened, tool } =
       this.props
     const { brushMode, color } = this.state
 
+    const solidToggleIconSet = [
+      this.iconsSet.find(({ key }) => key.startsWith(brushMode.split('-')[0])),
+      this.solidIconsSet.find(({ key }) => key.startsWith(brushMode)),
+    ]
+
     return (
       <SettingsGroup
-        direction="right-start"
-        containerStyles={settingsGroupContainerStyles}
+        direction={compact ? 'top' : 'right-start'}
+        compact={compact}
+        containerStyles={
+          compact
+            ? compactSettingsGroupContainerStyles
+            : settingsGroupContainerStyles
+        }
         isOpen={opened}
         handleClose={handleClose}
-        target={this.buttonRef.current}
+        offset={compact ? 4 : undefined}
+        target={compact ? '.drawing-toolbar' : this.buttonRef.current}
         content={
-          <div className={cn(css.column, className)}>
+          <div
+            className={cn(
+              css['settings-group'],
+              {
+                [css.column]: !compact,
+                [css.compact]: compact,
+                [css.row]: compact,
+              },
+              className,
+            )}
+          >
+            {compact && (
+              <>
+                <IconGroupSettings
+                  compact={compact}
+                  currentSelection={brushMode}
+                  gap={12}
+                  handleClick={(value) => this.handleClick('brushMode', value)}
+                  iconsSet={solidToggleIconSet}
+                />
+                <Divider className={css['divider-with-margin_l']} />
+              </>
+            )}
             <IconGroupSettings
+              compact={compact}
+              gap={compact ? 16 : 4}
               iconsSet={this.iconsSet}
               currentSelection={brushMode}
               handleClick={(value) => this.handleClick('brushMode', value)}
             />
-            <Divider horizontal />
-            <IconGroupSettings
-              iconsSet={this.solidIconsSet}
-              currentSelection={brushMode}
-              handleClick={(value) => this.handleClick('brushMode', value)}
-            />
-            <Divider horizontal />
-            <ColorSettings
-              currentColor={color}
-              handleClick={(value) => this.handleClick('color', value)}
-            />
+
+            {!compact && (
+              <>
+                <Divider horizontal />
+                <IconGroupSettings
+                  iconsSet={this.solidIconsSet}
+                  currentSelection={brushMode}
+                  handleClick={(value) => this.handleClick('brushMode', value)}
+                />
+                <Divider horizontal />
+                <ColorSettings
+                  currentColor={color}
+                  handleClick={(value) => this.handleClick('color', value)}
+                />
+              </>
+            )}
           </div>
         }
       >
         <ToolbarButton
           active={tool === toolEnum.SHAPE}
+          compact={compact}
           dataTestId="board-panel-group-shape-button"
-          group
+          group={!compact}
           groupColor={color}
           title={intl.formatMessage({ id: intlID.SHAPE })}
           onClick={() => handleOpen(this.getOptions())}

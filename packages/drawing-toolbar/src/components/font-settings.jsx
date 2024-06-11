@@ -14,7 +14,7 @@ const testAttributes = {
 }
 
 // eslint-disable-next-line import/prefer-default-export
-export function FontSettings({ currentFontSize, handleClick }) {
+export function FontSettings({ compact, currentFontSize, gap, handleClick }) {
   const fontIcons = {
     [fontSizes[0]]: <IconText32 />,
     [fontSizes[1]]: <IconText48 />,
@@ -30,7 +30,9 @@ export function FontSettings({ currentFontSize, handleClick }) {
   return (
     <IconGroupSettings
       iconsSet={iconsSet}
+      compact={compact}
       currentSelection={currentFontSize}
+      gap={gap}
       handleClick={handleClick}
     />
   )
