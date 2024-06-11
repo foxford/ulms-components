@@ -7,6 +7,7 @@ import css from './toolbar-button.module.css'
 export function ToolbarButton({
   active = false,
   children,
+  compact,
   dataTestId,
   fillWidth = false,
   group = false,
@@ -20,12 +21,12 @@ export function ToolbarButton({
   return (
     <div
       ref={innerRef}
-      className={cn(
-        css.button,
-        fillWidth && css.button_fillWidth,
-        active && css.button_active,
-        padded && css.button_padded,
-      )}
+      className={cn(css.button, {
+        [css.button_active]: active,
+        [css.button_fillWidth]: fillWidth,
+        [css.button_padded]: padded,
+        [css.compact]: compact,
+      })}
       data-testid={dataTestId}
       onClick={onClick}
       role="button"

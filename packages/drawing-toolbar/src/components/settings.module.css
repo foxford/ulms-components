@@ -9,12 +9,26 @@
 }
 
 .row {
+  --gap: 4px;
+
   padding: 0;
   margin: 0;
-  gap: 4px;
+  gap: var(--gap);
   display: flex;
   flex-flow: row nowrap;
   align-items: center;
+}
+
+.gap-4 {
+  --gap: 4px;
+}
+
+.gap-12 {
+  --gap: 12px;
+}
+
+.gap-16 {
+  --gap: 16px;
 }
 
 .horizontal .colorRow {
@@ -22,6 +36,12 @@
   grid-template-columns: repeat(auto-fill, 36px);
   grid-gap: 0 4px;
   max-width: 240px;
+}
+
+.compact .colorRow {
+  grid-template-columns: repeat(auto-fill, 32px);
+  max-width: 180px;
+  grid-gap: 0 12px;
 }
 
 .horizontal .colorRow > div {
@@ -46,6 +66,7 @@
 
 .horizontal .column__group {
   flex-direction: row;
+  align-items: center;
 }
 
 .colorCircle {
@@ -60,9 +81,37 @@
   transform: rotate(-45deg);
 }
 
+.settings-group .divider-with-margin {
+  margin: 0 12px;
+  height: 28px;
+}
+
+.settings-group .divider-with-margin_l {
+  margin: 0 20px;
+  height: 28px;
+}
+
 @media screen and (max-width: 1899px) {
-  .colorCircle {
+  .settings-group:not(.compact) .colorCircle {
     width: 16px;
     height: 16px;
+  }
+}
+
+@media screen and (max-width: 374px) {
+  .compact .colorRow {
+    grid-gap: 0 6px;
+  }
+
+  .compact.row {
+    --gap: 4px;
+  }
+
+  .settings-group .divider-with-margin {
+    margin: 0 8px;
+  }
+
+  .settings-group .column__group .divider-with-margin {
+    margin: 0 12px;
   }
 }

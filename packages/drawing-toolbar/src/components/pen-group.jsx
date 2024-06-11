@@ -12,6 +12,10 @@ import IconMarker from '../icons/marker-tool-icon.svg'
 
 import { intlID } from '../../lang/constants'
 
+import {
+  compactSettingsGroupContainerStyles,
+  settingsGroupContainerStyles,
+} from '../constants'
 import { HEXtoRGB, RGBtoHEX } from '../utils'
 
 import { IconGroupSettings } from './icon-group-settings'
@@ -41,13 +45,13 @@ const markerToLineMap = {
 export class PenGroup extends React.Component {
   constructor(props) {
     super(props)
-    const { intl } = props
+    const { compact, intl } = props
 
     this.buttonRef = React.createRef()
 
     let penColor = defaultToolSettings.color
     let penSize = defaultToolSettings.size
-    let { markerColor } = defaultToolSettings
+    let markerColor = compact ? penColor : defaultToolSettings.markerColor
     let { markerSize } = defaultToolSettings
     let brushMode = penToolModeEnum.PENCIL
 
@@ -166,12 +170,13 @@ export class PenGroup extends React.Component {
 
   render() {
     const {
+      compact,
       opened,
       tool,
       handleClose,
       handleOpen,
       className,
-      containerStyles = { marginTop: '-16px', marginLeft: '-2px' },
+      containerStyles = settingsGroupContainerStyles,
       direction = 'right-start',
       orientation = 'vertical',
     } = this.props
@@ -179,49 +184,93 @@ export class PenGroup extends React.Component {
 
     return (
       <SettingsGroup
+        compact={compact}
         direction={direction}
-        containerStyles={containerStyles}
+        containerStyles={
+          compact ? compactSettingsGroupContainerStyles : containerStyles
+        }
         isOpen={opened}
         handleClose={handleClose}
-        target={this.buttonRef.current}
+        offset={compact ? 4 : undefined}
+        target={compact ? '.drawing-toolbar' : this.buttonRef.current}
         content={
-          <div className={cn(css.column, css[orientation], className)}>
+          <div
+            className={cn(
+              css['settings-group'],
+              css[orientation],
+              {
+                [css.column]: !compact,
+                [css.compact]: compact,
+                [css.row]: compact,
+              },
+              className,
+            )}
+          >
             <div className={css.column__group}>
               <IconGroupSettings
                 iconsSet={this.iconsSet}
+                compact={compact}
                 currentSelection={brushMode}
+                gap={compact ? 12 : 4}
                 handleClick={(value) => this.handleClick('brushMode', value)}
               />
-              <Divider horizontal={orientation === 'vertical'} />
-              <LineSettings
-                currentSize={
-                  brushMode === penToolModeEnum.MARKER ? markerSize : penSize
-                }
-                dashed={brushMode === penToolModeEnum.DASHED_PENCIL}
-                handleClick={(value) =>
-                  brushMode === penToolModeEnum.MARKER
-                    ? this.handleClick('markerSize', value)
-                    : this.handleClick('penSize', value)
-                }
+              <Divider
+                className={cn(compact && css['divider-with-margin'])}
+                horizontal={orientation === 'vertical'}
               />
+              {compact ? (
+                <ColorSettings
+                  compact
+                  currentColor={
+                    brushMode === penToolModeEnum.MARKER
+                      ? markerColor
+                      : penColor
+                  }
+                  handleClick={(value) =>
+                    brushMode === penToolModeEnum.MARKER
+                      ? this.handleClick('markerColor', value)
+                      : this.handleClick('penColor', value)
+                  }
+                />
+              ) : (
+                <LineSettings
+                  currentSize={
+                    brushMode === penToolModeEnum.MARKER ? markerSize : penSize
+                  }
+                  dashed={brushMode === penToolModeEnum.DASHED_PENCIL}
+                  handleClick={(value) =>
+                    brushMode === penToolModeEnum.MARKER
+                      ? this.handleClick('markerSize', value)
+                      : this.handleClick('penSize', value)
+                  }
+                />
+              )}
             </div>
-            <Divider horizontal />
-            <ColorSettings
-              currentColor={
-                brushMode === penToolModeEnum.MARKER ? markerColor : penColor
-              }
-              handleClick={(value) =>
-                brushMode === penToolModeEnum.MARKER
-                  ? this.handleClick('markerColor', value)
-                  : this.handleClick('penColor', value)
-              }
-              rows={orientation === 'horizontal' ? 2 : 3}
-            />
+            {!compact && (
+              <>
+                <Divider horizontal />
+                <ColorSettings
+                  compact={compact}
+                  currentColor={
+                    brushMode === penToolModeEnum.MARKER
+                      ? markerColor
+                      : penColor
+                  }
+                  handleClick={(value) =>
+                    brushMode === penToolModeEnum.MARKER
+                      ? this.handleClick('markerColor', value)
+                      : this.handleClick('penColor', value)
+                  }
+                  rows={orientation === 'horizontal' ? 2 : 3}
+                />
+              </>
+            )}
           </div>
         }
       >
         <ToolbarButton
           active={tool === toolEnum.PEN}
+          compact={compact}
           dataTestId="board-panel-group-pen-button"
           group
           groupColor={

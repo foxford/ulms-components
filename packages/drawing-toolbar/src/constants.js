@@ -34,6 +34,12 @@ export const settingsGroupContainerStyles = {
   marginLeft: '-2px',
 }
 
+export const compactSettingsGroupContainerStyles = {
+  display: 'flex',
+  justifyContent: 'center',
+  minWidth: 'var(--drawing-toolbar-settings-group-min-width, 290px)',
+}
+
 export const contextMenuContainerStyles = (direction) => ({
   left: '-12px',
   padding: '8px 12px',
