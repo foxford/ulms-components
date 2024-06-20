@@ -198,3 +198,9 @@
   vertical-align: text-top;
   line-height: 1em;
 }
+
+.transformWrapper,
+.transformComponent {
+  height: 100% !important;
+  width: 100% !important;
+}
