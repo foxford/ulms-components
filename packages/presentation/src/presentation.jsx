@@ -1,4 +1,4 @@
-/* eslint-disable max-len, react/prop-types, jsx-a11y/no-static-element-interactions, react/jsx-one-expression-per-line,max-classes-per-file */
+/* eslint-disable max-len, react/prop-types, jsx-a11y/no-static-element-interactions, react/jsx-one-expression-per-line,max-classes-per-file,react/jsx-props-no-spreading */
 import React from 'react'
 import { injectIntl, IntlProvider } from 'react-intl'
 import VisibilitySensor from 'react-visibility-sensor'
@@ -8,6 +8,7 @@ import scrollIntoView from 'scroll-into-view-if-needed'
 import { Icons } from '@ulms/ui-icons'
 import { SizeMe } from 'react-sizeme'
 import { Spinner } from '@ulms/ui-spinner'
+import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch'
 
 import { messagesIntl } from '../lang/index'
 
@@ -155,6 +156,7 @@ class PresentationComponent extends React.Component {
       showPagesCount,
       showPreviews,
       slotSlide,
+      transformWrapperProps,
     } = this.props
 
     return (
@@ -234,24 +236,31 @@ class PresentationComponent extends React.Component {
                     ref={innerRef}
                     data-id="presentation-slide"
                   >
-                    <img
-                      alt="mainimage"
-                      className={cx(css.mainImage, {
-                        [css[`centered${centered}`]]: !fitToWidth,
-                      })}
-                      src={collection[index].image}
-                      width={imageSize.width}
-                      height={imageSize.height}
-                    />
-                    {slotSlide && (
-                      <div
-                        className={cx(css.slotSlide, {
-                          [css[`centered${centered}`]]: !fitToWidth,
-                        })}
+                    <TransformWrapper disabled {...transformWrapperProps}>
+                      <TransformComponent
+                        contentClass={css.transformComponent}
+                        wrapperClass={css.transformWrapper}
                       >
-                        {slotSlide(imageSize.width, imageSize.height)}
-                      </div>
-                    )}
+                        <img
+                          alt="mainimage"
+                          className={cx(css.mainImage, {
+                            [css[`centered${centered}`]]: !fitToWidth,
+                          })}
+                          src={collection[index].image}
+                          width={imageSize.width}
+                          height={imageSize.height}
+                        />
+                        {slotSlide && (
+                          <div
+                            className={cx(css.slotSlide, {
+                              [css[`centered${centered}`]]: !fitToWidth,
+                            })}
+                          >
+                            {slotSlide(imageSize.width, imageSize.height)}
+                          </div>
+                        )}
+                      </TransformComponent>
+                    </TransformWrapper>
                   </div>
                 )
               } else {
@@ -353,7 +362,6 @@ export class PresentationIntl extends React.PureComponent {
         locale={locale}
         messages={messagesIntl[locale]}
       >
-        {/* eslint-disable-next-line react/jsx-props-no-spreading */}
         <PresentationComponentIntl {...props} innerRef={innerRef} />
       </IntlProvider>
     )
