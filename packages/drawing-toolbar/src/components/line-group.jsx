@@ -11,8 +11,12 @@ import IconDashedLine from '../icons/dashed-line-tool-icon.svg'
 import IconArrow from '../icons/arrow-tool-icon.svg'
 
 import { intlID } from '../../lang/constants'
+
+import {
+  compactSettingsGroupContainerStyles,
+  settingsGroupContainerStyles,
+} from '../constants'
 import { HEXtoRGB, RGBtoHEX } from '../utils'
-import { settingsGroupContainerStyles } from '../constants'
 
 import { IconGroupSettings } from './icon-group-settings'
 import { ToolbarButton } from './toolbar-button'
@@ -112,39 +116,77 @@ export class LineGroup extends React.Component {
   }
 
   render() {
-    const { opened, tool, handleClose, handleOpen, className } = this.props
+    const { compact, opened, tool, handleClose, handleOpen, className } =
+      this.props
     const { brushMode, size, color } = this.state
 
     return (
       <SettingsGroup
-        direction="right-start"
-        containerStyles={settingsGroupContainerStyles}
+        direction={compact ? 'top' : 'right-start'}
+        compact={compact}
+        containerStyles={
+          compact
+            ? compactSettingsGroupContainerStyles
+            : settingsGroupContainerStyles
+        }
         isOpen={opened}
         handleClose={handleClose}
-        target={this.buttonRef.current}
+        offset={compact ? 4 : undefined}
+        target={compact ? '.drawing-toolbar' : this.buttonRef.current}
         content={
-          <div className={cn(css.column, className)}>
+          <div
+            className={cn(
+              css['settings-group'],
+              {
+                [css.column]: !compact,
+                [css.compact]: compact,
+                [css.row]: compact,
+              },
+              className,
+            )}
+          >
             <IconGroupSettings
+              compact={compact}
               iconsSet={this.iconsSet}
               currentSelection={brushMode}
+              gap={compact ? 12 : 4}
               handleClick={(value) => this.handleClick('brushMode', value)}
             />
-            <Divider horizontal />
-            <LineSettings
-              currentSize={size}
-              dashed={brushMode === lineToolModeEnum.DASHED_LINE}
-              handleClick={(value) => this.handleClick('size', value)}
-            />
-            <Divider horizontal />
-            <ColorSettings
-              currentColor={color}
-              handleClick={(value) => this.handleClick('color', value)}
-            />
+
+            {compact && (
+              <>
+                <Divider
+                  className={cn(compact && css['divider-with-margin'])}
+                />
+                <ColorSettings
+                  compact={compact}
+                  currentColor={color}
+                  handleClick={(value) => this.handleClick('color', value)}
+                />
+              </>
+            )}
+
+            {!compact && (
+              <>
+                <Divider horizontal />
+                <LineSettings
+                  currentSize={size}
+                  dashed={brushMode === lineToolModeEnum.DASHED_LINE}
+                  handleClick={(value) => this.handleClick('size', value)}
+                />
+                <Divider horizontal />
+                <ColorSettings
+                  currentColor={color}
+                  handleClick={(value) => this.handleClick('color', value)}
+                />
+              </>
+            )}
           </div>
         }
       >
         <ToolbarButton
           active={tool === toolEnum.LINE}
+          compact={compact}
           dataTestId="board-panel-group-line-button"
           group
           groupColor={color}
