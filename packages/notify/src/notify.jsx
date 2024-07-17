@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types,react/jsx-props-no-spreading */
-import React from 'react'
+import React, { useEffect } from 'react'
 import cn from 'classnames-es'
 import { cssTransition, toast, ToastContainer } from 'react-toastify'
 
@@ -21,7 +21,25 @@ const ALERT_SIZE = {
   SMALL: 's',
 }
 
-function NotificationContainer({ className, containerProps = {}, isCompact }) {
+function NotificationContainer({
+  className,
+  containerProps = {},
+  isCompact,
+  onMount,
+  onUnmount,
+}) {
+  useEffect(() => {
+    if (onMount) {
+      onMount()
+    }
+
+    return () => {
+      if (onUnmount) {
+        onUnmount()
+      }
+    }
+  }, [])
+
   return (
     <ToastContainer
       autoClose={4000}
