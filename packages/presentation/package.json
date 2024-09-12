@@ -1,6 +1,6 @@
 {
   "name": "@ulms/ui-presentation",
-  "version": "1.10.1",
+  "version": "1.11.0",
   "license": "MIT",
   "main": "index.js",
   "module": "es/index.js",
@@ -12,7 +12,6 @@
   },
   "dependencies": {
     "@ulms/ui-icons": "^1.1.0",
-    "@ulms/ui-spinner": "^1.1.0",
     "classnames-es": "2.2.6",
     "lodash": "~4.17.21",
     "prop-types": "^15.8.1",

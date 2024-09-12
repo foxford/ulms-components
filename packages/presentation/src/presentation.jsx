@@ -7,10 +7,11 @@ import PropTypes from 'prop-types'
 import scrollIntoView from 'scroll-into-view-if-needed'
 import { Icons } from '@ulms/ui-icons'
 import { SizeMe } from 'react-sizeme'
-import { Spinner } from '@ulms/ui-spinner'
 import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch'
 
 import { messagesIntl } from '../lang/index'
+
+import Spinner from './spinner'
 
 import css from './presentation.module.css'
 
